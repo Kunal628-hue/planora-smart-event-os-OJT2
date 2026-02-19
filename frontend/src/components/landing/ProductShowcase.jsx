@@ -3,7 +3,7 @@ import { animate } from "animejs";
 import useReveal from "../../hooks/useReveal";
 
 /* ── Waveform bars (ambient animation) ── */
-function Waveform({ color = "#8b5cf6" }) {
+function Waveform({ color = "#3b82f6" }) {
     return (
         <div style={{ display: "flex", alignItems: "flex-end", gap: 3, height: 32 }}>
             {[0.6, 1, 0.75, 0.9, 0.55, 1, 0.7, 0.85, 0.45, 0.95, 0.65, 1, 0.8].map((h, i) => (
@@ -15,6 +15,7 @@ function Waveform({ color = "#8b5cf6" }) {
                         background: color,
                         opacity: 0.7,
                         transformOrigin: "bottom",
+                        /* eslint-disable-next-line react-hooks/purity */
                         animation: `wave-bar ${0.9 + Math.random() * 0.8}s ease-in-out ${i * 80}ms infinite`,
                         height: `${h * 100}%`,
                     }}
@@ -58,13 +59,13 @@ function AnimatedChart() {
             <svg viewBox="0 0 540 130" fill="none" style={{ width: "100%", height: 130, display: "block" }}>
                 <defs>
                     <linearGradient id="areaGrad2" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.3" />
-                        <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
+                        <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3" />
+                        <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
                     </linearGradient>
                     <linearGradient id="lineGrad2" x1="0" y1="0" x2="540" y2="0" gradientUnits="userSpaceOnUse">
-                        <stop stopColor="#8b5cf6" />
-                        <stop offset="0.5" stopColor="#6366f1" />
-                        <stop offset="1" stopColor="#6ee7b7" />
+                        <stop stopColor="#3b82f6" />
+                        <stop offset="0.5" stopColor="#2563eb" />
+                        <stop offset="1" stopColor="#22d3ee" />
                     </linearGradient>
                 </defs>
                 {/* Grid lines */}
@@ -139,7 +140,7 @@ function FullDashboard() {
         <div id="product-dashboard" style={{
             background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)",
             borderRadius: "var(--radius-xl)", overflow: "hidden",
-            boxShadow: "0 48px 120px rgba(0,0,0,0.55), 0 0 0 1px rgba(139,92,246,0.1)",
+            boxShadow: "0 48px 120px rgba(0,0,0,0.55), 0 0 0 1px rgba(59,130,246,0.1)",
         }}>
             {/* Chrome */}
             <div style={{
@@ -184,7 +185,7 @@ function FullDashboard() {
 
                     {/* Waveform ambient */}
                     <div style={{ marginTop: "auto", paddingTop: "1rem" }}>
-                        <Waveform color="#8b5cf6" />
+                        <Waveform color="#3b82f6" />
                     </div>
                 </div>
 
@@ -193,8 +194,8 @@ function FullDashboard() {
                     {/* Stat row */}
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "0.75rem" }}>
                         {[
-                            { label: "Total Revenue", val: `₹${counts.revenue.toLocaleString()}`, icon: "💰", color: "#a78bfa" },
-                            { label: "Tickets Sold", val: counts.tickets.toLocaleString(), icon: "🎟️", color: "#6ee7b7" },
+                            { label: "Total Revenue", val: `₹${counts.revenue.toLocaleString()}`, icon: "💰", color: "#3b82f6" },
+                            { label: "Tickets Sold", val: counts.tickets.toLocaleString(), icon: "🎟️", color: "#34d399" },
                             { label: "Check-ins", val: counts.checkins.toLocaleString(), icon: "✅", color: "#60a5fa" },
                             { label: "Satisfaction", val: `${counts.satisfaction}%`, icon: "⭐", color: "#f59e0b" },
                         ].map((s) => (

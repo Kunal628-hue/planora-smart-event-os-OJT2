@@ -12,7 +12,7 @@ const STEPS = [
                 <path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
             </svg>
         ),
-        color: "#8b5cf6",
+        color: "#3b82f6",
     },
     {
         number: "02",
@@ -25,7 +25,7 @@ const STEPS = [
                 <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
             </svg>
         ),
-        color: "#6366f1",
+        color: "#2563eb",
     },
     {
         number: "03",
@@ -36,7 +36,7 @@ const STEPS = [
                 <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
             </svg>
         ),
-        color: "#06b6d4",
+        color: "#22d3ee",
     },
 ];
 
@@ -158,7 +158,7 @@ export default function HowItWorks() {
                     }}>
                         <div ref={lineRef} style={{
                             height: "100%", width: "0%",
-                            background: "linear-gradient(90deg, #8b5cf6, #6366f1, #06b6d4)",
+                            background: "linear-gradient(90deg, #3b82f6, #2563eb, #22d3ee)",
                             borderRadius: 1, opacity: 0,
                         }} />
                     </div>
@@ -177,10 +177,10 @@ export default function HowItWorks() {
                             style={{
                                 width: activeStep === i ? 24 : 7,
                                 height: 7, borderRadius: 4,
-                                background: activeStep === i ? "#8b5cf6" : "var(--border-subtle)",
+                                background: activeStep === i ? "#3b82f6" : "var(--border-subtle)",
                                 border: "none", cursor: "pointer",
                                 transition: "all 0.35s ease",
-                                boxShadow: activeStep === i ? "0 0 10px rgba(139,92,246,0.5)" : "none",
+                                boxShadow: activeStep === i ? "0 0 10px rgba(59,130,246,0.5)" : "none",
                             }}
                         />
                     ))}

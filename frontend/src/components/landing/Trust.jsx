@@ -65,9 +65,9 @@ export default function Trust() {
                                 whiteSpace: "nowrap",
                             }}
                             onMouseEnter={(e) => {
-                                e.currentTarget.style.background = "rgba(139,92,246,0.12)";
-                                e.currentTarget.style.borderColor = "rgba(139,92,246,0.35)";
-                                e.currentTarget.style.color = "#c4b5fd";
+                                e.currentTarget.style.background = "rgba(59,130,246,0.12)";
+                                e.currentTarget.style.borderColor = "rgba(59,130,246,0.35)";
+                                e.currentTarget.style.color = "#93c5fd";
                             }}
                             onMouseLeave={(e) => {
                                 e.currentTarget.style.background = "var(--bg-elevated)";
@@ -77,7 +77,7 @@ export default function Trust() {
                         >
                             <span style={{
                                 width: 5, height: 5, borderRadius: "50%",
-                                background: i % 3 === 0 ? "#8b5cf6" : i % 3 === 1 ? "#6ee7b7" : "#6366f1",
+                                background: i % 3 === 0 ? "#3b82f6" : i % 3 === 1 ? "#34d399" : "#2563eb",
                                 display: "inline-block", flexShrink: 0,
                             }} />
                             {org}

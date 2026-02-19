@@ -8,28 +8,28 @@
 
 /* ── CSS Design Tokens ───────────────────── */
 :root {
-  --bg-base: #0b0d14;
-  --bg-surface: #0f1119;
-  --bg-elevated: #13151f;
-  --bg-card: #161925;
-  --accent-purple: #8b5cf6;
-  --accent-indigo: #6366f1;
-  --accent-violet: #7c3aed;
-  --glow-color: rgba(139, 92, 246, 0.32);
-  --glow-subtle: rgba(139, 92, 246, 0.12);
-  --text-primary: #f1f5f9;
+  --bg-base: #020617;
+  --bg-surface: #0f172a;
+  --bg-elevated: #1e293b;
+  --bg-card: #0f172a;
+  --accent-purple: #3b82f6;
+  --accent-indigo: #2563eb;
+  --accent-violet: #1d4ed8;
+  --glow-color: rgba(59, 130, 246, 0.32);
+  --glow-subtle: rgba(59, 130, 246, 0.12);
+  --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
-  --text-muted: #475569;
-  --text-xmuted: #2d3a50;
-  --border-subtle: rgba(255, 255, 255, 0.055);
-  --border-accent: rgba(139, 92, 246, 0.22);
+  --text-muted: #64748b;
+  --text-xmuted: #334155;
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-accent: rgba(59, 130, 246, 0.22);
   --radius-sm: 0.5rem;
   --radius-md: 0.75rem;
   --radius-lg: 1.125rem;
   --radius-xl: 1.5rem;
   --radius-2xl: 2rem;
-  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.35);
-  --shadow-glow: 0 0 48px rgba(139, 92, 246, 0.2);
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.45);
+  --shadow-glow: 0 0 48px rgba(59, 130, 246, 0.2);
   --transition: all 0.26s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -50,7 +50,11 @@ html {
 body {
   background: var(--bg-base);
   color: var(--text-primary);
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -90,7 +94,7 @@ button {
 }
 
 ::selection {
-  background: rgba(139, 92, 246, 0.38);
+  background: rgba(59, 130, 246, 0.38);
   color: #fff;
 }
 
@@ -128,11 +132,11 @@ h6 {
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #a78bfa;
+  color: #3b82f6;
 }
 
 .gradient-text {
-  background: linear-gradient(130deg, #c4b5fd 0%, #818cf8 45%, #6ee7b7 100%);
+  background: linear-gradient(130deg, #93c5fd 0%, #3b82f6 45%, #22d3ee 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -168,15 +172,23 @@ h6 {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent-purple), var(--accent-indigo));
+  background: linear-gradient(
+    135deg,
+    var(--accent-purple),
+    var(--accent-indigo)
+  );
   color: #fff;
   border: 1px solid transparent;
-  box-shadow: 0 0 28px var(--glow-color), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 0 28px var(--glow-color),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px) scale(1.015);
-  box-shadow: 0 0 44px rgba(139, 92, 246, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 0 44px rgba(139, 92, 246, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .btn-primary:active {
@@ -207,7 +219,9 @@ h6 {
 .card:hover {
   border-color: var(--border-accent);
   transform: translateY(-5px);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(139, 92, 246, 0.12);
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(139, 92, 246, 0.12);
 }
 
 .glass-card {
@@ -220,8 +234,10 @@ h6 {
 }
 
 .glass-card:hover {
-  border-color: rgba(139, 92, 246, 0.35);
-  box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.15), 0 20px 60px rgba(0, 0, 0, 0.35);
+  border-color: rgba(59, 130, 246, 0.35);
+  box-shadow:
+    0 0 0 1px rgba(59, 130, 246, 0.15),
+    0 20px 60px rgba(0, 0, 0, 0.35);
   transform: translateY(-4px);
 }
 
@@ -250,7 +266,8 @@ h6 {
 .reveal.visible {
   opacity: 1;
   transform: translateY(0);
-  transition: opacity 0.72s cubic-bezier(0.22, 1, 0.36, 1),
+  transition:
+    opacity 0.72s cubic-bezier(0.22, 1, 0.36, 1),
     transform 0.72s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -280,7 +297,9 @@ h6 {
   align-items: center;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  transition: background 0.35s ease, border-color 0.35s ease;
+  transition:
+    background 0.35s ease,
+    border-color 0.35s ease;
 }
 
 .planora-nav.scrolled {
@@ -298,7 +317,7 @@ h6 {
   width: 34px;
   height: 34px;
   border-radius: 9px;
-  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -306,7 +325,7 @@ h6 {
   font-weight: 900;
   font-size: 1rem;
   color: #fff;
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.45);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.45);
   flex-shrink: 0;
 }
 
@@ -342,7 +361,9 @@ h6 {
   color: var(--text-primary);
   font-size: 0.9rem;
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   font-family: "Inter", sans-serif;
 }
 
@@ -438,7 +459,6 @@ h6 {
 
 /* Gentle vertical float */
 @keyframes float {
-
   0%,
   100% {
     transform: translateY(0px);
@@ -463,14 +483,17 @@ h6 {
 
 /* Glow pulse */
 @keyframes pulse-glow {
-
   0%,
   100% {
-    box-shadow: 0 0 24px rgba(139, 92, 246, 0.3), 0 0 8px rgba(139, 92, 246, 0.15);
+    box-shadow:
+      0 0 24px rgba(139, 92, 246, 0.3),
+      0 0 8px rgba(139, 92, 246, 0.15);
   }
 
   50% {
-    box-shadow: 0 0 56px rgba(139, 92, 246, 0.65), 0 0 24px rgba(139, 92, 246, 0.35);
+    box-shadow:
+      0 0 56px rgba(139, 92, 246, 0.65),
+      0 0 24px rgba(139, 92, 246, 0.35);
   }
 }
 
@@ -495,10 +518,15 @@ h6 {
 }
 
 .shimmer-hover::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.04) 50%, transparent 100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.04) 50%,
+    transparent 100%
+  );
   background-size: 600px 100%;
   opacity: 0;
   transition: opacity 0.3s;
@@ -612,7 +640,6 @@ h6 {
 
 /* Waveform bars */
 @keyframes wave-bar {
-
   0%,
   100% {
     transform: scaleY(0.35);
@@ -636,7 +663,6 @@ h6 {
 
 /* Typewriter cursor */
 @keyframes blink {
-
   0%,
   100% {
     opacity: 1;
@@ -653,7 +679,6 @@ h6 {
 
 /* Number count-up (visual placeholder glow) */
 @keyframes number-glow {
-
   0%,
   100% {
     text-shadow: 0 0 0px transparent;

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import useReveal from "../../hooks/useReveal";
 
 const FEATURES = [
@@ -14,7 +14,7 @@ const FEATURES = [
         ),
         title: "Smart Event Planning",
         desc: "Create structured timelines and track milestones effortlessly. Visualize your entire event workflow from inception to wrap-up.",
-        accent: "#8b5cf6",
+        accent: "#3b82f6",
         tags: ["Timelines", "Milestones", "Gantt View"],
     },
     {
@@ -26,7 +26,7 @@ const FEATURES = [
         ),
         title: "Budget & Sponsorship Tracking",
         desc: "Monitor allocations and manage event finances in real time. Keep every stakeholder aligned on spend and revenue.",
-        accent: "#6366f1",
+        accent: "#2563eb",
         tags: ["Live Budget", "Sponsorships", "Reports"],
     },
     {
@@ -39,7 +39,7 @@ const FEATURES = [
         ),
         title: "Volunteer Coordination",
         desc: "Assign roles, manage teams, and streamline execution across departments. Everyone knows their responsibility.",
-        accent: "#06b6d4",
+        accent: "#22d3ee",
         tags: ["Role Assignment", "Teams", "Shift Management"],
     },
     {
@@ -50,7 +50,7 @@ const FEATURES = [
         ),
         title: "Real-time Execution Dashboard",
         desc: "Track progress, deadlines, and performance instantly. Make data-driven decisions the moment information changes.",
-        accent: "#10b981",
+        accent: "#34d399",
         tags: ["Live Metrics", "Alerts", "Analytics"],
     },
 ];

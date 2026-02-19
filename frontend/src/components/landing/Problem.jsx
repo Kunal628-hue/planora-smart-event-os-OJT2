@@ -42,7 +42,7 @@ function DashboardMock({ triggerCount }) {
         <div style={{
             background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)",
             borderRadius: "var(--radius-lg)", overflow: "hidden",
-            boxShadow: "0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(139,92,246,0.08)",
+            boxShadow: "0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(59,130,246,0.08)",
         }}>
             {/* Chrome */}
             <div style={{
@@ -65,7 +65,7 @@ function DashboardMock({ triggerCount }) {
                 {/* Counters */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.7rem" }}>
                     {[
-                        { label: "Events", target: 24, color: "#a78bfa" },
+                        { label: "Events", target: 24, color: "#3b82f6" },
                         { label: "Volunteers", target: 312, color: "#6ee7b7" },
                         { label: "Budget Used", target: 76, suffix: "%", color: "#f59e0b" },
                     ].map((s) => (
@@ -81,9 +81,9 @@ function DashboardMock({ triggerCount }) {
 
                 {/* Progress bars with animation */}
                 {[
-                    { label: "Tech Fest 2026", pct: 82, color: "#8b5cf6", delay: 0 },
-                    { label: "Hackathon Sprint", pct: 58, color: "#6366f1", delay: 150 },
-                    { label: "Cultural Week", pct: 34, color: "#06b6d4", delay: 300 },
+                    { label: "Tech Fest 2026", pct: 82, color: "#3b82f6", delay: 0 },
+                    { label: "Hackathon Sprint", pct: 58, color: "#2563eb", delay: 150 },
+                    { label: "Cultural Week", pct: 34, color: "#22d3ee", delay: 300 },
                 ].map((item) => (
                     <div key={item.label}>
                         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.35rem" }}>
@@ -151,11 +151,11 @@ export default function Problem() {
                                 }}>
                                     <span style={{
                                         marginTop: "0.18rem", width: 18, height: 18, borderRadius: "50%",
-                                        background: "rgba(139,92,246,0.18)", border: "1px solid rgba(139,92,246,0.4)",
+                                        background: "rgba(59,130,246,0.18)", border: "1px solid rgba(59,130,246,0.4)",
                                         display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
                                     }}>
                                         <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
-                                            <path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="#a78bfa" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                            <path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="#3b82f6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                                         </svg>
                                     </span>
                                     {point}

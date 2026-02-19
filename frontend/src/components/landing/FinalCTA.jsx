@@ -6,10 +6,10 @@ import useReveal from "../../hooks/useReveal";
 /* ── Animated particle dots ── */
 function FloatingOrbs() {
     const orbs = [
-        { w: 160, h: 160, top: "10%", left: "5%", color: "#8b5cf6", delay: 0, dur: 7000 },
-        { w: 100, h: 100, top: "60%", right: "8%", color: "#6366f1", delay: 1200, dur: 9000 },
-        { w: 80, h: 80, top: "30%", right: "20%", color: "#06b6d4", delay: 600, dur: 6000 },
-        { w: 120, h: 120, top: "70%", left: "15%", color: "#7c3aed", delay: 900, dur: 8000 },
+        { w: 160, h: 160, top: "10%", left: "5%", color: "#3b82f6", delay: 0, dur: 7000 },
+        { w: 100, h: 100, top: "60%", right: "8%", color: "#2563eb", delay: 1200, dur: 9000 },
+        { w: 80, h: 80, top: "30%", right: "20%", color: "#22d3ee", delay: 600, dur: 6000 },
+        { w: 120, h: 120, top: "70%", left: "15%", color: "#1d4ed8", delay: 900, dur: 8000 },
     ];
     return (
         <>
@@ -74,7 +74,7 @@ export default function FinalCTA() {
                 width: 700, height: 500,
                 top: "50%", left: "50%",
                 transform: "translate(-50%, -50%)",
-                background: "radial-gradient(ellipse, rgba(124,58,237,0.22) 0%, rgba(99,102,241,0.1) 50%, transparent 70%)",
+                background: "radial-gradient(ellipse, rgba(37,99,235,0.22) 0%, rgba(59,130,246,0.1) 50%, transparent 70%)",
                 animation: "pulse-glow 4s ease-in-out infinite",
             }} />
 
@@ -82,7 +82,7 @@ export default function FinalCTA() {
                 <div
                     className="reveal"
                     style={{
-                        background: "linear-gradient(140deg, rgba(139,92,246,0.1), rgba(99,102,241,0.07), rgba(6,182,212,0.05))",
+                        background: "linear-gradient(140deg, rgba(59,130,246,0.1), rgba(37,99,235,0.07), rgba(34,211,238,0.05))",
                         border: "1px solid var(--border-accent)",
                         borderRadius: "var(--radius-2xl)",
                         padding: "5.5rem 2rem 4rem",
@@ -99,7 +99,7 @@ export default function FinalCTA() {
                     <div style={{
                         position: "absolute", top: 0, left: 0, right: 0,
                         height: 2,
-                        background: "linear-gradient(90deg, transparent, #8b5cf6, #6366f1, #06b6d4, transparent)",
+                        background: "linear-gradient(90deg, transparent, #3b82f6, #2563eb, #22d3ee, transparent)",
                         animation: "gradient-shift 3s ease infinite",
                         backgroundSize: "200% auto",
                     }} />
@@ -113,7 +113,7 @@ export default function FinalCTA() {
                         Run smarter events.{" "}
                         <br />
                         <span className="gradient-text" style={{
-                            background: "linear-gradient(130deg, #c4b5fd, #818cf8, #6ee7b7)",
+                            background: "linear-gradient(130deg, #93c5fd, #3b82f6, #22d3ee)",
                             backgroundSize: "200% auto",
                             animation: "gradient-shift 4s ease infinite",
                             WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
@@ -130,7 +130,7 @@ export default function FinalCTA() {
                     </p>
 
                     <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap", marginBottom: "3rem" }}>
-                        <Link to="/signup" className="btn btn-primary btn-lg" style={{ boxShadow: "0 0 48px rgba(139,92,246,0.5)" }}>
+                        <Link to="/signup" className="btn btn-primary btn-lg" style={{ boxShadow: "0 0 48px rgba(59,130,246,0.5)" }}>
                             Create Free Account →
                         </Link>
                         <Link to="/login" className="btn btn-ghost btn-lg">
@@ -152,7 +152,7 @@ export default function FinalCTA() {
                             <div key={s.val} className="cta-stat" style={{ textAlign: "center", opacity: 0 }}>
                                 <p className="anim-number-glow" style={{
                                     fontSize: "1.5rem", fontWeight: 900,
-                                    fontFamily: "Outfit, sans-serif", color: "#c4b5fd",
+                                    fontFamily: "Outfit, sans-serif", color: "#3b82f6",
                                     letterSpacing: "-0.02em", marginBottom: "0.2rem",
                                 }}>
                                     {s.val}
