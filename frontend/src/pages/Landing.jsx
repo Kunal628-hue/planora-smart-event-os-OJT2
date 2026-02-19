@@ -1,0 +1,136 @@
+import Navbar from "../components/landing/Navbar";
+import Hero from "../components/landing/Hero";
+import Trust from "../components/landing/Trust";
+import Problem from "../components/landing/Problem";
+import Features from "../components/landing/Features";
+import ProductShowcase from "../components/landing/ProductShowcase";
+import HowItWorks from "../components/landing/HowItWorks";
+import FinalCTA from "../components/landing/FinalCTA";
+import { Link } from "react-router-dom";
+
+const FOOTER_LINKS = {
+    Product: ["Features", "How It Works", "Dashboard", "Roadmap"],
+    Company: ["About", "Blog", "Careers", "Press"],
+    Legal: ["Privacy Policy", "Terms of Service", "Cookie Policy"],
+};
+
+export default function Landing() {
+    return (
+        <div style={{ minHeight: "100vh", background: "var(--bg-base)" }}>
+            <Navbar />
+            <Hero />
+            <Trust />
+            <Problem />
+            <Features />
+            <ProductShowcase />
+            <HowItWorks />
+            <FinalCTA />
+
+            {/* ── Footer ── */}
+            <footer
+                style={{
+                    background: "var(--bg-surface)",
+                    borderTop: "1px solid var(--border-subtle)",
+                    paddingTop: "4rem",
+                    paddingBottom: "2rem",
+                }}
+            >
+                <div className="page-container">
+                    {/* Top row */}
+                    <div
+                        style={{
+                            display: "grid",
+                            gridTemplateColumns: "2fr 1fr 1fr 1fr",
+                            gap: "3rem",
+                            marginBottom: "3.5rem",
+                        }}
+                    >
+                        {/* Brand */}
+                        <div>
+                            <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "1.1rem" }}>
+                                <div className="nav-logo-mark">P</div>
+                                <span
+                                    style={{
+                                        fontFamily: "Outfit,sans-serif",
+                                        fontWeight: 800,
+                                        fontSize: "1.05rem",
+                                        color: "var(--text-primary)",
+                                    }}
+                                >
+                                    Planora
+                                </span>
+                            </div>
+                            <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.72, maxWidth: 280 }}>
+                                The Operating System for Smart Campus Events. Built for student
+                                organizers who demand clarity and control.
+                            </p>
+                        </div>
+
+                        {/* Link columns */}
+                        {Object.entries(FOOTER_LINKS).map(([heading, links]) => (
+                            <div key={heading}>
+                                <p
+                                    style={{
+                                        fontSize: "0.75rem",
+                                        fontWeight: 700,
+                                        letterSpacing: "0.1em",
+                                        textTransform: "uppercase",
+                                        color: "var(--text-muted)",
+                                        marginBottom: "1rem",
+                                    }}
+                                >
+                                    {heading}
+                                </p>
+                                <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "0.55rem" }}>
+                                    {links.map((l) => (
+                                        <li key={l}>
+                                            <span
+                                                style={{
+                                                    fontSize: "0.875rem",
+                                                    color: "var(--text-secondary)",
+                                                    cursor: "pointer",
+                                                    transition: "color 0.2s",
+                                                }}
+                                                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-primary)")}
+                                                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
+                                            >
+                                                {l}
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Bottom bar */}
+                    <div
+                        style={{
+                            borderTop: "1px solid var(--border-subtle)",
+                            paddingTop: "1.5rem",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            flexWrap: "wrap",
+                            gap: "1rem",
+                        }}
+                    >
+                        <p style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
+                            © {new Date().getFullYear()} Planora Technologies. Built for student organizers everywhere.
+                        </p>
+                        <div style={{ display: "flex", gap: "1.25rem" }}>
+                            <Link to="/login" style={{ fontSize: "0.8rem", color: "var(--text-muted)", transition: "color 0.2s" }}
+                                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
+                                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}>
+                                Log In
+                            </Link>
+                            <Link to="/signup" style={{ fontSize: "0.8rem", color: "#a78bfa", fontWeight: 600 }}>
+                                Get Started Free →
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    );
+}
