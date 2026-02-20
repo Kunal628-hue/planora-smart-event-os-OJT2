@@ -104,13 +104,13 @@ export default function FinalCTA() {
                         backgroundSize: "200% auto",
                     }} />
 
-                    <p className="overline" style={{ marginBottom: "1.5rem" }}>Get Started Today</p>
+                    <p className="overline" style={{ marginBottom: "1.5rem", letterSpacing: "0.2em", color: "#60a5fa" }}>Ready to Upgrade?</p>
 
                     <h2 style={{
                         fontSize: "clamp(2rem, 5vw, 3.5rem)",
                         fontWeight: 900, marginBottom: "1.25rem", lineHeight: 1.1,
                     }}>
-                        Run smarter events.{" "}
+                        Run Events With Intelligence.{" "}
                         <br />
                         <span className="gradient-text" style={{
                             background: "linear-gradient(130deg, #93c5fd, #3b82f6, #22d3ee)",
@@ -118,52 +118,51 @@ export default function FinalCTA() {
                             animation: "gradient-shift 4s ease infinite",
                             WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
                         }}>
-                            Not chaotic ones.
+                            Not Guesswork.
                         </span>
                     </h2>
 
                     <p style={{
                         fontSize: "1.05rem", color: "var(--text-secondary)",
-                        maxWidth: 500, margin: "0 auto 3rem", lineHeight: 1.76,
+                        maxWidth: 600, margin: "0 auto 2.5rem", lineHeight: 1.76,
                     }}>
-                        Join the next generation of student organizers using structured event operations.
+                        Planora centralizes budgeting, vendor coordination, task management, and predictive risk monitoring into one intelligent dashboard.
                     </p>
 
                     <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap", marginBottom: "3rem" }}>
                         <Link to="/signup" className="btn btn-primary btn-lg" style={{ boxShadow: "0 0 48px rgba(59,130,246,0.5)" }}>
-                            Create Free Account →
+                            Start Your Free Trial →
                         </Link>
                         <Link to="/login" className="btn btn-ghost btn-lg">
-                            Sign In
+                            Schedule Demo
                         </Link>
                     </div>
 
-                    {/* Animated mini-stats */}
+                    {/* Value Indicators */}
                     <div ref={statsRef} style={{
-                        display: "flex", gap: "2.5rem", justifyContent: "center",
-                        flexWrap: "wrap", paddingTop: "2rem",
+                        display: "flex", gap: "2rem", justifyContent: "center",
+                        flexWrap: "wrap", paddingTop: "2.5rem",
                         borderTop: "1px solid var(--border-subtle)",
                     }}>
                         {[
-                            { val: "2,400+", label: "Campus organizers" },
-                            { val: "14-day", label: "Free trial" },
-                            { val: "100%", label: "Student-focused" },
-                        ].map((s) => (
-                            <div key={s.val} className="cta-stat" style={{ textAlign: "center", opacity: 0 }}>
-                                <p className="anim-number-glow" style={{
-                                    fontSize: "1.5rem", fontWeight: 900,
-                                    fontFamily: "Outfit, sans-serif", color: "#3b82f6",
-                                    letterSpacing: "-0.02em", marginBottom: "0.2rem",
-                                }}>
-                                    {s.val}
-                                </p>
-                                <p style={{ fontSize: "0.76rem", color: "var(--text-muted)", fontWeight: 500 }}>{s.label}</p>
+                            { label: "Real-time Event Health Score", icon: "●" },
+                            { label: "Automatic Financial Risk Alerts", icon: "!" },
+                            { label: "Smart Timeline & Task Automation", icon: "⚡" },
+                        ].map((s, i) => (
+                            <div key={i} className="cta-stat" style={{ textAlign: "center", opacity: 0, display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                                <span style={{
+                                    display: "flex", alignItems: "center", justifyContent: "center",
+                                    width: 28, height: 28, borderRadius: "50%",
+                                    background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.2)",
+                                    color: "#3b82f6", fontWeight: "bold", fontSize: "0.9rem"
+                                }}>{s.icon}</span>
+                                <p style={{ fontSize: "0.9rem", color: "var(--text-primary)", fontWeight: 500 }}>{s.label}</p>
                             </div>
                         ))}
                     </div>
 
-                    <p style={{ marginTop: "1.75rem", fontSize: "0.76rem", color: "var(--text-muted)" }}>
-                        Free to start · No credit card needed · Student-friendly pricing
+                    <p style={{ marginTop: "2rem", fontSize: "0.85rem", color: "var(--text-muted)", fontStyle: "italic" }}>
+                        "Built for professional planners, event businesses, and high-scale teams."
                     </p>
                 </div>
             </div>
