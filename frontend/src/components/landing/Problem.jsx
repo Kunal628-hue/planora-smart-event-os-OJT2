@@ -127,35 +127,40 @@ export default function Problem() {
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "center" }}>
                     {/* Left */}
                     <div>
-                        <p className="overline reveal" style={{ marginBottom: "1.25rem" }}>The Problem</p>
+                        <p className="overline reveal" style={{ marginBottom: "1.25rem" }}>The Operational Gap</p>
                         <h2 className="reveal delay-1" style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.6rem)", marginBottom: "1.5rem" }}>
-                            Event operations shouldn't feel chaotic.
+                            Campus events deserve systems — not spreadsheets.
                         </h2>
-                        <p className="reveal delay-2" style={{
-                            fontSize: "1rem", color: "var(--text-secondary)", lineHeight: 1.78, marginBottom: "2rem",
+                        <div className="reveal delay-2" style={{
+                            fontSize: "1.05rem", color: "var(--text-secondary)", lineHeight: 1.78, marginBottom: "2rem",
                         }}>
-                            Managing budgets in spreadsheets, coordinating volunteers across scattered platforms,
-                            and tracking approvals manually slows execution. Planora eliminates fragmentation
-                            by bringing every operational layer into one unified system.
-                        </p>
-                        <ul className="reveal delay-3" style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "0.8rem" }}>
+                            <p style={{ marginBottom: "1.2rem" }}>
+                                Most student committees operate across scattered tools: spreadsheets for budgets, messaging apps for coordination, and manual trackers for approvals. The result? Delayed execution, financial blind spots, and reactive decision-making.
+                            </p>
+                            <p style={{ fontWeight: 600, color: "var(--text-primary)" }}>
+                                Without centralized intelligence, even well-planned events become chaotic.
+                            </p>
+                        </div>
+                        <ul className="reveal delay-3" style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "1rem" }}>
                             {[
-                                "Structured timelines replace scattered reminders",
-                                "Real-time budget visibility for every stakeholder",
-                                "Single source of truth for every volunteer",
+                                "No real-time budget transparency",
+                                "Fragmented communication channels",
+                                "Manual task tracking and approvals",
+                                "Zero performance analytics",
                             ].map((point, i) => (
                                 <li key={point} style={{
                                     display: "flex", alignItems: "flex-start", gap: "0.65rem",
-                                    fontSize: "0.9rem", color: "var(--text-secondary)",
+                                    fontSize: "0.95rem", color: "var(--text-secondary)",
                                     animation: triggered ? `fade-up 0.6s ease ${i * 120}ms both` : "none",
                                 }}>
                                     <span style={{
-                                        marginTop: "0.18rem", width: 18, height: 18, borderRadius: "50%",
-                                        background: "rgba(59,130,246,0.18)", border: "1px solid rgba(59,130,246,0.4)",
+                                        marginTop: "0.18rem", width: 20, height: 20, borderRadius: "50%",
+                                        background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.3)",
                                         display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
                                     }}>
-                                        <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
-                                            <path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="#3b82f6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                            <line x1="6" y1="6" x2="18" y2="18"></line>
                                         </svg>
                                     </span>
                                     {point}

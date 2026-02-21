@@ -33,18 +33,15 @@ export default function Navbar() {
                     to="/"
                     style={{ display: "flex", alignItems: "center", gap: "0.6rem", flexShrink: 0 }}
                 >
-                    <div className="nav-logo-mark">P</div>
-                    <span
+                    <img
+                        src="/LOGO.jpeg"
+                        alt="Planora Logo"
                         style={{
-                            fontFamily: "Outfit, sans-serif",
-                            fontWeight: 800,
-                            fontSize: "1.1rem",
-                            color: "var(--text-primary)",
-                            letterSpacing: "-0.02em",
+                            height: "2.5rem",
+                            width: "auto",
+                            display: "block",
                         }}
-                    >
-                        Planora
-                    </span>
+                    />
                 </Link>
 
                 {/* Center nav links */}

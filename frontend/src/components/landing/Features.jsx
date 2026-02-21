@@ -13,9 +13,9 @@ const FEATURES = [
             </svg>
         ),
         title: "Smart Event Planning",
-        desc: "Create structured timelines and track milestones effortlessly. Visualize your entire event workflow from inception to wrap-up.",
+        desc: "Design structured workflows with milestone tracking, task dependencies, and approval pipelines. Replace scattered reminders with a single source of operational truth.",
         accent: "#3b82f6",
-        tags: ["Timelines", "Milestones", "Gantt View"],
+        tags: ["Gantt Timelines", "Milestone Tracking", "Automated Workflows"],
     },
     {
         icon: (
@@ -24,10 +24,10 @@ const FEATURES = [
                 <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
             </svg>
         ),
-        title: "Budget & Sponsorship Tracking",
-        desc: "Monitor allocations and manage event finances in real time. Keep every stakeholder aligned on spend and revenue.",
+        title: "Budget & Sponsorship Intelligence",
+        desc: "Monitor every transaction in real time. Track allocations, sponsorship inflow, and utilization rates — with automated alerts when projections shift.",
         accent: "#2563eb",
-        tags: ["Live Budget", "Sponsorships", "Reports"],
+        tags: ["Live Budget Dashboard", "Sponsor Tracking", "Financial Reports"],
     },
     {
         icon: (
@@ -37,10 +37,10 @@ const FEATURES = [
                 <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
             </svg>
         ),
-        title: "Volunteer Coordination",
-        desc: "Assign roles, manage teams, and streamline execution across departments. Everyone knows their responsibility.",
+        title: "Volunteer & Committee Coordination",
+        desc: "Assign roles, manage shifts, and track execution across departments with complete visibility.",
         accent: "#22d3ee",
-        tags: ["Role Assignment", "Teams", "Shift Management"],
+        tags: ["Role Assignment", "Attendance Monitoring", "Team Performance Tracking"],
     },
     {
         icon: (
@@ -48,10 +48,10 @@ const FEATURES = [
                 <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
             </svg>
         ),
-        title: "Real-time Execution Dashboard",
-        desc: "Track progress, deadlines, and performance instantly. Make data-driven decisions the moment information changes.",
+        title: "Real-Time Execution Dashboard",
+        desc: "Measure registrations, check-ins, task completion rates, and overall event health — live.",
         accent: "#34d399",
-        tags: ["Live Metrics", "Alerts", "Analytics"],
+        tags: ["Live Metrics", "Smart Alerts", "Performance Analytics"],
     },
 ];
 
@@ -98,7 +98,7 @@ function FeatureCard({ feature, index }) {
             </p>
 
             {/* Animated tags */}
-            <div style={{ display: "flex", gap: "0.45rem", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: "0.45rem", flexWrap: "wrap", marginTop: "auto" }}>
                 {feature.tags.map((tag, i) => (
                     <span
                         key={tag}
@@ -130,14 +130,11 @@ export default function Features() {
             style={{ background: "var(--bg-surface)", borderTop: "1px solid var(--border-subtle)", borderBottom: "1px solid var(--border-subtle)" }}
         >
             <div className="page-container">
-                <div style={{ textAlign: "center", maxWidth: 580, margin: "0 auto 4rem" }}>
-                    <p className="overline reveal" style={{ marginBottom: "1rem" }}>Features</p>
+                <div style={{ textAlign: "center", maxWidth: 700, margin: "0 auto 4rem" }}>
+                    <p className="overline reveal" style={{ marginBottom: "1rem" }}>Built for Every Layer of Event Operations</p>
                     <h2 className="reveal delay-1" style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.6rem)", marginBottom: "1rem" }}>
-                        Built for every layer of your event
+                        From strategy to execution — Planora orchestrates the full event lifecycle with precision.
                     </h2>
-                    <p className="reveal delay-2" style={{ color: "var(--text-secondary)", fontSize: "0.975rem" }}>
-                        From the first planning meeting to post-event reporting — Planora handles the full lifecycle.
-                    </p>
                 </div>
 
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "1.25rem" }}>

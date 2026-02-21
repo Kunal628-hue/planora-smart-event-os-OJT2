@@ -5,8 +5,8 @@ import useReveal from "../../hooks/useReveal";
 const STEPS = [
     {
         number: "01",
-        title: "Create Your Event",
-        desc: "Set up a structured event page with timelines, milestones, registration forms, and budgets in minutes.",
+        title: "Configure Your Event",
+        desc: "Define budgets, timelines, committees, and strategic goals in minutes.",
         icon: (
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
@@ -16,8 +16,8 @@ const STEPS = [
     },
     {
         number: "02",
-        title: "Organize Teams & Resources",
-        desc: "Assign volunteers to roles, track sponsorship budgets, and keep every department in sync through shared dashboards.",
+        title: "Coordinate Operations",
+        desc: "Assign responsibilities, monitor milestones, and align teams through structured workflows.",
         icon: (
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
@@ -29,8 +29,8 @@ const STEPS = [
     },
     {
         number: "03",
-        title: "Execute With Confidence",
-        desc: "Monitor live check-ins, task completions, and real-time metrics from one command center on event day.",
+        title: "Execute With Precision",
+        desc: "Track real-time metrics, receive intelligent alerts, and generate comprehensive post-event reports.",
         icon: (
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
@@ -140,9 +140,9 @@ export default function HowItWorks() {
         <section id="how-it-works" className="section-pad" ref={ref}>
             <div className="page-container">
                 <div style={{ textAlign: "center", maxWidth: 560, margin: "0 auto 5rem" }}>
-                    <p className="overline reveal" style={{ marginBottom: "1rem" }}>How It Works</p>
+                    <p className="overline reveal" style={{ marginBottom: "1rem" }}>Launch and Execute in Three Steps</p>
                     <h2 className="reveal delay-1" style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.6rem)", marginBottom: "1rem" }}>
-                        Up and running in three steps
+                        From strategy to remarkable experience
                     </h2>
                     <p className="reveal delay-2" style={{ color: "var(--text-secondary)", fontSize: "0.975rem" }}>
                         Planora removes all operational friction so your team can focus on delivering a remarkable experience.

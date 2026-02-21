@@ -5,6 +5,7 @@ import Problem from "../components/landing/Problem";
 import Features from "../components/landing/Features";
 import ProductShowcase from "../components/landing/ProductShowcase";
 import HowItWorks from "../components/landing/HowItWorks";
+import Security from "../components/landing/Security";
 import FinalCTA from "../components/landing/FinalCTA";
 import { Link } from "react-router-dom";
 
@@ -24,6 +25,7 @@ export default function Landing() {
             <Features />
             <ProductShowcase />
             <HowItWorks />
+            <Security />
             <FinalCTA />
 
             {/* ── Footer ── */}
@@ -60,9 +62,8 @@ export default function Landing() {
                                     Planora
                                 </span>
                             </div>
-                            <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.72, maxWidth: 280 }}>
-                                The Operating System for Smart Campus Events. Built for student
-                                organizers who demand clarity and control.
+                            <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.72, maxWidth: 320 }}>
+                                Planora is a next-generation Campus Event Operating System designed to modernize how student-led organizations plan, execute, and analyze events.
                             </p>
                         </div>
 

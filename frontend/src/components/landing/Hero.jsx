@@ -278,7 +278,7 @@ export default function Hero() {
                                 <span style={{ width: 8, height: 8, background: "#3b82f6", borderRadius: "50%" }}></span>
                             </span>
                             <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "#93c5fd", letterSpacing: "0.03em" }}>
-                                Planora Smart Event OS
+                                Introducing Planora — The Smart Campus Event OS
                             </span>
                         </div>
 
@@ -288,8 +288,8 @@ export default function Hero() {
                             fontWeight: 800, lineHeight: 1.15, marginBottom: "1.25rem",
                             color: "white", letterSpacing: "-0.02em"
                         }}>
-                            Run Events With <br />
-                            <span className="gradient-text">Intelligence</span>, Not Guesswork.
+                            Run Campus Events With <br />
+                            <span className="gradient-text">Intelligence</span>. Not Assumptions.
                         </h1>
 
                         {/* Subtext */}
@@ -298,7 +298,7 @@ export default function Hero() {
                             color: "var(--text-secondary)", lineHeight: 1.6, marginBottom: "2rem",
                             maxWidth: "540px"
                         }}>
-                            Stop relying on fragmented spreadsheets. Planora gives you centralized control with real-time budget tracking, financial risk prediction, and smart event health scores.
+                            Planora is a unified event operations platform built for student-led organizations. Plan smarter, track finances in real time, coordinate teams effortlessly, and execute with total clarity — all from a single intelligent control center.
                         </p>
 
                         {/* Bullet Points */}
@@ -307,9 +307,9 @@ export default function Hero() {
                             padding: 0, listStyle: "none"
                         }}>
                             {[
-                                "Real-time Event Health Score monitoring",
-                                "Automatic Financial Risk Alerts",
-                                "Smart Timeline & Task Automation"
+                                "Real-Time Financial Visibility",
+                                "Structured Task & Timeline Automation",
+                                "Predictive Risk & Performance Monitoring"
                             ].map((item, i) => (
                                 <li key={i} style={{ display: "flex", alignItems: "center", gap: "0.75rem", color: "var(--text-primary)", fontSize: "0.95rem" }}>
                                     <div style={{
@@ -327,11 +327,11 @@ export default function Hero() {
 
                         {/* CTAs */}
                         <div className="cta-group" style={{ display: "flex", gap: "1rem", flexWrap: "wrap", marginBottom: "1.75rem" }}>
-                            <Link to="/signup" className="btn btn-primary btn-lg" style={{ padding: "0.75rem 1.5rem", fontSize: "1rem" }}>
-                                Get Started
+                            <Link to="/signup" className="btn btn-primary btn-lg" style={{ padding: "0.75rem 1.8rem", fontSize: "1rem" }}>
+                                Start Free Trial →
                             </Link>
-                            <a href="#product" className="btn btn-ghost btn-lg" style={{ padding: "0.75rem 1.5rem", fontSize: "1rem" }}>
-                                View Demo ↗
+                            <a href="#product" className="btn btn-ghost btn-lg" style={{ padding: "0.75rem 1.8rem", fontSize: "1rem" }}>
+                                Book a Live Demo
                             </a>
                         </div>
 

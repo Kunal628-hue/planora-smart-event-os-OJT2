@@ -104,13 +104,13 @@ export default function FinalCTA() {
                         backgroundSize: "200% auto",
                     }} />
 
-                    <p className="overline" style={{ marginBottom: "1.5rem", letterSpacing: "0.2em", color: "#60a5fa" }}>Ready to Upgrade?</p>
+                    <p className="overline" style={{ marginBottom: "1.5rem", letterSpacing: "0.2em", color: "#60a5fa" }}>READY TO ELEVATE YOUR EVENT OPERATIONS?</p>
 
                     <h2 style={{
                         fontSize: "clamp(2rem, 5vw, 3.5rem)",
                         fontWeight: 900, marginBottom: "1.25rem", lineHeight: 1.1,
                     }}>
-                        Run Events With Intelligence.{" "}
+                        Operational Clarity {" "}
                         <br />
                         <span className="gradient-text" style={{
                             background: "linear-gradient(130deg, #93c5fd, #3b82f6, #22d3ee)",
@@ -118,7 +118,7 @@ export default function FinalCTA() {
                             animation: "gradient-shift 4s ease infinite",
                             WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
                         }}>
-                            Not Guesswork.
+                            Starts Here.
                         </span>
                     </h2>
 
@@ -126,15 +126,15 @@ export default function FinalCTA() {
                         fontSize: "1.05rem", color: "var(--text-secondary)",
                         maxWidth: 600, margin: "0 auto 2.5rem", lineHeight: 1.76,
                     }}>
-                        Planora centralizes budgeting, vendor coordination, task management, and predictive risk monitoring into one intelligent dashboard.
+                        Planora replaces fragmented tools with intelligent automation, financial transparency, and real-time execution control — purpose-built for campus leaders.
                     </p>
 
                     <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap", marginBottom: "3rem" }}>
-                        <Link to="/signup" className="btn btn-primary btn-lg" style={{ boxShadow: "0 0 48px rgba(59,130,246,0.5)" }}>
+                        <Link to="/signup" className="btn btn-primary btn-lg" style={{ boxShadow: "0 0 48px rgba(59,130,246,0.5)", padding: "0.75rem 2rem" }}>
                             Start Your Free Trial →
                         </Link>
-                        <Link to="/login" className="btn btn-ghost btn-lg">
-                            Schedule Demo
+                        <Link to="/demo" className="btn btn-ghost btn-lg" style={{ padding: "0.75rem 2rem" }}>
+                            Schedule a Strategy Demo
                         </Link>
                     </div>
 
@@ -145,24 +145,24 @@ export default function FinalCTA() {
                         borderTop: "1px solid var(--border-subtle)",
                     }}>
                         {[
-                            { label: "Real-time Event Health Score", icon: "●" },
-                            { label: "Automatic Financial Risk Alerts", icon: "!" },
-                            { label: "Smart Timeline & Task Automation", icon: "⚡" },
+                            { label: "Financial Transparency", icon: "💰" },
+                            { label: "Intelligent Automation", icon: "⚡" },
+                            { label: "Real-Time Execution Control", icon: "🎯" },
                         ].map((s, i) => (
                             <div key={i} className="cta-stat" style={{ textAlign: "center", opacity: 0, display: "flex", alignItems: "center", gap: "0.75rem" }}>
                                 <span style={{
                                     display: "flex", alignItems: "center", justifyContent: "center",
-                                    width: 28, height: 28, borderRadius: "50%",
+                                    width: 32, height: 32, borderRadius: "50%",
                                     background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.2)",
-                                    color: "#3b82f6", fontWeight: "bold", fontSize: "0.9rem"
+                                    fontSize: "1rem"
                                 }}>{s.icon}</span>
-                                <p style={{ fontSize: "0.9rem", color: "var(--text-primary)", fontWeight: 500 }}>{s.label}</p>
+                                <p style={{ fontSize: "0.95rem", color: "var(--text-primary)", fontWeight: 500 }}>{s.label}</p>
                             </div>
                         ))}
                     </div>
 
                     <p style={{ marginTop: "2rem", fontSize: "0.85rem", color: "var(--text-muted)", fontStyle: "italic" }}>
-                        "Built for professional planners, event businesses, and high-scale teams."
+                        "Built for student organizers, committee leaders, and campus event teams."
                     </p>
                 </div>
             </div>

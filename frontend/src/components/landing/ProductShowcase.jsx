@@ -283,15 +283,19 @@ export default function ProductShowcase() {
         <section id="product" className="section-pad" ref={ref}
             style={{ background: "var(--bg-surface)", borderTop: "1px solid var(--border-subtle)" }}>
             <div className="page-container">
-                <div style={{ textAlign: "center", maxWidth: 560, margin: "0 auto 4rem" }}>
-                    <p className="overline reveal" style={{ marginBottom: "1rem" }}>Product</p>
+                <div style={{ textAlign: "center", maxWidth: 650, margin: "0 auto 4rem" }}>
+                    <p className="overline reveal" style={{ marginBottom: "1rem" }}>Product Showcase</p>
                     <h2 className="reveal delay-1" style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.6rem)", marginBottom: "1rem" }}>
-                        Everything in one unified control panel.
+                        One Unified Command Center
                     </h2>
-                    <p className="reveal delay-2" style={{ color: "var(--text-secondary)", fontSize: "0.975rem", lineHeight: 1.76 }}>
-                        From idea to execution — manage events through one intelligent dashboard
-                        designed for clarity and accountability.
-                    </p>
+                    <div className="reveal delay-2" style={{ color: "var(--text-secondary)", fontSize: "0.975rem", lineHeight: 1.76 }}>
+                        <p style={{ marginBottom: "1rem" }}>
+                            From revenue metrics to volunteer performance, Planora consolidates every operational layer into a single, intelligent dashboard designed for clarity and accountability.
+                        </p>
+                        <p style={{ fontSize: "0.85rem", opacity: 0.8, fontWeight: 500, color: "var(--text-primary)" }}>
+                            Built on a modular full-stack architecture with real-time data synchronization, ensuring speed, reliability, and scalability.
+                        </p>
+                    </div>
                 </div>
 
                 <div className="reveal delay-1">
