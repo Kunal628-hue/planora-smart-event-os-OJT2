@@ -328,7 +328,7 @@ export default function Hero() {
                         {/* CTAs */}
                         <div className="cta-group" style={{ display: "flex", gap: "1rem", flexWrap: "wrap", marginBottom: "1.75rem" }}>
                             <Link to="/signup" className="btn btn-primary btn-lg" style={{ padding: "0.75rem 1.8rem", fontSize: "1rem" }}>
-                                Start Free Trial →
+                                Start →
                             </Link>
                             <a href="#product" className="btn btn-ghost btn-lg" style={{ padding: "0.75rem 1.8rem", fontSize: "1rem" }}>
                                 Book a Live Demo
