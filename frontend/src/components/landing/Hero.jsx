@@ -22,30 +22,30 @@ function HeroDashboardMock() {
     return (
         <div className="hero-mockup-card" style={{
             position: "relative",
-            background: "rgba(17, 24, 39, 0.75)",
-            border: "1px solid rgba(255, 255, 255, 0.08)",
+            background: "#ffffff",
+            border: "1px solid rgba(0, 0, 0, 0.05)",
             borderRadius: "1.5rem",
             padding: "1.5rem",
-            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(59, 130, 246, 0.1)",
-            backdropFilter: "blur(12px)",
+            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.1), 0 10px 15px -3px rgba(0, 0, 0, 0.05)",
             maxWidth: "520px",
             width: "100%",
             margin: "0 auto",
-            transition: "all 0.4s ease"
+            transition: "all 0.4s ease",
+            color: "#1e293b"
         }}>
             {/* Header */}
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1.5rem", alignItems: "center" }}>
                 <div>
-                    <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "0.2rem", fontWeight: 500 }}>Event Health</div>
-                    <div style={{ fontSize: "1.1rem", fontWeight: 700, color: "white" }}>TechCrunch Disrupt '26</div>
+                    <div style={{ fontSize: "0.85rem", color: "#64748b", marginBottom: "0.2rem", fontWeight: 500 }}>Event Health</div>
+                    <div style={{ fontSize: "1.1rem", fontWeight: 700, color: "#0f172a" }}>Tech Summit 2026</div>
                 </div>
                 <div style={{
-                    padding: "0.3rem 0.8rem", background: "rgba(16, 185, 129, 0.1)",
-                    borderRadius: "2rem", border: "1px solid rgba(16, 185, 129, 0.2)",
-                    color: "#34d399", fontSize: "0.75rem", fontWeight: 600,
+                    padding: "0.3rem 0.8rem", background: "#f0fdf4",
+                    borderRadius: "2rem", border: "1px solid #dcfce7",
+                    color: "#16a34a", fontSize: "0.75rem", fontWeight: 700,
                     display: "flex", alignItems: "center", gap: "0.3rem"
                 }}>
-                    <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#34d399", boxShadow: "0 0 8px #34d399" }}></span> Live Tracking
+                    <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#16a34a" }}></span> On Track
                 </div>
             </div>
 
@@ -53,55 +53,42 @@ function HeroDashboardMock() {
             <div style={{ display: "flex", gap: "1.5rem", marginBottom: "1.5rem", alignItems: "center" }}>
                 {/* Health Score Circle */}
                 <div style={{
-                    flex: "0 0 auto", width: "140px", height: "140px",
+                    flex: "0 0 auto", width: "130px", height: "130px",
                     position: "relative", display: "flex", alignItems: "center", justifyContent: "center"
                 }}>
                     <svg viewBox="0 0 36 36" style={{ width: "100%", height: "100%", transform: "rotate(-90deg)" }}>
-                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="3" />
+                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f1f5f9" strokeWidth="3" />
                         <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                            fill="none" stroke="#3b82f6" strokeWidth="3" strokeDasharray="92, 100" strokeLinecap="round"
-                            style={{ filter: "drop-shadow(0 0 4px rgba(59,130,246,0.6))" }}
+                            fill="none" stroke="#8b5cf6" strokeWidth="3" strokeDasharray="82, 100" strokeLinecap="round"
                         />
                     </svg>
                     <div style={{ position: "absolute", textAlign: "center", zIndex: 10 }}>
-                        <div style={{ fontSize: "2.3rem", fontWeight: 800, color: "white", lineHeight: 1 }}>92</div>
-                        <div style={{ fontSize: "0.65rem", color: "var(--text-muted)", marginTop: "0.3rem", fontWeight: 600, letterSpacing: "0.05em" }}>HEALTH</div>
+                        <div style={{ fontSize: "2.3rem", fontWeight: 800, color: "#8b5cf6", lineHeight: 1 }}>82</div>
+                        <div style={{ fontSize: "0.6rem", color: "#64748b", marginTop: "0.2rem", fontWeight: 700, letterSpacing: "0.05em" }}>SCORE</div>
                     </div>
                 </div>
 
                 {/* Right Column Stats */}
                 <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "1rem" }}>
-
                     {/* Budget Stability */}
-                    <div style={{ background: "rgba(255,255,255,0.03)", padding: "0.9rem", borderRadius: "0.75rem", border: "1px solid rgba(255,255,255,0.05)" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
-                            <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Budget Stability</span>
-                            <span style={{ fontSize: "0.75rem", color: "#60a5fa", fontWeight: 600 }}>Strong</span>
+                    <div style={{ background: "#f8fafc", padding: "0.8rem", borderRadius: "0.75rem", border: "1px solid #e2e8f0" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.4rem" }}>
+                            <span style={{ fontSize: "0.75rem", color: "#64748b", fontWeight: 600 }}>Budget Stability</span>
+                            <span style={{ fontSize: "0.75rem", color: "#10b981", fontWeight: 700 }}>78%</span>
                         </div>
-                        <div style={{ height: "6px", background: "rgba(255,255,255,0.1)", borderRadius: "3px", overflow: "hidden" }}>
-                            <div style={{ width: "88%", height: "100%", background: "#3b82f6", borderRadius: "3px", boxShadow: "0 0 10px rgba(59,130,246,0.5)" }}></div>
+                        <div style={{ height: "6px", background: "#e2e8f0", borderRadius: "3px", overflow: "hidden" }}>
+                            <div style={{ width: "78%", height: "100%", background: "#10b981", borderRadius: "3px" }}></div>
                         </div>
                     </div>
 
                     {/* Task Completion */}
-                    <div style={{ background: "rgba(255,255,255,0.03)", padding: "0.9rem", borderRadius: "0.75rem", border: "1px solid rgba(255,255,255,0.05)" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
-                            <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Task Completion</span>
-                            <span style={{ fontSize: "0.75rem", color: "#a78bfa", fontWeight: 600 }}>85%</span>
+                    <div style={{ background: "#f8fafc", padding: "0.8rem", borderRadius: "0.75rem", border: "1px solid #e2e8f0" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.4rem" }}>
+                            <span style={{ fontSize: "0.75rem", color: "#64748b", fontWeight: 600 }}>Task Completion</span>
+                            <span style={{ fontSize: "0.75rem", color: "#f59e0b", fontWeight: 700 }}>75%</span>
                         </div>
-                        <div style={{ height: "6px", background: "rgba(255,255,255,0.1)", borderRadius: "3px", overflow: "hidden" }}>
-                            <div style={{ width: "85%", height: "100%", background: "#8b5cf6", borderRadius: "3px", boxShadow: "0 0 10px rgba(139,92,246,0.5)" }}></div>
-                        </div>
-                    </div>
-
-                    {/* Vendor Confirmation */}
-                    <div style={{ background: "rgba(255,255,255,0.03)", padding: "0.9rem", borderRadius: "0.75rem", border: "1px solid rgba(255,255,255,0.05)" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
-                            <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Vendor Conf.</span>
-                            <span style={{ fontSize: "0.75rem", color: "#f472b6", fontWeight: 600 }}>8/12</span>
-                        </div>
-                        <div style={{ height: "6px", background: "rgba(255,255,255,0.1)", borderRadius: "3px", overflow: "hidden" }}>
-                            <div style={{ width: "66%", height: "100%", background: "#ec4899", borderRadius: "3px", boxShadow: "0 0 10px rgba(236,72,153,0.5)" }}></div>
+                        <div style={{ height: "6px", background: "#e2e8f0", borderRadius: "3px", overflow: "hidden" }}>
+                            <div style={{ width: "75%", height: "100%", background: "#f59e0b", borderRadius: "3px" }}></div>
                         </div>
                     </div>
                 </div>
@@ -109,33 +96,21 @@ function HeroDashboardMock() {
 
             {/* Risk Alert Banner */}
             <div style={{
-                background: "rgba(245, 158, 11, 0.1)", border: "1px solid rgba(245, 158, 11, 0.25)",
-                borderRadius: "0.75rem", padding: "0.85rem 1rem", display: "flex", alignItems: "flex-start", gap: "0.9rem",
-                marginBottom: "1.2rem"
+                background: "#fff1f2", border: "1px solid #fecaca",
+                borderRadius: "0.75rem", padding: "1rem", display: "flex", alignItems: "flex-start", gap: "0.75rem",
             }}>
                 <div style={{
-                    width: "24px", height: "24px", borderRadius: "50%", background: "rgba(245, 158, 11, 0.2)",
-                    display: "flex", alignItems: "center", justifyContent: "center", color: "#fbbf24", fontSize: "0.85rem", fontWeight: "bold",
-                    flexShrink: 0, marginTop: "2px"
-                }}>!</div>
-                <div>
-                    <div style={{ fontSize: "0.85rem", color: "#fbbf24", fontWeight: 600, marginBottom: "0.1rem" }}>Spending Risk Detected</div>
-                    <div style={{ fontSize: "0.75rem", color: "rgba(251, 191, 36, 0.9)", lineHeight: 1.4 }}>Catering budget exceeds projection by 12%. Reallocation recommended.</div>
+                    width: "28px", height: "28px", borderRadius: "8px", background: "#fee2e2",
+                    display: "flex", alignItems: "center", justifyContent: "center", color: "#ef4444",
+                    flexShrink: 0
+                }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                    </svg>
                 </div>
-            </div>
-
-            {/* Task Automation List */}
-            <div style={{ marginTop: "1rem", borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "1rem" }}>
-                <div style={{ fontSize: "0.7rem", color: "var(--text-muted)", marginBottom: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 600 }}>Recent Automations</div>
-                <div style={{ display: "flex", gap: "0.7rem", flexDirection: "column" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", opacity: 0.9, padding: "0.4rem 0" }}>
-                        <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#3b82f6", boxShadow: "0 0 5px #3b82f6" }}></div>
-                        <div style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Sent deposit reminders to 3 vendors</div>
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", opacity: 0.9, padding: "0.4rem 0" }}>
-                        <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#3b82f6", boxShadow: "0 0 5px #3b82f6" }}></div>
-                        <div style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Updated timeline for keynote speech</div>
-                    </div>
+                <div>
+                    <div style={{ fontSize: "0.85rem", color: "#991b1b", fontWeight: 700 }}>Financial Risk Detected</div>
+                    <div style={{ fontSize: "0.7rem", color: "#b91c1c", lineHeight: 1.4 }}>Catering budget exceeds projection by 10%.</div>
                 </div>
             </div>
         </div>
@@ -327,8 +302,12 @@ export default function Hero() {
 
                         {/* CTAs */}
                         <div className="cta-group" style={{ display: "flex", gap: "1rem", flexWrap: "wrap", marginBottom: "1.75rem" }}>
-                            <Link to="/signup" className="btn btn-primary btn-lg" style={{ padding: "0.75rem 1.8rem", fontSize: "1rem" }}>
-                                Start →
+                            <Link to="/signup" className="btn btn-primary btn-lg" style={{ padding: "0.75rem 2rem" }}>
+                                Start Now
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12" />
+                                    <polyline points="12 5 19 12 12 19" />
+                                </svg>
                             </Link>
                             <a href="#product" className="btn btn-ghost btn-lg" style={{ padding: "0.75rem 1.8rem", fontSize: "1rem" }}>
                                 Book a Live Demo

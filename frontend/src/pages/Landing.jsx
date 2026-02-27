@@ -17,7 +17,7 @@ const FOOTER_LINKS = {
 
 export default function Landing() {
     return (
-        <div style={{ minHeight: "100vh", background: "var(--bg-base)" }}>
+        <div className="dark-theme" style={{ minHeight: "100vh", background: "var(--bg-base)", color: "var(--text-primary)" }}>
             <Navbar />
             <Hero />
             <Trust />
@@ -50,17 +50,13 @@ export default function Landing() {
                         {/* Brand */}
                         <div>
                             <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "1.1rem" }}>
-                                <div className="nav-logo-mark">P</div>
-                                <span
-                                    style={{
-                                        fontFamily: "Outfit,sans-serif",
-                                        fontWeight: 800,
-                                        fontSize: "1.05rem",
-                                        color: "var(--text-primary)",
-                                    }}
-                                >
-                                    Planora
-                                </span>
+                                <Link to="/" style={{ display: "block" }}>
+                                    <img
+                                        src="/LOGO.jpeg"
+                                        alt="Planora Logo"
+                                        style={{ height: "3rem", width: "auto", display: "block" }}
+                                    />
+                                </Link>
                             </div>
                             <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.72, maxWidth: 320 }}>
                                 Planora is a next-generation Campus Event Operating System designed to modernize how student-led organizations plan, execute, and analyze events.
@@ -125,8 +121,19 @@ export default function Landing() {
                                 onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}>
                                 Log In
                             </Link>
-                            <Link to="/signup" style={{ fontSize: "0.8rem", color: "#a78bfa", fontWeight: 600 }}>
-                                Get Started Free →
+                            <Link to="/signup" style={{
+                                fontSize: "0.85rem",
+                                color: "#60a5fa",
+                                fontWeight: 700,
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "0.4rem"
+                            }}>
+                                Get Started Free
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12" />
+                                    <polyline points="12 5 19 12 12 19" />
+                                </svg>
                             </Link>
                         </div>
                     </div>

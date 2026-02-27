@@ -130,8 +130,12 @@ export default function FinalCTA() {
                     </p>
 
                     <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap", marginBottom: "3rem" }}>
-                        <Link to="/signup" className="btn btn-primary btn-lg" style={{ boxShadow: "0 0 48px rgba(59,130,246,0.5)", padding: "0.75rem 2rem" }}>
-                            Start Your Free Trial →
+                        <Link to="/signup" className="btn btn-primary btn-lg" style={{ boxShadow: "0 0 48px rgba(59,130,246,0.5)", padding: "0.85rem 2.5rem" }}>
+                            Start Your Free Trial
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                                <polyline points="12 5 19 12 12 19" />
+                            </svg>
                         </Link>
                         <Link to="/demo" className="btn btn-ghost btn-lg" style={{ padding: "0.75rem 2rem" }}>
                             Schedule a Strategy Demo
@@ -145,16 +149,40 @@ export default function FinalCTA() {
                         borderTop: "1px solid var(--border-subtle)",
                     }}>
                         {[
-                            { label: "Financial Transparency", icon: "💰" },
-                            { label: "Intelligent Automation", icon: "⚡" },
-                            { label: "Real-Time Execution Control", icon: "🎯" },
+                            {
+                                label: "Financial Transparency",
+                                icon: (
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <line x1="12" y1="1" x2="12" y2="23" />
+                                        <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+                                    </svg>
+                                )
+                            },
+                            {
+                                label: "Intelligent Automation",
+                                icon: (
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                                    </svg>
+                                )
+                            },
+                            {
+                                label: "Real-Time Execution Control",
+                                icon: (
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <circle cx="12" cy="12" r="10" />
+                                        <circle cx="12" cy="12" r="6" />
+                                        <circle cx="12" cy="12" r="2" />
+                                    </svg>
+                                )
+                            },
                         ].map((s, i) => (
                             <div key={i} className="cta-stat" style={{ textAlign: "center", opacity: 0, display: "flex", alignItems: "center", gap: "0.75rem" }}>
                                 <span style={{
                                     display: "flex", alignItems: "center", justifyContent: "center",
-                                    width: 32, height: 32, borderRadius: "50%",
+                                    width: 38, height: 38, borderRadius: "10px",
                                     background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.2)",
-                                    fontSize: "1rem"
+                                    color: "#3b82f6"
                                 }}>{s.icon}</span>
                                 <p style={{ fontSize: "0.95rem", color: "var(--text-primary)", fontWeight: 500 }}>{s.label}</p>
                             </div>
