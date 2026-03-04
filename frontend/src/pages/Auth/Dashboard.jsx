@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import { db } from "../../firebase";
-import { collection, query, where, onSnapshot } from "firebase/firestore";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Dashboard() {
     const { user } = useOutletContext();
@@ -23,12 +22,11 @@ export default function Dashboard() {
         ]
     });
 
-    useEffect(() => {
+    const fetchStats = async () => {
         if (!user) return;
-
-        const q = query(collection(db, "events"), where("userId", "==", user.uid));
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const events = snapshot.docs.map(doc => doc.data());
+        try {
+            const response = await fetch(`${API_URL}/events?user=${user.uid}`);
+            const events = await response.json();
 
             if (events.length === 0) {
                 setStats(curr => ({ ...curr, healthScore: 0 }));
@@ -41,7 +39,7 @@ export default function Dashboard() {
             const balance = estCost - paidAmt;
 
             setStats({
-                healthScore: 85, // Dummy calculated for now
+                healthScore: 85,
                 metrics: [
                     { label: "Budget Stability", value: "88%", color: "#10b981" },
                     { label: "Vendor Confirmation", value: "45%", color: "#f59e0b" },
@@ -59,9 +57,13 @@ export default function Dashboard() {
                     { label: "Remaining Balance", value: `₹${Math.round(balance).toLocaleString()}`, trend: "+3%", color: "#10b981", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h7" /><path d="M16 19h6" /><path d="M19 16v6" /></svg>, sub: `${Math.round((balance / estCost) * 100)}% remaining` },
                 ]
             });
-        });
+        } catch (err) {
+            console.error("Dashboard fetch error:", err);
+        }
+    };
 
-        return () => unsubscribe();
+    useEffect(() => {
+        fetchStats();
     }, [user]);
 
 

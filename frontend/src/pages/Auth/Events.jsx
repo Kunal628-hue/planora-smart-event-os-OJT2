@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
-import { db } from "../../firebase";
-import { collection, query, where, onSnapshot, addDoc, serverTimestamp, updateDoc, doc } from "firebase/firestore";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Events() {
     const { user } = useOutletContext();
@@ -17,35 +17,36 @@ export default function Events() {
         budget: ""
     });
 
-    useEffect(() => {
-        if (!user) {
-            setFetchLoading(false);
-            return;
-        }
-
-        const q = query(collection(db, "events"), where("userId", "==", user.uid));
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const eventsData = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-            setEvents(eventsData);
-            setFetchLoading(false);
-        }, (err) => {
+    const fetchEvents = async () => {
+        if (!user) return;
+        try {
+            const response = await fetch(`${API_URL}/events?user=${user.uid}`);
+            const data = await response.json();
+            setEvents(data);
+        } catch (err) {
             console.error("Fetch error:", err);
+        } finally {
             setFetchLoading(false);
-        });
+        }
+    };
 
-        return () => unsubscribe();
+    useEffect(() => {
+        fetchEvents();
     }, [user]);
 
     const [loading, setLoading] = useState(false);
 
     const handleToggleStatus = async (eventId, currentStatus) => {
         try {
-            await updateDoc(doc(db, "events", eventId), {
-                status: currentStatus === "Completed" ? "Planned" : "Completed"
+            const newStatus = currentStatus === "Completed" ? "Planned" : "Completed";
+            const response = await fetch(`${API_URL}/events/${eventId}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status: newStatus })
             });
+            if (response.ok) {
+                fetchEvents();
+            }
         } catch (err) {
             console.error("Status update failed:", err);
         }
@@ -62,18 +63,28 @@ export default function Events() {
             type: newEvent.type || "Other",
             budget: parseInt(newEvent.budget) || 0,
             userId: user.uid,
-            createdAt: serverTimestamp(),
             status: "Planned"
         };
 
         setLoading(true);
-        setShowModal(false); // Close immediately
 
-        // Fire and forget (let Firestore handle the rest in the background)
-        addDoc(collection(db, "events"), eventData)
-            .then(() => setNewEvent({ name: "", date: "", location: "", type: "Wedding", budget: "" }))
-            .catch(err => console.error("Firestore error:", err))
-            .finally(() => setLoading(false));
+        try {
+            const response = await fetch(`${API_URL}/events`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(eventData)
+            });
+
+            if (response.ok) {
+                setShowModal(false);
+                setNewEvent({ name: "", date: "", location: "", type: "Wedding", budget: "" });
+                fetchEvents();
+            }
+        } catch (err) {
+            console.error("Fetch error:", err);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (

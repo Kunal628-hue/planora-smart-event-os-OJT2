@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useOutletContext } from "react-router-dom";
-import { db } from "../../firebase";
-import { doc, onSnapshot, deleteDoc, updateDoc } from "firebase/firestore";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function EventDetails() {
     const { eventId } = useParams();
@@ -19,47 +19,62 @@ export default function EventDetails() {
         budget: ""
     });
 
-    useEffect(() => {
+    const fetchEvent = async () => {
         if (!eventId || !user) return;
+        try {
+            const response = await fetch(`${API_URL}/events/${eventId}`);
+            if (!response.ok) throw new Error("Event not found");
+            const data = await response.json();
 
-        const unsubscribe = onSnapshot(doc(db, "events", eventId), (docSnap) => {
-            if (docSnap.exists()) {
-                const data = { id: docSnap.id, ...docSnap.data() };
-
-                // Security check: Only allow if it belongs to current user
-                if (data.userId !== user.uid) {
-                    console.error("Unauthorized access");
-                    navigate("/events");
-                    return;
-                }
-
-                setEvent(data);
-                setEditData({
-                    name: data.name,
-                    date: data.date,
-                    location: data.location,
-                    type: data.type,
-                    budget: data.budget
-                });
-            } else {
-                // Only navigate away if we are sure it's not a loading glitch
-                console.error("No such document!");
+            // Security check: Only allow if it belongs to current user
+            // In a real app, the backend should handle this, but keeping logic consistent
+            if (data.user !== user.uid) {
+                console.error("Unauthorized access");
                 navigate("/events");
+                return;
             }
-            setLoading(false);
-        }, (err) => {
-            console.error("Firestore error:", err);
-            setLoading(false);
-        });
 
-        return () => unsubscribe();
-    }, [eventId, navigate, user]);
+            // Map backend fields to frontend names
+            const mappedData = {
+                id: data._id,
+                name: data.title,
+                date: data.date,
+                location: data.location,
+                type: data.description,
+                budget: data.budget,
+                status: data.status,
+                user: data.user
+            };
+
+            setEvent(mappedData);
+            setEditData({
+                name: mappedData.name,
+                date: mappedData.date,
+                location: mappedData.location,
+                type: mappedData.type,
+                budget: mappedData.budget
+            });
+        } catch (err) {
+            console.error("Fetch error:", err);
+            navigate("/events");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchEvent();
+    }, [eventId, user]);
 
     const handleDelete = async () => {
         if (window.confirm("Are you sure you want to delete this event? This action cannot be undone.")) {
             try {
-                await deleteDoc(doc(db, "events", eventId));
-                navigate("/events");
+                const response = await fetch(`${API_URL}/events/${eventId}`, {
+                    method: "DELETE"
+                });
+                if (response.ok) {
+                    navigate("/events");
+                }
             } catch (err) {
                 console.error("Error deleting event:", err);
                 alert("Failed to delete event.");
@@ -70,18 +85,32 @@ export default function EventDetails() {
     const handleUpdate = async (e) => {
         e.preventDefault();
         setUpdateLoading(true);
-        setShowEditModal(false); // Close immediately for snappy UX
 
-        updateDoc(doc(db, "events", eventId), {
-            ...editData,
-            budget: parseInt(editData.budget) || 0
-        }).catch(err => {
+        try {
+            const response = await fetch(`${API_URL}/events/${eventId}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    title: editData.name,
+                    date: editData.date,
+                    location: editData.location,
+                    description: editData.type,
+                    budget: parseInt(editData.budget) || 0
+                })
+            });
+
+            if (response.ok) {
+                setShowEditModal(false);
+                fetchEvent();
+            } else {
+                throw new Error("Failed to update");
+            }
+        } catch (err) {
             console.error("Error updating event:", err);
-            setShowEditModal(true); // Re-open if it failed
             alert("Failed to update event.");
-        }).finally(() => {
+        } finally {
             setUpdateLoading(false);
-        });
+        }
     };
 
     if (loading) {
