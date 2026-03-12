@@ -6,6 +6,7 @@ import eventRoutes from "./routes/eventRoutes.js";
 import guestRoutes from "./routes/guestRoutes.js";
 import vendorRoutes from "./routes/vendorRoutes.js";
 import taskRoutes from "./routes/taskRoutes.js";
+import aiRoutes from "./routes/aiRoutes.js";
 
 dotenv.config();
 
@@ -19,11 +20,18 @@ const PORT = process.env.PORT || 5001;
 app.use(cors());
 app.use(express.json());
 
+// Request Logger
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
+
 // Routes
 app.use("/api/events", eventRoutes);
 app.use("/api/guests", guestRoutes);
 app.use("/api/vendors", vendorRoutes);
 app.use("/api/tasks", taskRoutes);
+app.use("/api/ai", aiRoutes);
 
 // Test route
 app.get("/", (req, res) => {

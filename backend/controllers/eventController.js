@@ -8,13 +8,14 @@ export const createEvent = async (req, res) => {
         const { name, budget, location, date, userId, type, status } = req.body;
 
         const event = await Event.create({
-            title: name, // Map 'name' from frontend to 'title' in DB
-            description: type || "Event",
+            title: name,
+            description: "", // Now using a separate field for type
             location,
             date,
             user: userId,
             budget,
-            status: status || "Planned"
+            status: status || "Planned",
+            type: type || "Other"
         });
 
         res.status(201).json(event);
@@ -39,7 +40,7 @@ export const getEvents = async (req, res) => {
             name: event.title,
             date: event.date,
             location: event.location,
-            type: event.description, // using description for type as a simple map
+            type: event.type || "Other",
             budget: event.budget,
             status: event.status,
             userId: event.user
@@ -60,7 +61,20 @@ export const getEventById = async (req, res) => {
         if (!event) {
             return res.status(404).json({ message: "Event not found" });
         }
-        res.json(event);
+
+        // Format for frontend
+        const formattedEvent = {
+            id: event._id,
+            name: event.title,
+            date: event.date,
+            location: event.location,
+            type: event.type || "Other",
+            budget: event.budget,
+            status: event.status,
+            userId: event.user
+        };
+
+        res.json(formattedEvent);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

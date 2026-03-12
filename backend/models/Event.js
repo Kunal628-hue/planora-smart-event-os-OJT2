@@ -29,6 +29,10 @@ const eventSchema = mongoose.Schema(
         status: {
             type: String,
             default: "Planned"
+        },
+        type: {
+            type: String,
+            default: "Other"
         }
     },
     {

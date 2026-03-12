@@ -78,10 +78,15 @@ export default function Events() {
             if (response.ok) {
                 setShowModal(false);
                 setNewEvent({ name: "", date: "", location: "", type: "Wedding", budget: "" });
+                alert("Event created successfully!");
                 fetchEvents();
+            } else {
+                const errorData = await response.json();
+                alert(`Error: ${errorData.message || "Failed to create event"}`);
             }
         } catch (err) {
             console.error("Fetch error:", err);
+            alert("Connection error. Is the backend running?");
         } finally {
             setLoading(false);
         }
@@ -230,6 +235,8 @@ export default function Events() {
                                         onChange={e => setNewEvent({ ...newEvent, type: e.target.value })}
                                     >
                                         <option>Wedding</option>
+                                        <option>Conference</option>
+                                        <option>College Fest</option>
                                         <option>Birthday</option>
                                         <option>Corporate</option>
                                         <option>Other</option>
