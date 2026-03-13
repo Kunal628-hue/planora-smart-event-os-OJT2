@@ -31,13 +31,13 @@ export default function Navbar() {
                 {/* Logo */}
                 <Link
                     to="/"
-                    style={{ display: "flex", alignItems: "center", gap: "0.6rem", flexShrink: 0 }}
+                    style={{ display: "block", flexShrink: 0 }}
                 >
                     <img
-                        src="/LOGO.jpeg"
+                        src="/logo-new.svg"
                         alt="Planora Logo"
                         style={{
-                            height: "2.5rem",
+                            height: "3.2rem",
                             width: "auto",
                             display: "block",
                         }}

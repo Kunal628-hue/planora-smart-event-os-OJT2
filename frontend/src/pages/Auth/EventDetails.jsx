@@ -216,14 +216,14 @@ export default function EventDetails() {
                         </div>
                         <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
                             {healthData && [
-                                { label: "Task List", value: healthData.metrics.taskCompletion, icon: "✅" },
-                                { label: "Budget Stability", value: Math.max(0, 100 - (healthData.metrics.budgetUsage > 100 ? (healthData.metrics.budgetUsage - 100) : 0)), icon: "💰" },
-                                { label: "Vendor Bookings", value: healthData.metrics.vendorConfirmation, icon: "🤝" },
-                                { label: "Guest RSVPs", value: healthData.metrics.rsvpRate, icon: "💌" },
+                                { label: "Task List", value: healthData.metrics.taskCompletion, icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg> },
+                                { label: "Budget Stability", value: Math.max(0, 100 - (healthData.metrics.budgetUsage > 100 ? (healthData.metrics.budgetUsage - 100) : 0)), icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="2" y="5" width="20" height="14" rx="2" /><line x1="2" y1="10" x2="22" y2="10" /></svg> },
+                                { label: "Vendor Bookings", value: healthData.metrics.vendorConfirmation, icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg> },
+                                { label: "Guest RSVPs", value: healthData.metrics.rsvpRate, icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 2L11 13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg> },
                             ].map(item => (
                                 <div key={item.label}>
                                     <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem", fontWeight: 700, marginBottom: "0.5rem" }}>
-                                        <span style={{ color: "var(--text-secondary)" }}>{item.icon} {item.label}</span>
+                                        <span style={{ color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: "0.6rem" }}>{item.icon} {item.label}</span>
                                         <span style={{ color: "var(--text-primary)" }}>{item.value}%</span>
                                     </div>
                                     <div className="progress-bar" style={{ height: "8px", background: "var(--bg-elevated)" }}>
@@ -259,22 +259,30 @@ export default function EventDetails() {
 
                 {/* Bottom Stats */}
                 <div className="stat-card" style={{ gridColumn: "span 3" }}>
-                    <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>📑</div>
+                    <div style={{ fontSize: "1.25rem", marginBottom: "0.75rem", color: "#ef4444" }}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /><rect x="8" y="2" width="8" height="4" rx="1" /><path d="M12 11h4" /><path d="M12 16h4" /><path d="M8 11h.01" /><path d="M8 16h.01" /></svg>
+                    </div>
                     <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)" }}>TASKS OVERDUE</div>
                     <div style={{ fontSize: "1.75rem", fontWeight: 900, color: "#ef4444" }}>{healthData?.metrics.overdueTasks || 0}</div>
                 </div>
                 <div className="stat-card" style={{ gridColumn: "span 3" }}>
-                    <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>🥂</div>
+                    <div style={{ fontSize: "1.25rem", marginBottom: "0.75rem", color: "var(--accent-primary)" }}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 22h2" /><path d="M12 15v7" /><path d="M12 15a5 5 0 0 0 5-5c0-2-.5-4-2-8H9c-1.5 4-2 6-2 8a5 5 0 0 0 5 5Z" /></svg>
+                    </div>
                     <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)" }}>RSVP RATE</div>
                     <div style={{ fontSize: "1.75rem", fontWeight: 900 }}>{healthData?.metrics.rsvpRate || 0}%</div>
                 </div>
                 <div className="stat-card" style={{ gridColumn: "span 3" }}>
-                    <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>🚛</div>
+                    <div style={{ fontSize: "1.25rem", marginBottom: "0.75rem", color: "var(--accent-primary)" }}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="1" y="3" width="15" height="13" /><polyline points="16 8 20 8 23 11 23 16 16 16" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /></svg>
+                    </div>
                     <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)" }}>VENDORS READY</div>
                     <div style={{ fontSize: "1.75rem", fontWeight: 900 }}>{healthData?.metrics.vendorConfirmation || 0}%</div>
                 </div>
                 <div className="stat-card" style={{ gridColumn: "span 3" }}>
-                    <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>📊</div>
+                    <div style={{ fontSize: "1.25rem", marginBottom: "0.75rem", color: "#16a34a" }}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17" /><polyline points="16 7 22 7 22 13" /></svg>
+                    </div>
                     <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)" }}>STATUS</div>
                     <div style={{ fontSize: "1.75rem", fontWeight: 900, color: "#16a34a" }}>{event.status}</div>
                 </div>

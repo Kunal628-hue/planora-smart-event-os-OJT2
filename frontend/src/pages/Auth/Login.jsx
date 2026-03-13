@@ -21,7 +21,11 @@ export default function Login() {
             await signInWithPopup(auth, provider);
             navigate("/dashboard");
         } catch (err) {
-            setError(err.message);
+            if (err.code === "auth/operation-not-allowed") {
+                setError("Social sign-in is not enabled for this provider in your Firebase project. Please enable it in the Firebase Console.");
+            } else {
+                setError(err.message);
+            }
         } finally {
             setLoading(false);
         }
@@ -40,7 +44,13 @@ export default function Login() {
             await signInWithEmailAndPassword(auth, form.email, form.password);
             navigate("/dashboard");
         } catch (err) {
-            setError(err.message);
+            if (err.code === "auth/operation-not-allowed") {
+                setError("Email/Password sign-in is not enabled in your Firebase project. Please enable it in the Firebase Console under Authentication > Sign-in method.");
+            } else if (err.code === "auth/invalid-credential") {
+                setError("Invalid email or password. If you haven't created an account yet, please sign up first.");
+            } else {
+                setError(err.message);
+            }
         } finally {
             setLoading(false);
         }
@@ -66,12 +76,17 @@ export default function Login() {
 
             <div className="auth-card">
                 {/* Logo */}
-                <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "2rem" }}>
+                <div style={{ display: "flex", justifyContent: "center", marginBottom: "2.5rem" }}>
                     <Link to="/" style={{ display: "block" }}>
                         <img
-                            src="/LOGO.jpeg"
+                            src="/logo-new.svg"
                             alt="Planora Logo"
-                            style={{ height: "3.2rem", width: "auto", display: "block" }}
+                            style={{
+                                height: "4.5rem",
+                                width: "auto",
+                                display: "block",
+                                filter: "drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3))"
+                            }}
                         />
                     </Link>
                 </div>

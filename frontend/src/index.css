@@ -60,19 +60,22 @@
 }
 
 .dashboard-sidebar .sidebar-item {
-  color: rgba(255, 255, 255, 0.65) !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-.dashboard-sidebar .sidebar-item:hover,
-.dashboard-sidebar .sidebar-item.active {
-  background: rgba(255, 255, 255, 0.05) !important;
+.dashboard-sidebar .sidebar-item:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
   color: #fff !important;
+  transform: translateX(4px);
 }
 
 .dashboard-sidebar .sidebar-item.active {
-  background: var(--accent-primary) !important;
-  color: #fff !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.05) 100%) !important;
+  color: #3b82f6 !important;
+  font-weight: 700 !important;
+  border-left: 3px solid #3b82f6 !important;
+  box-shadow: none !important;
 }
 
 .dark-theme .planora-nav.scrolled {

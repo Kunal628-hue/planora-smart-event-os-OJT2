@@ -52,9 +52,9 @@ export default function Landing() {
                             <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "1.1rem" }}>
                                 <Link to="/" style={{ display: "block" }}>
                                     <img
-                                        src="/LOGO.jpeg"
+                                        src="/logo-new.svg"
                                         alt="Planora Logo"
-                                        style={{ height: "3rem", width: "auto", display: "block" }}
+                                        style={{ height: "3.5rem", width: "auto", display: "block" }}
                                     />
                                 </Link>
                             </div>
