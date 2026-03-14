@@ -15,22 +15,27 @@ export default function Dashboard() {
     const [vendors, setVendors] = useState([]);
     const [selectedVendor, setSelectedVendor] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     const fetchInitialData = async () => {
         if (!user) return;
+        setLoading(true);
+        setError(null);
         try {
             const res = await fetch(`${API_URL}/events?user=${user.uid}`);
+            if (!res.ok) throw new Error("Failed to connect to AI engine");
             const data = await res.json();
             setEvents(data);
             if (data.length > 0) {
                 const initialId = data[0].id || data[0]._id;
                 setSelectedEventId(initialId);
-                fetchAiInsights(initialId, data);
+                // fetchAiInsights will be triggered by selectedEventId change
             } else {
                 setLoading(false);
             }
         } catch (err) {
             console.error("Dashboard fetch error:", err);
+            setError(err.message);
             setLoading(false);
         }
     };
@@ -45,9 +50,9 @@ export default function Dashboard() {
                 fetch(`${API_URL}/ai/budget-opt/${eventId}`)
             ]);
 
-            const health = await healthRes.json();
-            const riskData = await riskRes.json();
-            const budgetData = await budgetRes.json();
+            const health = healthRes.ok ? await healthRes.json() : null;
+            const riskData = riskRes.ok ? await riskRes.json() : [];
+            const budgetData = budgetRes.ok ? await budgetRes.json() : [];
 
             setHealthData(health);
             setRisks(riskData);
@@ -60,8 +65,8 @@ export default function Dashboard() {
                     fetch(`${API_URL}/ai/timeline?type=${event.type || "Wedding"}`),
                     fetch(`${API_URL}/ai/vendors?type=${event.type || "Wedding"}`)
                 ]);
-                const timelineData = await timelineRes.json();
-                const vendorData = await vendorRes.json();
+                const timelineData = timelineRes.ok ? await timelineRes.json() : [];
+                const vendorData = vendorRes.ok ? await vendorRes.json() : [];
                 setTimeline(timelineData);
                 setVendors(vendorData);
             }
@@ -84,9 +89,9 @@ export default function Dashboard() {
     }, [selectedEventId]);
 
     const getHealthColor = (score) => {
-        if (score >= 80) return "#10b981"; // Green
-        if (score >= 50) return "#f59e0b"; // Yellow
-        return "#ef4444"; // Red
+        if (score >= 80) return "var(--accent-success)";
+        if (score >= 50) return "var(--accent-warning)";
+        return "var(--accent-danger)";
     };
 
     const getHealthStatus = (score) => {
@@ -97,17 +102,31 @@ export default function Dashboard() {
 
     if (loading && events.length === 0) {
         return (
-            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "80vh" }}>
+            <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", minHeight: "70vh", gap: "1rem" }}>
                 <div style={{ width: "50px", height: "50px", border: "5px solid var(--accent-primary)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 1s linear infinite" }}></div>
+                <p style={{ color: "var(--text-secondary)", fontWeight: 500 }}>Syncing AI Engine...</p>
+            </div>
+        );
+    }
+
+    if (error && events.length === 0) {
+        return (
+            <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", minHeight: "70vh", textAlign: "center", padding: "2rem" }}>
+                <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>⚠️</div>
+                <h2 style={{ fontSize: "1.5rem", fontWeight: 800 }}>Database Sync Error</h2>
+                <p style={{ color: "var(--text-secondary)", marginTop: "0.5rem" }}>{error}</p>
+                <button onClick={fetchInitialData} className="btn btn-primary" style={{ marginTop: "1.5rem" }}>Try Again</button>
             </div>
         );
     }
 
     if (events.length === 0 && !loading) {
         return (
-            <div style={{ textAlign: "center", padding: "5rem 2rem" }}>
+            <div style={{ textAlign: "center", padding: "7rem 2rem", background: "white", borderRadius: "24px", border: "1px dashed var(--border-medium)" }}>
+                <div style={{ fontSize: "3.5rem", marginBottom: "1.5rem" }}>✨</div>
                 <h1 style={{ fontSize: "2.5rem", fontWeight: 850 }}>Build something amazing.</h1>
-                <p style={{ color: "var(--text-secondary)", marginTop: "1rem", fontSize: "1.1rem" }}>Create your first event to see Planora's AI engine in action.</p>
+                <p style={{ color: "var(--text-secondary)", marginTop: "1rem", fontSize: "1.1rem", maxWidth: "500px", margin: "1rem auto" }}>Create your first event to see Planora's AI engine in action. Get live tracking, risk assessment, and more.</p>
+                <button className="btn btn-primary btn-lg" onClick={() => window.location.href = '/events'} style={{ marginTop: "1.5rem" }}>Create New Event</button>
             </div>
         );
     }
@@ -115,37 +134,40 @@ export default function Dashboard() {
     const selectedEvent = events.find(e => (e.id || e._id) === selectedEventId);
 
     return (
-        <div style={{ padding: 0 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "1.5rem" }}>
+        <div style={{ animation: "fade-up 0.5s ease-out" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "2.5rem" }}>
                 <div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.25rem" }}>
-                        <h1 style={{ fontSize: "1.75rem", fontWeight: 800, color: "var(--text-primary)" }}>AI Intelligence Dashboard</h1>
-                        <span style={{
-                            padding: "0.25rem 0.6rem",
-                            borderRadius: "6px",
+                    <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "0.5rem" }}>
+                        <h1 style={{ fontSize: "2rem", fontWeight: 850, color: "var(--text-primary)", letterSpacing: "-0.02em" }}>Intelligence Dashboard</h1>
+                        <div style={{
+                            padding: "0.35rem 0.75rem",
+                            borderRadius: "100px",
                             background: "rgba(16, 185, 129, 0.1)",
-                            color: "#10b981",
-                            fontSize: "0.65rem",
-                            fontWeight: 900,
+                            color: "var(--accent-success)",
+                            fontSize: "0.7rem",
+                            fontWeight: 800,
                             textTransform: "uppercase",
                             letterSpacing: "0.05em",
                             border: "1px solid rgba(16, 185, 129, 0.2)",
                             display: "flex",
                             alignItems: "center",
-                            gap: "0.4rem"
+                            gap: "0.5rem"
                         }}>
-                            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", animation: "pulse 2s infinite" }}></span>
-                            Live Engine
-                        </span>
+                            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "currentColor", animation: "pulse 2s infinite" }}></span>
+                            Analytical Engine Live
+                        </div>
                     </div>
-                    <p style={{ color: "var(--text-secondary)", fontWeight: 500 }}>Real-time predictive insights for <span style={{ color: "var(--accent-primary)", fontWeight: 700 }}>{selectedEvent?.name}</span></p>
+                    <p style={{ color: "var(--text-secondary)", fontWeight: 500, fontSize: "1rem" }}>
+                        Real-time insights for <span style={{ color: "var(--accent-primary)", fontWeight: 700 }}>{selectedEvent?.name}</span>
+                    </p>
                 </div>
-                <div>
+                <div style={{ position: "relative" }}>
+                    <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", marginBottom: "0.5rem", letterSpacing: "0.05em" }}>Switch Event Context</label>
                     <select
                         value={selectedEventId}
                         onChange={(e) => setSelectedEventId(e.target.value)}
                         className="auth-input"
-                        style={{ width: "250px", fontWeight: 600 }}
+                        style={{ width: "280px", fontWeight: 600, height: "46px", borderRadius: "12px", border: "1.5px solid var(--border-subtle)" }}
                     >
                         {events.map(e => <option key={e.id || e._id} value={e.id || e._id}>{e.name || e.title}</option>)}
                     </select>
@@ -334,11 +356,17 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* Vendor Recommendations */}
-                <div className="card hover-lift" style={{ gridColumn: "span 12" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-                        <h3 style={{ fontSize: "1.1rem", fontWeight: 800 }}>AI-Recommended Vendors</h3>
-                        <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", background: "var(--bg-elevated)", padding: "0.25rem 0.75rem", borderRadius: "20px" }}>Click for details</span>
+                <div className="card" style={{ gridColumn: "span 12", border: "1.5px solid var(--border-subtle)", position: "relative", overflow: "hidden", background: "linear-gradient(to bottom, #fff, var(--bg-elevated))" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
+                        <div>
+                            <h3 style={{ fontSize: "1.25rem", fontWeight: 850 }}>AI-Driven Vendor Intelligence</h3>
+                            <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", fontWeight: 500 }}>Top providers matched for your <span style={{ color: "var(--accent-primary)", fontWeight: 700 }}>{selectedEvent?.type}</span></p>
+                        </div>
+                        <div style={{ display: "flex", gap: "0.5rem" }}>
+                            <span style={{ fontSize: "0.7rem", fontWeight: 800, color: "var(--accent-primary)", background: "var(--accent-soft)", padding: "0.5rem 1rem", borderRadius: "100px", border: "1px solid var(--border-accent)" }}>
+                                Live Recommendations
+                            </span>
+                        </div>
                     </div>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1.5rem" }}>
                         {vendors.length > 0 ? vendors.map((vendor, i) => (
@@ -346,50 +374,67 @@ export default function Dashboard() {
                                 key={i}
                                 onClick={() => setSelectedVendor(vendor)}
                                 style={{
-                                    padding: "1.25rem",
-                                    borderRadius: "16px",
-                                    background: "var(--bg-elevated)",
-                                    border: "1px solid var(--border-subtle)",
+                                    padding: "1.5rem",
+                                    borderRadius: "18px",
+                                    background: "#fff",
+                                    border: "1.5px solid var(--border-subtle)",
                                     display: "flex",
-                                    alignItems: "center",
+                                    flexDirection: "column",
                                     gap: "1.25rem",
                                     cursor: "pointer",
-                                    transition: "all 0.3s ease",
-                                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.05)"
+                                    transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.05)",
+                                    position: "relative"
                                 }}
                                 className="vendor-card-hover"
                             >
-                                <div style={{
-                                    width: "48px",
-                                    height: "48px",
-                                    borderRadius: "12px",
-                                    background: "var(--accent-soft)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    color: "var(--accent-primary)"
-                                }}>
-                                    {vendor.service === "Catering" ? (
-                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 20H4a2 2 0 01-2-2V5a2 2 0 012-2h3.9a2 2 0 011.69.9l.81 1.2a2 2 0 001.67.9H20a2 2 0 012 2v5" /><path d="M16 19h6" /><path d="M19 16v6" /></svg>
-                                    ) : vendor.service === "Decor" ? (
-                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
-                                    ) : (
-                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
-                                    )}
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                                    <div style={{
+                                        width: "52px",
+                                        height: "52px",
+                                        borderRadius: "14px",
+                                        background: "var(--accent-soft)",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        color: "var(--accent-primary)",
+                                        fontSize: "1.5rem"
+                                    }}>
+                                        {vendor.service === "Catering" ? "🍽️" : vendor.service === "Decor" ? "✨" : "🤝"}
+                                    </div>
+                                    <div style={{
+                                        padding: "0.25rem 0.6rem",
+                                        borderRadius: "6px",
+                                        background: "rgba(245, 158, 11, 0.1)",
+                                        color: "#f59e0b",
+                                        fontSize: "0.7rem",
+                                        fontWeight: 800
+                                    }}>
+                                        ★ {vendor.rating}
+                                    </div>
                                 </div>
                                 <div>
-                                    <h4 style={{ fontSize: "0.95rem", fontWeight: 800 }}>{vendor.name}</h4>
-                                    <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.25rem", fontSize: "0.75rem", color: "var(--text-secondary)" }}>
-                                        <span>{vendor.service}</span>
+                                    <h4 style={{ fontSize: "1.05rem", fontWeight: 850, marginBottom: "0.25rem" }}>{vendor.name}</h4>
+                                    <div style={{ display: "flex", gap: "0.5rem", fontSize: "0.8rem", color: "var(--text-secondary)", fontWeight: 600 }}>
+                                        <span>{vendor.service} Specialist</span>
                                         <span>•</span>
-                                        <span style={{ color: "#f59e0b", fontWeight: 700 }}>★ {vendor.rating}</span>
-                                        <span>•</span>
-                                        <span style={{ fontWeight: 600 }}>{vendor.priceRange}</span>
+                                        <span style={{ color: "var(--accent-primary)" }}>{vendor.priceRange}</span>
                                     </div>
+                                </div>
+                                <div style={{
+                                    marginTop: "auto",
+                                    paddingTop: "1rem",
+                                    borderTop: "1px dashed var(--border-subtle)",
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center"
+                                }}>
+                                    <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600 }}>Click to analyze</span>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" style={{ color: "var(--accent-primary)" }}><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
                                 </div>
                             </div>
                         )) : (
-                            <p style={{ gridColumn: "span 3", textAlign: "center", color: "var(--text-muted)" }}>No recommendations found for this event type.</p>
+                            <p style={{ gridColumn: "span 3", textAlign: "center", color: "var(--text-muted)", padding: "3rem" }}>Predicting best vendor matches...</p>
                         )}
                     </div>
                 </div>

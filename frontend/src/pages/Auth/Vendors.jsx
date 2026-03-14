@@ -14,7 +14,8 @@ export default function Vendors() {
         service: "Catering",
         contact: "",
         cost: "",
-        eventId: ""
+        eventId: "",
+        status: "Unpaid"
     });
 
     const fetchData = async () => {
@@ -29,7 +30,7 @@ export default function Vendors() {
             setVendors(vendorsData);
             setEvents(eventsData);
             if (eventsData.length > 0) {
-                setNewVendor(prev => ({ ...prev, eventId: eventsData[0].id }));
+                setNewVendor(prev => ({ ...prev, eventId: eventsData[0].id || eventsData[0]._id }));
             }
         } catch (err) {
             console.error("Fetch error:", err);
@@ -56,7 +57,7 @@ export default function Vendors() {
             });
             if (response.ok) {
                 setShowModal(false);
-                setNewVendor({ name: "", service: "Catering", contact: "", cost: "", eventId: events[0]?.id || "" });
+                setNewVendor({ name: "", service: "Catering", contact: "", cost: "", eventId: events[0]?.id || events[0]?._id || "", status: "Unpaid" });
                 fetchData();
             }
         } catch (err) {
@@ -64,49 +65,142 @@ export default function Vendors() {
         }
     };
 
+    const toggleStatus = async (vendorId, currentStatus) => {
+        const newStatus = currentStatus === "Paid" ? "Unpaid" : "Paid";
+        try {
+            const response = await fetch(`${API_URL}/vendors/${vendorId}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status: newStatus })
+            });
+            if (response.ok) {
+                setVendors(vendors.map(v => v._id === vendorId ? { ...v, status: newStatus } : v));
+            }
+        } catch (err) {
+            console.error("Failed to update status:", err);
+        }
+    };
+
+    const handleDeleteVendor = async (vendorId) => {
+        if (!window.confirm("Are you sure you want to remove this vendor partnership?")) return;
+        try {
+            const response = await fetch(`${API_URL}/vendors/${vendorId}`, {
+                method: "DELETE"
+            });
+            if (response.ok) {
+                setVendors(vendors.filter(v => v._id !== vendorId));
+            }
+        } catch (err) {
+            console.error("Failed to delete vendor:", err);
+        }
+    };
+
     return (
-        <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
+        <div style={{ animation: "fade-up 0.5s ease-out" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2.5rem" }}>
                 <div>
-                    <h1 style={{ fontSize: "1.75rem", fontWeight: 800, color: "var(--text-primary)" }}>Vendors & Partners</h1>
-                    <p style={{ color: "var(--text-secondary)", fontWeight: 500 }}>Manage contracts and spending for each event.</p>
+                    <h1 style={{ fontSize: "2rem", fontWeight: 850, color: "var(--text-primary)", letterSpacing: "-0.02em" }}>Vendors & Strategic Partners</h1>
+                    <p style={{ color: "var(--text-secondary)", fontWeight: 500, marginTop: "0.25rem" }}>Manage contractual obligations and financial impact per event.</p>
                 </div>
                 <button
                     onClick={() => setShowModal(true)}
                     className="btn btn-primary"
                     disabled={events.length === 0}
-                    style={{ background: "var(--accent-primary)", borderRadius: "50px" }}
+                    style={{ borderRadius: "14px", padding: "0.8rem 1.5rem", fontWeight: 700 }}
                 >
-                    Add Vendor
+                    + Register New Vendor
                 </button>
             </div>
 
             {loading ? (
-                <div style={{ display: "flex", justifyContent: "center", padding: "5rem" }}>
+                <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "8rem 0", gap: "1rem" }}>
                     <div style={{ width: "40px", height: "40px", border: "4px solid var(--accent-primary)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 1s linear infinite" }}></div>
+                    <p style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text-muted)" }}>Synchronizing Ledger...</p>
                 </div>
             ) : vendors.length === 0 ? (
-                <div className="card" style={{ padding: "5rem 2rem", textAlign: "center", border: "1px dashed var(--border-subtle)" }}>
-                    <h2 style={{ fontSize: "1.5rem", fontWeight: 850 }}>No vendors found</h2>
-                    <p style={{ color: "var(--text-secondary)", marginTop: "1rem" }}>{events.length === 0 ? "Create an event first to add vendors." : "Track your catering, venue, and more."}</p>
+                <div style={{ padding: "6rem 2rem", textAlign: "center", background: "#fff", borderRadius: "24px", border: "1.5px dashed var(--border-medium)" }}>
+                    <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🤝</div>
+                    <h2 style={{ fontSize: "1.5rem", fontWeight: 850 }}>No active partnerships</h2>
+                    <p style={{ color: "var(--text-secondary)", marginTop: "0.75rem", maxWidth: "400px", margin: "0.75rem auto" }}>{events.length === 0 ? "You need an active event context before registering vendors." : "Keep track of catering, venue, and technical partners here."}</p>
                 </div>
             ) : (
                 <div className="dashboard-grid">
                     {vendors.map(vendor => (
-                        <div key={vendor._id} className="card hover-lift" style={{ gridColumn: "span 4", padding: "1.5rem", position: "relative" }}>
-                            <div style={{ position: "absolute", top: "1rem", right: "1rem", padding: "0.25rem 0.5rem", background: "var(--bg-elevated)", borderRadius: "6px", fontSize: "0.65rem", fontWeight: 800, color: "var(--text-muted)" }}>
-                                {vendor.status}
-                            </div>
-                            <h3 style={{ fontWeight: 850, fontSize: "1.1rem" }}>{vendor.name}</h3>
-                            <p style={{ color: "var(--accent-primary)", fontSize: "0.85rem", fontWeight: 700, marginTop: "0.25rem" }}>{vendor.service}</p>
-
-                            <div style={{ marginTop: "1.5rem", padding: "1rem", background: "var(--bg-base)", borderRadius: "12px" }}>
-                                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
-                                    <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600 }}>Budget impact</span>
-                                    <span style={{ fontSize: "0.85rem", fontWeight: 900 }}>₹{parseInt(vendor.cost).toLocaleString()}</span>
+                        <div key={vendor._id} className="card" style={{ gridColumn: "span 4", padding: "1.75rem", position: "relative", border: "1.5px solid var(--border-subtle)", transition: "all 0.3s ease", display: "flex", flexDirection: "column" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.25rem" }}>
+                                <div style={{
+                                    width: "42px",
+                                    height: "42px",
+                                    borderRadius: "12px",
+                                    background: "var(--accent-soft)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    fontSize: "1.25rem"
+                                }}>
+                                    {vendor.service === "Catering" ? "🍽️" : vendor.service === "Decor" ? "✨" : vendor.service === "Photography" ? "📸" : "🤝"}
                                 </div>
-                                <div style={{ fontSize: "0.7rem", color: "var(--text-secondary)", fontWeight: 500 }}>
-                                    Event: {events.find(e => e.id === vendor.event)?.name || "Unassigned"}
+                                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.6rem" }}>
+                                    <div
+                                        onClick={() => toggleStatus(vendor._id, vendor.status)}
+                                        style={{
+                                            padding: "0.35rem 0.75rem",
+                                            borderRadius: "100px",
+                                            background: vendor.status === "Paid" ? "rgba(16, 185, 129, 0.1)" : "rgba(239, 68, 68, 0.1)",
+                                            color: vendor.status === "Paid" ? "var(--accent-success)" : "var(--accent-danger)",
+                                            fontSize: "0.65rem",
+                                            fontWeight: 900,
+                                            cursor: "pointer",
+                                            textTransform: "uppercase",
+                                            letterSpacing: "0.05em",
+                                            border: `1px solid ${vendor.status === "Paid" ? "rgba(16, 185, 129, 0.2)" : "rgba(239, 68, 68, 0.2)"}`,
+                                            userSelect: "none",
+                                            whiteSpace: "nowrap"
+                                        }}
+                                    >
+                                        {vendor.status === "Paid" ? "✓ Fully Paid" : "✕ Unpaid Record"}
+                                    </div>
+                                    <button
+                                        onClick={() => handleDeleteVendor(vendor._id)}
+                                        style={{
+                                            background: "rgba(239, 68, 68, 0.05)",
+                                            border: "1px solid rgba(239, 68, 68, 0.1)",
+                                            color: "#ef4444",
+                                            cursor: "pointer",
+                                            padding: "0.4rem 0.6rem",
+                                            borderRadius: "8px",
+                                            fontSize: "0.75rem",
+                                            fontWeight: 700,
+                                            transition: "all 0.2s"
+                                        }}
+                                        onMouseOver={e => {
+                                            e.currentTarget.style.background = "rgba(239, 68, 68, 0.15)";
+                                            e.currentTarget.style.borderColor = "rgba(239, 68, 68, 0.3)";
+                                        }}
+                                        onMouseOut={e => {
+                                            e.currentTarget.style.background = "rgba(239, 68, 68, 0.05)";
+                                            e.currentTarget.style.borderColor = "rgba(239, 68, 68, 0.1)";
+                                        }}
+                                        title="Delete Vendor"
+                                    >
+                                        Remove 🗑️
+                                    </button>
+                                </div>
+                            </div>
+
+                            <h3 style={{ fontWeight: 850, fontSize: "1.15rem", color: "var(--text-primary)" }}>{vendor.name}</h3>
+                            <p style={{ color: "var(--accent-primary)", fontSize: "0.85rem", fontWeight: 700, marginTop: "0.2rem" }}>{vendor.service} Specialist</p>
+
+                            <div style={{ marginTop: "1.5rem", padding: "1.25rem", background: "var(--bg-elevated)", borderRadius: "14px", border: "1px solid var(--border-subtle)", marginTop: "auto" }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.75rem" }}>
+                                    <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase" }}>Financial Impact</span>
+                                    <span style={{ fontSize: "0.95rem", fontWeight: 900, color: "var(--text-primary)" }}>₹{parseInt(vendor.cost).toLocaleString()}</span>
+                                </div>
+                                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                                    <div style={{ width: 8, height: 8, borderRadius: "2px", background: "var(--accent-primary)", opacity: 0.5 }}></div>
+                                    <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 600 }}>
+                                        Event: {events.find(e => (e.id || e._id) === vendor.event)?.name || "Analytical Context"}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -115,33 +209,40 @@ export default function Vendors() {
             )}
 
             {showModal && (
-                <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(4px)" }}>
-                    <div className="card" style={{ width: "100%", maxWidth: "450px", padding: "2.5rem" }}>
-                        <h2 style={{ fontSize: "1.5rem", fontWeight: 850, marginBottom: "1.5rem" }}>Add New Vendor</h2>
-                        <form onSubmit={handleCreateVendor} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(8px)" }}>
+                    <div className="card" style={{ width: "100%", maxWidth: "480px", padding: "2.5rem", boxShadow: "0 20px 50px rgba(0,0,0,0.2)", borderRadius: "24px" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+                            <h2 style={{ fontSize: "1.5rem", fontWeight: 850 }}>Register New Vendor</h2>
+                            <span
+                                onClick={() => setShowModal(false)}
+                                style={{ cursor: "pointer", color: "var(--text-muted)", fontWeight: 800, fontSize: "1.25rem" }}
+                            >✕</span>
+                        </div>
+                        <form onSubmit={handleCreateVendor} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
                             <div>
-                                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 700, marginBottom: "0.5rem" }}>Vendor Name</label>
-                                <input className="auth-input" placeholder="e.g. Royal Caterers" value={newVendor.name} onChange={e => setNewVendor({ ...newVendor, name: e.target.value })} required />
+                                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.5rem", textTransform: "uppercase" }}>Vendor Entity Name</label>
+                                <input className="auth-input" placeholder="e.g. Royal Caterers & Events" value={newVendor.name} onChange={e => setNewVendor({ ...newVendor, name: e.target.value })} required style={{ borderRadius: "12px" }} />
                             </div>
 
                             <div>
-                                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 700, marginBottom: "0.5rem" }}>Associate with Event</label>
+                                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.5rem", textTransform: "uppercase" }}>Context Attribution</label>
                                 <select
                                     className="auth-input"
                                     value={newVendor.eventId}
                                     onChange={e => setNewVendor({ ...newVendor, eventId: e.target.value })}
                                     required
+                                    style={{ borderRadius: "12px", fontWeight: 600 }}
                                 >
                                     {events.map(event => (
-                                        <option key={event.id} value={event.id}>{event.name}</option>
+                                        <option key={event.id || event._id} value={event.id || event._id}>{event.name}</option>
                                     ))}
                                 </select>
                             </div>
 
-                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem" }}>
                                 <div>
-                                    <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 700, marginBottom: "0.5rem" }}>Service Category</label>
-                                    <select className="auth-input" value={newVendor.service} onChange={e => setNewVendor({ ...newVendor, service: e.target.value })}>
+                                    <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.5rem", textTransform: "uppercase" }}>Expertise</label>
+                                    <select className="auth-input" value={newVendor.service} onChange={e => setNewVendor({ ...newVendor, service: e.target.value })} style={{ borderRadius: "12px", fontWeight: 600 }}>
                                         <option>Catering</option>
                                         <option>Decor</option>
                                         <option>Photography</option>
@@ -151,12 +252,15 @@ export default function Vendors() {
                                     </select>
                                 </div>
                                 <div>
-                                    <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 700, marginBottom: "0.5rem" }}>Estimated Cost</label>
-                                    <input className="auth-input" type="number" placeholder="50000" value={newVendor.cost} onChange={e => setNewVendor({ ...newVendor, cost: e.target.value })} required />
+                                    <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.5rem", textTransform: "uppercase" }}>Agreed Valuation</label>
+                                    <input className="auth-input" type="number" placeholder="50000" value={newVendor.cost} onChange={e => setNewVendor({ ...newVendor, cost: e.target.value })} required style={{ borderRadius: "12px" }} />
                                 </div>
                             </div>
-                            <button className="btn btn-primary" type="submit" style={{ width: "100%", marginTop: "1rem", background: "var(--accent-primary)" }}>Add Vendor</button>
-                            <button className="btn btn-ghost" type="button" onClick={() => setShowModal(false)} style={{ width: "100%" }}>Cancel</button>
+
+                            <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+                                <button className="btn btn-ghost" type="button" onClick={() => setShowModal(false)} style={{ flex: 1, borderRadius: "12px", fontWeight: 700 }}>Cancel</button>
+                                <button className="btn btn-primary" type="submit" style={{ flex: 2, borderRadius: "12px", fontWeight: 800 }}>Confirm Registration</button>
+                            </div>
                         </form>
                     </div>
                 </div>

@@ -12,24 +12,28 @@
   --bg-surface: #ffffff;
   --bg-elevated: #f1f5f9;
   --bg-card: #ffffff;
-  --accent-primary: #1e3a8a;
-  /* Dark Blue / Navy */
-  --accent-light: rgba(30, 58, 138, 0.1);
-  --accent-soft: rgba(30, 58, 138, 0.05);
+  --accent-primary: #1e40af;
+  /* Adjusted to a deeper blue for professionalism */
+  --accent-secondary: #0ea5e9;
+  --accent-success: #10b981;
+  --accent-warning: #f59e0b;
+  --accent-danger: #ef4444;
+  --accent-light: rgba(30, 64, 175, 0.1);
+  --accent-soft: rgba(30, 64, 175, 0.05);
   --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
-  --text-xmuted: #cbd5e1;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --text-xmuted: #94a3b8;
   --border-subtle: #e2e8f0;
   --border-medium: #cbd5e1;
-  --border-accent: rgba(30, 58, 138, 0.2);
-  --radius-sm: 0.625rem;
-  --radius-md: 0.875rem;
-  --radius-lg: 1.25rem;
-  --radius-xl: 1.5rem;
+  --border-accent: rgba(30, 64, 175, 0.2);
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
   --radius-2xl: 2.25rem;
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.04);
   --shadow-card: 0 12px 30px -10px rgba(0, 0, 0, 0.08);
   --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -590,25 +594,51 @@ h6 {
 .search-input-wrapper {
   position: relative;
   width: 100%;
-  max-width: 480px;
+  max-width: 500px;
 }
 
 .search-input {
   width: 100%;
-  padding: 0.65rem 1rem 0.65rem 2.85rem;
+  padding: 0.75rem 1rem 0.75rem 3rem;
   background: var(--bg-elevated);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: 12px;
   color: var(--text-primary);
-  font-size: 0.875rem;
+  font-size: 0.9rem;
+  font-weight: 500;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .search-input:focus {
   background: #fff;
   border-color: var(--accent-primary);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.08);
+  box-shadow: 0 4px 20px rgba(30, 64, 175, 0.1);
   outline: none;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hover-dim:hover {
+  background: var(--bg-elevated) !important;
+}
+
+.hover-lift {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .dashboard-content {
