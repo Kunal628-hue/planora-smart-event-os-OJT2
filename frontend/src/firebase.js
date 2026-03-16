@@ -11,9 +11,26 @@ const firebaseConfig = {
     appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+// Check for required environment variables
+const isFirebaseConfigValid = !!import.meta.env.VITE_FIREBASE_API_KEY;
+
+let app;
+let auth;
+let db;
+
+if (isFirebaseConfigValid) {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+} else {
+    console.warn("Firebase configuration is missing or invalid. Check your .env file.");
+    // Provide dummy objects to prevent top-level crashes
+    app = {};
+    auth = { onAuthStateChanged: (cb) => { cb(null); return () => {}; } };
+    db = {};
+}
+
+export { auth, db };
 
 // Enable persistence only once
 let persistencePromise = null;
