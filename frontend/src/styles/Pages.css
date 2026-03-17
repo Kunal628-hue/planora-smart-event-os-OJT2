@@ -1,0 +1,163 @@
+/* ─────────────────────────────────────────────────────────────
+   Planora — Premium Page Styles
+   Custom animations and unique UI patterns
+   ───────────────────────────────────────────────────────────── */
+
+.page-header {
+  animation: slideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Glassy Dashboard Cards */
+.glass-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-card);
+  transition: var(--transition);
+  overflow: hidden;
+}
+
+.glass-panel:hover {
+  border-color: var(--accent-primary);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+/* Budget Progress Visuals */
+.budget-ring-container {
+  width: 160px;
+  height: 160px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.budget-ring-svg {
+  transform: rotate(-90deg);
+}
+
+.budget-ring-bg {
+  fill: none;
+  stroke: var(--bg-elevated);
+  stroke-width: 12;
+}
+
+.budget-ring-fill {
+  fill: none;
+  stroke: var(--accent-primary);
+  stroke-width: 12;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Unique Category Badges */
+.category-badge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 2rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid transparent;
+}
+
+/* Analytics Chart Components */
+.chart-container {
+  position: relative;
+  height: 240px;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding-top: 2rem;
+}
+
+.chart-bar {
+  flex: 1;
+  background: linear-gradient(to top, var(--accent-primary), var(--accent-secondary));
+  border-radius: 4px 4px 0 0;
+  min-height: 4px;
+  position: relative;
+  transition: height 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.chart-bar:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 4px 20px var(--accent-light);
+}
+
+/* Health Gauge SVG Animation Support */
+.health-ring-path {
+    transition: stroke-dashoffset 1.5s ease-out;
+}
+
+/* Floating Elements */
+.floating-item {
+  animation: floatSubtle 6s ease-in-out infinite;
+}
+
+@keyframes floatSubtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* Stagger Animations */
+.stagger-in > * {
+  opacity: 0;
+  animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.stagger-in > *:nth-child(1) { animation-delay: 0.1s; }
+.stagger-in > *:nth-child(2) { animation-delay: 0.2s; }
+.stagger-in > *:nth-child(3) { animation-delay: 0.3s; }
+.stagger-in > *:nth-child(4) { animation-delay: 0.4s; }
+.stagger-in > *:nth-child(5) { animation-delay: 0.5s; }
+.stagger-in > *:nth-child(6) { animation-delay: 0.6s; }
+
+/* Dashboard Grid Fix */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 1.5rem;
+}
+
+/* Gradient Text Effect */
+.gradient-text {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Premium Button Overrides */
+.btn-lg {
+    font-size: 1rem;
+    padding: 1.1rem 2.2rem;
+    font-weight: 850;
+    letter-spacing: -0.01em;
+}
+
+/* Pulse Animation for Critical Flags */
+@keyframes pulseDanger {
+    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.pulse-critical {
+    animation: pulseDanger 2s infinite;
+}
