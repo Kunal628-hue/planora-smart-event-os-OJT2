@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import { animate, stagger } from "animejs";
+import { Plus, Calendar, MapPin, ChevronRight, Loader2 } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -38,11 +39,11 @@ export default function Events() {
     useEffect(() => {
         if (!fetchLoading && events.length > 0) {
             animate('.event-card', {
-                scale: [0.9, 1],
+                translateY: [20, 0],
                 opacity: [0, 1],
-                delay: stagger(100),
-                easing: 'easeOutElastic(1, .8)',
-                duration: 1000
+                delay: stagger(60),
+                easing: 'cubicBezier(.22, 1, .36, 1)',
+                duration: 600
             });
         }
     }, [fetchLoading, events.length]);
@@ -119,22 +120,26 @@ export default function Events() {
                 <button
                     onClick={() => setShowModal(true)}
                     className="btn btn-primary btn-lg"
-                    style={{ borderRadius: "14px", padding: "1rem 2rem" }}
+                    style={{ borderRadius: "14px", padding: "1rem 2rem", display: "flex", alignItems: "center", gap: "0.5rem" }}
                 >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: "8px" }}><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                    <Plus size={20} strokeWidth={3} />
                     Initialize Event
                 </button>
             </div>
 
             <div className="dashboard-grid">
                 {fetchLoading ? (
-                    <div style={{ gridColumn: "span 12", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "8rem 0", gap: "1.25rem" }}>
-                        <div style={{ width: "48px", height: "48px", border: "5px solid var(--accent-primary)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 1s linear infinite" }}></div>
-                        <p style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Retrieving Portfolio...</p>
+                    <div style={{ gridColumn: "span 12", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "8rem 0", gap: "1.5rem" }}>
+                        <Loader2 className="animate-spin" size={48} color="var(--accent-primary)" />
+                        <p style={{ fontSize: "0.9rem", fontWeight: 750, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Retrieving Portfolio...</p>
                     </div>
                 ) : events.length === 0 ? (
                     <div className="glass-panel" style={{ gridColumn: "span 12", textAlign: "center", padding: "6rem 2rem", borderRadius: "32px", border: "2px dashed var(--border-medium)" }}>
-                        <div style={{ fontSize: "4rem", marginBottom: "1.5rem" }}>📅</div>
+                        <div style={{ marginBottom: "1.5rem", display: "flex", justifyContent: "center" }}>
+                            <div className="anim-float" style={{ width: "80px", height: "80px", borderRadius: "24px", background: "var(--bg-elevated)", display: "flex", alignItems: "center", justifyContent: "center", border: "1.5px solid var(--border-subtle)" }}>
+                                <Calendar size={40} color="var(--accent-primary)" />
+                            </div>
+                        </div>
                         <h2 style={{ fontSize: "1.75rem", fontWeight: 850 }}>No events registered yet</h2>
                         <p style={{ color: "var(--text-secondary)", marginBottom: "2.5rem", maxWidth: "450px", margin: "0 auto 2.5rem", fontSize: "1.1rem" }}>
                             Your strategic journey starts here. Create your first event to activate Planora's AI logistical engine.
@@ -143,14 +148,14 @@ export default function Events() {
                     </div>
                 ) : (
                     events.map(event => (
-                        <div 
-                            key={event.id || event._id} 
-                            className="glass-panel event-card" 
+                        <div
+                            key={event.id || event._id}
+                            className="glass-panel event-card"
                             style={{ gridColumn: "span 4", padding: "0", borderRadius: "28px", cursor: "pointer", overflow: "hidden" }}
                             onClick={() => navigate(`/events/${event.id || event._id}`)}
                         >
-                            <div style={{ 
-                                height: "8px", 
+                            <div style={{
+                                height: "8px",
                                 background: event.status === "Completed" ? "var(--accent-success)" : "var(--accent-primary)",
                                 opacity: 0.8
                             }}></div>
@@ -159,10 +164,10 @@ export default function Events() {
                                     <span className="category-badge" style={{ background: "var(--accent-soft)", color: "var(--accent-primary)" }}>
                                         {event.type}
                                     </span>
-                                    <div 
+                                    <div
                                         onClick={(e) => handleToggleStatus(e, event.id || event._id, event.status)}
                                         className="category-badge"
-                                        style={{ 
+                                        style={{
                                             background: event.status === "Completed" ? "rgba(16, 185, 129, 0.1)" : "rgba(59, 130, 246, 0.1)",
                                             color: event.status === "Completed" ? "var(--accent-success)" : "var(--accent-primary)",
                                             border: `1px solid ${event.status === "Completed" ? "rgba(16, 185, 129, 0.2)" : "rgba(59, 130, 246, 0.2)"}`
@@ -178,13 +183,13 @@ export default function Events() {
                                 <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginBottom: "2rem" }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", fontSize: "0.9rem", color: "var(--text-secondary)", fontWeight: 500 }}>
                                         <div style={{ width: "32px", height: "32px", borderRadius: "10px", background: "var(--bg-elevated)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent-primary)" }}>
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+                                            <Calendar size={16} strokeWidth={2.5} />
                                         </div>
                                         {event.date}
                                     </div>
                                     <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", fontSize: "0.9rem", color: "var(--text-secondary)", fontWeight: 500 }}>
                                         <div style={{ width: "32px", height: "32px", borderRadius: "10px", background: "var(--bg-elevated)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent-primary)" }}>
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
+                                            <MapPin size={16} strokeWidth={2.5} />
                                         </div>
                                         {event.location}
                                     </div>
@@ -195,8 +200,8 @@ export default function Events() {
                                         <span style={{ fontSize: "0.65rem", color: "var(--text-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>Budget Allocation</span>
                                         <span style={{ fontSize: "1.25rem", color: "var(--text-primary)", fontWeight: 900 }}>₹{parseInt(event.budget).toLocaleString()}</span>
                                     </div>
-                                    <button className="btn btn-ghost" style={{ width: "40px", height: "40px", borderRadius: "12px", padding: 0 }}>
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
+                                    <button className="btn btn-ghost" style={{ width: "40px", height: "40px", borderRadius: "12px", padding: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                        <ChevronRight size={20} strokeWidth={2.5} />
                                     </button>
                                 </div>
                             </div>

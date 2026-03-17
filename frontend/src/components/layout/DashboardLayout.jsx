@@ -2,41 +2,108 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation, Outlet } from "react-router-dom";
 import { auth } from "../../firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
+import {
+    LayoutDashboard,
+    Calendar,
+    Handshake,
+    Users,
+    Wallet,
+    ListTodo,
+    BarChart3,
+    Users2,
+    Settings as SettingsIcon,
+    LogOut,
+    Search,
+    Bell,
+    CheckCircle2,
+    AlertCircle,
+    Cpu,
+    User,
+    ChevronRight
+} from "lucide-react";
 
 const NAV_ITEMS = [
-    { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg> },
-    { id: "events", label: "Events", path: "/events", icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg> },
-    { id: "vendors", label: "Vendors", path: "/vendors", icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="8.5" cy="7" r="4" /><polyline points="17 11 19 13 23 9" /></svg> },
-    { id: "guests", label: "Guests", path: "/guests", icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg> },
-    { id: "budget", label: "Budget", path: "/budget", icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg> },
-    { id: "tasks", label: "Tasks / Timeline", path: "/tasks", icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 11 12 14 22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg> },
-    { id: "analytics", label: "Analytics", path: "/analytics", icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83" /><path d="M22 12A10 10 0 0 0 12 2v10z" /></svg> },
-    { id: "team", label: "Team", path: "/team", icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg> },
-    { id: "settings", label: "Settings", path: "/settings", icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg> },
+    { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={20} /> },
+    { id: "events", label: "Events", path: "/events", icon: <Calendar size={20} /> },
+    { id: "vendors", label: "Vendors", path: "/vendors", icon: <Handshake size={20} /> },
+    { id: "guests", label: "Guests", path: "/guests", icon: <Users size={20} /> },
+    { id: "budget", label: "Budget", path: "/budget", icon: <Wallet size={20} /> },
+    { id: "tasks", label: "Tasks / Timeline", path: "/tasks", icon: <ListTodo size={20} /> },
+    { id: "analytics", label: "Analytics", path: "/analytics", icon: <BarChart3 size={20} /> },
+    { id: "team", label: "Team", path: "/team", icon: <Users2 size={20} /> },
+    { id: "settings", label: "Settings", path: "/settings", icon: <SettingsIcon size={20} /> },
 ];
 
 export default function DashboardLayout() {
     const navigate = useNavigate();
     const location = useLocation();
     const [user, setUser] = useState(null);
+    const [events, setEvents] = useState([]);
+    const [selectedEventId, setSelectedEventId] = useState("");
     const [loading, setLoading] = useState(true);
     const [showNotifications, setShowNotifications] = useState(false);
+
+    const API_URL = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
-            setLoading(false);
             if (!currentUser) {
+                setLoading(false);
                 navigate("/login");
+            } else {
+                fetchEvents(currentUser.uid);
             }
         });
         return () => unsubscribe();
     }, [navigate]);
 
+    const fetchEvents = async (uid) => {
+        try {
+            const res = await fetch(`${API_URL}/events?user=${uid}`);
+            const data = await res.json();
+            setEvents(data);
+
+            // Sync with URL first if possible
+            const match = location.pathname.match(/\/events\/([^/]+)/);
+            if (match && match[1]) {
+                setSelectedEventId(match[1]);
+            } else if (data.length > 0) {
+                // Otherwise keep existing selection or pick first
+                setSelectedEventId(prev => {
+                    const exists = data.find(e => (e.id || e._id) === prev);
+                    return exists ? prev : (data[0].id || data[0]._id);
+                });
+            }
+        } catch (err) {
+            console.error("Layout fetch error:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Effect to sync dropdown selection with URL changes
+    useEffect(() => {
+        const match = location.pathname.match(/\/events\/([^/]+)/);
+        if (match && match[1] && match[1] !== selectedEventId) {
+            setSelectedEventId(match[1]);
+        }
+    }, [location.pathname]);
+
+    // Function to handle dropdown change with navigation sync
+    const handleEventChange = (newId) => {
+        setSelectedEventId(newId);
+        // If we are on event details, navigate to the new one
+        if (location.pathname.startsWith('/events/') && location.pathname !== '/events') {
+            navigate(`/events/${newId}`);
+        }
+    };
+
     if (loading) {
         return (
-            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", background: "var(--bg-base)" }}>
-                <div style={{ width: "40px", height: "40px", border: "4px solid var(--accent-primary)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 1s linear infinite" }}></div>
+            <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", minHeight: "100vh", background: "var(--bg-base)", gap: "1.5rem" }}>
+                <div style={{ width: "48px", height: "48px", border: "4px solid var(--accent-primary)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 1s linear infinite" }}></div>
+                <p style={{ fontWeight: 800, color: "var(--text-muted)", letterSpacing: "0.1em", fontSize: "0.8rem", textTransform: "uppercase" }}>Initializing Core...</p>
             </div>
         );
     }
@@ -50,47 +117,55 @@ export default function DashboardLayout() {
         }
     };
 
+    const selectedEvent = events.find(e => (e.id || e._id) === selectedEventId);
+
     return (
         <div className="dashboard-layout">
             <aside className="dashboard-sidebar">
-                <div style={{ padding: "2rem 1.75rem 3.5rem" }}>
-                    <Link to="/dashboard" style={{ display: "block", cursor: "pointer" }}>
+                <div style={{ padding: "1.5rem 1.5rem 2.5rem" }}>
+                    <Link to="/dashboard" style={{ display: "block" }}>
                         <img
                             src="/logo-new.svg"
                             alt="Planora Logo"
                             style={{
-                                width: "100%",
-                                height: "auto",
-                                display: "block",
-                                filter: "drop-shadow(0 4px 15px rgba(0,0,0,0.3))"
+                                height: "3.2rem",
+                                width: "auto",
+                                display: "block"
                             }}
                         />
                     </Link>
                 </div>
 
-                <nav style={{ flex: 1, padding: "0 0.85rem", overflowY: "auto" }}>
+                <nav style={{ flex: 1, padding: "0 1rem", overflowY: "auto" }}>
                     {NAV_ITEMS.map((item) => (
                         <Link
                             key={item.id}
                             to={item.path}
                             className={`sidebar-item${location.pathname === item.path ? " active" : ""}`}
                             style={{
-                                marginBottom: "0.4rem",
-                                padding: "0.85rem 1.15rem"
+                                marginBottom: "0.5rem",
+                                padding: "0.85rem 1.25rem",
+                                borderRadius: "12px",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "1rem",
+                                textDecoration: "none",
+                                transition: "all 0.2s ease"
                             }}
                         >
                             <span style={{
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                width: "22px",
-                                opacity: location.pathname === item.path ? 1 : 0.7
+                                opacity: location.pathname === item.path ? 1 : 0.6,
+                                color: "inherit"
                             }}>
                                 {item.icon}
                             </span>
                             <span style={{
-                                fontSize: "0.925rem",
-                                fontWeight: location.pathname === item.path ? 700 : 500
+                                fontSize: "0.95rem",
+                                fontWeight: location.pathname === item.path ? 700 : 500,
+                                color: "inherit"
                             }}>
                                 {item.label}
                             </span>
@@ -98,27 +173,26 @@ export default function DashboardLayout() {
                     ))}
                 </nav>
 
-                <div style={{ padding: "0 1rem", marginTop: "auto", marginBottom: "1.5rem" }}>
+                <div style={{ padding: "1.5rem", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
                     <button
                         onClick={handleLogout}
                         className="sidebar-item"
                         style={{
                             width: "100%",
-                            padding: "0.8rem 1rem",
-                            justifyContent: "center",
-                            color: "#ff4d4d",
+                            padding: "0.85rem 1.25rem",
+                            color: "rgba(255, 77, 77, 0.9)",
+                            background: "rgba(255, 77, 77, 0.08)",
                             border: "1px solid rgba(255, 77, 77, 0.15)",
-                            background: "rgba(255, 77, 77, 0.05)",
-                            cursor: "pointer",
                             borderRadius: "12px",
-                            transition: "all 0.3s ease",
+                            cursor: "pointer",
                             display: "flex",
                             alignItems: "center",
-                            gap: "0.8rem",
-                            fontWeight: 700
+                            gap: "1rem",
+                            fontWeight: 700,
+                            transition: "all 0.2s ease"
                         }}
                     >
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
+                        <LogOut size={18} />
                         <span>Sign Out</span>
                     </button>
                 </div>
@@ -126,138 +200,206 @@ export default function DashboardLayout() {
 
             <main className="dashboard-main">
                 <header className="top-bar" style={{
-                    height: "80px",
+                    height: "85px",
                     padding: "0 2.5rem",
                     position: "sticky",
                     top: 0,
                     zIndex: 100,
-                    backdropFilter: "blur(16px)",
-                    background: "rgba(255, 255, 255, 0.8)",
+                    backdropFilter: "blur(20px)",
+                    background: "rgba(255, 255, 255, 0.85)",
                     borderBottom: "1px solid var(--border-subtle)",
-                    boxShadow: "0 4px 6px -1px rgba(0,0,0,0.02)"
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between"
                 }}>
-                    <div className="search-input-wrapper" style={{ flex: 1 }}>
-                        <svg style={{ position: "absolute", left: "1.15rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", opacity: 0.6 }} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
-                        <input className="search-input" placeholder="Search insights, events, or vendors..." style={{ height: "46px", border: "1.5px solid var(--border-subtle)", borderRadius: "12px", width: "100%", maxWidth: "500px" }} />
+                    <div style={{ display: "flex", alignItems: "center", gap: "2rem", flex: 1 }}>
+                        {/* Global Event Selector */}
+                        <div style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "1rem",
+                            background: "var(--bg-elevated)",
+                            padding: "0.5rem 1rem",
+                            borderRadius: "16px",
+                            border: "1px solid var(--border-subtle)",
+                            minWidth: "280px"
+                        }}>
+                            <Calendar size={18} color="var(--accent-primary)" strokeWidth={2.5} />
+                            <div style={{ flex: 1 }}>
+                                <div style={{ fontSize: "0.65rem", fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "2px" }}>Active Project</div>
+                                <select
+                                    value={selectedEventId}
+                                    onChange={(e) => handleEventChange(e.target.value)}
+                                    style={{
+                                        background: "none",
+                                        border: "none",
+                                        fontSize: "0.95rem",
+                                        fontWeight: 850,
+                                        color: "var(--text-primary)",
+                                        width: "100%",
+                                        cursor: "pointer",
+                                        outline: "none"
+                                    }}
+                                >
+                                    {events.length === 0 ? (
+                                        <option value="">No events found</option>
+                                    ) : (
+                                        events.map(event => (
+                                            <option key={event.id || event._id} value={event.id || event._id}>
+                                                {event.name}
+                                            </option>
+                                        ))
+                                    )}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="search-input-wrapper" style={{ flex: 1, position: "relative", maxWidth: "400px" }}>
+                            <Search style={{ position: "absolute", left: "1.25rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", opacity: 0.5 }} size={16} />
+                            <input
+                                className="search-input"
+                                placeholder="Search workspace..."
+                                style={{
+                                    height: "44px",
+                                    border: "1px solid var(--border-subtle)",
+                                    borderRadius: "14px",
+                                    width: "100%",
+                                    paddingLeft: "3rem",
+                                    background: "var(--bg-elevated)",
+                                    fontSize: "0.9rem",
+                                    fontWeight: 500
+                                }}
+                            />
+                        </div>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
+
+                    <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
                         <div style={{ position: "relative" }}>
-                            <div
+                            <button
                                 onClick={() => setShowNotifications(!showNotifications)}
                                 style={{
                                     position: "relative",
                                     cursor: "pointer",
-                                    padding: "0.7rem",
+                                    width: "44px",
+                                    height: "44px",
                                     borderRadius: "12px",
                                     transition: "all 0.2s",
                                     border: "1.5px solid var(--border-subtle)",
                                     background: showNotifications ? "var(--bg-elevated)" : "#fff",
                                     display: "flex",
                                     alignItems: "center",
-                                    justifyContent: "center"
+                                    justifyContent: "center",
+                                    color: "var(--text-primary)"
                                 }}
                                 className="hover-lift"
                             >
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg>
-                            </div>
+                                <Bell size={20} />
+                                <span style={{ position: "absolute", top: "10px", right: "10px", width: "8px", height: "8px", background: "var(--accent-primary)", borderRadius: "50%", border: "2px solid #fff" }}></span>
+                            </button>
 
                             {showNotifications && (
                                 <div style={{
                                     position: "absolute",
-                                    top: "100%",
+                                    top: "calc(100% + 1rem)",
                                     right: 0,
-                                    marginTop: "1rem",
-                                    width: "360px",
+                                    width: "380px",
                                     background: "#fff",
-                                    borderRadius: "20px",
-                                    boxShadow: "0 25px 60px -12px rgba(0,0,0,0.18)",
+                                    borderRadius: "24px",
+                                    boxShadow: "0 25px 50px -12px rgba(0,0,0,0.15)",
                                     border: "1.5px solid var(--border-subtle)",
                                     zIndex: 1000,
                                     overflow: "hidden",
-                                    animation: "fade-up 0.25s cubic-bezier(0.16, 1, 0.3, 1)"
+                                    animation: "fade-up 0.2s ease-out"
                                 }}>
                                     <div style={{ padding: "1.5rem 1.75rem", borderBottom: "1.5px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--bg-elevated)" }}>
-                                        <span style={{ fontWeight: 850, fontSize: "1.05rem", color: "var(--text-primary)" }}>Intelligence Feed</span>
-                                        <span style={{ fontSize: "0.75rem", color: "var(--accent-primary)", fontWeight: 800, cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.05em" }}>Clear</span>
+                                        <h4 style={{ fontWeight: 900, fontSize: "1.1rem", margin: 0 }}>Intelligence Feed</h4>
+                                        <button style={{ background: "none", border: "none", fontSize: "0.75rem", color: "var(--accent-primary)", fontWeight: 800, cursor: "pointer", textTransform: "uppercase" }}>Mark All</button>
                                     </div>
-                                    <div style={{ maxHeight: "380px", overflowY: "auto" }}>
+                                    <div style={{ maxHeight: "400px", overflowY: "auto" }}>
                                         {[
-                                            { id: 1, title: "RSVP Confirmed", msg: "Kunal Singhi confirmed for Wedding", time: "2m ago", icon: "✨", color: "#10b981" },
-                                            { id: 2, title: "Budget Deviation", msg: "Catering is 10% over the optimized path", time: "1h ago", icon: "⚠️", color: "#f59e0b" },
-                                            { id: 3, title: "AI Model Update", msg: "Smart Timeline for Conference refreshed", time: "3h ago", icon: "🤖", color: "#3b82f6" },
+                                            { id: 1, title: "RSVP Confirmed", msg: "Kunal Singhi confirmed for Wedding", time: "2m ago", icon: <CheckCircle2 size={18} />, color: "#10b981" },
+                                            { id: 2, title: "Budget Variance", msg: "Logistics spending is 8% above target", time: "1h ago", icon: <AlertCircle size={18} />, color: "#f59e0b" },
+                                            { id: 3, title: "Neural Matrix Sync", msg: "Event timeline optimized for latency", time: "3h ago", icon: <Cpu size={18} />, color: "#3b82f6" },
                                         ].map((n, i) => (
-                                            <div key={n.id} style={{ padding: "1.25rem 1.75rem", borderBottom: i === 2 ? "none" : "1px solid var(--border-subtle)", cursor: "pointer", transition: "background 0.2s" }} className="hover-dim">
+                                            <div key={n.id} style={{ padding: "1.25rem 1.75rem", borderBottom: i === 2 ? "none" : "1px solid var(--border-subtle)", cursor: "pointer" }} className="hover-dim">
                                                 <div style={{ display: "flex", gap: "1.25rem" }}>
                                                     <div style={{
-                                                        width: "40px",
-                                                        height: "40px",
+                                                        width: "44px",
+                                                        height: "44px",
                                                         borderRadius: "12px",
-                                                        background: `${n.color}15`,
+                                                        background: `${n.color}12`,
                                                         display: "flex",
                                                         alignItems: "center",
                                                         justifyContent: "center",
-                                                        fontSize: "1.1rem"
+                                                        color: n.color,
+                                                        flexShrink: 0
                                                     }}>{n.icon}</div>
                                                     <div style={{ flex: 1 }}>
-                                                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.15rem" }}>
-                                                            <span style={{ fontWeight: 800, fontSize: "0.9rem", color: "var(--text-primary)" }}>{n.title}</span>
+                                                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.25rem" }}>
+                                                            <span style={{ fontWeight: 800, fontSize: "0.95rem" }}>{n.title}</span>
                                                             <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontWeight: 700 }}>{n.time}</span>
                                                         </div>
-                                                        <div style={{ fontSize: "0.825rem", color: "var(--text-secondary)", lineHeight: 1.45, fontWeight: 500 }}>{n.msg}</div>
+                                                        <p style={{ fontSize: "0.875rem", color: "var(--text-secondary)", lineHeight: 1.5, fontWeight: 500, margin: 0 }}>{n.msg}</p>
                                                     </div>
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
-                                    <div style={{ padding: "1.25rem", textAlign: "center", borderTop: "1.5px solid var(--border-subtle)", fontSize: "0.85rem", fontWeight: 800, color: "var(--accent-primary)", cursor: "pointer", background: "#fff" }}>
-                                        View All Engine Activity
-                                    </div>
+                                    <button style={{ width: "100%", padding: "1.25rem", textAlign: "center", border: "none", borderTop: "1.5px solid var(--border-subtle)", fontSize: "0.9rem", fontWeight: 800, color: "var(--accent-primary)", cursor: "pointer", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem" }}>
+                                        Full Engine Logs <ChevronRight size={16} />
+                                    </button>
                                 </div>
                             )}
                         </div>
 
-                        <div style={{ height: "32px", width: "1px", background: "var(--border-subtle)" }}></div>
-
                         <div style={{
                             display: "flex",
                             alignItems: "center",
-                            gap: "0.85rem",
+                            gap: "1rem",
                             cursor: "pointer",
-                            padding: "0.5rem 0.5rem 0.5rem 1rem",
-                            borderRadius: "14px",
+                            padding: "0.5rem",
+                            paddingRight: "1rem",
+                            borderRadius: "16px",
                             transition: "all 0.2s",
-                            border: "1.5px solid transparent",
-                            background: "var(--accent-soft)"
+                            background: "var(--accent-soft)",
+                            border: "1.5px solid transparent"
                         }} className="hover-lift">
-                            <div style={{ textAlign: "right" }}>
-                                <div style={{ fontSize: "0.9rem", fontWeight: 800, color: "var(--text-primary)", lineHeight: 1.2 }}>{user?.displayName?.split(' ')[0] || "Planner"}</div>
-                                <div style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.02em" }}>Expert Mode</div>
-                            </div>
                             <div style={{
-                                width: 42,
-                                height: 42,
-                                borderRadius: "10px",
+                                width: 44,
+                                height: 44,
+                                borderRadius: "12px",
                                 background: "var(--accent-primary)",
                                 color: "#fff",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                fontWeight: 800,
+                                fontWeight: 900,
+                                fontSize: "1.1rem",
                                 overflow: "hidden",
-                                boxShadow: "0 8px 16px -4px rgba(30, 64, 175, 0.3)",
-                                border: "2px solid #fff"
+                                border: "2px solid #fff",
+                                boxShadow: "0 8px 16px -4px rgba(var(--accent-primary-rgb), 0.3)"
                             }}>
                                 {user?.photoURL ? (
                                     <img src={user.photoURL} alt="Avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                                 ) : (
-                                    (user?.displayName?.[0] || user?.email?.[0] || "U").toUpperCase()
+                                    <User size={24} />
                                 )}
+                            </div>
+                            <div style={{ textAlign: "left" }}>
+                                <div style={{ fontSize: "0.95rem", fontWeight: 850, color: "var(--text-primary)", lineHeight: 1 }}>{user?.displayName?.split(' ')[0] || "Planner"}</div>
+                                <div style={{ fontSize: "0.7rem", color: "var(--accent-primary)", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em", marginTop: "4px" }}>Core Engine</div>
                             </div>
                         </div>
                     </div>
                 </header>
-                <div className="dashboard-content" style={{ padding: "2.5rem" }}>
-                    <Outlet context={{ user }} />
+                <div className="dashboard-content" style={{ padding: "3rem" }}>
+                    <Outlet context={{
+                        user,
+                        events,
+                        selectedEventId,
+                        setSelectedEventId,
+                        refreshEvents: () => fetchEvents(user.uid)
+                    }} />
                 </div>
             </main>
         </div>

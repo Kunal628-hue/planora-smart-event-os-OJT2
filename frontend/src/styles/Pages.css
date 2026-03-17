@@ -8,8 +8,15 @@
 }
 
 @keyframes slideDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Glassy Dashboard Cards */
@@ -47,14 +54,15 @@
 .budget-ring-bg {
   fill: none;
   stroke: var(--bg-elevated);
-  stroke-width: 12;
+  stroke-width: 14;
 }
 
 .budget-ring-fill {
   fill: none;
   stroke: var(--accent-primary);
-  stroke-width: 12;
+  stroke-width: 14;
   stroke-linecap: round;
+  filter: drop-shadow(0 0 4px rgba(30, 64, 175, 0.2));
   transition: stroke-dashoffset 1s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -87,7 +95,8 @@
   border-radius: 4px 4px 0 0;
   min-height: 4px;
   position: relative;
-  transition: height 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: bottom;
+  will-change: transform;
 }
 
 .chart-bar:hover {
@@ -97,7 +106,7 @@
 
 /* Health Gauge SVG Animation Support */
 .health-ring-path {
-    transition: stroke-dashoffset 1.5s ease-out;
+  transition: stroke-dashoffset 1.5s ease-out;
 }
 
 /* Floating Elements */
@@ -106,58 +115,97 @@
 }
 
 @keyframes floatSubtle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
 /* Stagger Animations */
-.stagger-in > * {
+.stagger-in>* {
   opacity: 0;
   animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.stagger-in > *:nth-child(1) { animation-delay: 0.1s; }
-.stagger-in > *:nth-child(2) { animation-delay: 0.2s; }
-.stagger-in > *:nth-child(3) { animation-delay: 0.3s; }
-.stagger-in > *:nth-child(4) { animation-delay: 0.4s; }
-.stagger-in > *:nth-child(5) { animation-delay: 0.5s; }
-.stagger-in > *:nth-child(6) { animation-delay: 0.6s; }
+.stagger-in>*:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.stagger-in>*:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.stagger-in>*:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.stagger-in>*:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+.stagger-in>*:nth-child(5) {
+  animation-delay: 0.5s;
+}
+
+.stagger-in>*:nth-child(6) {
+  animation-delay: 0.6s;
+}
 
 /* Dashboard Grid Fix */
 .dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    gap: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.5rem;
 }
 
 /* Gradient Text Effect */
 .gradient-text {
-    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* Premium Button Overrides */
 .btn-lg {
-    font-size: 1rem;
-    padding: 1.1rem 2.2rem;
-    font-weight: 850;
-    letter-spacing: -0.01em;
+  font-size: 1rem;
+  padding: 1.1rem 2.2rem;
+  font-weight: 850;
+  letter-spacing: -0.01em;
 }
 
 /* Pulse Animation for Critical Flags */
 @keyframes pulseDanger {
-    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-    70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+
+  70% {
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
 }
 
 .pulse-critical {
-    animation: pulseDanger 2s infinite;
+  animation: pulseDanger 2s infinite;
 }

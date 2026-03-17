@@ -1,5 +1,13 @@
-import { useEffect, useRef, useState } from "react";
-import { animate } from "animejs";
+import {
+    LayoutDashboard,
+    Calendar,
+    Users,
+    DollarSign,
+    ClipboardList,
+    Ticket,
+    CheckCircle2,
+    Star
+} from "lucide-react";
 import useReveal from "../../hooks/useReveal";
 
 /* ── Waveform bars (ambient animation) ── */
@@ -117,7 +125,7 @@ function FullDashboard() {
             triggered.current = true;
 
             const targets = { revenue: 128400, tickets: 3841, checkins: 1204, satisfaction: 98 };
-            const duration = 1800;
+            const duration = 1200;
             const start = performance.now();
             const tick = (now) => {
                 const t = Math.min((now - start) / duration, 1);
@@ -177,9 +185,15 @@ function FullDashboard() {
                             fontSize: "0.75rem", fontWeight: i === 0 ? 700 : 500,
                             color: i === 0 ? "#c4b5fd" : "var(--text-muted)",
                             background: i === 0 ? "rgba(139,92,246,0.14)" : "transparent",
-                            cursor: "default", display: "flex", alignItems: "center", gap: "0.4rem",
+                            cursor: "default", display: "flex", alignItems: "center", gap: "0.5rem",
                         }}>
-                            {["📊", "📅", "👥", "💰", "📋"][i]} {item}
+                            {[
+                                <LayoutDashboard size={14} />,
+                                <Calendar size={14} />,
+                                <Users size={14} />,
+                                <DollarSign size={14} />,
+                                <ClipboardList size={14} />
+                            ][i]} {item}
                         </div>
                     ))}
 
@@ -194,16 +208,16 @@ function FullDashboard() {
                     {/* Stat row */}
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "0.75rem" }}>
                         {[
-                            { label: "Total Revenue", val: `₹${counts.revenue.toLocaleString()}`, icon: "💰", color: "#3b82f6" },
-                            { label: "Tickets Sold", val: counts.tickets.toLocaleString(), icon: "🎟️", color: "#34d399" },
-                            { label: "Check-ins", val: counts.checkins.toLocaleString(), icon: "✅", color: "#60a5fa" },
-                            { label: "Satisfaction", val: `${counts.satisfaction}%`, icon: "⭐", color: "#f59e0b" },
+                            { label: "Total Revenue", val: `₹${counts.revenue.toLocaleString()}`, icon: <DollarSign size={12} />, color: "#3b82f6" },
+                            { label: "Tickets Sold", val: counts.tickets.toLocaleString(), icon: <Ticket size={12} />, color: "#34d399" },
+                            { label: "Check-ins", val: counts.checkins.toLocaleString(), icon: <CheckCircle2 size={12} />, color: "#60a5fa" },
+                            { label: "Satisfaction", val: `${counts.satisfaction}%`, icon: <Star size={12} />, color: "#f59e0b" },
                         ].map((s) => (
                             <div key={s.label} style={{
                                 background: "var(--bg-base)", borderRadius: "8px", padding: "0.85rem",
                                 border: "1px solid var(--border-subtle)",
                             }}>
-                                <p style={{ fontSize: "0.62rem", color: "var(--text-muted)", marginBottom: "0.3rem" }}>
+                                <p style={{ fontSize: "0.62rem", color: "var(--text-muted)", marginBottom: "0.3rem", display: 'flex', alignItems: 'center', gap: '4px' }}>
                                     {s.icon} {s.label}
                                 </p>
                                 <p style={{
