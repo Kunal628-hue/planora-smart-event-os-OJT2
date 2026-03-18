@@ -8,18 +8,18 @@
 
 /* ── CSS Design Tokens ───────────────────── */
 :root {
-  --bg-base: #f8fafc;
-  --bg-surface: #ffffff;
-  --bg-elevated: #f1f5f9;
+  --bg-base: #f1f5f9;
+  --bg-surface: rgba(255, 255, 255, 0.85);
+  --bg-elevated: #ffffff;
   --bg-card: #ffffff;
-  --accent-primary: #1e40af;
-  /* Adjusted to a deeper blue for professionalism */
+  --accent-primary: #2563eb;
+  /* Premium modern blue */
   --accent-secondary: #0ea5e9;
   --accent-success: #10b981;
   --accent-warning: #f59e0b;
   --accent-danger: #ef4444;
-  --accent-light: rgba(30, 64, 175, 0.1);
-  --accent-soft: rgba(30, 64, 175, 0.05);
+  --accent-light: rgba(37, 99, 235, 0.08);
+  --accent-soft: rgba(37, 99, 235, 0.04);
   --text-primary: #0f172a;
   --text-secondary: #334155;
   --text-muted: #64748b;
@@ -57,10 +57,10 @@
 }
 
 .dashboard-sidebar {
-  background: #0f172a !important;
-  /* Navy Dark Blue */
+  background: linear-gradient(180deg, #0f172a 0%, #020617 100%) !important;
   color: #fff !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.03) !important;
+  box-shadow: 10px 0 40px rgba(0, 0, 0, 0.2) !important;
 }
 
 .dashboard-sidebar .sidebar-item {
@@ -75,11 +75,18 @@
 }
 
 .dashboard-sidebar .sidebar-item.active {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.05) 100%) !important;
+  background: rgba(37, 99, 235, 0.1) !important;
   color: #3b82f6 !important;
   font-weight: 700 !important;
-  border-left: 3px solid #3b82f6 !important;
-  box-shadow: none !important;
+  border-left: 4px solid #3b82f6 !important;
+  box-shadow: inset 0 0 12px rgba(37, 99, 235, 0.05) !important;
+}
+
+.top-bar {
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
 }
 
 .dark-theme .planora-nav.scrolled {
@@ -136,16 +143,20 @@ button {
 
 /* ── Scrollbar ────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 5px;
+  width: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-base);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-accent);
-  border-radius: 3px;
+  background: rgba(30, 64, 175, 0.15);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(30, 64, 175, 0.3);
 }
 
 ::selection {
@@ -285,6 +296,57 @@ h6 {
   transform: translateY(-1px);
 }
 
+/* ── Glass System ──────────────────────────── */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+}
+
+.glass-panel-dark {
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  color: #fff;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+}
+
+.auth-input:focus {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+}
+
+.auth-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+  font-weight: 400;
+}
+
+.auth-input option {
+  background: #0f172a;
+  color: #fff;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
 /* ── Card System ──────────────────────────── */
 .card {
   background: var(--bg-card);
@@ -294,11 +356,18 @@ h6 {
 }
 
 .card:hover {
-  border-color: var(--border-accent);
-  transform: translateY(-5px);
+  border-color: var(--accent-primary);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.1);
+}
+
+.glass-panel:hover {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: var(--accent-primary);
+  transform: translateY(-3px);
   box-shadow:
-    0 16px 48px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(139, 92, 246, 0.12);
+    0 20px 25px -5px rgba(0, 0, 0, 0.05),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .glass-card {
@@ -420,14 +489,20 @@ h6 {
 }
 
 .auth-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-xl);
   padding: 1.75rem 2.25rem;
   width: 100%;
   max-width: 480px;
   position: relative;
   z-index: 2;
+  box-shadow:
+    0 10px 25px -5px rgba(0, 0, 0, 0.3),
+    0 20px 48px -12px rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
 }
 
 .social-group {
@@ -444,17 +519,17 @@ h6 {
   gap: 0.6rem;
   padding: 0.6rem;
   border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
   font-size: 0.85rem;
   font-weight: 500;
   transition: all 0.2s ease;
 }
 
 .social-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: var(--border-accent);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
   transform: translateY(-1px);
 }
 
@@ -463,7 +538,7 @@ h6 {
   align-items: center;
   gap: 1rem;
   margin: 1.25rem 0;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.4);
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -475,16 +550,16 @@ h6 {
   content: "";
   flex: 1;
   height: 1px;
-  background: var(--border-subtle);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .auth-input {
   width: 100%;
   padding: 0.65rem 0.85rem;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-sm);
-  color: var(--text-primary);
+  color: #fff;
   font-size: 0.875rem;
   outline: none;
   transition:
@@ -642,11 +717,46 @@ h6 {
 }
 
 .dashboard-content {
-  padding: 2.5rem;
+  padding: 3rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  animation: fade-up 0.5s ease-out;
+  gap: 2rem;
+  animation: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  z-index: 10;
+}
+
+@keyframes modal-reveal {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+    backdrop-filter: blur(0px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    backdrop-filter: blur(12px);
+  }
+}
+
+.modal-reveal {
+  animation: modal-reveal 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.premium-d.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+}
+
+.glass-panel-dark {
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  color: #fff;
 }
 
 .dashboard-grid {

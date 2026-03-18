@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import { animate, stagger } from "animejs";
-import { UserPlus, Users, Trash2, Mail, Briefcase, Loader2, X } from "lucide-react";
+import { UserPlus, Users, Trash2, Mail, Briefcase, Loader2, X, Calendar } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -142,18 +142,18 @@ export default function Guests() {
                     <p style={{ fontSize: "0.9rem", fontWeight: 750, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Analyzing RSVPs...</p>
                 </div>
             ) : filteredGuests.length === 0 ? (
-                <div className="glass-panel" style={{ padding: "6rem 2rem", textAlign: "center", borderRadius: "32px", border: "2px dashed var(--border-medium)", background: "var(--bg-elevated)", position: "relative", overflow: "hidden" }}>
+                <div className="premium-dark-panel modal-reveal" style={{ padding: "6rem 2rem", textAlign: "center", margin: "2rem 0", position: "relative", overflow: "hidden" }}>
                     <div style={{ marginBottom: "2rem", display: "flex", justifyContent: "center" }}>
-                        <div className="anim-float" style={{ width: "80px", height: "80px", borderRadius: "24px", background: "var(--bg-card)", display: "flex", alignItems: "center", justifyContent: "center", border: "1.5px solid var(--border-subtle)" }}>
+                        <div className="anim-float" style={{ width: "80px", height: "80px", borderRadius: "24px", background: "rgba(255,255,255,0.03)", display: "flex", alignItems: "center", justifyContent: "center", border: "1.5px solid rgba(255,255,255,0.1)" }}>
                             <Users size={40} color="var(--accent-primary)" />
                         </div>
                     </div>
-                    <h2 style={{ fontSize: "1.75rem", fontWeight: 850 }}>Guest list is currently empty</h2>
-                    <p style={{ color: "var(--text-secondary)", marginTop: "1rem", maxWidth: "450px", margin: "1rem auto", fontSize: "1.1rem", fontWeight: 500 }}>
+                    <h2 style={{ fontSize: "1.75rem", fontWeight: 850, color: "#fff" }}>Guest list is currently empty</h2>
+                    <p style={{ color: "rgba(255,255,255,0.6)", marginTop: "1rem", maxWidth: "450px", margin: "1rem auto", fontSize: "1.1rem", fontWeight: 500 }}>
                         {events.length === 0 ? "Identify an event context before adding guests. Create an event first." : "Start populating your attendee list to see analytical growth and rsvp velocity."}
                     </p>
                     {events.length > 0 && (
-                        <button onClick={() => setShowModal(true)} className="btn btn-primary" style={{ marginTop: "1rem" }}>Invite Your First Guest</button>
+                        <button onClick={() => setShowModal(true)} className="btn btn-primary" style={{ marginTop: "1.5rem", borderRadius: "12px", padding: "0.8rem 2rem" }}>Invite Your First Guest</button>
                     )}
                 </div>
             ) : (
@@ -224,47 +224,62 @@ export default function Guests() {
 
             {showModal && (
                 <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(12px)" }}>
-                    <div className="glass-panel" style={{ width: "100%", maxWidth: "500px", padding: "3rem", borderRadius: "32px", boxShadow: "0 30px 60px -12px rgba(0,0,0,0.25)" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                                <Users size={24} color="var(--accent-primary)" />
-                                <h2 style={{ fontSize: "1.75rem", fontWeight: 900, letterSpacing: "-0.03em" }}>Onboard Guest</h2>
+                    <div className="glass-panel-dark modal-reveal" style={{ width: "100%", maxWidth: "500px", padding: "3rem", borderRadius: "32px" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2.5rem" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
+                                <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "var(--accent-soft)", color: "var(--accent-primary)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                    <Users size={24} strokeWidth={2.5} />
+                                </div>
+                                <div>
+                                    <h2 style={{ fontSize: "1.65rem", fontWeight: 950, letterSpacing: "-0.04em", margin: 0 }}>Onboard Guest</h2>
+                                    <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", fontWeight: 600, margin: 0 }}>Register a new attendee for analysis.</p>
+                                </div>
                             </div>
                             <button
                                 onClick={() => setShowModal(false)}
-                                style={{ background: "var(--bg-elevated)", border: "none", color: "var(--text-primary)", width: "36px", height: "36px", borderRadius: "12px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
-                            ><X size={20} fontWeight={900} /></button>
+                                className="hover-lift"
+                                style={{ background: "var(--bg-elevated)", border: "1.5px solid var(--border-subtle)", color: "var(--text-primary)", width: "36px", height: "36px", borderRadius: "12px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                            ><X size={18} strokeWidth={3} /></button>
                         </div>
                         <form onSubmit={handleCreateGuest} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
                             <div>
-                                <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.6rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Full Identity</label>
-                                <input className="auth-input" placeholder="e.g. Johnathan Doe" value={newGuest.name} onChange={e => setNewGuest({ ...newGuest, name: e.target.value })} required style={{ borderRadius: "14px", padding: "1rem" }} />
+                                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Full Identity</label>
+                                <div style={{ position: "relative" }}>
+                                    <UserPlus size={18} style={{ position: "absolute", left: "1.25rem", top: "50%", transform: "translateY(-50%)", color: "var(--accent-primary)", opacity: 0.8 }} />
+                                    <input className="auth-input" placeholder="e.g. Johnathan Doe" value={newGuest.name} onChange={e => setNewGuest({ ...newGuest, name: e.target.value })} required style={{ borderRadius: "14px", padding: "1.1rem 1.1rem 1.1rem 3.25rem", fontWeight: 600 }} />
+                                </div>
                             </div>
 
                             <div>
-                                <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.6rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Operational Event</label>
-                                <select
-                                    className="auth-input"
-                                    value={newGuest.eventId}
-                                    onChange={e => setNewGuest({ ...newGuest, eventId: e.target.value })}
-                                    required
-                                    style={{ borderRadius: "14px", padding: "1rem", fontWeight: 700 }}
-                                >
-                                    {events.map(event => (
-                                        <option key={event.id || event._id} value={event.id || event._id}>{event.name}</option>
-                                    ))}
-                                </select>
+                                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Operational Event</label>
+                                <div style={{ position: "relative" }}>
+                                    <Calendar size={18} style={{ position: "absolute", left: "1.25rem", top: "50%", transform: "translateY(-50%)", color: "var(--accent-primary)", opacity: 0.8 }} />
+                                    <select
+                                        className="auth-input"
+                                        value={newGuest.eventId}
+                                        onChange={e => setNewGuest({ ...newGuest, eventId: e.target.value })}
+                                        required
+                                        style={{ borderRadius: "14px", padding: "1.1rem 1.1rem 1.1rem 3.25rem", fontWeight: 750 }}
+                                    >
+                                        {events.map(event => (
+                                            <option key={event.id || event._id} value={event.id || event._id}>{event.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
 
                             <div>
-                                <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.6rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Digital Contact</label>
-                                <input className="auth-input" placeholder="john@domain.com" type="email" value={newGuest.email} onChange={e => setNewGuest({ ...newGuest, email: e.target.value })} style={{ borderRadius: "14px", padding: "1rem" }} />
+                                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Digital Contact</label>
+                                <div style={{ position: "relative" }}>
+                                    <Mail size={18} style={{ position: "absolute", left: "1.25rem", top: "50%", transform: "translateY(-50%)", color: "var(--accent-primary)", opacity: 0.8 }} />
+                                    <input className="auth-input" placeholder="john@domain.com" type="email" value={newGuest.email} onChange={e => setNewGuest({ ...newGuest, email: e.target.value })} style={{ borderRadius: "14px", padding: "1.1rem 1.1rem 1.1rem 3.25rem", fontWeight: 600 }} />
+                                </div>
                             </div>
 
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
                                 <div>
-                                    <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.6rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Classification</label>
-                                    <select className="auth-input" value={newGuest.category} onChange={e => setNewGuest({ ...newGuest, category: e.target.value })} style={{ borderRadius: "14px", padding: "1rem", fontWeight: 700 }}>
+                                    <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Classification</label>
+                                    <select className="auth-input" value={newGuest.category} onChange={e => setNewGuest({ ...newGuest, category: e.target.value })} style={{ borderRadius: "14px", padding: "1.1rem", fontWeight: 750 }}>
                                         <option>Friend</option>
                                         <option>Family</option>
                                         <option>VIP</option>
@@ -273,8 +288,8 @@ export default function Guests() {
                                     </select>
                                 </div>
                                 <div>
-                                    <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.6rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Initial RSVP</label>
-                                    <select className="auth-input" value={newGuest.status} onChange={e => setNewGuest({ ...newGuest, status: e.target.value })} style={{ borderRadius: "14px", padding: "1rem", fontWeight: 700 }}>
+                                    <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Initial RSVP</label>
+                                    <select className="auth-input" value={newGuest.status} onChange={e => setNewGuest({ ...newGuest, status: e.target.value })} style={{ borderRadius: "14px", padding: "1.1rem", fontWeight: 750 }}>
                                         <option>Pending</option>
                                         <option>Confirmed</option>
                                         <option>Declined</option>
@@ -283,8 +298,8 @@ export default function Guests() {
                             </div>
 
                             <div style={{ display: "flex", gap: "1.25rem", marginTop: "1.25rem" }}>
-                                <button className="btn btn-ghost" type="button" onClick={() => setShowModal(false)} style={{ flex: 1, borderRadius: "14px", fontWeight: 700 }}>Cancel</button>
-                                <button className="btn btn-primary" type="submit" style={{ flex: 2, borderRadius: "14px", fontWeight: 900 }}>Confirm Onboarding</button>
+                                <button className="btn btn-ghost" type="button" onClick={() => setShowModal(false)} style={{ flex: 1, borderRadius: "16px", fontWeight: 750, padding: "1.1rem" }}>Cancel</button>
+                                <button className="btn btn-primary shadow-glow hover-lift" type="submit" style={{ flex: 2, borderRadius: "16px", fontWeight: 900, padding: "1.1rem" }}>Confirm Onboarding</button>
                             </div>
                         </form>
                     </div>

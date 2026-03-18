@@ -334,7 +334,7 @@ export const askAiAssistant = async (req, res) => {
             4. Keep responses friendly and encouraging.
         `;
 
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
         const result = await model.generateContent(context);
         const response = result.response.text();
 

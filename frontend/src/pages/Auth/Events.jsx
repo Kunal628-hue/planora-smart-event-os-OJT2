@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import { animate, stagger } from "animejs";
-import { Plus, Calendar, MapPin, ChevronRight, Loader2 } from "lucide-react";
+import { Plus, Calendar, MapPin, ChevronRight, Loader2, X, Sparkles } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -212,42 +212,58 @@ export default function Events() {
 
             {showModal && (
                 <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(12px)" }}>
-                    <div className="glass-panel" style={{ width: "100%", maxWidth: "550px", padding: "3rem", borderRadius: "32px", boxShadow: "0 30px 60px -12px rgba(0,0,0,0.25)" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
-                            <h2 style={{ fontSize: "1.75rem", fontWeight: 900, letterSpacing: "-0.03em" }}>Initialize Context</h2>
-                            <button onClick={() => setShowModal(false)} style={{ background: "var(--bg-elevated)", border: "none", color: "var(--text-primary)", width: "36px", height: "36px", borderRadius: "12px", cursor: "pointer", fontWeight: 900 }}>✕</button>
+                    <div className="glass-panel-dark modal-reveal" style={{ width: "100%", maxWidth: "550px", padding: "3rem", borderRadius: "32px" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "3rem" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
+                                <div style={{ width: "52px", height: "52px", borderRadius: "16px", background: "var(--accent-soft)", color: "var(--accent-primary)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                    <Plus size={28} strokeWidth={3} />
+                                </div>
+                                <div>
+                                    <h2 style={{ fontSize: "1.75rem", fontWeight: 950, letterSpacing: "-0.04em", margin: 0, color: "#fff" }}>Initialize Context</h2>
+                                    <p style={{ color: "var(--text-muted)", fontSize: "0.9rem", fontWeight: 600, margin: 0, marginTop: "0.25rem" }}>Establish a new operational event stream.</p>
+                                </div>
+                            </div>
+                            <button onClick={() => setShowModal(false)} className="hover-lift" style={{ background: "var(--bg-elevated)", border: "1.5px solid var(--border-subtle)", color: "var(--text-primary)", width: "36px", height: "36px", borderRadius: "12px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                <X size={18} strokeWidth={3} />
+                            </button>
                         </div>
                         <form onSubmit={handleCreateEvent} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
                             <div>
-                                <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.6rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Event Title</label>
-                                <input
-                                    className="auth-input"
-                                    placeholder="e.g. Neo-Tech Conference 2026"
-                                    value={newEvent.name}
-                                    onChange={e => setNewEvent({ ...newEvent, name: e.target.value })}
-                                    required
-                                    style={{ borderRadius: "14px", padding: "1rem" }}
-                                />
+                                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Event Title</label>
+                                <div style={{ position: "relative" }}>
+                                    <Sparkles size={18} style={{ position: "absolute", left: "1.25rem", top: "50%", transform: "translateY(-50%)", color: "var(--accent-primary)", opacity: 0.8 }} />
+                                    <input
+                                        className="auth-input"
+                                        placeholder="e.g. Neo-Tech Conference 2026"
+                                        value={newEvent.name}
+                                        onChange={e => setNewEvent({ ...newEvent, name: e.target.value })}
+                                        required
+                                        style={{ borderRadius: "14px", padding: "1.1rem 1.1rem 1.1rem 3.25rem", fontWeight: 600, fontSize: "1rem" }}
+                                    />
+                                </div>
                             </div>
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
                                 <div>
-                                    <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.6rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Operational Date</label>
-                                    <input
-                                        type="date"
-                                        className="auth-input"
-                                        value={newEvent.date}
-                                        onChange={e => setNewEvent({ ...newEvent, date: e.target.value })}
-                                        required
-                                        style={{ borderRadius: "14px", padding: "1rem" }}
-                                    />
+                                    <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Operational Date</label>
+                                    <div style={{ position: "relative" }}>
+                                        <Calendar size={18} style={{ position: "absolute", left: "1.25rem", top: "50%", transform: "translateY(-50%)", color: "var(--accent-primary)", opacity: 0.8, pointerEvents: "none" }} />
+                                        <input
+                                            type="date"
+                                            className="auth-input"
+                                            value={newEvent.date}
+                                            onChange={e => setNewEvent({ ...newEvent, date: e.target.value })}
+                                            required
+                                            style={{ borderRadius: "14px", padding: "1.1rem 1.1rem 1.1rem 3.25rem", fontWeight: 750, fontSize: "1rem" }}
+                                        />
+                                    </div>
                                 </div>
                                 <div>
-                                    <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.6rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Context Type</label>
+                                    <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Context Type</label>
                                     <select
                                         className="auth-input"
                                         value={newEvent.type}
                                         onChange={e => setNewEvent({ ...newEvent, type: e.target.value })}
-                                        style={{ borderRadius: "14px", padding: "1rem", fontWeight: 700 }}
+                                        style={{ borderRadius: "14px", padding: "1.1rem", fontWeight: 750, fontSize: "1rem" }}
                                     >
                                         <option>Wedding</option>
                                         <option>Conference</option>
@@ -259,27 +275,33 @@ export default function Events() {
                                 </div>
                             </div>
                             <div>
-                                <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.6rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Geographical Location</label>
-                                <input
-                                    className="auth-input"
-                                    placeholder="e.g. Jio World Convention Centre"
-                                    value={newEvent.location}
-                                    onChange={e => setNewEvent({ ...newEvent, location: e.target.value })}
-                                    required
-                                    style={{ borderRadius: "14px", padding: "1rem" }}
-                                />
+                                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Geographical Location</label>
+                                <div style={{ position: "relative" }}>
+                                    <MapPin size={18} style={{ position: "absolute", left: "1.25rem", top: "50%", transform: "translateY(-50%)", color: "var(--accent-primary)", opacity: 0.8 }} />
+                                    <input
+                                        className="auth-input"
+                                        placeholder="e.g. Jio World Convention Centre"
+                                        value={newEvent.location}
+                                        onChange={e => setNewEvent({ ...newEvent, location: e.target.value })}
+                                        required
+                                        style={{ borderRadius: "14px", padding: "1.1rem 1.1rem 1.1rem 3.25rem", fontWeight: 600, fontSize: "1rem" }}
+                                    />
+                                </div>
                             </div>
                             <div>
-                                <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.6rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Project Budget Allocation (₹)</label>
-                                <input
-                                    type="number"
-                                    className="auth-input"
-                                    placeholder="e.g. 500000"
-                                    value={newEvent.budget}
-                                    onChange={e => setNewEvent({ ...newEvent, budget: e.target.value })}
-                                    required
-                                    style={{ borderRadius: "14px", padding: "1rem" }}
-                                />
+                                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Project Budget Allocation (₹)</label>
+                                <div style={{ position: "relative" }}>
+                                    <span style={{ position: "absolute", left: "1.25rem", top: "50%", transform: "translateY(-50%)", color: "var(--accent-primary)", fontWeight: 900, opacity: 0.8 }}>₹</span>
+                                    <input
+                                        type="number"
+                                        className="auth-input"
+                                        placeholder="e.g. 500000"
+                                        value={newEvent.budget}
+                                        onChange={e => setNewEvent({ ...newEvent, budget: e.target.value })}
+                                        required
+                                        style={{ borderRadius: "14px", padding: "1.1rem 1.1rem 1.1rem 2.8rem", fontWeight: 850, fontSize: "1.1rem" }}
+                                    />
+                                </div>
                             </div>
                             <button
                                 type="submit"
@@ -300,10 +322,15 @@ export default function Events() {
                             >
                                 {loading ? (
                                     <>
-                                        <div style={{ width: "20px", height: "20px", border: "3px solid #fff", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }}></div>
-                                        Processing...
+                                        <div style={{ width: "22px", height: "22px", border: "3px solid #fff", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }}></div>
+                                        Processing Matrix...
                                     </>
-                                ) : "Initialize Project"}
+                                ) : (
+                                    <>
+                                        Initialize Project
+                                        <ChevronRight size={20} />
+                                    </>
+                                )}
                             </button>
                         </form>
                     </div>

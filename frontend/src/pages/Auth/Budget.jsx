@@ -13,7 +13,8 @@ import {
     X,
     ChevronDown,
     IndianRupee,
-    CircleSlash
+    CircleSlash,
+    Sparkles
 } from "lucide-react";
 
 export default function Budget() {
@@ -315,66 +316,82 @@ export default function Budget() {
             </div>
 
             {showModal && (
-                <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(16px)" }}>
-                    <div className="glass-panel" style={{ width: "90%", maxWidth: "540px", padding: "3.5rem", borderRadius: "32px", boxShadow: "0 40px 80px -20px rgba(0,0,0,0.35)", position: "relative" }}>
-                        <button
-                            onClick={() => setShowModal(false)}
-                            style={{ position: "absolute", right: "2rem", top: "2rem", background: "var(--bg-elevated)", border: "1.5px solid var(--border-subtle)", color: "var(--text-primary)", width: "40px", height: "40px", borderRadius: "14px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
-                        >
-                            <X size={20} />
-                        </button>
-                        <div style={{ marginBottom: "2.5rem" }}>
-                            <h2 style={{ fontSize: "2rem", fontWeight: 950, letterSpacing: "-0.04em", margin: 0 }}>Log Financial Impact</h2>
-                            <p style={{ color: "var(--text-muted)", fontSize: "1rem", marginTop: "0.5rem", fontWeight: 600 }}>Update the transaction ledger for the current context.</p>
+                <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(12px)" }}>
+                    <div className="glass-panel-dark modal-reveal" style={{ width: "100%", maxWidth: "520px", padding: "3rem", borderRadius: "32px", position: "relative" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2.5rem" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
+                                <div style={{ width: "52px", height: "52px", borderRadius: "16px", background: "rgba(30, 64, 175, 0.08)", color: "var(--accent-primary)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                    <Wallet size={28} strokeWidth={2.5} />
+                                </div>
+                                <div>
+                                    <h2 style={{ fontSize: "1.75rem", fontWeight: 950, letterSpacing: "-0.04em", margin: 0 }}>Log Financial Impact</h2>
+                                    <p style={{ color: "var(--text-muted)", fontSize: "0.9rem", fontWeight: 600, margin: 0, marginTop: "0.25rem" }}>Update the transaction ledger with a new entry.</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setShowModal(false)}
+                                className="hover-lift"
+                                style={{ background: "var(--bg-elevated)", border: "1.5px solid var(--border-subtle)", color: "var(--text-primary)", width: "40px", height: "40px", borderRadius: "14px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                            >
+                                <X size={20} strokeWidth={3} />
+                            </button>
                         </div>
                         <form onSubmit={handleAddExpense} style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
                             <div>
-                                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 850, color: "var(--text-muted)", marginBottom: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Entity / Vendor Name</label>
-                                <input
-                                    className="auth-input"
-                                    placeholder="e.g. Grand Ballroom Reservation"
-                                    value={newExpense.name}
-                                    onChange={e => setNewExpense({ ...newExpense, name: e.target.value })}
-                                    style={{ padding: "1.1rem", borderRadius: "16px", border: "1.5px solid var(--border-subtle)" }}
-                                    required
-                                />
+                                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Entity / Vendor Name</label>
+                                <div style={{ position: "relative" }}>
+                                    <Sparkles size={18} style={{ position: "absolute", left: "1.25rem", top: "50%", transform: "translateY(-50%)", color: "var(--accent-primary)", opacity: 0.8 }} />
+                                    <input
+                                        className="auth-input"
+                                        placeholder="e.g. Grand Ballroom Reservation"
+                                        value={newExpense.name}
+                                        onChange={e => setNewExpense({ ...newExpense, name: e.target.value })}
+                                        style={{ padding: "1.1rem 1.1rem 1.1rem 3.25rem", borderRadius: "16px", fontWeight: 600, fontSize: "1rem" }}
+                                        required
+                                    />
+                                </div>
                             </div>
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
                                 <div style={{ position: "relative" }}>
-                                    <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 850, color: "var(--text-muted)", marginBottom: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Category</label>
-                                    <select
-                                        className="auth-input"
-                                        value={newExpense.service}
-                                        onChange={e => setNewExpense({ ...newExpense, service: e.target.value })}
-                                        style={{ padding: "1.1rem", borderRadius: "16px", border: "1.5px solid var(--border-subtle)", appearance: "none" }}
-                                        required
-                                    >
-                                        <option>Catering</option>
-                                        <option>Decor</option>
-                                        <option>Photography</option>
-                                        <option>Venue</option>
-                                        <option>Logistics</option>
-                                        <option>Entertainment</option>
-                                    </select>
-                                    <ChevronDown size={18} style={{ position: "absolute", right: "1rem", bottom: "1.1rem", pointerEvents: "none", opacity: 0.5 }} />
+                                    <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Category</label>
+                                    <div style={{ position: "relative" }}>
+                                        <select
+                                            className="auth-input"
+                                            value={newExpense.service}
+                                            onChange={e => setNewExpense({ ...newExpense, service: e.target.value })}
+                                            style={{ padding: "1.1rem", borderRadius: "16px", appearance: "none", fontWeight: 750 }}
+                                            required
+                                        >
+                                            <option>Catering</option>
+                                            <option>Decor</option>
+                                            <option>Photography</option>
+                                            <option>Venue</option>
+                                            <option>Logistics</option>
+                                            <option>Entertainment</option>
+                                        </select>
+                                        <ChevronDown size={18} style={{ position: "absolute", right: "1rem", top: "50%", transform: "translateY(-50%)", pointerEvents: "none", opacity: 0.5 }} />
+                                    </div>
                                 </div>
                                 <div style={{ position: "relative" }}>
-                                    <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 850, color: "var(--text-muted)", marginBottom: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Financial Cost</label>
+                                    <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Financial Cost</label>
                                     <div style={{ position: "relative" }}>
-                                        <IndianRupee size={16} style={{ position: "absolute", left: "1.15rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
+                                        <IndianRupee size={16} style={{ position: "absolute", left: "1.15rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontWeight: 900, opacity: 0.6 }} />
                                         <input
                                             className="auth-input"
                                             type="number"
                                             placeholder="50000"
                                             value={newExpense.cost}
                                             onChange={e => setNewExpense({ ...newExpense, cost: e.target.value })}
-                                            style={{ padding: "1.1rem 1.1rem 1.1rem 2.8rem", borderRadius: "16px", border: "1.5px solid var(--border-subtle)" }}
+                                            style={{ padding: "1.1rem 1.1rem 1.1rem 2.8rem", borderRadius: "16px", fontWeight: 850, fontSize: "1.1rem" }}
                                             required
                                         />
                                     </div>
                                 </div>
                             </div>
-                            <button className="btn btn-primary" type="submit" style={{ width: "100%", padding: "1.25rem", borderRadius: "16px", fontWeight: 900, marginTop: "1rem", fontSize: "1.1rem", boxShadow: "0 15px 30px -10px rgba(var(--accent-primary-rgb), 0.4)" }}>Update Ledger</button>
+                            <div style={{ display: "flex", gap: "1.5rem", marginTop: "1rem" }}>
+                                <button className="btn btn-ghost" type="button" onClick={() => setShowModal(false)} style={{ flex: 1, borderRadius: "16px", fontWeight: 750, padding: "1.1rem" }}>Cancel</button>
+                                <button className="btn btn-primary shadow-glow hover-lift" type="submit" style={{ flex: 1.5, borderRadius: "16px", fontWeight: 900, padding: "1.1rem", fontSize: "1.05rem" }}>Update Ledger</button>
+                            </div>
                         </form>
                     </div>
                 </div>

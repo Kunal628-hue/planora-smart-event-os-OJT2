@@ -175,14 +175,14 @@ export default function Vendors() {
                     <p style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Synchronizing Global Ledger...</p>
                 </div>
             ) : filteredVendors.length === 0 ? (
-                <div className="glass-panel" style={{ padding: "6rem 2rem", textAlign: "center", borderRadius: "32px", border: "1.5px dashed var(--border-medium)", background: "var(--bg-elevated)", opacity: 0.8 }}>
+                <div className="premium-dark-panel modal-reveal" style={{ padding: "6rem 2rem", textAlign: "center", margin: "2rem 0" }}>
                     <div style={{ marginBottom: "2rem", display: "flex", justifyContent: "center" }}>
-                        <div style={{ width: "80px", height: "80px", borderRadius: "24px", background: "var(--bg-surface)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "var(--shadow-md)" }}>
-                            <Handshake size={40} color="var(--text-muted)" />
+                        <div style={{ width: "80px", height: "80px", borderRadius: "24px", background: "rgba(255,255,255,0.03)", display: "flex", alignItems: "center", justifyContent: "center", border: "1.5px solid rgba(255,255,255,0.1)" }}>
+                            <Handshake size={40} color="var(--accent-primary)" />
                         </div>
                     </div>
-                    <h2 style={{ fontSize: "1.75rem", fontWeight: 850, color: "var(--text-primary)" }}>No active partnerships found</h2>
-                    <p style={{ color: "var(--text-secondary)", marginTop: "1rem", maxWidth: "480px", margin: "1rem auto", fontSize: "1.1rem", lineHeight: 1.6 }}>
+                    <h2 style={{ fontSize: "1.75rem", fontWeight: 850, color: "#fff" }}>No active partnerships found</h2>
+                    <p style={{ color: "rgba(255,255,255,0.6)", marginTop: "1rem", maxWidth: "480px", margin: "1rem auto", fontSize: "1.1rem", lineHeight: 1.6 }}>
                         {events.length === 0 ? "Establish an event context before onboarding vendor partners to begin financial tracking." : "Commence tracking your catering, venue, and technical partners to unlock advanced fiscal analytics."}
                     </p>
                     {events.length > 0 && (
@@ -290,45 +290,56 @@ export default function Vendors() {
             )}
 
             {showModal && (
-                <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(8px)" }}>
-                    <div className="glass-panel" style={{ width: "100%", maxWidth: "520px", padding: "3rem", borderRadius: "32px", boxShadow: "0 40px 100px -12px rgba(0,0,0,0.3)", background: "var(--bg-surface)", border: "1px solid var(--border-medium)" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2.5rem" }}>
-                            <h2 style={{ fontSize: "1.85rem", fontWeight: 900, letterSpacing: "-0.04em" }}>Register Business Partner</h2>
+                <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(12px)" }}>
+                    <div className="glass-panel-dark modal-reveal" style={{ width: "100%", maxWidth: "540px", padding: "3.5rem", borderRadius: "32px", position: "relative" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "3rem" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
+                                <div style={{ width: "52px", height: "52px", borderRadius: "16px", background: "var(--accent-soft)", color: "var(--accent-primary)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                    <Handshake size={28} strokeWidth={2.5} />
+                                </div>
+                                <div>
+                                    <h2 style={{ fontSize: "1.75rem", fontWeight: 950, letterSpacing: "-0.04em", margin: 0 }}>Register Business Partner</h2>
+                                    <p style={{ color: "var(--text-muted)", fontSize: "0.9rem", fontWeight: 600, margin: 0, marginTop: "0.25rem" }}>Onboard a new vendor into the ecosystem.</p>
+                                </div>
+                            </div>
                             <button
                                 onClick={() => setShowModal(false)}
                                 className="hover-lift"
-                                style={{ background: "var(--bg-elevated)", border: "none", color: "var(--text-primary)", width: "40px", height: "40px", borderRadius: "14px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                                style={{ background: "var(--bg-elevated)", border: "1.5px solid var(--border-subtle)", color: "var(--text-primary)", width: "40px", height: "40px", borderRadius: "14px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
                             >
-                                <X size={20} strokeWidth={2.5} />
+                                <X size={20} strokeWidth={3} />
                             </button>
                         </div>
                         <form onSubmit={handleCreateVendor} style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
                             <div>
-                                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Legal Trading Name</label>
+                                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Legal Trading Name</label>
                                 <div style={{ position: "relative" }}>
-                                    <Building2 size={18} style={{ position: "absolute", left: "1.25rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
+                                    <Building2 size={18} style={{ position: "absolute", left: "1.25rem", top: "50%", transform: "translateY(-50%)", color: "var(--accent-primary)", opacity: 0.8 }} />
                                     <input className="auth-input" placeholder="e.g. Paramount Global Services" value={newVendor.name} onChange={e => setNewVendor({ ...newVendor, name: e.target.value })} required style={{ borderRadius: "14px", padding: "1.1rem 1.1rem 1.1rem 3.25rem", fontSize: "1rem", fontWeight: 600 }} />
                                 </div>
                             </div>
 
                             <div>
-                                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Operational Context (Event)</label>
-                                <select
-                                    className="auth-input"
-                                    value={newVendor.eventId}
-                                    onChange={e => setNewVendor({ ...newVendor, eventId: e.target.value })}
-                                    required
-                                    style={{ borderRadius: "14px", padding: "1.1rem", fontWeight: 750, fontSize: "1rem" }}
-                                >
-                                    {events.map(event => (
-                                        <option key={event.id || event._id} value={event.id || event._id}>{event.name}</option>
-                                    ))}
-                                </select>
+                                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Operational Context (Event)</label>
+                                <div style={{ position: "relative" }}>
+                                    <MapPin size={18} style={{ position: "absolute", left: "1.25rem", top: "50%", transform: "translateY(-50%)", color: "var(--accent-primary)", opacity: 0.8 }} />
+                                    <select
+                                        className="auth-input"
+                                        value={newVendor.eventId}
+                                        onChange={e => setNewVendor({ ...newVendor, eventId: e.target.value })}
+                                        required
+                                        style={{ borderRadius: "14px", padding: "1.1rem 1.1rem 1.1rem 3.25rem", fontWeight: 750, fontSize: "1rem" }}
+                                    >
+                                        {events.map(event => (
+                                            <option key={event.id || event._id} value={event.id || event._id}>{event.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
 
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
                                 <div>
-                                    <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Core Competency</label>
+                                    <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Core Competency</label>
                                     <select className="auth-input" value={newVendor.service} onChange={e => setNewVendor({ ...newVendor, service: e.target.value })} style={{ borderRadius: "14px", padding: "1.1rem", fontWeight: 750, fontSize: "1rem" }}>
                                         <option>Catering</option>
                                         <option>Decor</option>
@@ -338,15 +349,18 @@ export default function Vendors() {
                                         <option>Logistics</option>
                                     </select>
                                 </div>
-                                <div>
-                                    <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Project Valuation (₹)</label>
-                                    <input className="auth-input" type="number" placeholder="0.00" value={newVendor.cost} onChange={e => setNewVendor({ ...newVendor, cost: e.target.value })} required style={{ borderRadius: "14px", padding: "1.1rem", fontSize: "1rem", fontWeight: 800 }} />
+                                <div >
+                                    <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Project Valuation (₹)</label>
+                                    <div style={{ position: "relative" }}>
+                                        <Sparkles size={16} style={{ position: "absolute", left: "1.1rem", top: "50%", transform: "translateY(-50%)", color: "var(--accent-primary)", opacity: 0.8 }} />
+                                        <input className="auth-input" type="number" placeholder="0.00" value={newVendor.cost} onChange={e => setNewVendor({ ...newVendor, cost: e.target.value })} required style={{ borderRadius: "14px", padding: "1.1rem 1.1rem 1.1rem 2.8rem", fontSize: "1rem", fontWeight: 850 }} />
+                                    </div>
                                 </div>
                             </div>
 
-                            <div style={{ display: "flex", gap: "1.25rem", marginTop: "1rem" }}>
-                                <button className="btn btn-ghost" type="button" onClick={() => setShowModal(false)} style={{ flex: 1, borderRadius: "14px", fontWeight: 750, padding: "1.1rem" }}>Cancel</button>
-                                <button className="btn btn-primary" type="submit" style={{ flex: 1.5, borderRadius: "14px", fontWeight: 900, padding: "1.1rem" }}>Execute Registration</button>
+                            <div style={{ display: "flex", gap: "1.5rem", marginTop: "1rem" }}>
+                                <button className="btn btn-ghost" type="button" onClick={() => setShowModal(false)} style={{ flex: 1, borderRadius: "16px", fontWeight: 750, padding: "1.1rem" }}>Cancel</button>
+                                <button className="btn btn-primary shadow-glow hover-lift" type="submit" style={{ flex: 1.5, borderRadius: "16px", fontWeight: 900, padding: "1.1rem", fontSize: "1.05rem" }}>Execute Registration</button>
                             </div>
                         </form>
                     </div>

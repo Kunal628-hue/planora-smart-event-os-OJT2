@@ -208,7 +208,7 @@ export default function Tasks() {
 
             {showModal && (
                 <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(12px)" }}>
-                    <div className="glass-panel" style={{ width: "100%", maxWidth: "500px", padding: "3rem", borderRadius: "32px", boxShadow: "0 30px 60px -12px rgba(0,0,0,0.25)" }}>
+                    <div className="glass-panel-dark modal-reveal" style={{ width: "100%", maxWidth: "520px", padding: "3rem", borderRadius: "32px" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
                                 <ListTodo size={24} color="var(--accent-primary)" />
@@ -221,12 +221,12 @@ export default function Tasks() {
                         </div>
                         <form onSubmit={handleCreateTask} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
                             <div>
-                                <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.6rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Milestone Title</label>
+                                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.6rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Milestone Title</label>
                                 <input className="auth-input" placeholder="e.g. Finalize Catering Menu" value={newTask.title} onChange={e => setNewTask({ ...newTask, title: e.target.value })} required style={{ borderRadius: "14px", padding: "1rem" }} />
                             </div>
 
                             <div>
-                                <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.6rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Associated Context</label>
+                                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.6rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Associated Context</label>
                                 <select
                                     className="auth-input"
                                     value={newTask.eventId}
@@ -242,11 +242,11 @@ export default function Tasks() {
 
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
                                 <div>
-                                    <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.6rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Deadline</label>
+                                    <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.6rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Deadline</label>
                                     <input className="auth-input" type="date" value={newTask.dueDate} onChange={e => setNewTask({ ...newTask, dueDate: e.target.value })} required style={{ borderRadius: "14px", padding: "1rem" }} />
                                 </div>
                                 <div>
-                                    <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.6rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Priority Index</label>
+                                    <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.6rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Priority Index</label>
                                     <select className="auth-input" value={newTask.priority} onChange={e => setNewTask({ ...newTask, priority: e.target.value })} style={{ borderRadius: "14px", padding: "1rem", fontWeight: 700 }}>
                                         <option>Low</option>
                                         <option>Medium</option>

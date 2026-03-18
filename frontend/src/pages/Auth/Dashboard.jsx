@@ -149,10 +149,10 @@ export default function Dashboard() {
     return (
         <div className="stagger-in">
             <div className="page-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "3.5rem" }}>
-                <div>
+                <div style={{ position: "relative", zIndex: 1 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", marginBottom: "0.75rem" }}>
                         <h1 style={{ fontSize: "3rem", fontWeight: 950, letterSpacing: "-0.05em" }}>Operational <span className="gradient-text">Intelligence</span></h1>
-                        <div className="category-badge" style={{ background: "rgba(16, 185, 129, 0.08)", color: "var(--accent-success)", border: "1px solid rgba(16, 185, 129, 0.15)", padding: "0.5rem 1rem", fontSize: "0.75rem", fontWeight: 800 }}>
+                        <div className="category-badge" style={{ background: "rgba(37, 92, 235, 0.08)", color: "var(--accent-primary)", border: "1px solid rgba(37, 92, 235, 0.15)", padding: "0.5rem 1rem", fontSize: "0.75rem", fontWeight: 800 }}>
                             <span style={{ width: 8, height: 8, borderRadius: "50%", background: "currentColor", animation: "pulse 2s infinite" }}></span>
                             CORE ENGINE v6.2
                         </div>
@@ -215,19 +215,25 @@ export default function Dashboard() {
                         <div style={{ display: "flex", justifyContent: "center" }}>
                             <div className="budget-ring-container" style={{ width: 220, height: 220, position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
                                 <svg width="220" height="220" viewBox="0 0 100 100" style={{ transform: "rotate(-90deg)" }}>
-                                    <circle cx="50" cy="50" r="42" fill="none" stroke="var(--bg-elevated)" strokeWidth="10" />
-                                    <circle cx="50" cy="50" r="42" fill="none"
-                                        stroke={getHealthColor(healthData?.score || 0)}
-                                        strokeWidth="10"
-                                        strokeDasharray="263.89"
-                                        strokeDashoffset={263.89 * (1 - (healthData?.score || 0) / 100)}
+                                    <defs>
+                                        <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" stopColor="var(--accent-primary)" />
+                                            <stop offset="100%" stopColor="var(--accent-secondary)" />
+                                        </linearGradient>
+                                    </defs>
+                                    <circle cx="50" cy="50" r="44" fill="none" stroke="var(--bg-elevated)" strokeWidth="8" />
+                                    <circle cx="50" cy="50" r="44" fill="none"
+                                        stroke="url(#ringGradient)"
+                                        strokeWidth="8"
+                                        strokeDasharray="276.46"
+                                        strokeDashoffset={276.46 * (1 - (healthData?.score || 0) / 100)}
                                         strokeLinecap="round"
-                                        style={{ transition: "stroke-dashoffset 1s cubic-bezier(.22, 1, .36, 1)" }}
+                                        style={{ transition: "stroke-dashoffset 1.5s cubic-bezier(.16, 1, .3, 1)" }}
                                     />
                                 </svg>
                                 <div style={{ position: "absolute", textAlign: "center" }}>
-                                    <div style={{ fontSize: "4.5rem", fontWeight: 950, color: "var(--text-primary)", lineHeight: 1, letterSpacing: "-0.05em" }}>{healthData?.score || 0}</div>
-                                    <div style={{ fontSize: "0.8rem", fontWeight: 900, color: "var(--text-muted)", textTransform: "uppercase", marginTop: "0.25rem", letterSpacing: "0.1em" }}>Health ID</div>
+                                    <div style={{ fontSize: "4.5rem", fontWeight: 950, color: "var(--text-primary)", lineHeight: 1, letterSpacing: "-0.05em" }}>{healthData?.score || 0}%</div>
+                                    <div style={{ fontSize: "0.8rem", fontWeight: 900, color: "var(--text-muted)", textTransform: "uppercase", marginTop: "0.15rem", letterSpacing: "0.1em" }}>Health Index</div>
                                 </div>
                             </div>
                         </div>

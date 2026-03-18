@@ -19,8 +19,10 @@ import {
     AlertCircle,
     Cpu,
     User,
-    ChevronRight
+    ChevronRight,
+    Sparkles
 } from "lucide-react";
+import DashboardBackground from "./DashboardBackground";
 
 const NAV_ITEMS = [
     { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={20} /> },
@@ -198,7 +200,8 @@ export default function DashboardLayout() {
                 </div>
             </aside>
 
-            <main className="dashboard-main">
+            <main className="dashboard-main" style={{ position: "relative" }}>
+                <DashboardBackground />
                 <header className="top-bar" style={{
                     height: "85px",
                     padding: "0 2.5rem",
