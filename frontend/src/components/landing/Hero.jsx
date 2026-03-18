@@ -1,333 +1,450 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { animate, stagger, createTimeline } from "animejs";
-import ThreeBackground from "./ThreeBackground";
+import { animate, createTimeline, stagger } from "animejs";
+import useCursorGlow from "../../hooks/useCursorGlow";
+import useMagnetic from "../../hooks/useMagnetic";
 
-// ── Particles ──
-function Particle({ style }) {
-    return (
-        <div
-            style={{
-                position: "absolute",
-                borderRadius: "50%",
-                pointerEvents: "none",
-                ...style,
-            }}
-        />
-    );
+// ── Canvas Particle System ──
+function ParticleCanvas() {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+
+    const resize = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    const PARTICLE_COUNT = 60;
+    const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      radius: Math.random() * 1.5 + 0.3,
+      opacity: Math.random() * 0.4 + 0.05,
+      speedX: (Math.random() - 0.5) * 0.25,
+      speedY: -(Math.random() * 0.3 + 0.1),
+      hue: Math.random() > 0.5 ? 250 : 200 + Math.random() * 50,
+    }));
+
+    let raf;
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach((p) => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${p.hue}, 80%, 70%, ${p.opacity})`;
+        ctx.fill();
+
+        p.x += p.speedX;
+        p.y += p.speedY;
+
+        if (p.y < -5) {
+          p.y = canvas.height + 5;
+          p.x = Math.random() * canvas.width;
+        }
+        if (p.x < -5) p.x = canvas.width + 5;
+        if (p.x > canvas.width + 5) p.x = -5;
+      });
+      raf = requestAnimationFrame(draw);
+    };
+    draw();
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", resize);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: "absolute",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        pointerEvents: "none",
+        zIndex: 1,
+      }}
+    />
+  );
 }
 
-// ── UI Mockup Component ──
+// ── Dashboard Preview Mock ──
 function HeroDashboardMock() {
-    return (
-        <div className="hero-mockup-card" style={{
-            position: "relative",
-            background: "#ffffff",
-            border: "1px solid rgba(0, 0, 0, 0.05)",
-            borderRadius: "1.5rem",
-            padding: "1.5rem",
-            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.1), 0 10px 15px -3px rgba(0, 0, 0, 0.05)",
-            maxWidth: "520px",
-            width: "100%",
-            margin: "0 auto",
-            transition: "all 0.4s ease",
-            color: "#1e293b"
-        }}>
-            {/* Header */}
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1.5rem", alignItems: "center" }}>
-                <div>
-                    <div style={{ fontSize: "0.85rem", color: "#64748b", marginBottom: "0.2rem", fontWeight: 500 }}>Event Health</div>
-                    <div style={{ fontSize: "1.1rem", fontWeight: 700, color: "#0f172a" }}>Tech Summit 2026</div>
-                </div>
-                <div style={{
-                    padding: "0.3rem 0.8rem", background: "#f0fdf4",
-                    borderRadius: "2rem", border: "1px solid #dcfce7",
-                    color: "#16a34a", fontSize: "0.75rem", fontWeight: 700,
-                    display: "flex", alignItems: "center", gap: "0.3rem"
-                }}>
-                    <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#16a34a" }}></span> On Track
-                </div>
-            </div>
+  const pathRef = useRef(null);
 
-            {/* Main Stats Row - Health Score & Budget */}
-            <div style={{ display: "flex", gap: "1.5rem", marginBottom: "1.5rem", alignItems: "center" }}>
-                {/* Health Score Circle */}
-                <div style={{
-                    flex: "0 0 auto", width: "130px", height: "130px",
-                    position: "relative", display: "flex", alignItems: "center", justifyContent: "center"
-                }}>
-                    <svg viewBox="0 0 36 36" style={{ width: "100%", height: "100%", transform: "rotate(-90deg)" }}>
-                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f1f5f9" strokeWidth="3" />
-                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                            fill="none" stroke="#8b5cf6" strokeWidth="3" strokeDasharray="82, 100" strokeLinecap="round"
-                        />
-                    </svg>
-                    <div style={{ position: "absolute", textAlign: "center", zIndex: 10 }}>
-                        <div style={{ fontSize: "2.3rem", fontWeight: 800, color: "#8b5cf6", lineHeight: 1 }}>82</div>
-                        <div style={{ fontSize: "0.6rem", color: "#64748b", marginTop: "0.2rem", fontWeight: 700, letterSpacing: "0.05em" }}>SCORE</div>
-                    </div>
-                </div>
+  useEffect(() => {
+    if (!pathRef.current) return;
+    const len = 1000;
+    animate(pathRef.current, {
+      strokeDashoffset: [len, 0],
+      duration: 2000,
+      delay: 1400,
+      easing: "easeOutCubic",
+    });
+  }, []);
 
-                {/* Right Column Stats */}
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "1rem" }}>
-                    {/* Budget Stability */}
-                    <div style={{ background: "#f8fafc", padding: "0.8rem", borderRadius: "0.75rem", border: "1px solid #e2e8f0" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.4rem" }}>
-                            <span style={{ fontSize: "0.75rem", color: "#64748b", fontWeight: 600 }}>Budget Stability</span>
-                            <span style={{ fontSize: "0.75rem", color: "#10b981", fontWeight: 700 }}>78%</span>
-                        </div>
-                        <div style={{ height: "6px", background: "#e2e8f0", borderRadius: "3px", overflow: "hidden" }}>
-                            <div style={{ width: "78%", height: "100%", background: "#10b981", borderRadius: "3px" }}></div>
-                        </div>
-                    </div>
+  const chartPoints = [
+    [0, 75], [20, 55], [40, 65], [60, 35], [80, 45], [100, 20], [120, 30],
+    [140, 10], [160, 22], [180, 5], [200, 15], [220, 0],
+  ];
+  const svgPath = `M ${chartPoints.map(([x, y]) => `${x},${y}`).join(" L ")}`;
+  const areaPath = `M 0,75 L ${chartPoints.map(([x, y]) => `${x},${y}`).join(" L ")} L 220,75 Z`;
 
-                    {/* Task Completion */}
-                    <div style={{ background: "#f8fafc", padding: "0.8rem", borderRadius: "0.75rem", border: "1px solid #e2e8f0" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.4rem" }}>
-                            <span style={{ fontSize: "0.75rem", color: "#64748b", fontWeight: 600 }}>Task Completion</span>
-                            <span style={{ fontSize: "0.75rem", color: "#f59e0b", fontWeight: 700 }}>75%</span>
-                        </div>
-                        <div style={{ height: "6px", background: "#e2e8f0", borderRadius: "3px", overflow: "hidden" }}>
-                            <div style={{ width: "75%", height: "100%", background: "#f59e0b", borderRadius: "3px" }}></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Risk Alert Banner */}
-            <div style={{
-                background: "#fff1f2", border: "1px solid #fecaca",
-                borderRadius: "0.75rem", padding: "1rem", display: "flex", alignItems: "flex-start", gap: "0.75rem",
-            }}>
-                <div style={{
-                    width: "28px", height: "28px", borderRadius: "8px", background: "#fee2e2",
-                    display: "flex", alignItems: "center", justifyContent: "center", color: "#ef4444",
-                    flexShrink: 0
-                }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-                    </svg>
-                </div>
-                <div>
-                    <div style={{ fontSize: "0.85rem", color: "#991b1b", fontWeight: 700 }}>Financial Risk Detected</div>
-                    <div style={{ fontSize: "0.7rem", color: "#b91c1c", lineHeight: 1.4 }}>Catering budget exceeds projection by 10%.</div>
-                </div>
-            </div>
+  return (
+    <div
+      style={{
+        background: "rgba(13,16,28,0.95)",
+        border: "1px solid rgba(139,92,246,0.25)",
+        borderRadius: "1.5rem",
+        padding: "1.75rem",
+        backdropFilter: "blur(24px)",
+        boxShadow:
+          "0 40px 80px -20px rgba(0,0,0,0.6), 0 0 0 1px rgba(139,92,246,0.1), inset 0 1px 0 rgba(255,255,255,0.05)",
+        maxWidth: "520px",
+        width: "100%",
+        margin: "0 auto",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+        <div>
+          <div style={{ fontSize: "0.72rem", color: "rgba(148,163,184,0.7)", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "0.25rem" }}>Event Dashboard</div>
+          <div style={{ fontSize: "1.05rem", fontWeight: 700, color: "#fff" }}>Tech Summit 2026</div>
         </div>
-    );
+        <div style={{
+          padding: "0.28rem 0.8rem",
+          background: "rgba(34,197,94,0.12)",
+          border: "1px solid rgba(34,197,94,0.25)",
+          borderRadius: "2rem",
+          color: "#4ade80",
+          fontSize: "0.72rem",
+          fontWeight: 700,
+          display: "flex",
+          alignItems: "center",
+          gap: "0.4rem",
+        }}>
+          <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 6px #4ade80" }} />
+          On Track
+        </div>
+      </div>
+
+      {/* Stats Row */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.75rem", marginBottom: "1.25rem" }}>
+        {[
+          { label: "Guests", value: "842", color: "#a78bfa", icon: "👥" },
+          { label: "Budget Used", value: "78%", color: "#60a5fa", icon: "💰" },
+          { label: "Tasks Done", value: "23/31", color: "#34d399", icon: "✅" },
+        ].map((s) => (
+          <div key={s.label} style={{
+            background: "rgba(255,255,255,0.03)",
+            border: "1px solid rgba(255,255,255,0.06)",
+            borderRadius: "0.875rem",
+            padding: "0.9rem 0.75rem",
+            textAlign: "center",
+          }}>
+            <div style={{ fontSize: "1rem", marginBottom: "0.25rem" }}>{s.icon}</div>
+            <div style={{ fontSize: "1.1rem", fontWeight: 800, color: s.color, lineHeight: 1 }}>{s.value}</div>
+            <div style={{ fontSize: "0.65rem", color: "rgba(148,163,184,0.6)", marginTop: "0.2rem", fontWeight: 500, letterSpacing: "0.04em" }}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* SVG Chart */}
+      <div style={{
+        background: "rgba(255,255,255,0.02)",
+        border: "1px solid rgba(255,255,255,0.05)",
+        borderRadius: "1rem",
+        padding: "1rem",
+        marginBottom: "1rem",
+      }}>
+        <div style={{ fontSize: "0.7rem", color: "rgba(148,163,184,0.5)", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "0.5rem" }}>
+          Registrations Over Time
+        </div>
+        <svg viewBox="0 0 220 80" style={{ width: "100%", height: "70px", overflow: "visible" }}>
+          <defs>
+            <linearGradient id="chartGradHero" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#a78bfa" stopOpacity="0.3" />
+              <stop offset="100%" stopColor="#a78bfa" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <path d={areaPath} fill="url(#chartGradHero)" />
+          <path
+            ref={pathRef}
+            d={svgPath}
+            fill="none"
+            stroke="#a78bfa"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{
+              strokeDasharray: 1000,
+              strokeDashoffset: 1000,
+            }}
+          />
+        </svg>
+      </div>
+
+      {/* Progress Bar */}
+      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+        <div style={{ flex: 1, height: "5px", background: "rgba(255,255,255,0.06)", borderRadius: "3px", overflow: "hidden" }}>
+          <div style={{ width: "74%", height: "100%", background: "linear-gradient(90deg, #8b5cf6, #60a5fa)", borderRadius: "3px" }} />
+        </div>
+        <span style={{ fontSize: "0.72rem", color: "rgba(148,163,184,0.6)", fontWeight: 600, flexShrink: 0 }}>74% Overall Health</span>
+      </div>
+
+      <div style={{
+        position: "absolute", top: -50, right: -50, width: 160, height: 160,
+        background: "radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 70%)",
+        pointerEvents: "none", borderRadius: "50%",
+      }} />
+    </div>
+  );
 }
 
 export default function Hero() {
-    const leftColRef = useRef(null);
-    const rightColWrapperRef = useRef(null);
-    const particleRefs = useRef([]);
+  const glowPos = useCursorGlow();
+  const primaryBtnRef = useMagnetic(0.35);
+  const ghostBtnRef = useMagnetic(0.25);
 
-    useEffect(() => {
-        /* ── Entrance timeline ── */
-        const tl = createTimeline({ easing: "outExpo", autoplay: true });
+  const badgeRef = useRef(null);
+  const headlineRef = useRef(null);
+  const subRef = useRef(null);
+  const ctaRef = useRef(null);
+  const statsRef = useRef(null);
+  const mockupRef = useRef(null);
+  const sectionRef = useRef(null);
 
-        // Left Column Elements
-        const leftElements = Array.from(leftColRef.current.children);
-
-        tl.add(leftElements, {
-            opacity: [0, 1],
-            translateY: [20, 0],
-            duration: 800,
-            delay: stagger(100),
-            easing: "outQuad"
-        })
-            // Right Column
-            .add(rightColWrapperRef.current, {
-                opacity: [0, 1],
-                translateX: [30, 0],
-                rotateY: [-5, -5], // Start and end at -5deg for perspective
-                rotateX: [2, 2],
-                scale: [0.95, 1],
-                duration: 900,
-                easing: "outExpo"
-            }, "-=600");
-
-        /* ── Floating particles ── */
-        particleRefs.current.forEach((el) => {
-            if (!el) return;
-            const delay = Math.random() * 3000;
-            const dur = 4500 + Math.random() * 5500;
-            animate(el, {
-                translateY: [0, -(30 + Math.random() * 60)],
-                opacity: [0, 0.6, 0],
-                scale: [0.4, 1 + Math.random() * 0.6, 0.2],
-                duration: dur,
-                delay,
-                easing: "inOutSine",
-                loop: true,
-            });
+  // Parallax on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      if (sectionRef.current) {
+        const blobs = sectionRef.current.querySelectorAll(".parallax-blob");
+        blobs.forEach((b, i) => {
+          const speed = i % 2 === 0 ? 0.15 : 0.25;
+          b.style.transform = `translateY(${scrollY * speed}px)`;
         });
-    }, []);
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-    /* particle config */
-    const particles = [
-        { top: "15%", left: "10%", w: 4, h: 4, c: "#3b82f6" },
-        { top: "25%", left: "20%", w: 6, h: 6, c: "#2563eb" },
-        { top: "85%", left: "5%", w: 3, h: 3, c: "#60a5fa" },
-        { top: "65%", left: "30%", w: 5, h: 5, c: "#3b82f6" },
-        { top: "10%", right: "15%", w: 4, h: 4, c: "#22d3ee" },
-        { top: "40%", right: "5%", w: 6, h: 6, c: "#3b82f6" },
-        { top: "80%", right: "25%", w: 3, h: 3, c: "#2563eb" },
-        { top: "90%", left: "50%", w: 4, h: 4, c: "#60a5fa" },
-    ];
+  // Entrance animation using Anime.js v4 createTimeline
+  useEffect(() => {
+    const tl = createTimeline({ easing: "easeOutExpo", autoplay: true, defaults: { duration: 700 } });
 
-    return (
-        <section
-            id="hero"
-            style={{
-                position: "relative",
-                overflow: "hidden",
-                minHeight: "100vh",
-                display: "flex",
-                alignItems: "center",
-                paddingTop: "6rem",
-                paddingBottom: "4rem",
-            }}
-        >
-            <ThreeBackground />
+    tl.add(badgeRef.current, { opacity: [0, 1], translateY: [20, 0], delay: 200 })
+      .add(headlineRef.current, { opacity: [0, 1], translateY: [30, 0], duration: 900 }, "-=400")
+      .add(subRef.current, { opacity: [0, 1], translateY: [20, 0] }, "-=500")
+      .add(ctaRef.current, { opacity: [0, 1], translateY: [16, 0], duration: 600 }, "-=400")
+      .add(statsRef.current, { opacity: [0, 1], translateY: [12, 0], duration: 500 }, "-=300")
+      .add(mockupRef.current, { opacity: [0, 1], translateX: [40, 0], duration: 1000, easing: "easeOutCubic" }, "-=800");
+  }, []);
 
-            {/* ── Background Glows ── */}
-            <div className="glow-blob anim-float-slow" style={{
-                width: 700, height: 700, top: "-15%", left: "-10%",
-                background: "radial-gradient(ellipse, rgba(37,99,235,0.12) 0%, transparent 70%)",
-                filter: "blur(60px)", pointerEvents: "none"
-            }} />
-            <div className="glow-blob anim-float" style={{
-                width: 500, height: 500, bottom: "0%", right: "-5%",
-                background: "radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%)",
-                filter: "blur(60px)", pointerEvents: "none"
-            }} />
+  return (
+    <section
+      ref={sectionRef}
+      id="hero"
+      style={{
+        position: "relative",
+        overflow: "hidden",
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        paddingTop: "6rem",
+        paddingBottom: "5rem",
+      }}
+    >
+      {/* Cursor glow */}
+      <div style={{
+        position: "fixed",
+        left: glowPos.x - 200,
+        top: glowPos.y - 200,
+        width: 400,
+        height: 400,
+        background: "radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 65%)",
+        pointerEvents: "none",
+        zIndex: 0,
+        filter: "blur(12px)",
+      }} />
 
-            {/* Rendered visible particles */}
-            <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 1 }}>
-                {particles.map((p, i) => (
-                    <div
-                        key={i}
-                        ref={el => particleRefs.current[i] = el}
-                        style={{
-                            position: "absolute",
-                            top: p.top, left: p.left, right: p.right,
-                            width: p.w, height: p.h, borderRadius: "50%",
-                            background: p.c, boxShadow: `0 0 ${p.w * 2}px ${p.c}`,
-                            opacity: 0, pointerEvents: "none",
-                        }}
-                    />
-                ))}
+      {/* Particle canvas */}
+      <ParticleCanvas />
+
+      {/* Background glows */}
+      <div className="parallax-blob" style={{
+        position: "absolute", width: 800, height: 800, top: "-20%", left: "-15%",
+        background: "radial-gradient(ellipse, rgba(99,102,241,0.13) 0%, transparent 65%)",
+        filter: "blur(80px)", pointerEvents: "none", zIndex: 0, borderRadius: "50%",
+      }} />
+      <div className="parallax-blob" style={{
+        position: "absolute", width: 600, height: 600, bottom: "-10%", right: "-10%",
+        background: "radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 65%)",
+        filter: "blur(80px)", pointerEvents: "none", zIndex: 0, borderRadius: "50%",
+      }} />
+
+      {/* Grid overlay */}
+      <div style={{
+        position: "absolute", inset: 0,
+        backgroundImage: `linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)`,
+        backgroundSize: "60px 60px",
+        pointerEvents: "none", zIndex: 0,
+        maskImage: "radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent)",
+        WebkitMaskImage: "radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent)",
+      }} />
+
+      <div style={{ position: "relative", zIndex: 2, width: "100%", maxWidth: "1280px", margin: "0 auto", padding: "0 1.5rem" }}>
+        <style>{`
+          .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
+          @media (max-width: 960px) {
+            .hero-grid { grid-template-columns: 1fr; gap: 3.5rem; text-align: center; }
+            .hero-cta-group { justify-content: center !important; }
+          }
+          @keyframes ping-hero { 75%,100% { transform: scale(2); opacity: 0; } }
+          .ping-ring { position: absolute; inset: 0; border-radius: 50%; animation: ping-hero 1.8s cubic-bezier(0,0,0.2,1) infinite; }
+        `}</style>
+
+        <div className="hero-grid">
+          {/* Left */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+            {/* Badge */}
+            <div ref={badgeRef} style={{
+              opacity: 0,
+              display: "inline-flex", alignItems: "center", gap: "0.6rem",
+              background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.2)",
+              borderRadius: "2rem", padding: "0.4rem 1.1rem 0.4rem 0.7rem", marginBottom: "1.75rem",
+            }}>
+              <span style={{ position: "relative", display: "flex", width: 8, height: 8 }}>
+                <span className="ping-ring" style={{ background: "rgba(139,92,246,0.5)" }} />
+                <span style={{ width: 8, height: 8, background: "#a78bfa", borderRadius: "50%", position: "relative" }} />
+              </span>
+              <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "#c4b5fd", letterSpacing: "0.03em" }}>
+                Introducing Planora — The Smart Campus Event OS
+              </span>
             </div>
 
-            <div className="page-container" style={{ position: "relative", zIndex: 2, width: "100%", maxWidth: "1280px", margin: "0 auto", padding: "0 1.5rem" }}>
-                <style>{`
-                    .hero-grid {
-                        display: grid;
-                        grid-template-columns: 1fr 1fr;
-                        gap: 4rem;
-                        align-items: center;
-                    }
-                    @media (max-width: 960px) {
-                        .hero-grid { grid-template-columns: 1fr; gap: 3.5rem; text-align: center; }
-                        .hero-content { display: flex; flex-direction: column; align-items: center; }
-                        .hero-content ul { align-items: center; }
-                        .hero-content .cta-group { justify-content: center; width: 100%; }
-                        .hero-content .position-line { margin: 0 auto; text-align: center; }
-                        .hero-mockup-wrapper { transform: none !important; margin-top: 1rem; }
-                    }
-                `}</style>
+            {/* Headline */}
+            <h1 ref={headlineRef} style={{
+              opacity: 0,
+              fontSize: "clamp(2.6rem, 4.8vw, 4rem)",
+              fontWeight: 900, lineHeight: 1.1, marginBottom: "1.5rem",
+              color: "#fff", letterSpacing: "-0.03em",
+              fontFamily: "'Outfit', 'Inter', sans-serif",
+            }}>
+              The Operating System<br />
+              for{" "}
+              <span style={{
+                background: "linear-gradient(135deg, #c4b5fd 0%, #818cf8 40%, #60a5fa 100%)",
+                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+              }}>
+                Smart Campus Events
+              </span>
+            </h1>
 
-                <div className="hero-grid">
-                    {/* ── Left Column: Content ── */}
-                    <div ref={leftColRef} className="hero-content" style={{ textAlign: "left" }}>
+            {/* Subheadline */}
+            <p ref={subRef} style={{
+              opacity: 0,
+              fontSize: "clamp(1rem, 1.3vw, 1.15rem)",
+              color: "rgba(148,163,184,0.85)", lineHeight: 1.75,
+              marginBottom: "2.5rem", maxWidth: "500px",
+            }}>
+              Planora centralizes planning, budgeting, volunteer coordination, and execution into one intelligent dashboard.
+            </p>
 
-                        {/* Eyebrow / Badge */}
-                        <div style={{
-                            display: "inline-flex", alignItems: "center", gap: "0.6rem",
-                            background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.2)",
-                            borderRadius: "2rem", padding: "0.4rem 1rem", marginBottom: "1.5rem",
-                        }}>
-                            <span style={{ position: "relative", display: "flex", width: 8, height: 8 }}>
-                                <span className="ping-ring" style={{ background: "#3b82f6" }}></span>
-                                <span style={{ width: 8, height: 8, background: "#3b82f6", borderRadius: "50%" }}></span>
-                            </span>
-                            <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "#93c5fd", letterSpacing: "0.03em" }}>
-                                Introducing Planora — The Smart Campus Event OS
-                            </span>
-                        </div>
+            {/* CTAs */}
+            <div ref={ctaRef} className="hero-cta-group" style={{
+              opacity: 0,
+              display: "flex", gap: "1rem", flexWrap: "wrap",
+              marginBottom: "2.5rem", alignItems: "center",
+            }}>
+              <Link
+                to="/signup"
+                ref={primaryBtnRef}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: "0.6rem",
+                  padding: "0.9rem 2.25rem",
+                  background: "linear-gradient(135deg, #7c3aed 0%, #4f46e5 60%, #4338ca 100%)",
+                  color: "#fff", borderRadius: "0.875rem", fontWeight: 700, fontSize: "0.975rem",
+                  textDecoration: "none",
+                  boxShadow: "0 10px 30px -8px rgba(124,58,237,0.55), inset 0 1px 0 rgba(255,255,255,0.15)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  willChange: "transform",
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 20px 40px -8px rgba(124,58,237,0.65), inset 0 1px 0 rgba(255,255,255,0.2)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 10px 30px -8px rgba(124,58,237,0.55), inset 0 1px 0 rgba(255,255,255,0.15)"; }}
+              >
+                Get Started Free
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+                </svg>
+              </Link>
 
-                        {/* Headline */}
-                        <h1 style={{
-                            fontSize: "clamp(2.5rem, 4.5vw, 3.8rem)",
-                            fontWeight: 800, lineHeight: 1.15, marginBottom: "1.25rem",
-                            color: "white", letterSpacing: "-0.02em"
-                        }}>
-                            Run Campus Events With <br />
-                            <span className="gradient-text">Intelligence</span>. Not Assumptions.
-                        </h1>
+              <a
+                href="#product"
+                ref={ghostBtnRef}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: "0.6rem",
+                  padding: "0.9rem 1.9rem",
+                  background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.8)",
+                  borderRadius: "0.875rem", fontWeight: 600, fontSize: "0.975rem",
+                  textDecoration: "none",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  backdropFilter: "blur(12px)",
+                  willChange: "transform",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="5 3 19 12 5 21 5 3" />
+                </svg>
+                View Demo
+              </a>
+            </div>
 
-                        {/* Subtext */}
-                        <p style={{
-                            fontSize: "clamp(1rem, 1.25vw, 1.15rem)",
-                            color: "var(--text-secondary)", lineHeight: 1.6, marginBottom: "2rem",
-                            maxWidth: "540px"
-                        }}>
-                            Planora is a unified event operations platform built for student-led organizations. Plan smarter, track finances in real time, coordinate teams effortlessly, and execute with total clarity — all from a single intelligent control center.
-                        </p>
-
-                        {/* Bullet Points */}
-                        <ul style={{
-                            display: "flex", flexDirection: "column", gap: "0.85rem", marginBottom: "2.5rem",
-                            padding: 0, listStyle: "none"
-                        }}>
-                            {[
-                                "Real-Time Financial Visibility",
-                                "Structured Task & Timeline Automation",
-                                "Predictive Risk & Performance Monitoring"
-                            ].map((item, i) => (
-                                <li key={i} style={{ display: "flex", alignItems: "center", gap: "0.75rem", color: "var(--text-primary)", fontSize: "0.95rem" }}>
-                                    <div style={{
-                                        width: "22px", height: "22px", borderRadius: "50%", background: "rgba(34, 197, 94, 0.15)",
-                                        display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0
-                                    }}>
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                            <polyline points="20 6 9 17 4 12"></polyline>
-                                        </svg>
-                                    </div>
-                                    {item}
-                                </li>
-                            ))}
-                        </ul>
-
-                        {/* CTAs */}
-                        <div className="cta-group" style={{ display: "flex", gap: "1rem", flexWrap: "wrap", marginBottom: "1.75rem" }}>
-                            <Link to="/signup" className="btn btn-primary btn-lg" style={{ padding: "0.75rem 2rem" }}>
-                                Start Now
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <line x1="5" y1="12" x2="19" y2="12" />
-                                    <polyline points="12 5 19 12 12 19" />
-                                </svg>
-                            </Link>
-                            <a href="#product" className="btn btn-ghost btn-lg" style={{ padding: "0.75rem 1.8rem", fontSize: "1rem" }}>
-                                Book a Live Demo
-                            </a>
-                        </div>
-
-                        {/* Positioning Line */}
-                        <p className="position-line" style={{ fontSize: "0.85rem", color: "var(--text-muted)", fontStyle: "italic", borderLeft: "3px solid rgba(59,130,246,0.3)", paddingLeft: "1rem" }}>
-                            "Built for professional planners, event businesses, and high-scale event teams."
-                        </p>
-                    </div>
-
-                    {/* ── Right Column: Mockup ── */}
-                    <div className="hero-mockup-wrapper" ref={rightColWrapperRef} style={{ perspective: "1000px" }}>
-                        <div style={{ transform: "rotateY(-5deg) rotateX(2deg)", transformStyle: "preserve-3d" }}>
-                            <HeroDashboardMock />
-                        </div>
-                    </div>
+            {/* Stats */}
+            <div ref={statsRef} style={{ opacity: 0, display: "flex", gap: "2rem", flexWrap: "wrap" }}>
+              {[
+                { value: "10k+", label: "Events Managed" },
+                { value: "98%", label: "Satisfaction Rate" },
+                { value: "40%", label: "Time Saved" },
+              ].map((s) => (
+                <div key={s.label} style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
+                  <span style={{ fontSize: "1.4rem", fontWeight: 800, color: "#fff", lineHeight: 1, fontFamily: "'Outfit', sans-serif" }}>{s.value}</span>
+                  <span style={{ fontSize: "0.72rem", color: "rgba(148,163,184,0.5)", fontWeight: 500, letterSpacing: "0.04em" }}>{s.label}</span>
                 </div>
+              ))}
             </div>
-        </section>
-    );
+          </div>
+
+          {/* Right — Mockup */}
+          <div ref={mockupRef} style={{ opacity: 0, perspective: "1200px" }}>
+            <div
+              style={{ transform: "rotateY(-6deg) rotateX(3deg)", transformStyle: "preserve-3d", transition: "transform 0.6s ease" }}
+              onMouseEnter={(e) => { e.currentTarget.style.transform = "rotateY(-2deg) rotateX(1deg)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.transform = "rotateY(-6deg) rotateX(3deg)"; }}
+            >
+              <HeroDashboardMock />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 }

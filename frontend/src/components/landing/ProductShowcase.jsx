@@ -1,307 +1,271 @@
-import { useEffect, useRef, useState } from "react";
-import { animate } from "animejs";
+import { useEffect, useRef } from "react";
 import useReveal from "../../hooks/useReveal";
+import { animate, stagger } from "animejs";
 
-/* ── Waveform bars (ambient animation) ── */
-function Waveform({ color = "#3b82f6" }) {
-    return (
-        <div style={{ display: "flex", alignItems: "flex-end", gap: 3, height: 32 }}>
-            {[0.6, 1, 0.75, 0.9, 0.55, 1, 0.7, 0.85, 0.45, 0.95, 0.65, 1, 0.8].map((h, i) => (
-                <div
-                    key={i}
-                    style={{
-                        width: 4,
-                        borderRadius: 2,
-                        background: color,
-                        opacity: 0.7,
-                        transformOrigin: "bottom",
-                        /* eslint-disable-next-line react-hooks/purity */
-                        animation: `wave-bar ${0.9 + Math.random() * 0.8}s ease-in-out ${i * 80}ms infinite`,
-                        height: `${h * 100}%`,
-                    }}
-                />
-            ))}
-        </div>
+function DashboardPreview() {
+  const lineRef = useRef(null);
+  const areaRef = useRef(null);
+  const containerRef = useRef(null);
+  const animated = useRef(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !animated.current) {
+          animated.current = true;
+
+          // Draw the line
+          const path = lineRef.current;
+          if (path) {
+            animate(path, {
+              strokeDashoffset: [2000, 0],
+              duration: 2000,
+              delay: 300,
+              easing: "easeOutCubic",
+            });
+          }
+
+          // Fade in the area
+          if (areaRef.current) {
+            animate(areaRef.current, {
+              opacity: [0, 1],
+              duration: 1500,
+              delay: 600,
+              easing: "easeOutCubic",
+            });
+          }
+
+          // Animate the stat numbers
+          const stats = containerRef.current?.querySelectorAll(".stat-number");
+          if (stats && stats.length) {
+            animate(stats, {
+              opacity: [0, 1],
+              translateY: [10, 0],
+              duration: 600,
+              delay: stagger(120, { start: 400 }),
+              easing: "easeOutCubic",
+            });
+          }
+        }
+      },
+      { threshold: 0.3 }
     );
-}
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
-/* ── Animated SVG chart ── */
-function AnimatedChart() {
-    const pathRef = useRef(null);
-    const dotRef = useRef(null);
+  const chartW = 380;
+  const chartH = 100;
+  const data = [82, 60, 74, 45, 85, 50, 92, 65, 78, 55, 88, 70];
+  const maxVal = Math.max(...data);
+  const points = data.map((v, i) => [
+    (i / (data.length - 1)) * chartW,
+    chartH - (v / maxVal) * chartH * 0.85 - 5,
+  ]);
+  const pathD = points.map(([x, y], i) => (i === 0 ? `M ${x},${y}` : `L ${x},${y}`)).join(" ");
+  const areaD = `M ${points[0][0]},${chartH} L ${pathD.slice(2)} L ${points[points.length - 1][0]},${chartH} Z`;
 
-    useEffect(() => {
-        const path = pathRef.current;
-        if (!path) return;
-        const len = path.getTotalLength();
-        path.style.strokeDasharray = len;
-        path.style.strokeDashoffset = len;
-
-        const observer = new IntersectionObserver(([entry]) => {
-            if (!entry.isIntersecting) return;
-            animate(path, { strokeDashoffset: [len, 0], duration: 2000, easing: "outCubic" });
-
-            /* animate the tracking dot along the path */
-            if (dotRef.current) {
-                animate(dotRef.current, {
-                    offsetDistance: ["0%", "100%"],
-                    duration: 2000, easing: "outCubic",
-                });
-            }
-            observer.disconnect();
-        }, { threshold: 0.4 });
-        observer.observe(path);
-        return () => observer.disconnect();
-    }, []);
-
-    return (
-        <div style={{ position: "relative" }}>
-            <svg viewBox="0 0 540 130" fill="none" style={{ width: "100%", height: 130, display: "block" }}>
-                <defs>
-                    <linearGradient id="areaGrad2" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3" />
-                        <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
-                    </linearGradient>
-                    <linearGradient id="lineGrad2" x1="0" y1="0" x2="540" y2="0" gradientUnits="userSpaceOnUse">
-                        <stop stopColor="#3b82f6" />
-                        <stop offset="0.5" stopColor="#2563eb" />
-                        <stop offset="1" stopColor="#22d3ee" />
-                    </linearGradient>
-                </defs>
-                {/* Grid lines */}
-                {[0.25, 0.5, 0.75].map((y) => (
-                    <line key={y} x1="0" y1={y * 130} x2="540" y2={y * 130} stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
-                ))}
-                {/* Area */}
-                <path
-                    d="M0 108 C60 95 95 65 140 58 C185 51 215 78 265 60 C315 42 340 28 390 18 C440 8 490 30 540 20 L540 130 L0 130 Z"
-                    fill="url(#areaGrad2)"
-                />
-                {/* Animated line */}
-                <path
-                    ref={pathRef}
-                    d="M0 108 C60 95 95 65 140 58 C185 51 215 78 265 60 C315 42 340 28 390 18 C440 8 490 30 540 20"
-                    stroke="url(#lineGrad2)"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    fill="none"
-                />
-                {/* Dots at data points */}
-                {[
-                    [0, 108], [140, 58], [265, 60], [390, 18], [540, 20],
-                ].map(([x, y], i) => (
-                    <circle
-                        key={i}
-                        cx={x} cy={y} r="4"
-                        fill="#8b5cf6"
-                        stroke="var(--bg-base)"
-                        strokeWidth="2"
-                        style={{ opacity: 0, animation: `fade-up 0.4s ease ${1600 + i * 100}ms both` }}
-                    />
-                ))}
-            </svg>
+  return (
+    <div
+      ref={containerRef}
+      style={{
+        background: "rgba(13,16,28,0.98)",
+        border: "1px solid rgba(139,92,246,0.2)",
+        borderRadius: "1.5rem",
+        padding: "2rem",
+        boxShadow: "0 40px 80px -20px rgba(0,0,0,0.7), 0 0 1px rgba(255,255,255,0.05)",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
+        <div>
+          <div style={{ fontSize: "0.7rem", color: "rgba(148,163,184,0.5)", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "0.25rem" }}>
+            RSVP Analytics — Oct 2026
+          </div>
+          <div style={{ fontSize: "1.2rem", fontWeight: 800, color: "#fff" }}>Registrations Overview</div>
         </div>
-    );
-}
-
-/* ── Full dashboard ── */
-function FullDashboard() {
-    const [counts, setCounts] = useState({ revenue: 0, tickets: 0, checkins: 0, satisfaction: 0 });
-    const triggered = useRef(false);
-
-    useEffect(() => {
-        const el = document.getElementById("product-dashboard");
-        if (!el) return;
-        const observer = new IntersectionObserver(([entry]) => {
-            if (!entry.isIntersecting || triggered.current) return;
-            triggered.current = true;
-
-            const targets = { revenue: 128400, tickets: 3841, checkins: 1204, satisfaction: 98 };
-            const duration = 1800;
-            const start = performance.now();
-            const tick = (now) => {
-                const t = Math.min((now - start) / duration, 1);
-                const ease = 1 - Math.pow(1 - t, 3);
-                setCounts({
-                    revenue: Math.floor(ease * targets.revenue),
-                    tickets: Math.floor(ease * targets.tickets),
-                    checkins: Math.floor(ease * targets.checkins),
-                    satisfaction: Math.floor(ease * targets.satisfaction),
-                });
-                if (t < 1) requestAnimationFrame(tick);
-            };
-            requestAnimationFrame(tick);
-        }, { threshold: 0.3 });
-        observer.observe(el);
-        return () => observer.disconnect();
-    }, []);
-
-    return (
-        <div id="product-dashboard" style={{
-            background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)",
-            borderRadius: "var(--radius-xl)", overflow: "hidden",
-            boxShadow: "0 48px 120px rgba(0,0,0,0.55), 0 0 0 1px rgba(59,130,246,0.1)",
+        <div style={{
+          padding: "0.35rem 0.9rem",
+          background: "rgba(167,139,250,0.1)",
+          border: "1px solid rgba(167,139,250,0.25)",
+          borderRadius: "0.6rem",
+          fontSize: "0.75rem",
+          fontWeight: 700,
+          color: "#c4b5fd",
         }}>
-            {/* Chrome */}
-            <div style={{
-                background: "var(--bg-card)", borderBottom: "1px solid var(--border-subtle)",
-                padding: "0.9rem 1.25rem", display: "flex", alignItems: "center", gap: "0.5rem",
-            }}>
-                {["#ef4444", "#f59e0b", "#22c55e"].map((c) => (
-                    <div key={c} style={{ width: 11, height: 11, borderRadius: "50%", background: c }} />
-                ))}
-                <div style={{
-                    flex: 1, marginLeft: "0.8rem", height: 22, background: "rgba(255,255,255,0.04)",
-                    borderRadius: 5, display: "flex", alignItems: "center", paddingLeft: "0.7rem",
-                    gap: "0.4rem",
-                }}>
-                    {/* Live indicator */}
-                    <span style={{ position: "relative", width: 7, height: 7, display: "inline-flex" }}>
-                        <span className="ping-ring" style={{ color: "#22c55e", width: 7, height: 7 }} />
-                        <span style={{ position: "relative", zIndex: 1, width: 7, height: 7, borderRadius: "50%", background: "#22c55e", display: "block" }} />
-                    </span>
-                    <span style={{ fontSize: "0.7rem", color: "var(--text-muted)" }}>app.planora.io/dashboard — Live</span>
-                </div>
-            </div>
-
-            {/* Main layout */}
-            <div style={{ display: "flex" }}>
-                {/* Sidebar */}
-                <div style={{
-                    width: 180, background: "var(--bg-card)", borderRight: "1px solid var(--border-subtle)",
-                    padding: "1rem 0.75rem", display: "flex", flexDirection: "column", gap: "2px", flexShrink: 0,
-                }}>
-                    {["Overview", "Events", "Volunteers", "Budget", "Reports"].map((item, i) => (
-                        <div key={item} style={{
-                            padding: "0.55rem 0.8rem", borderRadius: "6px",
-                            fontSize: "0.75rem", fontWeight: i === 0 ? 700 : 500,
-                            color: i === 0 ? "#c4b5fd" : "var(--text-muted)",
-                            background: i === 0 ? "rgba(139,92,246,0.14)" : "transparent",
-                            cursor: "default", display: "flex", alignItems: "center", gap: "0.4rem",
-                        }}>
-                            {["📊", "📅", "👥", "💰", "📋"][i]} {item}
-                        </div>
-                    ))}
-
-                    {/* Waveform ambient */}
-                    <div style={{ marginTop: "auto", paddingTop: "1rem" }}>
-                        <Waveform color="#3b82f6" />
-                    </div>
-                </div>
-
-                {/* Content */}
-                <div style={{ flex: 1, padding: "1.25rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
-                    {/* Stat row */}
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "0.75rem" }}>
-                        {[
-                            { label: "Total Revenue", val: `₹${counts.revenue.toLocaleString()}`, icon: "💰", color: "#3b82f6" },
-                            { label: "Tickets Sold", val: counts.tickets.toLocaleString(), icon: "🎟️", color: "#34d399" },
-                            { label: "Check-ins", val: counts.checkins.toLocaleString(), icon: "✅", color: "#60a5fa" },
-                            { label: "Satisfaction", val: `${counts.satisfaction}%`, icon: "⭐", color: "#f59e0b" },
-                        ].map((s) => (
-                            <div key={s.label} style={{
-                                background: "var(--bg-base)", borderRadius: "8px", padding: "0.85rem",
-                                border: "1px solid var(--border-subtle)",
-                            }}>
-                                <p style={{ fontSize: "0.62rem", color: "var(--text-muted)", marginBottom: "0.3rem" }}>
-                                    {s.icon} {s.label}
-                                </p>
-                                <p style={{
-                                    fontSize: "1.1rem", fontWeight: 800, color: s.color,
-                                    fontFamily: "Outfit, sans-serif", transition: "color 0.3s",
-                                }}>
-                                    {s.val}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Chart */}
-                    <div style={{
-                        background: "var(--bg-base)", border: "1px solid var(--border-subtle)",
-                        borderRadius: "8px", padding: "1rem",
-                    }}>
-                        <p style={{ fontSize: "0.7rem", color: "var(--text-muted)", marginBottom: "0.75rem" }}>
-                            Event registrations — last 12 weeks
-                        </p>
-                        <AnimatedChart />
-                    </div>
-
-                    {/* Table */}
-                    <div style={{
-                        background: "var(--bg-base)", border: "1px solid var(--border-subtle)",
-                        borderRadius: "8px", overflow: "hidden",
-                    }}>
-                        <div style={{
-                            padding: "0.65rem 0.9rem", borderBottom: "1px solid var(--border-subtle)",
-                            fontSize: "0.66rem", color: "var(--text-muted)",
-                            display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "0.5rem", fontWeight: 600,
-                            textTransform: "uppercase", letterSpacing: "0.06em",
-                        }}>
-                            <span>Event</span><span>Status</span><span>Team</span>
-                        </div>
-                        {[
-                            { name: "Tech Fest 2026", status: "Live", team: 42 },
-                            { name: "Hackathon Sprint", status: "Planning", team: 18 },
-                            { name: "Cultural Week", status: "Planning", team: 55 },
-                        ].map((ev, i) => (
-                            <div key={ev.name} style={{
-                                padding: "0.6rem 0.9rem",
-                                borderBottom: i < 2 ? "1px solid var(--border-subtle)" : "none",
-                                fontSize: "0.72rem",
-                                display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "0.5rem",
-                                color: "var(--text-secondary)",
-                                animation: `fade-up 0.5s ease ${200 + i * 100}ms both`,
-                            }}>
-                                <span style={{ color: "var(--text-primary)", fontWeight: 600 }}>{ev.name}</span>
-                                <span style={{
-                                    color: ev.status === "Live" ? "#34d399" : "#a78bfa", fontWeight: 600,
-                                    display: "flex", alignItems: "center", gap: "0.3rem",
-                                }}>
-                                    {ev.status === "Live" && (
-                                        <span style={{ position: "relative", width: 6, height: 6, display: "inline-flex" }}>
-                                            <span className="ping-ring" style={{ color: "#34d399", width: 6, height: 6 }} />
-                                            <span style={{ position: "relative", zIndex: 1, width: 6, height: 6, borderRadius: "50%", background: "#34d399", display: "block" }} />
-                                        </span>
-                                    )}
-                                    {ev.status}
-                                </span>
-                                <span>{ev.team} ppl</span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
+          This Month ↑ 24%
         </div>
-    );
+      </div>
+
+      {/* Stats row */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem", marginBottom: "2rem" }}>
+        {[
+          { label: "Total RSVPs", value: "1,284", color: "#a78bfa" },
+          { label: "Confirmed", value: "947", color: "#34d399" },
+          { label: "Pending VIP", value: "128", color: "#fb923c" },
+          { label: "Dropped", value: "209", color: "#f87171" },
+        ].map((s) => (
+          <div key={s.label} style={{
+            background: "rgba(255,255,255,0.025)",
+            border: "1px solid rgba(255,255,255,0.05)",
+            borderRadius: "0.875rem",
+            padding: "1rem 0.875rem",
+          }}>
+            <div className="stat-number" style={{ fontSize: "1.5rem", fontWeight: 800, color: s.color, lineHeight: 1, opacity: 0 }}>{s.value}</div>
+            <div style={{ fontSize: "0.68rem", color: "rgba(148,163,184,0.5)", marginTop: "0.3rem", fontWeight: 500, letterSpacing: "0.04em", textTransform: "uppercase" }}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Chart */}
+      <div style={{
+        background: "rgba(255,255,255,0.02)",
+        border: "1px solid rgba(255,255,255,0.05)",
+        borderRadius: "1rem",
+        padding: "1.5rem",
+        marginBottom: "1.5rem",
+      }}>
+        <svg viewBox={`0 0 ${chartW} ${chartH}`} style={{ width: "100%", height: "140px", overflow: "visible" }}>
+          <defs>
+            <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#a78bfa" stopOpacity="0.25" />
+              <stop offset="100%" stopColor="#a78bfa" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          {/* Grid lines */}
+          {[0, 25, 50, 75, 100].map((y) => (
+            <line key={y} x1="0" y1={chartH - (y / 100) * chartH * 0.85 - 5} x2={chartW} y2={chartH - (y / 100) * chartH * 0.85 - 5}
+              stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+          ))}
+          {/* Area */}
+          <path ref={areaRef} d={areaD} fill="url(#areaGrad)" style={{ opacity: 0 }} />
+          {/* Line */}
+          <path
+            ref={lineRef}
+            d={pathD}
+            fill="none"
+            stroke="#a78bfa"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{
+              strokeDasharray: 2000,
+              strokeDashoffset: 2000,
+            }}
+          />
+          {/* Data points */}
+          {points.map(([x, y], i) => (
+            <circle key={i} cx={x} cy={y} r="3.5" fill="#a78bfa" opacity="0.8" />
+          ))}
+        </svg>
+      </div>
+
+      {/* Bottom row */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+        {[
+          { label: "Budget Used", value: "78%", color: "#60a5fa", bar: 78 },
+          { label: "Task Completion", value: "91%", color: "#34d399", bar: 91 },
+        ].map((b) => (
+          <div key={b.label} style={{
+            background: "rgba(255,255,255,0.025)",
+            border: "1px solid rgba(255,255,255,0.05)",
+            borderRadius: "0.875rem",
+            padding: "1rem",
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.6rem" }}>
+              <span style={{ fontSize: "0.75rem", color: "rgba(148,163,184,0.6)", fontWeight: 600 }}>{b.label}</span>
+              <span style={{ fontSize: "0.75rem", color: b.color, fontWeight: 700 }}>{b.value}</span>
+            </div>
+            <div style={{ height: "5px", background: "rgba(255,255,255,0.06)", borderRadius: "3px", overflow: "hidden" }}>
+              <div style={{ width: `${b.bar}%`, height: "100%", background: b.color, borderRadius: "3px", boxShadow: `0 0 8px ${b.color}50` }} />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Shine */}
+      <div style={{
+        position: "absolute",
+        top: -60,
+        left: -60,
+        width: 200,
+        height: 200,
+        background: "radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 65%)",
+        pointerEvents: "none",
+        borderRadius: "50%",
+      }} />
+    </div>
+  );
 }
 
 export default function ProductShowcase() {
-    const ref = useReveal();
+  const ref = useReveal();
 
-    return (
-        <section id="product" className="section-pad" ref={ref}
-            style={{ background: "var(--bg-surface)", borderTop: "1px solid var(--border-subtle)" }}>
-            <div className="page-container">
-                <div style={{ textAlign: "center", maxWidth: 650, margin: "0 auto 4rem" }}>
-                    <p className="overline reveal" style={{ marginBottom: "1rem" }}>Product Showcase</p>
-                    <h2 className="reveal delay-1" style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.6rem)", marginBottom: "1rem" }}>
-                        One Unified Command Center
-                    </h2>
-                    <div className="reveal delay-2" style={{ color: "var(--text-secondary)", fontSize: "0.975rem", lineHeight: 1.76 }}>
-                        <p style={{ marginBottom: "1rem" }}>
-                            From revenue metrics to volunteer performance, Planora consolidates every operational layer into a single, intelligent dashboard designed for clarity and accountability.
-                        </p>
-                        <p style={{ fontSize: "0.85rem", opacity: 0.8, fontWeight: 500, color: "var(--text-primary)" }}>
-                            Built on a modular full-stack architecture with real-time data synchronization, ensuring speed, reliability, and scalability.
-                        </p>
-                    </div>
-                </div>
+  return (
+    <section
+      ref={ref}
+      id="product"
+      style={{
+        paddingBottom: "5rem",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {/* Glow */}
+      <div style={{
+        position: "absolute",
+        width: 700,
+        height: 700,
+        bottom: "-20%",
+        left: "-10%",
+        background: "radial-gradient(circle, rgba(139,92,246,0.07) 0%, transparent 65%)",
+        filter: "blur(80px)",
+        pointerEvents: "none",
+        borderRadius: "50%",
+      }} />
 
-                <div className="reveal delay-1">
-                    <FullDashboard />
-                </div>
-            </div>
-        </section>
-    );
+      <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 1.5rem", position: "relative", zIndex: 1 }}>
+
+        {/* Header */}
+        <div className="reveal" style={{ maxWidth: 640, margin: "0 auto 4rem", textAlign: "center" }}>
+          <div style={{
+            display: "inline-block",
+            fontSize: "0.72rem",
+            fontWeight: 700,
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            color: "#a78bfa",
+            background: "rgba(167,139,250,0.08)",
+            border: "1px solid rgba(167,139,250,0.2)",
+            borderRadius: "2rem",
+            padding: "0.3rem 1rem",
+            marginBottom: "1.25rem",
+          }}>
+            Product
+          </div>
+          <h2 style={{
+            fontSize: "clamp(1.9rem, 3.2vw, 2.75rem)",
+            fontWeight: 900,
+            color: "#fff",
+            lineHeight: 1.15,
+            letterSpacing: "-0.025em",
+            marginBottom: "1rem",
+            fontFamily: "'Outfit', 'Inter', sans-serif",
+          }}>
+            Your events. Completely under control.
+          </h2>
+          <p style={{ fontSize: "1rem", color: "rgba(148,163,184,0.7)", lineHeight: 1.7 }}>
+            See your registration trends, financial health, and task progress — all in one intelligent dashboard.
+          </p>
+        </div>
+
+        {/* Dashboard Preview */}
+        <div className="reveal" style={{ maxWidth: 900, margin: "0 auto" }}>
+          <DashboardPreview />
+        </div>
+      </div>
+    </section>
+  );
 }

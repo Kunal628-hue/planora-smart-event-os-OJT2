@@ -1,191 +1,219 @@
-import { useEffect, useRef, useState } from "react";
-import { animate } from "animejs";
 import useReveal from "../../hooks/useReveal";
 
 const STEPS = [
-    {
-        number: "01",
-        title: "Configure Your Event",
-        desc: "Define budgets, timelines, committees, and strategic goals in minutes.",
-        icon: (
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
-            </svg>
-        ),
-        color: "#3b82f6",
-    },
-    {
-        number: "02",
-        title: "Coordinate Operations",
-        desc: "Assign responsibilities, monitor milestones, and align teams through structured workflows.",
-        icon: (
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-                <circle cx="9" cy="7" r="4" />
-                <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
-            </svg>
-        ),
-        color: "#2563eb",
-    },
-    {
-        number: "03",
-        title: "Execute With Precision",
-        desc: "Track real-time metrics, receive intelligent alerts, and generate comprehensive post-event reports.",
-        icon: (
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-            </svg>
-        ),
-        color: "#22d3ee",
-    },
+  {
+    number: "01",
+    color: "#a78bfa",
+    colorRgb: "167,139,250",
+    title: "Create Your Event",
+    desc: "Set up your event in minutes. Add dates, venue, team members, and initial budgets. Planora structures everything automatically.",
+    icon: (
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+      </svg>
+    ),
+  },
+  {
+    number: "02",
+    color: "#60a5fa",
+    colorRgb: "96,165,250",
+    title: "Coordinate Your Team",
+    desc: "Assign roles, set tasks, and track who's doing what in real time. Automated nudges keep everyone accountable.",
+    icon: (
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+      </svg>
+    ),
+  },
+  {
+    number: "03",
+    color: "#34d399",
+    colorRgb: "52,211,153",
+    title: "Monitor in Real-Time",
+    desc: "Watch your event health score update live as tasks complete, RSVPs come in, and budgets are managed.",
+    icon: (
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+      </svg>
+    ),
+  },
+  {
+    number: "04",
+    color: "#fb923c",
+    colorRgb: "251,146,60",
+    title: "Execute & Analyze",
+    desc: "Run the event with full visibility. Post-event, get automated insights to improve your next one.",
+    icon: (
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" />
+        <line x1="6" y1="20" x2="6" y2="14" />
+      </svg>
+    ),
+  },
 ];
 
-function StepCard({ step, index, active }) {
-    return (
-        <div
-            className={`reveal delay-${index + 1}`}
-            style={{ textAlign: "center", position: "relative", zIndex: 1 }}
-        >
-            {/* Animated circle */}
-            <div style={{ position: "relative", width: 90, height: 90, margin: "0 auto 2rem" }}>
-                {/* Outer orbit ring — spins when active */}
-                <div style={{
-                    position: "absolute", inset: -8, borderRadius: "50%",
-                    border: `1.5px dashed ${step.color}40`,
-                    animation: active ? "spin-slow 8s linear infinite" : "none",
-                    transition: "opacity 0.4s",
-                    opacity: active ? 1 : 0.35,
-                }} />
-                {/* Glow for active */}
-                {active && (
-                    <div style={{
-                        position: "absolute", inset: -4, borderRadius: "50%",
-                        boxShadow: `0 0 32px ${step.color}40`,
-                        animation: "pulse-glow 2.4s ease infinite",
-                    }} />
-                )}
-                {/* Circle body */}
-                <div style={{
-                    width: 90, height: 90, borderRadius: "50%",
-                    background: active
-                        ? `linear-gradient(135deg, ${step.color}30, ${step.color}10)`
-                        : "rgba(255,255,255,0.03)",
-                    border: `1.5px solid ${active ? step.color + "60" : "rgba(255,255,255,0.07)"}`,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    color: active ? step.color : "var(--text-muted)",
-                    transition: "all 0.4s ease",
-                    position: "relative",
-                }}>
-                    {step.icon}
-                </div>
-                {/* Number badge */}
-                <span style={{
-                    position: "absolute", top: -4, right: -4,
-                    width: 24, height: 24, borderRadius: "50%",
-                    background: active ? `linear-gradient(135deg, ${step.color}, ${step.color}cc)` : "var(--bg-elevated)",
-                    border: `1px solid ${step.color}40`,
-                    fontSize: "0.62rem", fontWeight: 800,
-                    color: active ? "#fff" : "var(--text-muted)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    transition: "all 0.4s ease",
-                    boxShadow: active ? `0 0 12px ${step.color}50` : "none",
-                }}>
-                    {index + 1}
-                </span>
-            </div>
-
-            <h3 style={{
-                fontSize: "1.05rem", fontWeight: 700, marginBottom: "0.65rem",
-                color: active ? "var(--text-primary)" : "var(--text-secondary)",
-                transition: "color 0.4s",
-            }}>
-                {step.title}
-            </h3>
-            <p style={{
-                fontSize: "0.875rem", color: "var(--text-secondary)", lineHeight: 1.74,
-                maxWidth: 280, margin: "0 auto",
-            }}>
-                {step.desc}
-            </p>
-        </div>
-    );
-}
-
 export default function HowItWorks() {
-    const ref = useReveal();
-    const [activeStep, setActiveStep] = useState(0);
-    const lineRef = useRef(null);
+  const ref = useReveal();
 
-    /* Auto-cycle step highlight */
-    useEffect(() => {
-        const id = setInterval(() => {
-            setActiveStep((s) => (s + 1) % STEPS.length);
-        }, 2200);
-        return () => clearInterval(id);
-    }, []);
+  return (
+    <section
+      ref={ref}
+      id="how-it-works"
+      style={{
+        padding: "7rem 0",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {/* Background glow */}
+      <div style={{
+        position: "absolute",
+        width: 500,
+        height: 500,
+        top: "20%",
+        right: "-5%",
+        background: "radial-gradient(circle, rgba(96,165,250,0.06) 0%, transparent 65%)",
+        filter: "blur(80px)",
+        pointerEvents: "none",
+        borderRadius: "50%",
+      }} />
 
-    /* Animate the connector line width */
-    useEffect(() => {
-        if (!lineRef.current) return;
-        animate(lineRef.current, {
-            width: ["0%", "100%"],
-            opacity: [0, 1],
-            duration: 1200,
-            easing: "outCubic",
-            delay: 400,
-        });
-    }, []);
+      <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 1.5rem", position: "relative", zIndex: 1 }}>
 
-    return (
-        <section id="how-it-works" className="section-pad" ref={ref}>
-            <div className="page-container">
-                <div style={{ textAlign: "center", maxWidth: 560, margin: "0 auto 5rem" }}>
-                    <p className="overline reveal" style={{ marginBottom: "1rem" }}>Launch and Execute in Three Steps</p>
-                    <h2 className="reveal delay-1" style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.6rem)", marginBottom: "1rem" }}>
-                        From strategy to remarkable experience
-                    </h2>
-                    <p className="reveal delay-2" style={{ color: "var(--text-secondary)", fontSize: "0.975rem" }}>
-                        Planora removes all operational friction so your team can focus on delivering a remarkable experience.
-                    </p>
+        {/* Header */}
+        <div className="reveal" style={{ maxWidth: 600, margin: "0 auto 5rem", textAlign: "center" }}>
+          <div style={{
+            display: "inline-block",
+            fontSize: "0.72rem",
+            fontWeight: 700,
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            color: "#60a5fa",
+            background: "rgba(96,165,250,0.08)",
+            border: "1px solid rgba(96,165,250,0.2)",
+            borderRadius: "2rem",
+            padding: "0.3rem 1rem",
+            marginBottom: "1.25rem",
+          }}>
+            How It Works
+          </div>
+          <h2 style={{
+            fontSize: "clamp(1.9rem, 3.2vw, 2.75rem)",
+            fontWeight: 900,
+            color: "#fff",
+            lineHeight: 1.15,
+            letterSpacing: "-0.025em",
+            marginBottom: "1rem",
+            fontFamily: "'Outfit', 'Inter', sans-serif",
+          }}>
+            From idea to execution in four steps.
+          </h2>
+          <p style={{ fontSize: "1rem", color: "rgba(148,163,184,0.7)", lineHeight: 1.7 }}>
+            Planora guides you through every phase — so nothing slips through the cracks.
+          </p>
+        </div>
+
+        {/* Steps */}
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+          gap: "1.5rem",
+          position: "relative",
+        }}>
+          {STEPS.map((step, i) => (
+            <div
+              key={step.number}
+              className={`reveal delay-${i + 1}`}
+              style={{ position: "relative" }}
+            >
+              {/* Connector line (not last) */}
+              {i < STEPS.length - 1 && (
+                <div style={{
+                  position: "absolute",
+                  top: "2.5rem",
+                  right: "-0.75rem",
+                  width: "1.5rem",
+                  height: "1px",
+                  background: `linear-gradient(90deg, rgba(${step.colorRgb}, 0.4), rgba(${STEPS[i + 1].colorRgb}, 0.4))`,
+                  zIndex: 2,
+                  display: "none", // hide on small, show on large via inline
+                }} />
+              )}
+
+              <div style={{
+                background: "rgba(255,255,255,0.02)",
+                border: "1px solid rgba(255,255,255,0.06)",
+                borderRadius: "1.25rem",
+                padding: "2rem",
+                height: "100%",
+                transition: "border-color 0.35s ease, transform 0.35s ease, background 0.35s ease",
+              }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = `rgba(${step.colorRgb}, 0.3)`;
+                  e.currentTarget.style.transform = "translateY(-4px)";
+                  e.currentTarget.style.background = `rgba(${step.colorRgb}, 0.03)`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)";
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.background = "rgba(255,255,255,0.02)";
+                }}
+              >
+                {/* Step number */}
+                <div style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  marginBottom: "1.5rem",
+                }}>
+                  <div style={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: "0.875rem",
+                    background: `rgba(${step.colorRgb}, 0.1)`,
+                    border: `1px solid rgba(${step.colorRgb}, 0.2)`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: step.color,
+                  }}>
+                    {step.icon}
+                  </div>
+                  <span style={{
+                    fontSize: "2.5rem",
+                    fontWeight: 900,
+                    color: `rgba(${step.colorRgb}, 0.12)`,
+                    lineHeight: 1,
+                    fontFamily: "'Outfit', 'Inter', sans-serif",
+                    letterSpacing: "-0.04em",
+                  }}>
+                    {step.number}
+                  </span>
                 </div>
 
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "2rem", position: "relative" }}>
-                    {/* Animated connector line */}
-                    <div style={{
-                        position: "absolute", top: 44, left: "calc(16.66%)",
-                        right: "calc(16.66%)", height: 2,
-                        background: "var(--border-subtle)", pointerEvents: "none",
-                    }}>
-                        <div ref={lineRef} style={{
-                            height: "100%", width: "0%",
-                            background: "linear-gradient(90deg, #3b82f6, #2563eb, #22d3ee)",
-                            borderRadius: 1, opacity: 0,
-                        }} />
-                    </div>
-
-                    {STEPS.map((step, i) => (
-                        <StepCard key={step.number} step={step} index={i} active={activeStep === i} />
-                    ))}
-                </div>
-
-                {/* Step indicator dots */}
-                <div style={{ display: "flex", justifyContent: "center", gap: "0.5rem", marginTop: "3rem" }}>
-                    {STEPS.map((_, i) => (
-                        <button
-                            key={i}
-                            onClick={() => setActiveStep(i)}
-                            style={{
-                                width: activeStep === i ? 24 : 7,
-                                height: 7, borderRadius: 4,
-                                background: activeStep === i ? "#3b82f6" : "var(--border-subtle)",
-                                border: "none", cursor: "pointer",
-                                transition: "all 0.35s ease",
-                                boxShadow: activeStep === i ? "0 0 10px rgba(59,130,246,0.5)" : "none",
-                            }}
-                        />
-                    ))}
-                </div>
+                <h3 style={{
+                  fontSize: "1.05rem",
+                  fontWeight: 700,
+                  color: "#fff",
+                  marginBottom: "0.7rem",
+                  lineHeight: 1.3,
+                }}>
+                  {step.title}
+                </h3>
+                <p style={{
+                  fontSize: "0.875rem",
+                  color: "rgba(148,163,184,0.65)",
+                  lineHeight: 1.7,
+                }}>
+                  {step.desc}
+                </p>
+              </div>
             </div>
-        </section>
-    );
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 }

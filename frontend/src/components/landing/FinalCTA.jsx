@@ -1,199 +1,248 @@
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { animate, stagger } from "animejs";
-import useReveal from "../../hooks/useReveal";
-
-/* ── Animated particle dots ── */
-function FloatingOrbs() {
-    const orbs = [
-        { w: 160, h: 160, top: "10%", left: "5%", color: "#3b82f6", delay: 0, dur: 7000 },
-        { w: 100, h: 100, top: "60%", right: "8%", color: "#2563eb", delay: 1200, dur: 9000 },
-        { w: 80, h: 80, top: "30%", right: "20%", color: "#22d3ee", delay: 600, dur: 6000 },
-        { w: 120, h: 120, top: "70%", left: "15%", color: "#1d4ed8", delay: 900, dur: 8000 },
-    ];
-    return (
-        <>
-            {orbs.map((o, i) => (
-                <div
-                    key={i}
-                    className="glow-blob anim-float"
-                    style={{
-                        width: o.w, height: o.h,
-                        top: o.top, left: o.left, right: o.right,
-                        background: `radial-gradient(circle, ${o.color}25, transparent 70%)`,
-                        animationDelay: `${o.delay}ms`,
-                        animationDuration: `${o.dur}ms`,
-                    }}
-                />
-            ))}
-        </>
-    );
-}
+import { animate, createTimeline } from "animejs";
+import useMagnetic from "../../hooks/useMagnetic";
 
 export default function FinalCTA() {
-    const ref = useReveal();
-    const statsRef = useRef(null);
+  const sectionRef = useRef(null);
+  const headRef = useRef(null);
+  const subRef = useRef(null);
+  const btnGroupRef = useRef(null);
+  const animated = useRef(false);
+  const primaryRef = useMagnetic(0.35);
+  const ghostRef = useMagnetic(0.25);
 
-    useEffect(() => {
-        if (!statsRef.current) return;
-        const items = statsRef.current.querySelectorAll(".cta-stat");
-        if (!items.length) return;
-
-        const observer = new IntersectionObserver(([entry]) => {
-            if (!entry.isIntersecting) return;
-            animate(Array.from(items), {
-                opacity: [0, 1],
-                translateY: [20, 0],
-                scale: [0.92, 1],
-                duration: 700,
-                easing: "outExpo",
-                delay: stagger(100),
-            });
-            observer.disconnect();
-        }, { threshold: 0.4 });
-        observer.observe(statsRef.current);
-        return () => observer.disconnect();
-    }, []);
-
-    return (
-        <section
-            id="cta"
-            className="section-pad"
-            style={{
-                position: "relative",
-                overflow: "hidden",
-                background: "var(--bg-surface)",
-                borderTop: "1px solid var(--border-subtle)",
-            }}
-        >
-            {/* Animated glow orbs */}
-            <FloatingOrbs />
-
-            {/* Large radial sweep */}
-            <div className="glow-blob" style={{
-                width: 700, height: 500,
-                top: "50%", left: "50%",
-                transform: "translate(-50%, -50%)",
-                background: "radial-gradient(ellipse, rgba(37,99,235,0.22) 0%, rgba(59,130,246,0.1) 50%, transparent 70%)",
-                animation: "pulse-glow 4s ease-in-out infinite",
-            }} />
-
-            <div className="page-container" style={{ position: "relative", zIndex: 2 }} ref={ref}>
-                <div
-                    className="reveal"
-                    style={{
-                        background: "linear-gradient(140deg, rgba(59,130,246,0.1), rgba(37,99,235,0.07), rgba(34,211,238,0.05))",
-                        border: "1px solid var(--border-accent)",
-                        borderRadius: "var(--radius-2xl)",
-                        padding: "5.5rem 2rem 4rem",
-                        textAlign: "center",
-                        maxWidth: 780,
-                        margin: "0 auto",
-                        backdropFilter: "blur(16px)",
-                        WebkitBackdropFilter: "blur(16px)",
-                        position: "relative",
-                        overflow: "hidden",
-                    }}
-                >
-                    {/* Corner accent */}
-                    <div style={{
-                        position: "absolute", top: 0, left: 0, right: 0,
-                        height: 2,
-                        background: "linear-gradient(90deg, transparent, #3b82f6, #2563eb, #22d3ee, transparent)",
-                        animation: "gradient-shift 3s ease infinite",
-                        backgroundSize: "200% auto",
-                    }} />
-
-                    <p className="overline" style={{ marginBottom: "1.5rem", letterSpacing: "0.2em", color: "#60a5fa" }}>READY TO ELEVATE YOUR EVENT OPERATIONS?</p>
-
-                    <h2 style={{
-                        fontSize: "clamp(2rem, 5vw, 3.5rem)",
-                        fontWeight: 900, marginBottom: "1.25rem", lineHeight: 1.1,
-                    }}>
-                        Operational Clarity {" "}
-                        <br />
-                        <span className="gradient-text" style={{
-                            background: "linear-gradient(130deg, #93c5fd, #3b82f6, #22d3ee)",
-                            backgroundSize: "200% auto",
-                            animation: "gradient-shift 4s ease infinite",
-                            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-                        }}>
-                            Starts Here.
-                        </span>
-                    </h2>
-
-                    <p style={{
-                        fontSize: "1.05rem", color: "var(--text-secondary)",
-                        maxWidth: 600, margin: "0 auto 2.5rem", lineHeight: 1.76,
-                    }}>
-                        Planora replaces fragmented tools with intelligent automation, financial transparency, and real-time execution control — purpose-built for campus leaders.
-                    </p>
-
-                    <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap", marginBottom: "3rem" }}>
-                        <Link to="/signup" className="btn btn-primary btn-lg" style={{ boxShadow: "0 0 48px rgba(59,130,246,0.5)", padding: "0.85rem 2.5rem" }}>
-                            Start Your Free Trial
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                <line x1="5" y1="12" x2="19" y2="12" />
-                                <polyline points="12 5 19 12 12 19" />
-                            </svg>
-                        </Link>
-                        <Link to="/demo" className="btn btn-ghost btn-lg" style={{ padding: "0.75rem 2rem" }}>
-                            Schedule a Strategy Demo
-                        </Link>
-                    </div>
-
-                    {/* Value Indicators */}
-                    <div ref={statsRef} style={{
-                        display: "flex", gap: "2rem", justifyContent: "center",
-                        flexWrap: "wrap", paddingTop: "2.5rem",
-                        borderTop: "1px solid var(--border-subtle)",
-                    }}>
-                        {[
-                            {
-                                label: "Financial Transparency",
-                                icon: (
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <line x1="12" y1="1" x2="12" y2="23" />
-                                        <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
-                                    </svg>
-                                )
-                            },
-                            {
-                                label: "Intelligent Automation",
-                                icon: (
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-                                    </svg>
-                                )
-                            },
-                            {
-                                label: "Real-Time Execution Control",
-                                icon: (
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <circle cx="12" cy="12" r="10" />
-                                        <circle cx="12" cy="12" r="6" />
-                                        <circle cx="12" cy="12" r="2" />
-                                    </svg>
-                                )
-                            },
-                        ].map((s, i) => (
-                            <div key={i} className="cta-stat" style={{ textAlign: "center", opacity: 0, display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                                <span style={{
-                                    display: "flex", alignItems: "center", justifyContent: "center",
-                                    width: 38, height: 38, borderRadius: "10px",
-                                    background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.2)",
-                                    color: "#3b82f6"
-                                }}>{s.icon}</span>
-                                <p style={{ fontSize: "0.95rem", color: "var(--text-primary)", fontWeight: 500 }}>{s.label}</p>
-                            </div>
-                        ))}
-                    </div>
-
-                    <p style={{ marginTop: "2rem", fontSize: "0.85rem", color: "var(--text-muted)", fontStyle: "italic" }}>
-                        "Built for student organizers, committee leaders, and campus event teams."
-                    </p>
-                </div>
-            </div>
-        </section>
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !animated.current) {
+          animated.current = true;
+          const tl = createTimeline({ easing: "easeOutExpo", autoplay: true });
+          tl.add(headRef.current, { opacity: [0, 1], translateY: [30, 0], duration: 800 })
+            .add(subRef.current, { opacity: [0, 1], translateY: [20, 0], duration: 700 }, "-=500")
+            .add(btnGroupRef.current, { opacity: [0, 1], translateY: [16, 0], duration: 600 }, "-=400");
+        }
+      },
+      { threshold: 0.3 }
     );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  // Pulse animation on button
+  const pulseRef = useRef(null);
+  useEffect(() => {
+    if (!pulseRef.current) return;
+    animate(pulseRef.current, {
+      scale: [1, 1.18, 1],
+      opacity: [0.6, 0, 0.6],
+      duration: 2800,
+      loop: true,
+      easing: "easeInOutSine",
+    });
+  }, []);
+
+  return (
+    <section
+      ref={sectionRef}
+      id="cta"
+      style={{
+        padding: "8rem 0",
+        position: "relative",
+        overflow: "hidden",
+        textAlign: "center",
+      }}
+    >
+      {/* Large glow blobs */}
+      <div style={{
+        position: "absolute",
+        width: 700,
+        height: 700,
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%,-50%)",
+        background: "radial-gradient(circle, rgba(124,58,237,0.15) 0%, rgba(79,70,229,0.08) 40%, transparent 65%)",
+        filter: "blur(80px)",
+        pointerEvents: "none",
+        borderRadius: "50%",
+      }} />
+      <div style={{
+        position: "absolute",
+        width: 400,
+        height: 400,
+        top: "30%",
+        left: "20%",
+        background: "radial-gradient(circle, rgba(96,165,250,0.06) 0%, transparent 65%)",
+        filter: "blur(60px)",
+        pointerEvents: "none",
+        borderRadius: "50%",
+      }} />
+      <div style={{
+        position: "absolute",
+        width: 350,
+        height: 350,
+        bottom: "20%",
+        right: "15%",
+        background: "radial-gradient(circle, rgba(167,139,250,0.06) 0%, transparent 65%)",
+        filter: "blur(60px)",
+        pointerEvents: "none",
+        borderRadius: "50%",
+      }} />
+
+      {/* Grid */}
+      <div style={{
+        position: "absolute",
+        inset: 0,
+        backgroundImage: `linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px)`,
+        backgroundSize: "60px 60px",
+        pointerEvents: "none",
+        maskImage: "radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent)",
+        WebkitMaskImage: "radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent)",
+      }} />
+
+      <div style={{ maxWidth: 760, margin: "0 auto", padding: "0 1.5rem", position: "relative", zIndex: 1 }}>
+
+        {/* Badge */}
+        <div style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "0.6rem",
+          background: "rgba(124,58,237,0.1)",
+          border: "1px solid rgba(124,58,237,0.25)",
+          borderRadius: "2rem",
+          padding: "0.35rem 1.1rem 0.35rem 0.7rem",
+          marginBottom: "2.5rem",
+        }}>
+          <span style={{ fontSize: "0.85rem" }}>✦</span>
+          <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "#c4b5fd", letterSpacing: "0.03em" }}>
+            Free for student clubs — always
+          </span>
+        </div>
+
+        <h2
+          ref={headRef}
+          style={{
+            fontSize: "clamp(2.2rem, 4.5vw, 3.8rem)",
+            fontWeight: 900,
+            color: "#fff",
+            lineHeight: 1.1,
+            letterSpacing: "-0.03em",
+            marginBottom: "1.5rem",
+            fontFamily: "'Outfit', 'Inter', sans-serif",
+            opacity: 0,
+          }}
+        >
+          Ready to run your campus<br />
+          events with{" "}
+          <span style={{
+            background: "linear-gradient(135deg, #c4b5fd 0%, #818cf8 45%, #60a5fa 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+          }}>
+            intelligence?
+          </span>
+        </h2>
+
+        <p
+          ref={subRef}
+          style={{
+            fontSize: "clamp(0.95rem, 1.2vw, 1.1rem)",
+            color: "rgba(148,163,184,0.75)",
+            lineHeight: 1.75,
+            marginBottom: "3rem",
+            maxWidth: 520,
+            margin: "0 auto 3rem",
+            opacity: 0,
+          }}
+        >
+          Join hundreds of student organizations already using Planora to run smarter, faster, better events.
+        </p>
+
+        <div
+          ref={btnGroupRef}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "1rem",
+            flexWrap: "wrap",
+            opacity: 0,
+          }}
+        >
+          {/* Primary CTA with pulse */}
+          <div style={{ position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
+            <div ref={pulseRef} style={{
+              position: "absolute",
+              inset: -4,
+              borderRadius: "1.1rem",
+              background: "rgba(124,58,237,0.4)",
+              pointerEvents: "none",
+            }} />
+            <Link
+              to="/signup"
+              ref={primaryRef}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.6rem",
+                padding: "1rem 2.5rem",
+                background: "linear-gradient(135deg, #7c3aed 0%, #4f46e5 60%, #4338ca 100%)",
+                color: "#fff",
+                borderRadius: "0.9rem",
+                fontWeight: 700,
+                fontSize: "1rem",
+                textDecoration: "none",
+                boxShadow: "0 12px 35px -8px rgba(124,58,237,0.6), inset 0 1px 0 rgba(255,255,255,0.15)",
+                border: "1px solid rgba(255,255,255,0.1)",
+                position: "relative",
+                zIndex: 1,
+                willChange: "transform",
+              }}
+            >
+              Get Started Free
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+              </svg>
+            </Link>
+          </div>
+
+          <a
+            href="#features"
+            ref={ghostRef}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.6rem",
+              padding: "1rem 2rem",
+              background: "rgba(255,255,255,0.04)",
+              color: "rgba(255,255,255,0.75)",
+              borderRadius: "0.9rem",
+              fontWeight: 600,
+              fontSize: "1rem",
+              textDecoration: "none",
+              border: "1px solid rgba(255,255,255,0.1)",
+              backdropFilter: "blur(12px)",
+              transition: "background 0.3s, border-color 0.3s",
+              willChange: "transform",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+              e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+              e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
+            }}
+          >
+            See all features
+          </a>
+        </div>
+
+        {/* Small trust note */}
+        <p style={{ marginTop: "2.5rem", fontSize: "0.8rem", color: "rgba(148,163,184,0.35)", fontWeight: 500 }}>
+          No credit card required · Free for student organizations · Cancel anytime
+        </p>
+      </div>
+    </section>
+  );
 }

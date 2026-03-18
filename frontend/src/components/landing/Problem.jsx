@@ -1,180 +1,165 @@
-import { useEffect, useRef, useState } from "react";
 import useReveal from "../../hooks/useReveal";
 
-/* ── Animated counter hook ── */
-function useCounter(target, duration = 1600, start = false) {
-    const [val, setVal] = useState(0);
-    useEffect(() => {
-        if (!start) return;
-        let startTime = null;
-        const step = (ts) => {
-            if (!startTime) startTime = ts;
-            const progress = Math.min((ts - startTime) / duration, 1);
-            const ease = 1 - Math.pow(1 - progress, 3);
-            setVal(Math.floor(ease * target));
-            if (progress < 1) requestAnimationFrame(step);
-            else setVal(target);
-        };
-        requestAnimationFrame(step);
-    }, [start, target, duration]);
-    return val;
-}
-
-/* ── Mini stat with animated counter ── */
-function AnimatedStat({ label, target, suffix = "", prefix = "", color, triggerCount }) {
-    const val = useCounter(target, 1500, triggerCount);
-    return (
-        <div style={{ textAlign: "center" }}>
-            <p className="anim-number-glow" style={{
-                fontSize: "2rem", fontWeight: 900, color,
-                fontFamily: "Outfit, sans-serif", letterSpacing: "-0.03em", marginBottom: "0.3rem",
-            }}>
-                {prefix}{val.toLocaleString()}{suffix}
-            </p>
-            <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 500 }}>{label}</p>
-        </div>
-    );
-}
-
-/* ── Mini Dashboard Mock ── */
-function DashboardMock({ triggerCount }) {
-    return (
-        <div style={{
-            background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)",
-            borderRadius: "var(--radius-lg)", overflow: "hidden",
-            boxShadow: "0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(59,130,246,0.08)",
-        }}>
-            {/* Chrome */}
-            <div style={{
-                background: "var(--bg-card)", borderBottom: "1px solid var(--border-subtle)",
-                padding: "0.7rem 1rem", display: "flex", alignItems: "center", gap: "0.4rem",
-            }}>
-                {["#ef4444", "#f59e0b", "#22c55e"].map((c) => (
-                    <div key={c} style={{ width: 10, height: 10, borderRadius: "50%", background: c }} />
-                ))}
-                <div style={{
-                    flex: 1, marginLeft: "0.6rem", height: 20, background: "rgba(255,255,255,0.04)",
-                    borderRadius: 4, display: "flex", alignItems: "center", paddingLeft: "0.6rem",
-                }}>
-                    <span style={{ fontSize: "0.66rem", color: "var(--text-muted)" }}>app.planora.io/events</span>
-                </div>
-            </div>
-
-            {/* Body */}
-            <div style={{ padding: "1.25rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
-                {/* Counters */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.7rem" }}>
-                    {[
-                        { label: "Events", target: 24, color: "#3b82f6" },
-                        { label: "Volunteers", target: 312, color: "#6ee7b7" },
-                        { label: "Budget Used", target: 76, suffix: "%", color: "#f59e0b" },
-                    ].map((s) => (
-                        <div key={s.label} style={{
-                            background: "var(--bg-card)", borderRadius: "var(--radius-sm)",
-                            padding: "0.85rem", border: "1px solid var(--border-subtle)", textAlign: "center",
-                        }}>
-                            <p style={{ fontSize: "0.62rem", color: "var(--text-muted)", marginBottom: "0.3rem" }}>{s.label}</p>
-                            <AnimatedStat target={s.target} suffix={s.suffix || ""} color={s.color} triggerCount={triggerCount} />
-                        </div>
-                    ))}
-                </div>
-
-                {/* Progress bars with animation */}
-                {[
-                    { label: "Tech Fest 2026", pct: 82, color: "#3b82f6", delay: 0 },
-                    { label: "Hackathon Sprint", pct: 58, color: "#2563eb", delay: 150 },
-                    { label: "Cultural Week", pct: 34, color: "#22d3ee", delay: 300 },
-                ].map((item) => (
-                    <div key={item.label}>
-                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.35rem" }}>
-                            <span style={{ fontSize: "0.72rem", color: "var(--text-secondary)", fontWeight: 500 }}>{item.label}</span>
-                            <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>{item.pct}%</span>
-                        </div>
-                        <div style={{ height: 6, background: "rgba(255,255,255,0.06)", borderRadius: 3, overflow: "hidden" }}>
-                            <div style={{
-                                height: "100%", width: triggerCount ? `${item.pct}%` : "0%",
-                                background: `linear-gradient(90deg, ${item.color}, ${item.color}aa)`,
-                                borderRadius: 3,
-                                transition: triggerCount ? `width 1.2s cubic-bezier(0.22,1,0.36,1) ${item.delay}ms` : "none",
-                            }} />
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
-}
+const PROBLEMS = [
+  {
+    emoji: "📋",
+    title: "Scattered Spreadsheets",
+    desc: "Plans, budgets, guest lists — saved across 10 different files shared over WhatsApp. One wrong edit breaks everything.",
+  },
+  {
+    emoji: "💸",
+    title: "Budget Black Holes",
+    desc: "Nobody knows how much has been spent until the invoice arrives. By then, it's too late to course-correct.",
+  },
+  {
+    emoji: "🤯",
+    title: "Volunteer Chaos",
+    desc: "Chasing team members across platforms. No visibility into who's doing what or whether it's getting done.",
+  },
+  {
+    emoji: "📊",
+    title: "Zero Insights",
+    desc: "After every event, you have no data. No idea what worked, what didn't, or how to improve next time.",
+  },
+];
 
 export default function Problem() {
-    const ref = useReveal();
-    const [triggered, setTriggered] = useState(false);
-    const sectionRef = useRef(null);
+  const ref = useReveal();
 
-    useEffect(() => {
-        const el = sectionRef.current;
-        if (!el) return;
-        const observer = new IntersectionObserver(
-            ([entry]) => { if (entry.isIntersecting) { setTriggered(true); observer.disconnect(); } },
-            { threshold: 0.25 }
-        );
-        observer.observe(el);
-        return () => observer.disconnect();
-    }, []);
+  return (
+    <section
+      ref={ref}
+      id="problem"
+      style={{
+        padding: "8rem 0",
+        position: "relative",
+        overflow: "hidden",
+        background: "#0B0D14",
+      }}
+    >
+      {/* Background glow */}
+      <div style={{
+        position: "absolute",
+        width: 500,
+        height: 500,
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%,-50%)",
+        background: "radial-gradient(circle, rgba(99,102,241,0.06) 0%, transparent 65%)",
+        filter: "blur(60px)",
+        pointerEvents: "none",
+        borderRadius: "50%",
+      }} />
 
-    return (
-        <section id="problem" className="section-pad" ref={ref}>
-            <div className="page-container" ref={sectionRef}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "center" }}>
-                    {/* Left */}
-                    <div>
-                        <p className="overline reveal" style={{ marginBottom: "1.25rem" }}>The Operational Gap</p>
-                        <h2 className="reveal delay-1" style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.6rem)", marginBottom: "1.5rem" }}>
-                            Campus events deserve systems — not spreadsheets.
-                        </h2>
-                        <div className="reveal delay-2" style={{
-                            fontSize: "1.05rem", color: "var(--text-secondary)", lineHeight: 1.78, marginBottom: "2rem",
-                        }}>
-                            <p style={{ marginBottom: "1.2rem" }}>
-                                Most student committees operate across scattered tools: spreadsheets for budgets, messaging apps for coordination, and manual trackers for approvals. The result? Delayed execution, financial blind spots, and reactive decision-making.
-                            </p>
-                            <p style={{ fontWeight: 600, color: "var(--text-primary)" }}>
-                                Without centralized intelligence, even well-planned events become chaotic.
-                            </p>
-                        </div>
-                        <ul className="reveal delay-3" style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "1rem" }}>
-                            {[
-                                "No real-time budget transparency",
-                                "Fragmented communication channels",
-                                "Manual task tracking and approvals",
-                                "Zero performance analytics",
-                            ].map((point, i) => (
-                                <li key={point} style={{
-                                    display: "flex", alignItems: "flex-start", gap: "0.65rem",
-                                    fontSize: "0.95rem", color: "var(--text-secondary)",
-                                    animation: triggered ? `fade-up 0.6s ease ${i * 120}ms both` : "none",
-                                }}>
-                                    <span style={{
-                                        marginTop: "0.18rem", width: 20, height: 20, borderRadius: "50%",
-                                        background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.3)",
-                                        display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-                                    }}>
-                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                                        </svg>
-                                    </span>
-                                    {point}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+      <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 1.5rem", position: "relative", zIndex: 1 }}>
 
-                    {/* Right — Dashboard with animated progress bars and counters */}
-                    <div className="reveal delay-2">
-                        <DashboardMock triggerCount={triggered} />
-                    </div>
-                </div>
+        {/* Section header */}
+        <div className="reveal" style={{ textAlign: "center", maxWidth: 640, margin: "0 auto 4rem" }}>
+          <div style={{
+            display: "inline-block",
+            fontSize: "0.72rem",
+            fontWeight: 700,
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            color: "#f87171",
+            background: "rgba(248,113,113,0.08)",
+            border: "1px solid rgba(248,113,113,0.2)",
+            borderRadius: "2rem",
+            padding: "0.3rem 1rem",
+            marginBottom: "1.25rem",
+          }}>
+            The Problem
+          </div>
+          <h2 style={{
+            fontSize: "clamp(2rem, 3.5vw, 2.8rem)",
+            fontWeight: 900,
+            color: "#fff",
+            lineHeight: 1.15,
+            letterSpacing: "-0.025em",
+            marginBottom: "1rem",
+            fontFamily: "'Outfit', 'Inter', sans-serif",
+          }}>
+            Event planning is still running on spreadsheets and group chats.
+          </h2>
+          <p style={{ fontSize: "1rem", color: "rgba(148,163,184,0.75)", lineHeight: 1.7 }}>
+            Student organizers deserve better tools. Here's what they deal with every single time.
+          </p>
+        </div>
+
+        {/* Cards grid */}
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+          gap: "1.25rem",
+        }}>
+          {PROBLEMS.map((p, i) => (
+            <div
+              key={p.title}
+              className={`reveal delay-${i + 1}`}
+              style={{
+                background: "rgba(255,255,255,0.02)",
+                border: "1px solid rgba(255,255,255,0.06)",
+                borderRadius: "1.25rem",
+                padding: "2rem",
+                transition: "border-color 0.3s ease, background 0.3s ease, transform 0.3s ease",
+                cursor: "default",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = "rgba(248,113,113,0.25)";
+                e.currentTarget.style.background = "rgba(248,113,113,0.03)";
+                e.currentTarget.style.transform = "translateY(-4px)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)";
+                e.currentTarget.style.background = "rgba(255,255,255,0.02)";
+                e.currentTarget.style.transform = "translateY(0)";
+              }}
+            >
+              <div style={{
+                width: 52,
+                height: 52,
+                borderRadius: "0.875rem",
+                background: "rgba(248,113,113,0.08)",
+                border: "1px solid rgba(248,113,113,0.15)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "1.5rem",
+                marginBottom: "1.25rem",
+              }}>
+                {p.emoji}
+              </div>
+              <h3 style={{
+                fontSize: "1.05rem",
+                fontWeight: 700,
+                color: "#fff",
+                marginBottom: "0.6rem",
+                lineHeight: 1.3,
+              }}>
+                {p.title}
+              </h3>
+              <p style={{
+                fontSize: "0.875rem",
+                color: "rgba(148,163,184,0.7)",
+                lineHeight: 1.7,
+              }}>
+                {p.desc}
+              </p>
             </div>
-        </section>
-    );
+          ))}
+        </div>
+
+        {/* Separator with solution hint */}
+        <div className="reveal" style={{ textAlign: "center", marginTop: "4rem" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "1rem" }}>
+            <div style={{ height: 1, width: 60, background: "rgba(255,255,255,0.08)" }} />
+            <span style={{ fontSize: "0.875rem", color: "rgba(148,163,184,0.4)", fontWeight: 500 }}>
+              There's a better way
+            </span>
+            <div style={{ height: 1, width: 60, background: "rgba(255,255,255,0.08)" }} />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 }
