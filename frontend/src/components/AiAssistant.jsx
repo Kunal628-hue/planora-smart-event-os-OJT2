@@ -54,14 +54,15 @@ export default function AiAssistant({ eventId }) {
                     display: "flex",
                     flexDirection: "column",
                     marginBottom: "1rem",
-                    background: "rgba(255, 255, 255, 0.95)",
-                    backdropFilter: "blur(20px)",
-                    WebkitBackdropFilter: "blur(20px)",
-                    borderRadius: "24px",
+                    background: "rgba(255, 255, 255, 0.75)",
+                    backdropFilter: "blur(30px) saturate(180%)",
+                    WebkitBackdropFilter: "blur(30px) saturate(180%)",
+                    borderRadius: "32px",
                     overflow: "hidden",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
-                    boxShadow: "0 20px 50px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.02)",
-                    animation: "slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)"
+                    border: "1px solid rgba(255, 255, 255, 0.5)",
+                    boxShadow: "0 25px 60px -12px rgba(0,0,0,0.15), inset 0 0 0 1px rgba(255,255,255,0.2)",
+                    animation: "slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+                    zIndex: 1001
                 }}>
                     {/* Header */}
                     <div style={{
@@ -144,15 +145,16 @@ export default function AiAssistant({ eventId }) {
                                 alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
                                 maxWidth: "85%",
                                 padding: "1rem 1.25rem",
-                                borderRadius: msg.role === "user" ? "20px 20px 4px 20px" : "20px 20px 20px 4px",
-                                fontSize: "0.925rem",
-                                lineHeight: "1.5",
-                                background: msg.role === "user" ? "linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)" : "#fff",
-                                color: msg.role === "user" ? "#fff" : "#1e293b",
-                                boxShadow: msg.role === "user" ? "0 4px 15px rgba(37, 99, 235, 0.2)" : "0 2px 8px rgba(0,0,0,0.04)",
-                                border: msg.role === "assistant" ? "1px solid #e2e8f0" : "none",
+                                borderRadius: msg.role === "user" ? "24px 24px 4px 24px" : "24px 24px 24px 4px",
+                                fontSize: "0.95rem",
+                                fontWeight: 500,
+                                lineHeight: "1.6",
+                                background: msg.role === "user" ? "linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)" : "rgba(255, 255, 255, 0.9)",
+                                color: msg.role === "user" ? "#fff" : "#0f172a",
+                                boxShadow: msg.role === "user" ? "0 8px 20px -4px rgba(37, 99, 235, 0.3)" : "0 4px 12px rgba(0,0,0,0.03)",
+                                border: msg.role === "assistant" ? "1px solid rgba(255,255,255,0.8)" : "none",
                                 position: "relative",
-                                animation: "fadeIn 0.3s ease-out"
+                                animation: "bubbleIn 0.4s cubic-bezier(0.2, 1, 0.3, 1)"
                             }}>
                                 {msg.text}
                             </div>
@@ -277,9 +279,9 @@ export default function AiAssistant({ eventId }) {
                     from { opacity: 0; transform: translateY(30px) scale(0.95); }
                     to { opacity: 1; transform: translateY(0) scale(1); }
                 }
-                @keyframes fadeIn {
-                    from { opacity: 0; transform: translateY(10px); }
-                    to { opacity: 1; transform: translateY(0); }
+                @keyframes bubbleIn {
+                    from { opacity: 0; transform: translateY(15px) scale(0.9); }
+                    to { opacity: 1; transform: translateY(0) scale(1); }
                 }
                 @keyframes botBounce {
                     0%, 100% { transform: translateY(0); opacity: 0.4; }

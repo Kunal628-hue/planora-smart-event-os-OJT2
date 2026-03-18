@@ -1,13 +1,30 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import { animate, stagger } from "animejs";
+import {
+    Plus,
+    Utensils,
+    Sparkles,
+    Camera,
+    Handshake,
+    Trash2,
+    MapPin,
+    Loader2,
+    X,
+    Building2,
+    Music,
+    Truck,
+    CheckCircle2,
+    AlertCircle,
+    ChevronRight,
+    Search
+} from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Vendors() {
-    const { user } = useOutletContext();
+    const { user, events, selectedEventId } = useOutletContext();
     const [vendors, setVendors] = useState([]);
-    const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [newVendor, setNewVendor] = useState({
@@ -21,18 +38,11 @@ export default function Vendors() {
 
     const fetchData = async () => {
         if (!user) return;
+        setLoading(true);
         try {
-            const [vendorsRes, eventsRes] = await Promise.all([
-                fetch(`${API_URL}/vendors?user=${user.uid}`),
-                fetch(`${API_URL}/events?user=${user.uid}`)
-            ]);
-            const vendorsData = await vendorsRes.json();
-            const eventsData = await eventsRes.json();
-            setVendors(vendorsData);
-            setEvents(eventsData);
-            if (eventsData.length > 0) {
-                setNewVendor(prev => ({ ...prev, eventId: eventsData[0].id || eventsData[0]._id }));
-            }
+            const res = await fetch(`${API_URL}/vendors?user=${user.uid}`);
+            const data = await res.json();
+            setVendors(data);
         } catch (err) {
             console.error("Fetch error:", err);
         } finally {
@@ -45,13 +55,19 @@ export default function Vendors() {
     }, [user]);
 
     useEffect(() => {
+        if (selectedEventId) {
+            setNewVendor(prev => ({ ...prev, eventId: selectedEventId }));
+        }
+    }, [selectedEventId]);
+
+    useEffect(() => {
         if (!loading && vendors.length > 0) {
             animate('.vendor-card', {
-                translateY: [20, 0],
+                translateY: [15, 0],
                 opacity: [0, 1],
-                delay: stagger(100),
-                easing: 'easeOutExpo',
-                duration: 800
+                delay: stagger(60),
+                easing: 'cubicBezier(.22, 1, .36, 1)',
+                duration: 600
             });
         }
     }, [loading, vendors.length]);
@@ -70,7 +86,14 @@ export default function Vendors() {
             });
             if (response.ok) {
                 setShowModal(false);
-                setNewVendor({ name: "", service: "Catering", contact: "", cost: "", eventId: events[0]?.id || events[0]?._id || "", status: "Unpaid" });
+                setNewVendor({
+                    name: "",
+                    service: "Catering",
+                    contact: "",
+                    cost: "",
+                    eventId: selectedEventId,
+                    status: "Unpaid"
+                });
                 fetchData();
             }
         } catch (err) {
@@ -108,60 +131,83 @@ export default function Vendors() {
         }
     };
 
+    const getServiceIcon = (service) => {
+        switch (service) {
+            case "Catering": return <Utensils size={24} />;
+            case "Decor": return <Sparkles size={24} />;
+            case "Photography": return <Camera size={24} />;
+            case "Venue": return <Building2 size={24} />;
+            case "Entertainment": return <Music size={24} />;
+            case "Logistics": return <Truck size={24} />;
+            default: return <Handshake size={24} />;
+        }
+    };
+
+    const filteredVendors = vendors.filter(v => v.event === selectedEventId);
+
     return (
         <div className="stagger-in">
-            <div className="page-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "2.5rem" }}>
+            <div className="page-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "3rem" }}>
                 <div>
-                    <h1 style={{ fontSize: "2.5rem", fontWeight: 900, letterSpacing: "-0.03em", marginBottom: "0.5rem" }}>
-                        Strategic <span className="gradient-text">Partners</span>
-                    </h1>
-                    <p style={{ color: "var(--text-secondary)", fontSize: "1.1rem" }}>
-                        Manage contractual obligations and financial impact per event context.
+                    <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "0.5rem" }}>
+                        <h1 style={{ fontSize: "2.75rem", fontWeight: 900, letterSpacing: "-0.04em" }}>
+                            Vendor <span className="gradient-text">Ecosystem</span>
+                        </h1>
+                    </div>
+                    <p style={{ color: "var(--text-secondary)", fontSize: "1.1rem", fontWeight: 500 }}>
+                        Orchestrate partnerships and financial commitments across your portfolio.
                     </p>
                 </div>
                 <button
                     onClick={() => setShowModal(true)}
                     className="btn btn-primary btn-lg"
                     disabled={events.length === 0}
-                    style={{ borderRadius: "14px", padding: "1rem 2rem" }}
+                    style={{ borderRadius: "14px", padding: "0.85rem 1.75rem", display: "flex", alignItems: "center", gap: "0.5rem" }}
                 >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: "8px" }}><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-                    Register Vendor
+                    <Plus size={20} strokeWidth={3} />
+                    <span>Register Partner</span>
                 </button>
             </div>
 
             {loading ? (
-                <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "8rem 0", gap: "1.25rem" }}>
-                    <div style={{ width: "48px", height: "48px", border: "5px solid var(--accent-primary)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 1s linear infinite" }}></div>
-                    <p style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Synchronizing Ledger...</p>
+                <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "8rem 0", gap: "1.5rem" }}>
+                    <Loader2 className="animate-spin" size={48} color="var(--accent-primary)" />
+                    <p style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Synchronizing Global Ledger...</p>
                 </div>
-            ) : vendors.length === 0 ? (
-                <div className="glass-panel" style={{ padding: "6rem 2rem", textAlign: "center", borderRadius: "32px", border: "2px dashed var(--border-medium)" }}>
-                    <div style={{ fontSize: "4rem", marginBottom: "1.5rem" }}>🤝</div>
-                    <h2 style={{ fontSize: "1.75rem", fontWeight: 850 }}>No active partnerships found</h2>
-                    <p style={{ color: "var(--text-secondary)", marginTop: "1rem", maxWidth: "450px", margin: "1rem auto", fontSize: "1.1rem" }}>
-                        {events.length === 0 ? "You need an active event context before registering vendors. Create an event first." : "Start tracking your catering, venue, and technical partners to see financial analytics."}
+            ) : filteredVendors.length === 0 ? (
+                <div className="premium-dark-panel modal-reveal" style={{ padding: "6rem 2rem", textAlign: "center", margin: "2rem 0" }}>
+                    <div style={{ marginBottom: "2rem", display: "flex", justifyContent: "center" }}>
+                        <div style={{ width: "80px", height: "80px", borderRadius: "24px", background: "rgba(255,255,255,0.03)", display: "flex", alignItems: "center", justifyContent: "center", border: "1.5px solid rgba(255,255,255,0.1)" }}>
+                            <Handshake size={40} color="var(--accent-primary)" />
+                        </div>
+                    </div>
+                    <h2 style={{ fontSize: "1.75rem", fontWeight: 850, color: "#fff" }}>No active partnerships found</h2>
+                    <p style={{ color: "rgba(255,255,255,0.6)", marginTop: "1rem", maxWidth: "480px", margin: "1rem auto", fontSize: "1.1rem", lineHeight: 1.6 }}>
+                        {events.length === 0 ? "Establish an event context before onboarding vendor partners to begin financial tracking." : "Commence tracking your catering, venue, and technical partners to unlock advanced fiscal analytics."}
                     </p>
                     {events.length > 0 && (
-                        <button onClick={() => setShowModal(true)} className="btn btn-primary" style={{ marginTop: "1rem" }}>Add Your First Vendor</button>
+                        <button onClick={() => setShowModal(true)} className="btn btn-primary" style={{ marginTop: "1.5rem", padding: "0.8rem 2rem", borderRadius: "12px" }}>
+                            Onboard First Vendor
+                        </button>
                     )}
                 </div>
             ) : (
                 <div className="dashboard-grid">
-                    {vendors.map(vendor => (
-                        <div key={vendor._id} className="glass-panel vendor-card" style={{ gridColumn: "span 4", padding: "2rem", display: "flex", flexDirection: "column", borderRadius: "28px" }}>
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.5rem" }}>
+                    {filteredVendors.map(vendor => (
+                        <div key={vendor._id} className="glass-panel vendor-card" style={{ gridColumn: "span 4", padding: "2rem", display: "flex", flexDirection: "column", borderRadius: "28px", border: "1px solid var(--border-subtle)", position: "relative", overflow: "hidden" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.75rem" }}>
                                 <div style={{
-                                    width: "54px",
-                                    height: "54px",
-                                    borderRadius: "16px",
+                                    width: "60px",
+                                    height: "60px",
+                                    borderRadius: "18px",
                                     background: "var(--accent-soft)",
+                                    color: "var(--accent-primary)",
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
-                                    fontSize: "1.75rem"
+                                    border: "1px solid var(--border-accent)"
                                 }}>
-                                    {vendor.service === "Catering" ? "🍽️" : vendor.service === "Decor" ? "✨" : vendor.service === "Photography" ? "📸" : "🤝"}
+                                    {getServiceIcon(vendor.service)}
                                 </div>
                                 <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.75rem" }}>
                                     <div
@@ -172,46 +218,68 @@ export default function Vendors() {
                                             color: vendor.status === "Paid" ? "var(--accent-success)" : "var(--accent-danger)",
                                             cursor: "pointer",
                                             border: `1px solid ${vendor.status === "Paid" ? "rgba(16, 185, 129, 0.2)" : "rgba(239, 68, 68, 0.2)"}`,
+                                            fontWeight: 800,
+                                            padding: "0.4rem 0.8rem"
                                         }}
                                     >
                                         <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "currentColor" }}></span>
-                                        {vendor.status === "Paid" ? "Paid" : "Due"}
+                                        {vendor.status === "Paid" ? "Settled" : "Payment Due"}
                                     </div>
                                     <button
                                         onClick={() => handleDeleteVendor(vendor._id)}
+                                        className="hover-lift"
                                         style={{
-                                            background: "none",
+                                            background: "rgba(239, 68, 68, 0.05)",
                                             border: "none",
-                                            color: "var(--text-muted)",
+                                            color: "var(--accent-danger)",
                                             cursor: "pointer",
-                                            fontSize: "0.75rem",
-                                            fontWeight: 700,
+                                            fontSize: "0.7rem",
+                                            fontWeight: 800,
                                             display: "flex",
                                             alignItems: "center",
-                                            gap: "4px"
+                                            gap: "6px",
+                                            padding: "0.4rem 0.75rem",
+                                            borderRadius: "8px",
+                                            textTransform: "uppercase"
                                         }}
                                     >
-                                        Remove 🗑️
+                                        <Trash2 size={12} strokeWidth={3} />
+                                        Remove
                                     </button>
                                 </div>
                             </div>
 
-                            <div style={{ marginBottom: "1.5rem" }}>
-                                <h3 style={{ fontWeight: 900, fontSize: "1.4rem", color: "var(--text-primary)", letterSpacing: "-0.02em" }}>{vendor.name}</h3>
-                                <p style={{ color: "var(--accent-primary)", fontSize: "0.9rem", fontWeight: 750, marginTop: "0.25rem" }}>{vendor.service} Specialist</p>
+                            <div style={{ marginBottom: "1.75rem" }}>
+                                <h3 style={{ fontWeight: 900, fontSize: "1.5rem", color: "var(--text-primary)", letterSpacing: "-0.03em", marginBottom: "0.25rem" }}>{vendor.name}</h3>
+                                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                                    <span style={{
+                                        padding: "0.25rem 0.6rem",
+                                        borderRadius: "6px",
+                                        background: "var(--bg-elevated)",
+                                        fontSize: "0.75rem",
+                                        fontWeight: 800,
+                                        color: "var(--accent-primary)",
+                                        textTransform: "uppercase",
+                                        letterSpacing: "0.02em"
+                                    }}>
+                                        {vendor.service} Specialist
+                                    </span>
+                                </div>
                             </div>
 
                             <div style={{ marginTop: "auto", padding: "1.5rem", background: "var(--bg-elevated)", borderRadius: "20px", border: "1px solid var(--border-subtle)" }}>
-                                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem", alignItems: "baseline" }}>
-                                    <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>Agreed Valuation</span>
-                                    <span style={{ fontSize: "1.25rem", fontWeight: 900, color: "var(--text-primary)" }}>₹{parseInt(vendor.cost).toLocaleString()}</span>
+                                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1.25rem", alignItems: "baseline" }}>
+                                    <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>Contract Value</span>
+                                    <span style={{ fontSize: "1.4rem", fontWeight: 950, color: "var(--text-primary)", letterSpacing: "-0.02em" }}>₹{parseInt(vendor.cost).toLocaleString()}</span>
                                 </div>
-                                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", paddingTop: "0.75rem", borderTop: "1px dashed var(--border-subtle)" }}>
-                                    <div style={{ width: "32px", height: "32px", borderRadius: "10px", background: "var(--bg-card)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.9rem" }}>📍</div>
+                                <div style={{ display: "flex", alignItems: "center", gap: "1rem", paddingTop: "1rem", borderTop: "1px dashed var(--border-medium)" }}>
+                                    <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "var(--bg-surface)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--border-subtle)", color: "var(--text-muted)" }}>
+                                        <MapPin size={18} />
+                                    </div>
                                     <div style={{ display: "flex", flexDirection: "column" }}>
-                                        <span style={{ fontSize: "0.65rem", color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase" }}>Active Context</span>
-                                        <span style={{ fontSize: "0.85rem", color: "var(--text-primary)", fontWeight: 700 }}>
-                                            {events.find(e => (e.id || e._id) === vendor.event)?.name || "Analytical Context"}
+                                        <span style={{ fontSize: "0.65rem", color: "var(--text-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.02em" }}>Assigned Event</span>
+                                        <span style={{ fontSize: "0.9rem", color: "var(--text-primary)", fontWeight: 750 }}>
+                                            {events.find(e => (e.id || e._id) === vendor.event)?.name || "Unassigned context"}
                                         </span>
                                     </div>
                                 </div>
@@ -223,39 +291,56 @@ export default function Vendors() {
 
             {showModal && (
                 <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(12px)" }}>
-                    <div className="glass-panel" style={{ width: "100%", maxWidth: "500px", padding: "3rem", borderRadius: "32px", boxShadow: "0 30px 60px -12px rgba(0,0,0,0.25)" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
-                            <h2 style={{ fontSize: "1.75rem", fontWeight: 900, letterSpacing: "-0.03em" }}>Register Partner</h2>
+                    <div className="glass-panel-dark modal-reveal" style={{ width: "100%", maxWidth: "540px", padding: "3.5rem", borderRadius: "32px", position: "relative" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "3rem" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
+                                <div style={{ width: "52px", height: "52px", borderRadius: "16px", background: "var(--accent-soft)", color: "var(--accent-primary)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                    <Handshake size={28} strokeWidth={2.5} />
+                                </div>
+                                <div>
+                                    <h2 style={{ fontSize: "1.75rem", fontWeight: 950, letterSpacing: "-0.04em", margin: 0 }}>Register Business Partner</h2>
+                                    <p style={{ color: "var(--text-muted)", fontSize: "0.9rem", fontWeight: 600, margin: 0, marginTop: "0.25rem" }}>Onboard a new vendor into the ecosystem.</p>
+                                </div>
+                            </div>
                             <button
                                 onClick={() => setShowModal(false)}
-                                style={{ background: "var(--bg-elevated)", border: "none", color: "var(--text-primary)", width: "36px", height: "36px", borderRadius: "12px", cursor: "pointer", fontWeight: 900 }}
-                            >✕</button>
+                                className="hover-lift"
+                                style={{ background: "var(--bg-elevated)", border: "1.5px solid var(--border-subtle)", color: "var(--text-primary)", width: "40px", height: "40px", borderRadius: "14px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                            >
+                                <X size={20} strokeWidth={3} />
+                            </button>
                         </div>
-                        <form onSubmit={handleCreateVendor} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                        <form onSubmit={handleCreateVendor} style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
                             <div>
-                                <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.6rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Entity Name</label>
-                                <input className="auth-input" placeholder="e.g. Royal Caterers & Events" value={newVendor.name} onChange={e => setNewVendor({ ...newVendor, name: e.target.value })} required style={{ borderRadius: "14px", padding: "1rem" }} />
+                                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Legal Trading Name</label>
+                                <div style={{ position: "relative" }}>
+                                    <Building2 size={18} style={{ position: "absolute", left: "1.25rem", top: "50%", transform: "translateY(-50%)", color: "var(--accent-primary)", opacity: 0.8 }} />
+                                    <input className="auth-input" placeholder="e.g. Paramount Global Services" value={newVendor.name} onChange={e => setNewVendor({ ...newVendor, name: e.target.value })} required style={{ borderRadius: "14px", padding: "1.1rem 1.1rem 1.1rem 3.25rem", fontSize: "1rem", fontWeight: 600 }} />
+                                </div>
                             </div>
 
                             <div>
-                                <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.6rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Event Attribution</label>
-                                <select
-                                    className="auth-input"
-                                    value={newVendor.eventId}
-                                    onChange={e => setNewVendor({ ...newVendor, eventId: e.target.value })}
-                                    required
-                                    style={{ borderRadius: "14px", padding: "1rem", fontWeight: 700 }}
-                                >
-                                    {events.map(event => (
-                                        <option key={event.id || event._id} value={event.id || event._id}>{event.name}</option>
-                                    ))}
-                                </select>
+                                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Operational Context (Event)</label>
+                                <div style={{ position: "relative" }}>
+                                    <MapPin size={18} style={{ position: "absolute", left: "1.25rem", top: "50%", transform: "translateY(-50%)", color: "var(--accent-primary)", opacity: 0.8 }} />
+                                    <select
+                                        className="auth-input"
+                                        value={newVendor.eventId}
+                                        onChange={e => setNewVendor({ ...newVendor, eventId: e.target.value })}
+                                        required
+                                        style={{ borderRadius: "14px", padding: "1.1rem 1.1rem 1.1rem 3.25rem", fontWeight: 750, fontSize: "1rem" }}
+                                    >
+                                        {events.map(event => (
+                                            <option key={event.id || event._id} value={event.id || event._id}>{event.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
 
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
                                 <div>
-                                    <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.6rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Expertise</label>
-                                    <select className="auth-input" value={newVendor.service} onChange={e => setNewVendor({ ...newVendor, service: e.target.value })} style={{ borderRadius: "14px", padding: "1rem", fontWeight: 700 }}>
+                                    <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Core Competency</label>
+                                    <select className="auth-input" value={newVendor.service} onChange={e => setNewVendor({ ...newVendor, service: e.target.value })} style={{ borderRadius: "14px", padding: "1.1rem", fontWeight: 750, fontSize: "1rem" }}>
                                         <option>Catering</option>
                                         <option>Decor</option>
                                         <option>Photography</option>
@@ -264,15 +349,18 @@ export default function Vendors() {
                                         <option>Logistics</option>
                                     </select>
                                 </div>
-                                <div>
-                                    <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.6rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Valuation (₹)</label>
-                                    <input className="auth-input" type="number" placeholder="50000" value={newVendor.cost} onChange={e => setNewVendor({ ...newVendor, cost: e.target.value })} required style={{ borderRadius: "14px", padding: "1rem" }} />
+                                <div >
+                                    <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Project Valuation (₹)</label>
+                                    <div style={{ position: "relative" }}>
+                                        <Sparkles size={16} style={{ position: "absolute", left: "1.1rem", top: "50%", transform: "translateY(-50%)", color: "var(--accent-primary)", opacity: 0.8 }} />
+                                        <input className="auth-input" type="number" placeholder="0.00" value={newVendor.cost} onChange={e => setNewVendor({ ...newVendor, cost: e.target.value })} required style={{ borderRadius: "14px", padding: "1.1rem 1.1rem 1.1rem 2.8rem", fontSize: "1rem", fontWeight: 850 }} />
+                                    </div>
                                 </div>
                             </div>
 
-                            <div style={{ display: "flex", gap: "1.25rem", marginTop: "1rem" }}>
-                                <button className="btn btn-ghost" type="button" onClick={() => setShowModal(false)} style={{ flex: 1, borderRadius: "14px", fontWeight: 700 }}>Cancel</button>
-                                <button className="btn btn-primary" type="submit" style={{ flex: 2, borderRadius: "14px", fontWeight: 900 }}>Confirm Registration</button>
+                            <div style={{ display: "flex", gap: "1.5rem", marginTop: "1rem" }}>
+                                <button className="btn btn-ghost" type="button" onClick={() => setShowModal(false)} style={{ flex: 1, borderRadius: "16px", fontWeight: 750, padding: "1.1rem" }}>Cancel</button>
+                                <button className="btn btn-primary shadow-glow hover-lift" type="submit" style={{ flex: 1.5, borderRadius: "16px", fontWeight: 900, padding: "1.1rem", fontSize: "1.05rem" }}>Execute Registration</button>
                             </div>
                         </form>
                     </div>

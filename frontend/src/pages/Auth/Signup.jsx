@@ -1,13 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { auth, googleProvider, facebookProvider } from "../../firebase";
 import { createUserWithEmailAndPassword, updateProfile, signInWithPopup } from "firebase/auth";
+import { animate } from "animejs";
+import AuthBackground from "../../components/auth/AuthBackground";
 
 export default function Signup() {
     const navigate = useNavigate();
     const [form, setForm] = useState({ name: "", email: "", password: "" });
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+
+    const cardRef = useRef(null);
+
+    useEffect(() => {
+        if (!cardRef.current) return;
+        animate(cardRef.current, {
+            opacity: [0, 1],
+            translateY: [30, 0],
+            duration: 1000,
+            easing: "outExpo",
+        });
+    }, []);
 
     const handleChange = (e) => {
         setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -67,23 +81,10 @@ export default function Signup() {
     };
 
     return (
-        <div className="auth-page">
-            <div
-                style={{
-                    position: "absolute",
-                    width: 500,
-                    height: 500,
-                    borderRadius: "50%",
-                    background: "radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%)",
-                    top: "5%",
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    filter: "blur(80px)",
-                    pointerEvents: "none",
-                }}
-            />
+        <div className="auth-page" style={{ position: "relative" }}>
+            <AuthBackground />
 
-            <div className="auth-card">
+            <div className="auth-card" ref={cardRef} style={{ opacity: 0, zIndex: 2 }}>
                 {/* Logo */}
                 <div style={{ display: "flex", justifyContent: "center", marginBottom: "2.5rem" }}>
                     <Link to="/" style={{ display: "block" }}>
@@ -100,8 +101,8 @@ export default function Signup() {
                     </Link>
                 </div>
 
-                <h1 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "0.25rem", color: "var(--text-primary)" }}>Create your account</h1>
-                <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "1.5rem" }}>
+                <h1 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "0.25rem", color: "#ffffff" }}>Create your account</h1>
+                <p style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.6)", marginBottom: "1.5rem" }}>
                     Start your 14-day free trial. No credit card required.
                 </p>
 
@@ -153,7 +154,7 @@ export default function Signup() {
                 <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                         <div style={{ gridColumn: "span 2" }}>
-                            <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: "0.35rem", color: "var(--text-secondary)" }}>
+                            <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: "0.35rem", color: "rgba(255,255,255,0.5)" }}>
                                 Full name
                             </label>
                             <input
@@ -168,7 +169,7 @@ export default function Signup() {
                         </div>
 
                         <div>
-                            <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: "0.35rem", color: "var(--text-secondary)" }}>
+                            <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: "0.35rem", color: "rgba(255,255,255,0.5)" }}>
                                 Work email
                             </label>
                             <input
@@ -183,7 +184,7 @@ export default function Signup() {
                         </div>
 
                         <div>
-                            <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: "0.35rem", color: "var(--text-secondary)" }}>
+                            <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: "0.35rem", color: "rgba(255,255,255,0.5)" }}>
                                 Password
                             </label>
                             <input

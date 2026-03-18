@@ -1,6 +1,23 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useOutletContext } from "react-router-dom";
 import { animate, stagger } from "animejs";
+import {
+    ChevronLeft,
+    Settings,
+    Trash2,
+    AlertTriangle,
+    LayoutList,
+    DollarSign,
+    Handshake,
+    Zap,
+    AlertCircle,
+    TrendingUp,
+    Target,
+    Activity,
+    MapPin,
+    Calendar,
+    ArrowRight
+} from "lucide-react";
 import AiAssistant from "../../components/AiAssistant";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -74,7 +91,7 @@ export default function EventDetails() {
                 easing: 'easeOutExpo',
                 duration: 800
             });
-            
+
             if (healthData) {
                 animate('.health-ring-path', {
                     strokeDashoffset: [282.7, 282.7 * (1 - (healthData?.score || 0) / 100)],
@@ -152,8 +169,8 @@ export default function EventDetails() {
         <div className="stagger-in" style={{ paddingBottom: "5rem" }}>
             {/* Header Area */}
             <div className="stagger-detail" style={{ display: "flex", alignItems: "center", gap: "2rem", marginBottom: "3rem" }}>
-                <button onClick={() => navigate("/events")} className="btn-icon" style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)", width: "48px", height: "48px" }}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></svg>
+                <button onClick={() => navigate("/events")} className="btn-icon" style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)", width: "48px", height: "48px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <ChevronLeft size={24} strokeWidth={3} />
                 </button>
                 <div style={{ flex: 1 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
@@ -163,8 +180,12 @@ export default function EventDetails() {
                     <p style={{ color: "var(--text-secondary)", fontSize: "1.1rem", marginTop: "0.5rem" }}>Predictive logistical intelligence active.</p>
                 </div>
                 <div style={{ display: "flex", gap: "1rem" }}>
-                    <button onClick={() => setShowEditModal(true)} className="btn btn-ghost" style={{ borderRadius: "14px", fontWeight: 800 }}>Adjust Config</button>
-                    <button onClick={handleDelete} className="btn" style={{ borderRadius: "14px", fontWeight: 800, color: "var(--accent-danger)", border: "1px solid rgba(239,68,68,0.2)" }}>Terminate</button>
+                    <button onClick={() => setShowEditModal(true)} className="btn btn-ghost" style={{ borderRadius: "14px", fontWeight: 800, display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                        <Settings size={18} /> Adjust Config
+                    </button>
+                    <button onClick={handleDelete} className="btn" style={{ borderRadius: "14px", fontWeight: 800, color: "var(--accent-danger)", border: "1px solid rgba(239,68,68,0.2)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                        <Trash2 size={18} /> Terminate
+                    </button>
                 </div>
             </div>
 
@@ -217,17 +238,17 @@ export default function EventDetails() {
 
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", alignItems: "center" }}>
                         <div style={{ display: "flex", justifyContent: "center", position: "relative" }}>
-                             <svg width="220" height="220" viewBox="0 0 100 100">
+                            <svg width="220" height="220" viewBox="0 0 100 100">
                                 <circle cx="50" cy="50" r="45" fill="none" stroke="var(--bg-elevated)" strokeWidth="8" />
-                                <circle 
+                                <circle
                                     className="health-ring-path"
-                                    cx="50" cy="50" r="45" 
-                                    fill="none" 
-                                    stroke={getHealthColor(healthData?.score || 0)} 
-                                    strokeWidth="8" 
+                                    cx="50" cy="50" r="45"
+                                    fill="none"
+                                    stroke={getHealthColor(healthData?.score || 0)}
+                                    strokeWidth="8"
                                     strokeDasharray="282.7"
                                     strokeDashoffset={282.7 * (1 - (healthData?.score || 0) / 100)}
-                                    strokeLinecap="round" 
+                                    strokeLinecap="round"
                                     transform="rotate(-90 50 50)"
                                 />
                                 <text x="50" y="52" textAnchor="middle" style={{ fontSize: "20px", fontWeight: 900, fill: "var(--text-primary)" }}>
@@ -240,15 +261,15 @@ export default function EventDetails() {
                         </div>
                         <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
                             {healthData && [
-                                { label: "Logistics Tracking", value: healthData.metrics.taskCompletion, icon: "📋" },
-                                { label: "Financial Stability", value: Math.max(0, 100 - (healthData.metrics.budgetUsage > 100 ? (healthData.metrics.budgetUsage - 100) : 0)), icon: "💰" },
-                                { label: "Provider Synergy", value: healthData.metrics.vendorConfirmation, icon: "🤝" },
-                                { label: "Interaction Velocity", value: healthData.metrics.rsvpRate, icon: "⚡" },
+                                { label: "Logistics Tracking", value: healthData.metrics.taskCompletion, icon: <LayoutList size={20} /> },
+                                { label: "Financial Stability", value: Math.max(0, 100 - (healthData.metrics.budgetUsage > 100 ? (healthData.metrics.budgetUsage - 100) : 0)), icon: <DollarSign size={20} /> },
+                                { label: "Provider Synergy", value: healthData.metrics.vendorConfirmation, icon: <Handshake size={20} /> },
+                                { label: "Interaction Velocity", value: healthData.metrics.rsvpRate, icon: <Zap size={20} /> },
                             ].map(item => (
                                 <div key={item.label}>
                                     <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.9rem", fontWeight: 800, marginBottom: "0.75rem" }}>
                                         <span style={{ color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                                            <span style={{ fontSize: "1.1rem" }}>{item.icon}</span> {item.label}
+                                            <span style={{ opacity: 0.8, color: "var(--accent-primary)" }}>{item.icon}</span> {item.label}
                                         </span>
                                         <span style={{ color: "var(--text-primary)" }}>{item.value}%</span>
                                     </div>
@@ -286,13 +307,13 @@ export default function EventDetails() {
                 {/* Analytical Mini-Summary */}
                 <div className="glass-panel" style={{ gridColumn: "span 12", padding: "2rem", borderRadius: "24px", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "2rem" }}>
                     {[
-                        { label: "Overdue Vectors", value: healthData?.metrics.overdueTasks || 0, color: "var(--accent-danger)", icon: "⚠️" },
-                        { label: "Attendee Velocity", value: `${healthData?.metrics.rsvpRate || 0}%`, color: "var(--accent-primary)", icon: "📈" },
-                        { label: "Synergy Readiness", value: `${healthData?.metrics.vendorConfirmation || 0}%`, color: "var(--accent-success)", icon: "💠" },
-                        { label: "Current State", value: event.status, color: "var(--accent-primary)", icon: "🎯" }
+                        { label: "Overdue Vectors", value: healthData?.metrics.overdueTasks || 0, color: "var(--accent-danger)", icon: <AlertCircle size={22} /> },
+                        { label: "Attendee Velocity", value: `${healthData?.metrics.rsvpRate || 0}%`, color: "var(--accent-primary)", icon: <TrendingUp size={22} /> },
+                        { label: "Synergy Readiness", value: `${healthData?.metrics.vendorConfirmation || 0}%`, color: "var(--accent-success)", icon: <Activity size={22} /> },
+                        { label: "Current State", value: event.status, color: "var(--accent-primary)", icon: <Target size={22} /> }
                     ].map(st => (
                         <div key={st.label} style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
-                            <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "var(--bg-elevated)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.25rem" }}>{st.icon}</div>
+                            <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "var(--bg-elevated)", display: "flex", alignItems: "center", justifyContent: "center", color: st.color }}>{st.icon}</div>
                             <div>
                                 <div style={{ fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase" }}>{st.label}</div>
                                 <div style={{ fontSize: "1.25rem", fontWeight: 900, color: st.color }}>{st.value}</div>
