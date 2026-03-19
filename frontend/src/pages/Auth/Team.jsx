@@ -1,76 +1,115 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import { Plus, User, Mail, Shield, Check, ChevronRight, LayoutGrid, Users2, MoreHorizontal, Trash2, Edit2, X } from "lucide-react";
+import { Plus, User, Mail, Shield, Check, ChevronRight, LayoutGrid, Users2, MoreHorizontal, Trash2, Edit2, X, Loader2 } from "lucide-react";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Team() {
     const { user } = useOutletContext();
+    const [members, setMembers] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [isInviting, setIsInviting] = useState(false);
-    const [editingIndex, setEditingIndex] = useState(null);
+    const [editingId, setEditingId] = useState(null);
     const [inviteData, setInviteData] = useState({ name: "", email: "", role: "Editor" });
     const [editData, setEditData] = useState({ name: "", role: "" });
 
-    const [members, setMembers] = useState([
-        {
-            name: user?.displayName || "Workspace Owner",
-            email: user?.email || "owner@planora.os",
-            role: "Event Lead",
-            status: "Active",
-            permissions: "Full administrative control over workspace"
-        },
-        {
-            name: "Sarah Chen",
-            email: "sarah@nexus.com",
-            role: "Editor",
-            status: "Active",
-            permissions: "Can modify budget, vendor SLAs, and guest lists"
-        },
-        {
-            name: "Marcus Roe",
-            email: "marcus@vertex.io",
-            role: "Viewer",
-            status: "Active",
-            permissions: "Read-only access to financial and analytical logs"
-        }
-    ]);
+    const fetchMembers = async () => {
+        if (!user) return;
+        setLoading(true);
+        try {
+            const res = await fetch(`${API_URL}/collaborators?user=${user.uid}`);
+            const data = await res.json();
 
-    const handleInvite = (e) => {
-        e.preventDefault();
-        setMembers([...members, {
-            name: inviteData.name,
-            email: inviteData.email,
-            role: inviteData.role,
-            status: "Active",
-            permissions: inviteData.role === "Editor" ? "Can modify core modules" : inviteData.role === "Event Lead" ? "Full administrative control" : "Read-only access"
-        }]);
-        setIsInviting(false);
-        setInviteData({ name: "", email: "", role: "Editor" });
+            // The owner is always implicitly part of the team, but we might want to store them too?
+            // For now, let's keep the owner as a virtual first record if they aren't in the DB.
+            const owner = {
+                _id: 'owner',
+                name: user?.displayName || "Workspace Owner",
+                email: user?.email || "owner@planora.os",
+                role: "Event Lead",
+                status: "Active",
+                permissions: "Full administrative control over workspace",
+                isOwner: true
+            };
+
+            setMembers([owner, ...data]);
+        } catch (err) {
+            console.error("Fetch error:", err);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const handleDelete = (index) => {
-        if (members[index].role === "Event Lead" && index === 0) {
+    useEffect(() => {
+        fetchMembers();
+    }, [user]);
+
+    const handleInvite = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await fetch(`${API_URL}/collaborators`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    ...inviteData,
+                    user: user.uid,
+                    status: "Active",
+                    permissions: inviteData.role === "Editor" ? "Can modify core modules" : inviteData.role === "Event Lead" ? "Full administrative control" : "Read-only access"
+                })
+            });
+            if (response.ok) {
+                setIsInviting(false);
+                setInviteData({ name: "", email: "", role: "Editor" });
+                fetchMembers();
+            }
+        } catch (err) {
+            console.error("Failed to add collaborator:", err);
+        }
+    };
+
+    const handleDelete = async (memberId, isOwner) => {
+        if (isOwner) {
             alert("Cannot terminate the primary owner's session.");
             return;
         }
         if (window.confirm("Permanently revoke workspace access for this collaborator?")) {
-            setMembers(members.filter((_, i) => i !== index));
+            try {
+                const response = await fetch(`${API_URL}/collaborators/${memberId}`, {
+                    method: "DELETE"
+                });
+                if (response.ok) {
+                    setMembers(members.filter(m => m._id !== memberId));
+                }
+            } catch (err) {
+                console.error("Failed to delete collaborator:", err);
+            }
         }
     };
 
-    const startEditing = (index) => {
-        setEditingIndex(index);
-        setEditData({ name: members[index].name, role: members[index].role });
+    const startEditing = (member) => {
+        if (member.isOwner) return;
+        setEditingId(member._id);
+        setEditData({ name: member.name, role: member.role });
     };
 
-    const saveEdit = (index) => {
-        const updated = [...members];
-        updated[index] = {
-            ...updated[index],
-            name: editData.name,
-            role: editData.role,
-            permissions: editData.role === "Editor" ? "Can modify core modules" : editData.role === "Event Lead" ? "Full administrative control" : "Read-only access"
-        };
-        setMembers(updated);
-        setEditingIndex(null);
+    const saveEdit = async (memberId) => {
+        try {
+            const response = await fetch(`${API_URL}/collaborators/${memberId}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: editData.name,
+                    role: editData.role,
+                    permissions: editData.role === "Editor" ? "Can modify core modules" : editData.role === "Event Lead" ? "Full administrative control" : "Read-only access"
+                })
+            });
+            if (response.ok) {
+                setEditingId(null);
+                fetchMembers();
+            }
+        } catch (err) {
+            console.error("Failed to update collaborator:", err);
+        }
     };
 
     const getInitials = (name) => name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
@@ -118,12 +157,18 @@ export default function Team() {
                         </tr>
                     </thead>
                     <tbody>
-                        {members.map((member, i) => {
+                        {loading ? (
+                            <tr>
+                                <td colSpan="4" style={{ padding: "4rem", textAlign: "center" }}>
+                                    <Loader2 className="animate-spin" size={24} color="#2563eb" style={{ margin: "0 auto" }} />
+                                </td>
+                            </tr>
+                        ) : members.map((member) => {
                             const colors = getRoleColor(member.role);
-                            const isEditing = editingIndex === i;
+                            const isEditing = editingId === member._id;
 
                             return (
-                                <tr key={i} style={{ borderBottom: "1px solid #f8fafc", transition: "background 0.2s" }} className="member-row">
+                                <tr key={member._id} style={{ borderBottom: "1px solid #f8fafc", transition: "background 0.2s" }} className="member-row">
                                     <td style={{ padding: "0.85rem 1.5rem" }}>
                                         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
                                             <div style={{
@@ -192,25 +237,27 @@ export default function Team() {
                                         </span>
                                     </td>
                                     <td style={{ padding: "0.85rem 1.5rem", textAlign: "right" }}>
-                                        <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem" }}>
-                                            {isEditing ? (
-                                                <>
-                                                    <button onClick={() => saveEdit(i)} style={{ background: "#2563eb", color: "#fff", border: "none", width: "30px", height: "30px", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}><Check size={16} /></button>
-                                                    <button onClick={() => setEditingIndex(null)} style={{ background: "#f1f5f9", color: "#64748b", border: "none", width: "30px", height: "30px", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}><X size={16} /></button>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <button onClick={() => startEditing(i)} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", padding: "6px", borderRadius: "8px" }} className="action-btn"><Edit2 size={16} /></button>
-                                                    <button onClick={() => handleDelete(i)} style={{ background: "none", border: "none", color: "#f87171", cursor: "pointer", padding: "6px", borderRadius: "8px" }} className="action-btn-danger"><Trash2 size={16} /></button>
-                                                </>
-                                            )}
-                                        </div>
+                                        {!member.isOwner && (
+                                            <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem" }}>
+                                                {isEditing ? (
+                                                    <>
+                                                        <button onClick={() => saveEdit(member._id)} style={{ background: "#2563eb", color: "#fff", border: "none", width: "30px", height: "30px", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}><Check size={16} /></button>
+                                                        <button onClick={() => setEditingId(null)} style={{ background: "#f1f5f9", color: "#64748b", border: "none", width: "30px", height: "30px", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}><X size={16} /></button>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <button onClick={() => startEditing(member)} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", padding: "6px", borderRadius: "8px" }} className="action-btn"><Edit2 size={16} /></button>
+                                                        <button onClick={() => handleDelete(member._id, member.isOwner)} style={{ background: "none", border: "none", color: "#f87171", cursor: "pointer", padding: "6px", borderRadius: "8px" }} className="action-btn-danger"><Trash2 size={16} /></button>
+                                                    </>
+                                                )}
+                                            </div>
+                                        )}
                                     </td>
                                 </tr>
                             );
                         })}
 
-                        {/* Integrated Invite Section - Expanded for Name, Email, Role */}
+                        {/* Integrated Invite Section */}
                         {!isInviting ? (
                             <tr
                                 onClick={() => setIsInviting(true)}

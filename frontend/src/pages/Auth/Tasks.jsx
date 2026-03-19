@@ -21,9 +21,11 @@ export default function Tasks() {
         if (!user) return;
         setLoading(true);
         try {
-            const res = await fetch(`${API_URL}/tasks?user=${user.uid}`);
+            let url = `${API_URL}/tasks?user=${user.uid}`;
+            if (selectedEventId) url += `&eventId=${selectedEventId}`;
+            const res = await fetch(url);
             const data = await res.json();
-            setTasks(data);
+            setTasks(Array.isArray(data) ? data : []);
         } catch (err) {
             console.error("Fetch error:", err);
         } finally {
@@ -33,7 +35,7 @@ export default function Tasks() {
 
     useEffect(() => {
         fetchData();
-    }, [user]);
+    }, [user, selectedEventId]);
 
     useEffect(() => {
         if (selectedEventId) {
@@ -98,7 +100,9 @@ export default function Tasks() {
         }
     };
 
-    const filteredTasks = tasks.filter(t => t.event === selectedEventId);
+    const filteredTasks = selectedEventId
+        ? tasks.filter(t => (t.event?._id || t.event) === selectedEventId)
+        : tasks;
 
     return (
         <div style={{

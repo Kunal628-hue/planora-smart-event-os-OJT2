@@ -7,6 +7,7 @@ import guestRoutes from "./routes/guestRoutes.js";
 import vendorRoutes from "./routes/vendorRoutes.js";
 import taskRoutes from "./routes/taskRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
+import collaboratorRoutes from "./routes/collaboratorRoutes.js";
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.use("/api/guests", guestRoutes);
 app.use("/api/vendors", vendorRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/collaborators", collaboratorRoutes);
 
 // Test route
 app.get("/", (req, res) => {

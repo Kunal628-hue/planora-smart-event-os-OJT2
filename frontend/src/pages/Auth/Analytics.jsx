@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useNavigate } from "react-router-dom";
 import { animate, stagger } from "animejs";
 import {
     Activity,
@@ -15,26 +15,56 @@ import {
     RefreshCw,
     Copy,
     Share2,
-    PlusCircle
+    PlusCircle,
+    TrendingDown,
+    Layers,
+    Wand2,
+    Shield
 } from "lucide-react";
 
 /**
- * Muted placeholder for charts when data is missing.
+ * Premium Neon Chart Placeholder
  */
-const EmptyChartIllustration = ({ prompt }) => (
-    <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "2rem", opacity: 0.8 }}>
-        <svg width="100" height="60" viewBox="0 0 100 60" fill="none" style={{ marginBottom: "1.5rem" }}>
-            <rect x="5" y="40" width="18" height="20" rx="4" fill="#f8fafc" stroke="#e2e8f0" strokeWidth="1" />
-            <rect x="30" y="25" width="18" height="35" rx="4" fill="#f8fafc" stroke="#e2e8f0" strokeWidth="1" />
-            <rect x="55" y="35" width="18" height="25" rx="4" fill="#f8fafc" stroke="#e2e8f0" strokeWidth="1" />
-            <rect x="80" y="15" width="18" height="45" rx="4" fill="#f8fafc" stroke="#e2e8f0" strokeWidth="1" />
-            <path d="M5 50 Q30 20 55 40 T100 10" stroke="#cbd5e1" strokeWidth="2" strokeDasharray="4 4" fill="none" opacity="0.4" />
-        </svg>
-        <p style={{ fontSize: "11px", fontWeight: 800, color: "#94a3b8", textAlign: "center", textTransform: "uppercase", letterSpacing: "0.05em", margin: 0 }}>{prompt}</p>
+const CyberChartIllustration = ({ prompt, icon: Icon }) => (
+    <div style={{
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "3rem",
+        background: "rgba(15, 23, 42, 0.02)",
+        borderRadius: "24px",
+        border: "1px dashed rgba(37, 99, 235, 0.2)"
+    }}>
+        <div style={{
+            width: "56px",
+            height: "56px",
+            borderRadius: "16px",
+            background: "rgba(37, 99, 235, 0.05)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: "1.5rem",
+            color: "#2563eb"
+        }}>
+            {Icon ? <Icon size={28} /> : <PieChart size={28} />}
+        </div>
+        <p style={{
+            fontSize: "12px",
+            fontWeight: 800,
+            color: "#64748b",
+            textAlign: "center",
+            textTransform: "uppercase",
+            letterSpacing: "0.1em",
+            maxWidth: "200px",
+            lineHeight: 1.5
+        }}>{prompt}</p>
     </div>
 );
 
 export default function Analytics() {
+    const navigate = useNavigate();
     const { user, events, selectedEventId } = useOutletContext();
     const [stats, setStats] = useState({
         visits: 0,
@@ -65,7 +95,7 @@ export default function Analytics() {
             const totalConfirmed = filteredGuests.filter(g => g.status === "Confirmed").length;
             const checkInRate = filteredGuests.length > 0 ? Math.round((totalConfirmed / filteredGuests.length) * 100) : 0;
 
-            const trend = filteredGuests.length > 0 ? [20, 45, 35, 65, 50, 80, 75] : [0, 0, 0, 0, 0, 0, 0];
+            const trend = filteredGuests.length > 0 ? [24, 52, 38, 71, 55, 88, 82] : [0, 0, 0, 0, 0, 0, 0];
 
             const channels = filteredGuests.length > 0 ? Object.entries(filteredGuests.reduce((acc, g) => {
                 const cat = g.category || "General";
@@ -96,224 +126,329 @@ export default function Analytics() {
         fetchData();
     }, [user, selectedEventId, events]);
 
-    const handleCopyLink = () => {
-        navigator.clipboard.writeText(`${window.location.origin}/share/${selectedEventId}`);
-        alert("Event link copied to clipboard!");
+    const sparklinePoints = stats.rsvpTrend.map((v, i) => `${(i / 6) * 100},${100 - v}`).join(' ');
+
+    const handleExecute = () => {
+        // Since it mentions Catering Protocol, navigate to Vendors
+        navigate("/vendors");
     };
 
-    const sparklinePoints = stats.rsvpTrend.map((v, i) => `${(i / 6) * 100},${100 - v}`).join(' ');
-    const areaPoints = `0,100 ${sparklinePoints} 100,100`;
+    const handleRisk = () => {
+        // Navigate to Dashboard where risks are primary
+        navigate("/dashboard");
+    };
 
     return (
         <div style={{
             fontFamily: "'Outfit', 'Inter', system-ui, sans-serif",
             padding: "2rem",
-            background: "#fcfdff",
+            background: "#fff",
             minHeight: "100vh",
-            color: "#0f172a"
+            color: "#0f172a",
+            backgroundImage: "radial-gradient(circle at 50% -20%, #eff6ff 0%, #ffffff 50%)"
         }}>
-            {/* Header Section - Scaled Down */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "2.5rem" }}>
+            {/* Ultra-Premium Header - Scaled Down */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2.5rem" }}>
                 <div>
-                    <h1 style={{ fontSize: "2.25rem", fontWeight: 850, letterSpacing: "-0.04em", margin: "0 0 0.25rem" }}>
-                        Intelligent <span style={{ color: "#2563eb" }}>Insights</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+                        <div style={{ width: "24px", height: "3px", background: "#2563eb", borderRadius: "10px" }}></div>
+                        <span style={{ fontSize: "10px", fontWeight: 800, color: "#2563eb", textTransform: "uppercase", letterSpacing: "0.2em" }}>Strategic Intelligence</span>
+                    </div>
+                    <h1 style={{ fontSize: "2.25rem", fontWeight: 900, letterSpacing: "-0.04em", margin: 0, color: "#0f172a" }}>
+                        Tactical <span style={{ color: "#2563eb" }}>Analytics</span>
                     </h1>
-                    <p style={{ color: "#64748b", fontSize: "0.95rem", fontWeight: 500, margin: 0 }}>
-                        Real-time cross-channel performance metrics and predictive analytics.
-                    </p>
                 </div>
-                <button
-                    onClick={fetchData}
-                    style={{
-                        borderRadius: "12px",
-                        padding: "0.6rem 1rem",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.5rem",
-                        background: "#fff",
-                        color: "#0f172a",
-                        border: "1px solid #e2e8f0",
-                        fontWeight: 750,
-                        fontSize: "12px",
-                        cursor: "pointer",
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.02)"
-                    }}
-                >
-                    <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
-                    <span>Sync</span>
-                </button>
+
+                <div style={{ display: "flex", gap: "0.75rem" }}>
+                    <button onClick={fetchData} className="premium-btn-secondary">
+                        <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
+                        <span>Resync</span>
+                    </button>
+                    <button className="premium-btn-primary">
+                        <Share2 size={14} />
+                        <span>Export</span>
+                    </button>
+                </div>
             </div>
 
-            {/* KPI Pills Container - Compact */}
-            <div style={{ display: "flex", gap: "1rem", marginBottom: "2.5rem" }}>
+            {/* KPI Executive Strip - Compact */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem", marginBottom: "2rem" }}>
                 {[
-                    { label: "Visits", val: stats.visits.toLocaleString() },
-                    { label: "RSVP", val: stats.confirmed.toLocaleString() },
-                    { label: "Volume", val: `₹${(stats.revenue / 1000).toFixed(0)}k` },
-                    { label: "Conversion", val: `${stats.checkInRate}%` }
+                    { label: "Guest Velocity", val: stats.visits.toLocaleString(), icon: Users, color: "#2563eb", trend: "+12%" },
+                    { label: "RSVP Conversion", val: stats.confirmed.toLocaleString(), icon: Ticket, color: "#10b981", trend: "+5.2%" },
+                    { label: "Strategic Capital", val: `₹${(stats.revenue / 1000).toFixed(1)}k`, icon: DollarSign, color: "#f59e0b", trend: "Target" },
+                    { label: "Operational Grip", val: `${stats.checkInRate}%`, icon: Activity, color: "#7e22ce", trend: "Stable" }
                 ].map((stat, i) => (
-                    <div key={i} style={{
-                        width: "110px",
-                        background: "#fff",
-                        padding: "0.75rem 1rem",
-                        borderRadius: "14px",
-                        border: "1px solid #f1f5f9",
-                        textAlign: "left",
-                        boxShadow: "0 4px 12px rgba(0,0,0,0.015)"
-                    }}>
-                        <div style={{ fontSize: "9px", fontWeight: 850, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "2px" }}>{stat.label}</div>
-                        <div style={{ fontSize: "1.2rem", fontWeight: 900, color: "#0f172a", lineHeight: 1 }}>{stat.val}</div>
+                    <div key={i} className="kpi-card">
+                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.75rem" }}>
+                            <div style={{ width: "32px", height: "32px", borderRadius: "10px", background: `${stat.color}10`, display: "flex", alignItems: "center", justifyContent: "center", color: stat.color }}>
+                                <stat.icon size={16} fontWeight={800} />
+                            </div>
+                            <div style={{ fontSize: "9px", fontWeight: 800, color: stat.color === "#10b981" ? "#059669" : "#64748b", background: stat.color === "#10b981" ? "#d1fae5" : "#f1f5f9", padding: "3px 6px", borderRadius: "4px" }}>{stat.trend}</div>
+                        </div>
+                        <div style={{ fontSize: "1.75rem", fontWeight: 900, color: "#0f172a", letterSpacing: "-0.04em", marginBottom: "2px" }}>{stat.val}</div>
+                        <div style={{ fontSize: "10px", fontWeight: 750, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em" }}>{stat.label}</div>
                     </div>
                 ))}
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(12, 1fr)", gap: "2rem" }}>
-                {/* Engagement Velocity - Scaled Down */}
-                <div style={{
-                    gridColumn: "span 8",
-                    background: "#fff",
-                    padding: "2rem",
-                    borderRadius: "32px",
-                    border: "1px solid #f1f5f9",
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.02)",
-                    minHeight: "360px",
-                    display: "flex",
-                    flexDirection: "column"
-                }}>
-                    <h3 style={{ fontSize: "1.1rem", fontWeight: 900, color: "#0f172a", marginBottom: "2.5rem", display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                        <Zap size={18} color="#2563eb" fill="#2563eb" />
-                        Engagement Velocity
-                    </h3>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(12, 1fr)", gap: "1.5rem", marginBottom: "2rem" }}>
+                {/* Real-time Trajectory Chart - Smaller */}
+                <div style={{ gridColumn: "span 8" }} className="analytics-module">
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
+                        <h3 className="module-title">
+                            <TrendingUp size={16} />
+                            Strategic Trajectory
+                        </h3>
+                        <div style={{ display: "flex", gap: "10px" }}>
+                            <span className="chart-legend"><div style={{ background: "#2563eb" }}></div> RSVPs</span>
+                            <span className="chart-legend"><div style={{ background: "#e2e8f0" }}></div> Projected</span>
+                        </div>
+                    </div>
 
                     {stats.visits > 0 ? (
-                        <div style={{ flex: 1, position: "relative", paddingBottom: "1.5rem" }}>
-                            <svg width="100%" height="240" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ overflow: "visible" }}>
+                        <div style={{ flex: 1, position: "relative", minHeight: "200px" }}>
+                            <svg width="100%" height="200" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ overflow: "visible" }}>
                                 <defs>
-                                    <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stopColor="#2563eb" stopOpacity="0.08" />
+                                    <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stopColor="#2563eb" stopOpacity="0.15" />
                                         <stop offset="100%" stopColor="#2563eb" stopOpacity="0" />
                                     </linearGradient>
                                 </defs>
-                                <path d={`M 0,100 L 0,${100 - stats.rsvpTrend[0]} ${stats.rsvpTrend.map((v, i) => `L ${(i / 6) * 100},${100 - v}`).join(' ')} L 100,100 Z`} fill="url(#areaGradient)" />
-                                <polyline points={sparklinePoints} fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                <path d={`M 0,100 L 0,${100 - stats.rsvpTrend[0]} ${stats.rsvpTrend.map((v, i) => `L ${(i / 6) * 100},${100 - v}`).join(' ')} L 100,100 Z`} fill="url(#chartFill)" />
+                                <polyline points={sparklinePoints} fill="none" stroke="#2563eb" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                                 {stats.rsvpTrend.map((v, i) => (
-                                    <circle key={i} cx={(i / 6) * 100} cy={100 - v} r="3" fill="#fff" stroke="#2563eb" strokeWidth="1.5" />
+                                    <g key={i}>
+                                        <circle cx={(i / 6) * 100} cy={100 - v} r="4" fill="#fff" stroke="#2563eb" strokeWidth="2" style={{ transition: "all 0.3s ease", cursor: "pointer" }} />
+                                    </g>
                                 ))}
                             </svg>
                         </div>
                     ) : (
-                        <EmptyChartIllustration prompt="Add guests to see trends" />
+                        <CyberChartIllustration prompt="Awaiting project data for trajectory calculation" icon={TrendingUp} />
                     )}
                 </div>
 
-                {/* Acquisition Breakdown */}
-                <div style={{
-                    gridColumn: "span 4",
-                    background: "#fff",
-                    padding: "2rem",
-                    borderRadius: "32px",
-                    border: "1px solid #f1f5f9",
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.02)",
-                    display: "flex",
-                    flexDirection: "column",
-                    minHeight: "360px"
-                }}>
-                    <h3 style={{ fontSize: "1.1rem", fontWeight: 900, color: "#0f172a", marginBottom: "2.5rem", display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                        <PieChart size={18} color="#f59e0b" fill="#f59e0b" />
-                        Acquisition Depth
+                {/* Distribution Matrix - Smaller */}
+                <div style={{ gridColumn: "span 4" }} className="analytics-module">
+                    <h3 className="module-title">
+                        <PieChart size={16} />
+                        Segment Distribution
                     </h3>
 
                     {stats.checkInRate > 0 ? (
-                        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center" }}>
-                            <div style={{ position: 'relative', width: '150px', height: '150px', marginBottom: '2rem' }}>
-                                <svg width="150" height="150" viewBox="0 0 100 100">
-                                    <circle cx="50" cy="50" r="42" fill="none" stroke="#f1f5f9" strokeWidth="10" />
+                        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                            <div style={{ position: 'relative', width: '140px', height: '140px', marginBottom: '1.5rem' }}>
+                                <svg width="140" height="140" viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="40" fill="none" stroke="#f1f5f9" strokeWidth="10" />
                                     <circle
                                         cx="50"
                                         cy="50"
-                                        r="42"
+                                        r="40"
                                         fill="none"
                                         stroke="#2563eb"
                                         strokeWidth="10"
                                         strokeLinecap="round"
-                                        strokeDasharray="263.89"
-                                        strokeDashoffset={263.89 * (1 - stats.checkInRate / 100)}
-                                        style={{ transform: 'rotate(-90deg)', transformOrigin: 'center' }}
+                                        strokeDasharray="251.2"
+                                        strokeDashoffset={251.2 * (1 - stats.checkInRate / 100)}
+                                        style={{ transform: 'rotate(-90deg)', transformOrigin: 'center', transition: "stroke-dashoffset 1s ease-out" }}
                                     />
                                 </svg>
-                                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 900 }}>
-                                    {stats.checkInRate}%
+                                <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: "column", alignItems: 'center', justifyContent: 'center' }}>
+                                    <span style={{ fontSize: '2rem', fontWeight: 900, color: "#0f172a", letterSpacing: "-0.05em" }}>{stats.checkInRate}%</span>
+                                    <span style={{ fontSize: "9px", fontWeight: 800, color: "#94a3b8", textTransform: "uppercase" }}>Engagement</span>
                                 </div>
                             </div>
-                            <div style={{ width: "100%", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                            <div style={{ width: "100%", display: "flex", flexWrap: "wrap", gap: "8px", justifyContent: "center" }}>
                                 {stats.channels.map(ch => (
-                                    <div key={ch.name} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                                        <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: ch.color }}></div>
-                                        <span style={{ fontSize: "11px", fontWeight: 750, color: "#64748b" }}>{ch.name} ({ch.value}%)</span>
+                                    <div key={ch.name} className="segment-badge">
+                                        <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: ch.color }}></div>
+                                        <span>{ch.name}: {ch.value}%</span>
                                     </div>
                                 ))}
                             </div>
                         </div>
                     ) : (
-                        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "1.5rem" }}>
-                            <div style={{ width: "60px", height: "60px", borderRadius: "18px", background: "#fefce8", display: "flex", alignItems: "center", justifyContent: "center", color: "#f59e0b" }}>
-                                <Share2 size={32} />
-                            </div>
-                            <div style={{ textAlign: "center" }}>
-                                <p style={{ fontSize: "14px", fontWeight: 900, color: "#1e293b", margin: "0 0 0.25rem" }}>No RSVPs</p>
-                                <p style={{ fontSize: "12px", fontWeight: 550, color: "#94a3b8", margin: 0 }}>Activate your data pipeline.</p>
-                            </div>
-                        </div>
+                        <CyberChartIllustration prompt="Execute guest outreach to populate matrix" icon={Layers} />
                     )}
                 </div>
+            </div>
 
-                {/* Neural Strategy Matrix - Fixed Color and Scaled Down */}
-                <div style={{
-                    gridColumn: "span 12",
-                    padding: "3rem",
-                    background: "linear-gradient(135deg, #0f172a 0%, #1e40af 100%)",
-                    borderRadius: "40px",
-                    color: "#fff",
-                    boxShadow: "0 25px 50px -12px rgba(37, 99, 235, 0.2)",
-                    position: "relative",
-                    overflow: "hidden"
-                }}>
-                    <div style={{ position: "absolute", top: "-50px", right: "-50px", width: "250px", height: "250px", background: "rgba(59, 130, 246, 0.15)", borderRadius: "50%", filter: "blur(60px)" }}></div>
-                    <div style={{ position: "relative", zIndex: 1 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.25rem" }}>
-                            <div style={{ background: "rgba(255,255,255,0.1)", padding: "0.75rem", borderRadius: "16px", backdropFilter: "blur(10px)" }}>
-                                <Brain size={28} color="#fff" />
-                            </div>
-                            <h3 style={{ fontSize: "1.75rem", fontWeight: 900, margin: 0, letterSpacing: "-0.03em", color: "#fff" }}>Neural Strategy Matrix</h3>
+            {/* Immersive Tactical Action Card - Scaled Down */}
+            <div className="tactical-matrix-card">
+                <div style={{ pointerEvents: "none", position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundImage: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.03) 50%, transparent 100%)", backgroundSize: "200% 100%", animation: "sweep 4s linear infinite" }}></div>
+                <div style={{ position: "relative", zIndex: 2 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.5rem" }}>
+                        <div style={{ background: "rgba(255,255,255,0.1)", width: "48px", height: "48px", borderRadius: "14px", display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.2)" }}>
+                            <Brain size={24} color="#fff" />
                         </div>
-                        <p style={{ fontSize: "1.1rem", color: "rgba(255,255,255,0.85)", lineHeight: 1.6, maxWidth: "750px", fontWeight: 550, marginBottom: "2.5rem" }}>
-                            Intelligent analysis of active data points suggests an <span style={{ color: "#fff", fontWeight: 950 }}>18.2% conversion spike</span> by optimizing catering logistics. Executing this protocol will synchronize guest preferences with your timeline.
-                        </p>
-                        <button style={{
-                            background: "#fff",
-                            color: "#1e3a8a",
-                            padding: "1rem 2rem",
-                            borderRadius: "16px",
-                            border: "none",
-                            fontWeight: 950,
-                            fontSize: "0.95rem",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "0.85rem",
-                            cursor: "pointer",
-                            boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-                            transition: "all 0.2s ease"
-                        }}>
-                            Execute Protocol <ArrowRight size={18} strokeWidth={3} />
+                        <div>
+                            <h3 style={{ fontSize: "1.5rem", fontWeight: 900, margin: 0, color: "#fff", letterSpacing: "-0.03em" }}>Neural Strategy Vector</h3>
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "2px" }}>
+                                <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 8px #4ade80" }}></div>
+                                <span style={{ fontSize: "9px", fontWeight: 800, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Live AI Optimization Active</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p style={{ fontSize: "1.1rem", color: "rgba(255,255,255,0.9)", lineHeight: 1.5, maxWidth: "700px", fontWeight: 500, marginBottom: "2rem" }}>
+                        Planora AI has detected a <span style={{ background: "rgba(255,255,255,0.15)", padding: "2px 6px", borderRadius: "5px", fontWeight: 800 }}>+18.2% conversion opportunity</span> in your guest retention pipeline. We recommend initiating the <span style={{ color: "#fff", fontWeight: 900, textDecoration: "underline" }}>Catering Selection Protocol</span>.
+                    </p>
+
+                    <div style={{ display: "flex", gap: "1rem" }}>
+                        <button onClick={handleExecute} className="execute-btn">
+                            <Wand2 size={16} />
+                            Execute Strategy Protocol
+                        </button>
+                        <button onClick={handleRisk} className="tactical-secondary-btn">
+                            <Shield size={16} />
+                            Risk Assessment
                         </button>
                     </div>
                 </div>
             </div>
 
             <style>{`
+                .premium-btn-primary {
+                    background: #2563eb;
+                    color: #fff;
+                    padding: 0.85rem 1.75rem;
+                    border-radius: 14px;
+                    border: none;
+                    font-weight: 800;
+                    font-size: 13px;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    cursor: pointer;
+                    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+                .premium-btn-secondary {
+                    background: #fff;
+                    color: #0f172a;
+                    padding: 0.85rem 1.75rem;
+                    border-radius: 14px;
+                    border: 1px solid #e2e8f0;
+                    font-weight: 800;
+                    font-size: 13px;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                }
+                .kpi-card {
+                    background: #fff;
+                    padding: 2rem;
+                    border-radius: 28px;
+                    border: 1px solid #f1f5f9;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.015);
+                    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                    cursor: pointer;
+                }
+                .kpi-card:hover {
+                    transform: translateY(-8px);
+                    box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+                    border-color: #2563eb30;
+                }
+                .analytics-module {
+                    background: #fff;
+                    padding: 2.5rem;
+                    border-radius: 36px;
+                    border: 1px solid #f1f5f9;
+                    box-shadow: 0 4px 25px rgba(0,0,0,0.02);
+                    display: flex;
+                    flex-direction: column;
+                }
+                .module-title {
+                    font-size: 14px;
+                    fontWeight: 900;
+                    color: #0f172a;
+                    margin: 0 0 2.5rem;
+                    display: flex;
+                    alignHeight: center;
+                    gap: 12px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                }
+                .chart-legend {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-size: 11px;
+                    font-weight: 700;
+                    color: #64748b;
+                }
+                .chart-legend div {
+                    width: 8px;
+                    height: 8px;
+                    border-radius: 2px;
+                }
+                .segment-badge {
+                    background: #f8fafc;
+                    padding: 8px 14px;
+                    border-radius: 10px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    font-size: 11px;
+                    font-weight: 800;
+                    color: #475569;
+                    border: 1px solid #f1f5f9;
+                }
+                .tactical-matrix-card {
+                    grid-column: span 12;
+                    padding: 4rem;
+                    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+                    border-radius: 44px;
+                    position: relative;
+                    overflow: hidden;
+                    box-shadow: 0 30px 60px rgba(15, 23, 42, 0.2);
+                }
+                .execute-btn {
+                    background: #fff;
+                    color: #1e3a8a;
+                    padding: 1.25rem 2.5rem;
+                    border-radius: 18px;
+                    border: none;
+                    font-weight: 900;
+                    font-size: 1.1rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 1rem;
+                    cursor: pointer;
+                    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+                    transition: all 0.3s ease;
+                }
+                .execute-btn:hover {
+                    transform: scale(1.05);
+                    box-shadow: 0 20px 45px rgba(0,0,0,0.15);
+                }
+                .tactical-secondary-btn {
+                    background: rgba(255,255,255,0.1);
+                    color: #fff;
+                    padding: 1.25rem 2rem;
+                    border-radius: 18px;
+                    border: 1px solid rgba(255,255,255,0.2);
+                    font-weight: 800;
+                    font-size: 1rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 1rem;
+                    cursor: pointer;
+                    backdrop-filter: blur(10px);
+                    transition: all 0.3s ease;
+                }
+                .tactical-secondary-btn:hover {
+                    background: rgba(255,255,255,0.15);
+                }
+                @keyframes sweep {
+                    0% { transform: translateX(-100%); }
+                    100% { transform: translateX(100%); }
+                }
                 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-                .animate-spin { animation: spin 1s linear infinite; }
-                button:hover { opacity: 0.9; transform: translateY(-1px); }
+                .animate-spin { animation: spin 2s linear infinite; }
             `}</style>
         </div>
     );

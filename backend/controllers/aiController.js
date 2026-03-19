@@ -76,7 +76,13 @@ export const getEventHealth = async (req, res) => {
 export const getRiskAssessment = async (req, res) => {
     try {
         const { eventId } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(eventId)) {
+            return res.status(400).json({ message: "Invalid Event Context ID" });
+        }
+
         const event = await Event.findById(eventId);
+        if (!event) return res.status(404).json({ message: "Strategic Context not found" });
+
         const tasks = await Task.find({ event: new mongoose.Types.ObjectId(eventId) });
         const vendors = await Vendor.find({ event: new mongoose.Types.ObjectId(eventId) });
         const guests = await Guest.find({ event: new mongoose.Types.ObjectId(eventId) });
@@ -85,19 +91,21 @@ export const getRiskAssessment = async (req, res) => {
 
         // Budget Risk
         const totalCost = vendors.reduce((sum, v) => sum + (v.cost || 0), 0);
-        if (totalCost > event.budget) {
+        const eventBudget = event.budget || 0;
+
+        if (totalCost > eventBudget && eventBudget > 0) {
             risks.push({
                 type: "CRITICAL",
                 category: "Budget",
-                message: `Budget overspent by ₹${(totalCost - event.budget).toLocaleString()}`,
-                suggestion: "Consider reducing costs in non-essential categories or increasing budget."
+                message: `Capital overflow: ₹${(totalCost - eventBudget).toLocaleString()} over allocation`,
+                suggestion: "Initiate cost-reduction protocols or expand budget bandwidth."
             });
-        } else if (totalCost > event.budget * 0.9) {
+        } else if (totalCost > eventBudget * 0.9 && eventBudget > 0) {
             risks.push({
                 type: "WARNING",
                 category: "Budget",
-                message: "Budget usage is above 90%",
-                suggestion: "Review upcoming expenses carefully."
+                message: "Capital utilization exceeded 90%",
+                suggestion: "Review upcoming transactional flows immediately."
             });
         }
 
@@ -106,9 +114,9 @@ export const getRiskAssessment = async (req, res) => {
         if (unpaidVendors.length > 0) {
             risks.push({
                 type: "WARNING",
-                category: "Vendors",
-                message: `${unpaidVendors.length} vendors have pending payments`,
-                suggestion: "Schedule payments to secure bookings."
+                category: "Partners",
+                message: `${unpaidVendors.length} partnership agreements have pending settlements`,
+                suggestion: "Verify payment schedules to ensure service continuity."
             });
         }
 
@@ -119,29 +127,31 @@ export const getRiskAssessment = async (req, res) => {
             risks.push({
                 type: "CRITICAL",
                 category: "Timeline",
-                message: `${overdueTasks.length} tasks are overdue`,
-                suggestion: "Reassign tasks or adjust deadlines to maintain progress."
+                message: `${overdueTasks.length} milestones identified as overdue`,
+                suggestion: "Prioritize immediate deployment to these delinquent tasks."
             });
         }
 
         // Guest RSVP Risk
-        const eventDate = new Date(event.date);
-        const daysToEvent = Math.ceil((eventDate - now) / (1000 * 60 * 60 * 24));
-        const rsvpRate = guests.length > 0 ? (guests.filter(g => g.status === "Confirmed").length / guests.length) * 100 : 0;
+        if (event.date) {
+            const eventDate = new Date(event.date);
+            const daysToEvent = Math.ceil((eventDate - now) / (1000 * 60 * 60 * 24));
+            const rsvpRate = guests.length > 0 ? (guests.filter(g => g.status === "Confirmed").length / guests.length) * 100 : 0;
 
-        if (daysToEvent < 14 && rsvpRate < 50) {
-            risks.push({
-                type: "WARNING",
-                category: "Guests",
-                message: `Low RSVP rate (${Math.round(rsvpRate)}%) with only ${daysToEvent} days left`,
-                suggestion: "Send reminders to guests who haven't responded yet."
-            });
+            if (daysToEvent > 0 && daysToEvent < 14 && rsvpRate < 50) {
+                risks.push({
+                    type: "WARNING",
+                    category: "Audience",
+                    message: `RSVP velocity low (${Math.round(rsvpRate)}%) with T-minus ${daysToEvent} days`,
+                    suggestion: "Initiate re-engagement sequence with pending attendees."
+                });
+            }
         }
 
         res.status(200).json(risks);
     } catch (error) {
         console.error("Risk assessment error:", error);
-        res.status(500).json({ message: "Failed to perform risk assessment" });
+        res.status(500).json({ message: "Analytical engine malfunction" });
     }
 };
 
@@ -187,10 +197,16 @@ export const getSmartTimeline = async (req, res) => {
 export const getBudgetOptimization = async (req, res) => {
     try {
         const { eventId } = req.params;
-        const vendors = await Vendor.find({ event: new mongoose.Types.ObjectId(eventId) });
-        const event = await Event.findById(eventId);
+        if (!mongoose.Types.ObjectId.isValid(eventId)) {
+            return res.status(400).json({ message: "Invalid Context ID" });
+        }
 
-        console.log(`[AI Budget] Event: ${eventId} | Vendors: ${vendors.length}`);
+        const event = await Event.findById(eventId);
+        if (!event) return res.status(404).json({ message: "Event context lost" });
+
+        const vendors = await Vendor.find({ event: new mongoose.Types.ObjectId(eventId) });
+
+        console.log(`[AI Budget] Event: ${eventId} | Records found: ${vendors.length}`);
 
         const categories = {};
         vendors.forEach(v => {
@@ -199,24 +215,31 @@ export const getBudgetOptimization = async (req, res) => {
 
         const suggestions = [];
         const totalCost = Object.values(categories).reduce((a, b) => a + b, 0);
+        const eventBudget = event.budget || 0;
 
         Object.keys(categories).forEach(cat => {
-            const percentage = (categories[cat] / event.budget) * 100;
-            if (cat === "Catering" && percentage > 40) {
-                suggestions.push(`Catering cost (${Math.round(percentage)}%) exceeds recommended 35-40% of budget.`);
-            }
-            if (cat === "Decor" && percentage > 25) {
-                suggestions.push(`Decor & Venue Styling (${Math.round(percentage)}%) is higher than average (15-20%).`);
+            if (eventBudget > 0) {
+                const percentage = (categories[cat] / eventBudget) * 100;
+                if (cat === "Catering" && percentage > 40) {
+                    suggestions.push(`Catering allocation is aggressive (${Math.round(percentage)}%). Industrial benchmark for ${event.type} is 35%.`);
+                }
+                if (cat === "Decor" && percentage > 25) {
+                    suggestions.push(`Aesthetic investment (${Math.round(percentage)}%) in Decor is diverging from strategic norms (15-20%).`);
+                }
             }
         });
 
-        if (totalCost > event.budget) {
-            suggestions.push(`Current estimated cost is ₹${(totalCost - event.budget).toLocaleString()} over budget.`);
+        if (totalCost > eventBudget && eventBudget > 0) {
+            suggestions.push(`Current operational flow is ₹${(totalCost - eventBudget).toLocaleString()} over designated capital.`);
+        }
+
+        if (suggestions.length === 0 && eventBudget > 0) {
+            suggestions.push("Capital allocation is currently showing high strategic alignment with industrial benchmarks.");
         }
 
         res.status(200).json(suggestions);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Budget optimization engine error" });
     }
 };
 
@@ -334,7 +357,7 @@ export const askAiAssistant = async (req, res) => {
             4. Keep responses friendly and encouraging.
         `;
 
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         const result = await model.generateContent(context);
         const response = result.response.text();
 

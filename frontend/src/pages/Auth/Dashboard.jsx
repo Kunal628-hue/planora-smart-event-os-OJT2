@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useNavigate } from "react-router-dom";
 import {
     AlertTriangle,
     ArrowRight,
@@ -12,8 +12,10 @@ import {
     ChevronRight,
     Search
 } from "lucide-react";
+import AiAssistant from "../../components/AiAssistant";
 
 export default function Dashboard() {
+    const navigate = useNavigate();
     const { user, events, selectedEventId } = useOutletContext();
     const [healthData, setHealthData] = useState(null);
     const [risks, setRisks] = useState([]);
@@ -97,6 +99,16 @@ export default function Dashboard() {
         return "#ef4444";
     };
 
+    const handleResolve = () => {
+        if (risks.length === 0) return;
+        const category = risks[0].category;
+
+        if (category === "Timeline") navigate("/tasks");
+        else if (category === "Budget" || category === "Partners") navigate("/vendors");
+        else if (category === "Audience" || category === "Guests") navigate("/guests");
+        else navigate("/events");
+    };
+
     const getCategoryStyles = (service) => {
         const styles = {
             "Catering": { bg: "#fff7ed", color: "#c2410c", icon: "🍱" },
@@ -161,7 +173,12 @@ export default function Dashboard() {
                         <span style={{ fontWeight: 700, color: "#9f1239" }}>Action Item</span>
                         <span style={{ color: "#be123c", fontWeight: 500 }}>{risks[0].message}</span>
                     </div>
-                    <button style={{ color: "#be123c", fontWeight: 700, fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.05em", border: "none", background: "none" }}>Resolve Now →</button>
+                    <button
+                        onClick={handleResolve}
+                        style={{ color: "#be123c", fontWeight: 700, fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.05em", border: "none", background: "none", cursor: "pointer" }}
+                    >
+                        Resolve Now →
+                    </button>
                 </div>
             )}
 
@@ -235,24 +252,39 @@ export default function Dashboard() {
                         }}></div>
 
                         <div style={{ display: "flex", justifyContent: "space-between" }}>
-                            {(timeline.length > 0 ? timeline.slice(0, 5) : Array(5).fill({})).map((step, idx) => (
-                                <div key={idx} style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", maxWidth: "100px" }}>
-                                    <div style={{
-                                        width: "16px",
-                                        height: "16px",
-                                        borderRadius: "50%",
-                                        background: idx === 0 ? "#2563eb" : "#fff",
-                                        border: `3.5px solid ${idx === 0 ? "#dbeafe" : "#f1f5f9"}`,
-                                        zIndex: 2,
-                                        boxShadow: idx === 0 ? "0 4px 10px rgba(37, 99, 235, 0.4)" : "none",
-                                        transition: "all 0.3s ease"
-                                    }}></div>
-                                    <div style={{ marginTop: "1.25rem", textAlign: "center" }}>
-                                        <div style={{ fontSize: "12px", fontWeight: 700, color: idx === 0 ? "#2563eb" : "#0f172a", marginBottom: "2px" }}>{step.title ? step.title.split(' ')[0] : 'Phase'}</div>
-                                        <div style={{ fontSize: "11px", color: "#b4bbc5", fontWeight: 600 }}>{Math.floor(Math.random() * 8) + 1} tasks</div>
+                            {timeline.slice(0, 5).map((step, idx) => {
+                                const currentPhaseIdx = timeline.findIndex(s => daysRemaining <= s.daysBefore);
+                                const isActive = idx === (currentPhaseIdx === -1 ? timeline.length - 1 : currentPhaseIdx);
+                                const isPast = idx < (currentPhaseIdx === -1 ? timeline.length - 1 : currentPhaseIdx);
+
+                                return (
+                                    <div key={idx} style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", maxWidth: "100px" }}>
+                                        <div style={{
+                                            width: "16px",
+                                            height: "16px",
+                                            borderRadius: "50%",
+                                            background: isActive ? "#2563eb" : (isPast ? "#d1fae5" : "#fff"),
+                                            border: `3.5px solid ${isActive ? "#dbeafe" : (isPast ? "#10b981" : "#f1f5f9")}`,
+                                            zIndex: 2,
+                                            boxShadow: isActive ? "0 4px 10px rgba(37, 99, 235, 0.4)" : "none",
+                                            transition: "all 0.3s ease"
+                                        }}></div>
+                                        <div style={{ marginTop: "1.25rem", textAlign: "center" }}>
+                                            <div style={{
+                                                fontSize: "12px",
+                                                fontWeight: 700,
+                                                color: isActive ? "#2563eb" : (isPast ? "#10b981" : "#0f172a"),
+                                                marginBottom: "2px"
+                                            }}>
+                                                {step.title?.split(' ')[0]}
+                                            </div>
+                                            <div style={{ fontSize: "11px", color: isActive ? "#64748b" : "#b4bbc5", fontWeight: 600 }}>
+                                                {isActive ? "ACTIVE" : (isPast ? "DONE" : `${step.daysBefore}d left`)}
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
@@ -387,6 +419,7 @@ export default function Dashboard() {
                 </div>
             )}
 
+            <AiAssistant eventId={selectedEventId} />
             <style>{`
                 @keyframes pulse {
                     0% { transform: scale(0.95); opacity: 0.9; }

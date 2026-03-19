@@ -22,9 +22,11 @@ export default function Guests() {
         if (!user) return;
         setLoading(true);
         try {
-            const res = await fetch(`${API_URL}/guests?user=${user.uid}`);
+            let url = `${API_URL}/guests?user=${user.uid}`;
+            if (selectedEventId) url += `&eventId=${selectedEventId}`;
+            const res = await fetch(url);
             const data = await res.json();
-            setGuests(data);
+            setGuests(Array.isArray(data) ? data : []);
         } catch (err) {
             console.error("Fetch error:", err);
         } finally {
@@ -34,7 +36,7 @@ export default function Guests() {
 
     useEffect(() => {
         fetchData();
-    }, [user]);
+    }, [user, selectedEventId]);
 
     useEffect(() => {
         if (selectedEventId) {
@@ -112,7 +114,9 @@ export default function Guests() {
         }
     };
 
-    const filteredGuests = guests.filter(g => g.event === selectedEventId);
+    const filteredGuests = selectedEventId
+        ? guests.filter(g => (g.event?._id || g.event) === selectedEventId)
+        : guests;
 
     return (
         <div style={{
