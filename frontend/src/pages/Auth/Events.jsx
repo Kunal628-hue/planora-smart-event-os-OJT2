@@ -106,107 +106,117 @@ export default function Events() {
         }
     };
 
+    const getStatusColor = (status) => {
+        switch (status) {
+            case "Planned": return "#3b82f6"; // Blue
+            case "Completed": return "#10b981"; // Green
+            case "At Risk": return "#f59e0b"; // Amber
+            default: return "#64748b";
+        }
+    };
+
     return (
-        <div className="stagger-in">
-            <div className="page-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "3rem" }}>
+        <div style={{ fontFamily: "'Inter', system-ui, sans-serif", padding: "1rem" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2.5rem" }}>
                 <div>
-                    <h1 style={{ fontSize: "2.5rem", fontWeight: 900, letterSpacing: "-0.03em", marginBottom: "0.5rem" }}>
-                        Event <span className="gradient-text">Portfolio</span>
-                    </h1>
-                    <p style={{ color: "var(--text-secondary)", fontSize: "1.1rem" }}>
-                        Architecting experiences and managing logistical complexity.
-                    </p>
+                    <h1 style={{ fontSize: "1.75rem", fontWeight: 800, color: "#0f172a", marginBottom: "0.25rem", letterSpacing: "-0.02em" }}>Event Portfolio</h1>
+                    <p style={{ color: "#64748b", fontSize: "0.9rem" }}>Manage and track your operational event streams.</p>
                 </div>
                 <button
                     onClick={() => setShowModal(true)}
-                    className="btn btn-primary btn-lg"
-                    style={{ borderRadius: "14px", padding: "1rem 2rem", display: "flex", alignItems: "center", gap: "0.5rem" }}
+                    className="btn btn-primary"
+                    style={{ borderRadius: "8px", padding: "0.75rem 1.5rem", fontWeight: 700, fontSize: "14px", boxShadow: "0 4px 12px rgba(37, 99, 235, 0.2)" }}
                 >
-                    <Plus size={20} strokeWidth={3} />
                     Initialize Event
                 </button>
             </div>
 
-            <div className="dashboard-grid">
+            <div className="portfolio-grid" style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+                gap: "1.25rem"
+            }}>
                 {fetchLoading ? (
-                    <div style={{ gridColumn: "span 12", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "8rem 0", gap: "1.5rem" }}>
-                        <Loader2 className="animate-spin" size={48} color="var(--accent-primary)" />
-                        <p style={{ fontSize: "0.9rem", fontWeight: 750, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Retrieving Portfolio...</p>
+                    <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "5rem" }}>
+                        <Loader2 className="animate-spin" size={32} color="#2563eb" style={{ margin: "0 auto" }} />
                     </div>
                 ) : events.length === 0 ? (
-                    <div className="glass-panel" style={{ gridColumn: "span 12", textAlign: "center", padding: "6rem 2rem", borderRadius: "32px", border: "2px dashed var(--border-medium)" }}>
-                        <div style={{ marginBottom: "1.5rem", display: "flex", justifyContent: "center" }}>
-                            <div className="anim-float" style={{ width: "80px", height: "80px", borderRadius: "24px", background: "var(--bg-elevated)", display: "flex", alignItems: "center", justifyContent: "center", border: "1.5px solid var(--border-subtle)" }}>
-                                <Calendar size={40} color="var(--accent-primary)" />
-                            </div>
-                        </div>
-                        <h2 style={{ fontSize: "1.75rem", fontWeight: 850 }}>No events registered yet</h2>
-                        <p style={{ color: "var(--text-secondary)", marginBottom: "2.5rem", maxWidth: "450px", margin: "0 auto 2.5rem", fontSize: "1.1rem" }}>
-                            Your strategic journey starts here. Create your first event to activate Planora's AI logistical engine.
-                        </p>
-                        <button onClick={() => setShowModal(true)} className="btn btn-primary btn-lg">Begin Planning</button>
+                    <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "5rem", background: "#fff", border: "1px dashed #e2e8f0", borderRadius: "12px" }}>
+                        <p style={{ color: "#64748b" }}>Your portfolio is empty. Initialize your first event to get started.</p>
                     </div>
                 ) : (
-                    events.map(event => (
-                        <div
-                            key={event.id || event._id}
-                            className="glass-panel event-card"
-                            style={{ gridColumn: "span 4", padding: "0", borderRadius: "28px", cursor: "pointer", overflow: "hidden" }}
-                            onClick={() => navigate(`/events/${event.id || event._id}`)}
-                        >
-                            <div style={{
-                                height: "8px",
-                                background: event.status === "Completed" ? "var(--accent-success)" : "var(--accent-primary)",
-                                opacity: 0.8
-                            }}></div>
-                            <div style={{ padding: "2rem" }}>
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.5rem" }}>
-                                    <span className="category-badge" style={{ background: "var(--accent-soft)", color: "var(--accent-primary)" }}>
-                                        {event.type}
-                                    </span>
-                                    <div
-                                        onClick={(e) => handleToggleStatus(e, event.id || event._id, event.status)}
-                                        className="category-badge"
-                                        style={{
-                                            background: event.status === "Completed" ? "rgba(16, 185, 129, 0.1)" : "rgba(59, 130, 246, 0.1)",
-                                            color: event.status === "Completed" ? "var(--accent-success)" : "var(--accent-primary)",
-                                            border: `1px solid ${event.status === "Completed" ? "rgba(16, 185, 129, 0.2)" : "rgba(59, 130, 246, 0.2)"}`
-                                        }}
-                                    >
-                                        <span style={{ width: 6, height: 6, borderRadius: "50%", background: "currentColor" }}></span>
-                                        {event.status}
+                    events.map(event => {
+                        const statusColor = getStatusColor(event.status);
+                        // Mocking utilization for UI beauty (spent/total)
+                        const spent = Math.floor(Math.random() * (event.budget * 0.8));
+                        const remaining = event.budget - spent;
+                        const utilization = (spent / event.budget) * 100;
+
+                        return (
+                            <div
+                                key={event.id || event._id}
+                                onClick={() => navigate(`/events/${event.id || event._id}`)}
+                                style={{
+                                    background: "#fff",
+                                    height: "170px",
+                                    maxHeight: "180px",
+                                    borderLeft: `4px solid ${statusColor}`,
+                                    borderRadius: "8px",
+                                    padding: "16px",
+                                    boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+                                    cursor: "pointer",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    justifyContent: "space-between",
+                                    transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                                    position: "relative",
+                                    overflow: "hidden"
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = "translateY(-2px)";
+                                    e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.05)";
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = "translateY(0)";
+                                    e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.08)";
+                                }}
+                            >
+                                <div>
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px" }}>
+                                        <h3 style={{ fontSize: "16px", fontWeight: 700, margin: 0, color: "#0f172a", letterSpacing: "-0.01em" }}>{event.name}</h3>
+                                        <div style={{ fontSize: "10px", fontWeight: 800, color: statusColor, textTransform: "uppercase", letterSpacing: "0.05em" }}>{event.status}</div>
+                                    </div>
+                                    <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "#64748b", fontSize: "12px", fontWeight: 500 }}>
+                                        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                                            <Calendar size={12} />
+                                            {event.date}
+                                        </div>
+                                        <span style={{ color: "#e2e8f0" }}>|</span>
+                                        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                                            <MapPin size={12} />
+                                            {event.location}
+                                        </div>
                                     </div>
                                 </div>
 
-                                <h3 style={{ fontSize: "1.5rem", fontWeight: 900, marginBottom: "1.25rem", color: "var(--text-primary)", letterSpacing: "-0.02em" }}>{event.name}</h3>
-
-                                <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginBottom: "2rem" }}>
-                                    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", fontSize: "0.9rem", color: "var(--text-secondary)", fontWeight: 500 }}>
-                                        <div style={{ width: "32px", height: "32px", borderRadius: "10px", background: "var(--bg-elevated)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent-primary)" }}>
-                                            <Calendar size={16} strokeWidth={2.5} />
-                                        </div>
-                                        {event.date}
+                                <div style={{ borderTop: "1px solid #f8fafc", paddingTop: "12px" }}>
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "6px" }}>
+                                        <div style={{ fontSize: "10px", color: "#94a3b8", fontWeight: 700, textTransform: "uppercase" }}>Utilisation</div>
+                                        <div style={{ fontSize: "11px", color: "#1e293b", fontWeight: 700 }}>₹{remaining.toLocaleString()} remaining</div>
                                     </div>
-                                    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", fontSize: "0.9rem", color: "var(--text-secondary)", fontWeight: 500 }}>
-                                        <div style={{ width: "32px", height: "32px", borderRadius: "10px", background: "var(--bg-elevated)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent-primary)" }}>
-                                            <MapPin size={16} strokeWidth={2.5} />
-                                        </div>
-                                        {event.location}
+                                    <div style={{ height: "6px", background: "#f1f5f9", borderRadius: "10px", overflow: "hidden" }}>
+                                        <div style={{
+                                            width: `${utilization}%`,
+                                            height: "100%",
+                                            background: utilization > 90 ? "#ef4444" : statusColor,
+                                            borderRadius: "10px",
+                                            transition: "width 1s ease"
+                                        }}></div>
                                     </div>
-                                </div>
-
-                                <div style={{ padding: "1.25rem", background: "var(--bg-base)", borderRadius: "20px", border: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                    <div style={{ display: "flex", flexDirection: "column" }}>
-                                        <span style={{ fontSize: "0.65rem", color: "var(--text-muted)", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>Budget Allocation</span>
-                                        <span style={{ fontSize: "1.25rem", color: "var(--text-primary)", fontWeight: 900 }}>₹{parseInt(event.budget).toLocaleString()}</span>
-                                    </div>
-                                    <button className="btn btn-ghost" style={{ width: "40px", height: "40px", borderRadius: "12px", padding: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                        <ChevronRight size={20} strokeWidth={2.5} />
-                                    </button>
                                 </div>
                             </div>
-                        </div>
-                    ))
+                        );
+                    })
                 )}
             </div>
 

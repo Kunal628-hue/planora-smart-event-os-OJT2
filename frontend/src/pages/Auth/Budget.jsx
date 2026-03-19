@@ -120,80 +120,117 @@ export default function Budget() {
     }, [totalSpent, activeEvent, circumference, offset, loading]);
 
     return (
-        <div className="stagger-in">
-            <div className="page-header" style={{ marginBottom: "3rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{
+            fontFamily: "'Outfit', 'Inter', system-ui, sans-serif",
+            padding: "2.5rem",
+            background: "#fcfdff",
+            minHeight: "100vh",
+            color: "#0f172a"
+        }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "3.5rem" }}>
                 <div>
-                    <h1 style={{ fontSize: "2.75rem", fontWeight: 950, letterSpacing: "-0.04em", marginBottom: "0.75rem" }}>
-                        Financial <span className="gradient-text">Studio</span>
+                    <h1 style={{ fontSize: "2.75rem", fontWeight: 800, letterSpacing: "-0.04em", margin: "0 0 0.5rem" }}>
+                        Financial <span style={{ color: "#2563eb" }}>Studio</span>
                     </h1>
-                    <p style={{ color: "var(--text-secondary)", fontSize: "1.1rem", fontWeight: 600 }}>
+                    <p style={{ color: "#64748b", fontSize: "1.1rem", fontWeight: 500, margin: 0 }}>
                         {activeEvent ? `Optimizing budget for ${activeEvent.name}` : "Initialize an event context to start tracking."}
                     </p>
                 </div>
                 <button
                     onClick={() => setShowModal(true)}
-                    className="btn btn-primary btn-lg hover-lift"
-                    style={{ borderRadius: "16px", padding: "1rem 2.25rem", boxShadow: "0 10px 20px -5px rgba(var(--accent-primary-rgb), 0.3)", display: "flex", alignItems: "center", gap: "0.75rem" }}
                     disabled={!selectedEventId}
+                    style={{
+                        borderRadius: "16px",
+                        padding: "1rem 2rem",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.75rem",
+                        background: "#2563eb",
+                        color: "#fff",
+                        border: "none",
+                        fontWeight: 800,
+                        fontSize: "15px",
+                        cursor: "pointer",
+                        boxShadow: "0 8px 20px rgba(37, 99, 235, 0.2)",
+                        transition: "all 0.2s ease"
+                    }}
                 >
-                    <Plus size={22} strokeWidth={2.5} />
-                    Log Expense
+                    <Plus size={20} strokeWidth={3} />
+                    <span>Log Expense</span>
                 </button>
             </div>
 
-            <div className="dashboard-grid">
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(12, 1fr)", gap: "2.5rem" }}>
                 {/* Main Overview */}
-                <div className="glass-panel" style={{ gridColumn: "span 4", padding: "2.5rem", borderRadius: "32px", position: "relative", border: "1.5px solid var(--border-subtle)" }}>
+                <div style={{
+                    gridColumn: "span 4",
+                    background: "#fff",
+                    padding: "2.5rem",
+                    borderRadius: "40px",
+                    border: "1px solid #f1f5f9",
+                    boxShadow: "0 4px 25px rgba(0,0,0,0.02)",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "2.5rem"
+                }}>
                     {!activeEvent ? (
                         <div style={{ textAlign: "center", padding: "4rem 0", display: "flex", flexDirection: "column", alignItems: "center", gap: "1.5rem" }}>
-                            <div style={{ width: "64px", height: "64px", borderRadius: "20px", background: "var(--bg-elevated)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-muted)" }}>
+                            <div style={{ width: "80px", height: "80px", borderRadius: "24px", background: "#f8fafc", display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8" }}>
                                 <CircleSlash size={32} />
                             </div>
-                            <p style={{ fontWeight: 800, color: "var(--text-muted)", fontSize: "1.1rem" }}>No Active Context</p>
+                            <p style={{ fontWeight: 800, color: "#64748b", fontSize: "1.1rem" }}>No active context selected</p>
                         </div>
                     ) : (
                         <>
-                            <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
-                                <div className="budget-ring-container">
-                                    <svg className="budget-ring-svg" width="180" height="180">
-                                        <circle className="budget-ring-bg" cx="90" cy="90" r={radius} />
-                                        <circle
-                                            className="budget-ring-fill"
-                                            cx="90"
-                                            cy="90"
-                                            r={radius}
-                                            strokeDasharray={circumference}
-                                            strokeDashoffset={circumference}
-                                        />
-                                    </svg>
-                                    <div style={{ position: "absolute", textAlign: "center" }}>
-                                        <div style={{ fontSize: "2rem", fontWeight: 950, letterSpacing: "-0.02em" }}>{Math.round(percentUsed)}%</div>
-                                        <div style={{ fontSize: "0.75rem", fontWeight: 800, textTransform: "uppercase", color: "var(--text-muted)", letterSpacing: "0.05em" }}>Utilized</div>
-                                    </div>
+                            <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                <svg width="200" height="200" viewBox="0 0 200 200">
+                                    <circle cx="100" cy="100" r={radius} fill="none" stroke="#f1f5f9" strokeWidth="12" />
+                                    <circle
+                                        cx="100"
+                                        cy="100"
+                                        r={radius}
+                                        fill="none"
+                                        stroke="#2563eb"
+                                        strokeWidth="12"
+                                        strokeLinecap="round"
+                                        strokeDasharray={circumference}
+                                        strokeDashoffset={offset}
+                                        style={{ transition: "stroke-dashoffset 1s cubic-bezier(0.16, 1, 0.3, 1)" }}
+                                        transform="rotate(-90 100 100)"
+                                    />
+                                </svg>
+                                <div style={{ position: "absolute", textAlign: "center" }}>
+                                    <div style={{ fontSize: "2.5rem", fontWeight: 800, color: "#0f172a", lineHeight: 1 }}>{Math.round(percentUsed)}%</div>
+                                    <div style={{ fontSize: "12px", fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", marginTop: "4px" }}>Utilized</div>
                                 </div>
                             </div>
 
-                            <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-                                <div className="hover-lift" style={{ padding: "1.5rem", background: "var(--bg-elevated)", borderRadius: "24px", border: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                                <div style={{
+                                    padding: "1.5rem",
+                                    background: "#f8fafc",
+                                    borderRadius: "24px",
+                                    border: "1px solid #f1f5f9",
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center"
+                                }}>
                                     <div>
-                                        <div style={{ fontSize: "0.85rem", color: "var(--text-secondary)", fontWeight: 750, marginBottom: "0.25rem" }}>Available Balance</div>
-                                        <div style={{ fontSize: "2.25rem", fontWeight: 950, color: "var(--text-primary)", letterSpacing: "-0.04em" }}>₹{(totalAllocated - totalSpent).toLocaleString()}</div>
+                                        <div style={{ fontSize: "13px", color: "#64748b", fontWeight: 600, marginBottom: "4px" }}>Available Balance</div>
+                                        <div style={{ fontSize: "1.75rem", fontWeight: 800, color: "#0f172a", letterSpacing: "-0.03em" }}>₹{(totalAllocated - totalSpent).toLocaleString()}</div>
                                     </div>
-                                    <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "rgba(30, 64, 175, 0.08)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent-primary)" }}>
+                                    <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "#eff6ff", display: "flex", alignItems: "center", justifyContent: "center", color: "#2563eb" }}>
                                         <Wallet size={24} />
                                     </div>
                                 </div>
-                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                                    <div style={{ padding: "1.25rem", background: "rgba(16, 185, 129, 0.04)", borderRadius: "20px", border: "1px solid rgba(16, 185, 129, 0.1)" }}>
-                                        <div style={{ fontSize: "0.7rem", color: "var(--accent-success)", fontWeight: 900, textTransform: "uppercase", marginBottom: "0.5rem", letterSpacing: "0.05em" }}>Budget</div>
-                                        <div style={{ fontSize: "1.5rem", fontWeight: 950, color: "var(--text-primary)" }}>₹{totalAllocated.toLocaleString()}</div>
+                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem" }}>
+                                    <div style={{ padding: "1.25rem", background: "#f0fdf4", borderRadius: "20px", border: "1px solid #dcfce7" }}>
+                                        <div style={{ fontSize: "11px", color: "#10b981", fontWeight: 800, textTransform: "uppercase", marginBottom: "8px", letterSpacing: "0.05em" }}>Budget</div>
+                                        <div style={{ fontSize: "1.25rem", fontWeight: 800, color: "#0f172a" }}>₹{totalAllocated.toLocaleString()}</div>
                                     </div>
-                                    <div style={{ padding: "1.25rem", background: "rgba(99, 102, 241, 0.04)", borderRadius: "20px", border: "1px solid rgba(99, 102, 241, 0.1)" }}>
-                                        <div style={{ fontSize: "0.7rem", color: "var(--accent-primary)", fontWeight: 900, textTransform: "uppercase", marginBottom: "0.25rem", letterSpacing: "0.05em", lineHeight: 1.2 }}>TOTAL<br />SPENT</div>
-                                        <div style={{ fontSize: "1.5rem", fontWeight: 950, color: "var(--text-primary)", display: "flex", alignItems: "baseline" }}>
-                                            <span style={{ fontSize: "1rem", marginRight: "2px" }}>₹</span>
-                                            <span className="stat-value">0</span>
-                                        </div>
+                                    <div style={{ padding: "1.25rem", background: "#fdf2f8", borderRadius: "20px", border: "1px solid #fce7f3" }}>
+                                        <div style={{ fontSize: "11px", color: "#ec4899", fontWeight: 800, textTransform: "uppercase", marginBottom: "8px", letterSpacing: "0.05em" }}>Spent</div>
+                                        <div style={{ fontSize: "1.25rem", fontWeight: 800, color: "#0f172a" }}>₹{totalSpent.toLocaleString()}</div>
                                     </div>
                                 </div>
                             </div>
@@ -202,109 +239,131 @@ export default function Budget() {
                 </div>
 
                 {/* Categories Breakdown */}
-                <div className="glass-panel" style={{ gridColumn: "span 8", padding: "2.5rem", borderRadius: "32px", border: "1.5px solid var(--border-subtle)" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2.5rem" }}>
-                        <h3 style={{ fontSize: "1.5rem", fontWeight: 900, display: "flex", alignItems: "center", gap: "0.85rem" }}>
-                            <PieChart size={24} color="var(--accent-primary)" strokeWidth={2.5} />
+                <div style={{
+                    gridColumn: "span 8",
+                    background: "#fff",
+                    padding: "2.5rem",
+                    borderRadius: "40px",
+                    border: "1px solid #f1f5f9",
+                    boxShadow: "0 4px 25px rgba(0,0,0,0.02)"
+                }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "3rem" }}>
+                        <h3 style={{ fontSize: "1.5rem", fontWeight: 800, display: "flex", alignItems: "center", gap: "0.85rem" }}>
+                            <PieChart size={24} color="#2563eb" strokeWidth={2.5} />
                             Category Distribution
                         </h3>
-                        <span className="category-badge" style={{ background: "var(--accent-soft)", color: "var(--accent-primary)", fontWeight: 800 }}>LIVE ANALYSIS</span>
+                        <span style={{
+                            background: "#eff6ff",
+                            color: "#2563eb",
+                            fontWeight: 800,
+                            fontSize: "11px",
+                            padding: "6px 12px",
+                            borderRadius: "100px",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.05em"
+                        }}>Live Analysis</span>
                     </div>
 
-                    <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
                         {categoryStats.filter(c => c.spent > 0).length === 0 ? (
                             <div style={{ textAlign: "center", padding: "5rem 0", display: "flex", flexDirection: "column", alignItems: "center", gap: "1.25rem" }}>
-                                <History size={48} style={{ opacity: 0.1 }} />
+                                <div style={{ width: "64px", height: "64px", borderRadius: "20px", background: "#f8fafc", display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8" }}>
+                                    <History size={32} />
+                                </div>
                                 <div>
-                                    <p style={{ fontSize: "1.1rem", fontWeight: 850, color: "var(--text-primary)" }}>No categorical allocation detected.</p>
-                                    <p style={{ fontSize: "0.95rem", color: "var(--text-muted)", fontWeight: 500 }}>Log your first expense to see the breakdown.</p>
+                                    <p style={{ fontSize: "1.1rem", fontWeight: 800, color: "#0f172a", margin: "0 0 0.5rem" }}>No categorical data</p>
+                                    <p style={{ fontSize: "0.95rem", color: "#64748b", fontWeight: 500, margin: 0 }}>Log your first expense to see the visual breakdown.</p>
                                 </div>
                             </div>
                         ) : (
-                            categoryStats.map((cat, idx) => {
-                                const catPercent = (cat.spent / (totalAllocated / 6 || 1)) * 100;
-                                return (
-                                    <div key={cat.name} className="reveal visible" style={{ animationDelay: `${idx * 0.1}s` }}>
-                                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.75rem", alignItems: "center" }}>
-                                            <div>
-                                                <span style={{ fontSize: "1rem", fontWeight: 850 }}>{cat.name}</span>
-                                                <span style={{ marginLeft: "1rem", fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: 700 }}>
-                                                    ₹{cat.spent.toLocaleString()} Managed
-                                                </span>
-                                            </div>
-                                            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                                                {cat.spent > 0 && (
-                                                    <span style={{ fontSize: "0.85rem", fontWeight: 900, color: cat.color }}>
-                                                        {Math.round((cat.spent / totalSpent) * 100)}%
-                                                    </span>
-                                                )}
-                                            </div>
+                            categoryStats.map((cat) => (
+                                <div key={cat.name}>
+                                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.75rem", alignItems: "flex-end" }}>
+                                        <div>
+                                            <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "#0f172a" }}>{cat.name}</span>
+                                            <span style={{ marginLeft: "1rem", fontSize: "13px", color: "#64748b", fontWeight: 600 }}>
+                                                ₹{cat.spent.toLocaleString()}
+                                            </span>
                                         </div>
-                                        <div style={{ height: "12px", background: "var(--bg-elevated)", borderRadius: "12px", overflow: "hidden", border: "1px solid var(--border-subtle)" }}>
-                                            <div
-                                                style={{
-                                                    height: "100%",
-                                                    width: `${Math.min((cat.spent / totalSpent) * 100, 100)}%`,
-                                                    background: cat.color,
-                                                    borderRadius: "12px",
-                                                    transition: "width 1.2s cubic-bezier(0.16, 1, 0.3, 1)",
-                                                    boxShadow: `0 0 20px ${cat.color}33`
-                                                }}
-                                            />
+                                        <div style={{ fontSize: "13px", fontWeight: 800, color: cat.color }}>
+                                            {totalSpent > 0 ? Math.round((cat.spent / totalSpent) * 100) : 0}%
                                         </div>
                                     </div>
-                                );
-                            })
+                                    <div style={{ height: "10px", background: "#f1f5f9", borderRadius: "100px", overflow: "hidden" }}>
+                                        <div
+                                            style={{
+                                                height: "100%",
+                                                width: `${totalSpent > 0 ? (cat.spent / totalSpent) * 100 : 0}%`,
+                                                background: cat.color,
+                                                borderRadius: "100px",
+                                                transition: "width 1s cubic-bezier(0.16, 1, 0.3, 1)"
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            ))
                         )}
                     </div>
                 </div>
 
-                {/* Recent Transactions */}
-                <div className="glass-panel" style={{ gridColumn: "span 12", padding: "2.5rem", borderRadius: "32px", border: "1.5px solid var(--border-subtle)" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                            <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "var(--accent-soft)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent-primary)" }}>
-                                <History size={24} />
-                            </div>
-                            <div>
-                                <h3 style={{ fontSize: "1.5rem", fontWeight: 950, margin: 0 }}>Transaction Ledger</h3>
-                                <p style={{ fontSize: "0.9rem", color: "var(--text-muted)", fontWeight: 600, margin: 0 }}>Historical spend analysis across operational vectors</p>
-                            </div>
+                {/* Transaction Ledger */}
+                <div style={{
+                    gridColumn: "span 12",
+                    background: "#fff",
+                    padding: "2.5rem",
+                    borderRadius: "40px",
+                    border: "1px solid #f1f5f9",
+                    boxShadow: "0 4px 25px rgba(0,0,0,0.02)"
+                }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "2.5rem" }}>
+                        <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "#f8fafc", display: "flex", alignItems: "center", justifyContent: "center", color: "#2563eb" }}>
+                            <History size={24} />
+                        </div>
+                        <div>
+                            <h3 style={{ fontSize: "1.5rem", fontWeight: 800, margin: 0 }}>Transaction Ledger</h3>
+                            <p style={{ fontSize: "0.9rem", color: "#64748b", fontWeight: 500, margin: "0.25rem 0 0" }}>Chronological record of operational commitments.</p>
                         </div>
                     </div>
+
                     <div style={{ overflowX: "auto" }}>
                         {eventVendors.length === 0 ? (
-                            <div style={{ textAlign: "center", padding: "4rem", color: "var(--text-muted)", background: "var(--bg-elevated)", borderRadius: "24px", border: "1.5px dashed var(--border-subtle)" }}>
-                                <CreditCard size={40} style={{ opacity: 0.1, marginBottom: "1rem" }} />
-                                <p style={{ fontWeight: 800 }}>No transactions matching this context.</p>
+                            <div style={{ textAlign: "center", padding: "4rem", color: "#94a3b8", background: "#f8fafc", borderRadius: "24px", border: "1px dashed #e2e8f0" }}>
+                                <CreditCard size={40} style={{ opacity: 0.5, marginBottom: "1rem" }} />
+                                <p style={{ fontWeight: 800, margin: 0 }}>No transaction history found.</p>
                             </div>
                         ) : (
-                            <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: "0 0.75rem" }}>
+                            <table style={{ width: "100%", borderCollapse: "collapse" }}>
                                 <thead>
-                                    <tr style={{ textAlign: "left" }}>
-                                        <th style={{ padding: "0.5rem 1.5rem", fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: 850, textTransform: "uppercase", letterSpacing: "0.05em" }}>Entity</th>
-                                        <th style={{ padding: "0.5rem 1.5rem", fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: 850, textTransform: "uppercase", letterSpacing: "0.05em" }}>Service Vector</th>
-                                        <th style={{ padding: "0.5rem 1.5rem", fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: 850, textTransform: "uppercase", letterSpacing: "0.05em" }}>Status</th>
-                                        <th style={{ padding: "0.5rem 1.5rem", fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: 850, textTransform: "uppercase", letterSpacing: "0.05em", textAlign: "right" }}>Financial Impact</th>
+                                    <tr style={{ textAlign: "left", borderBottom: "1px solid #f1f5f9" }}>
+                                        <th style={{ padding: "0 1.5rem 1rem", fontSize: "11px", color: "#64748b", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>Entity</th>
+                                        <th style={{ padding: "0 1.5rem 1rem", fontSize: "11px", color: "#64748b", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>Category</th>
+                                        <th style={{ padding: "0 1.5rem 1rem", fontSize: "11px", color: "#64748b", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>Status</th>
+                                        <th style={{ padding: "0 1.5rem 1rem", fontSize: "11px", color: "#64748b", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em", textAlign: "right" }}>Financial Impact</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {eventVendors.map((v) => (
-                                        <tr key={v._id} className="hover-lift" style={{ background: "var(--bg-elevated)", transition: "all 0.2s ease", cursor: "pointer" }}>
-                                            <td style={{ padding: "1.5rem", borderRadius: "20px 0 0 20px", fontWeight: 850, border: "1.5px solid var(--border-subtle)", borderRight: "none" }}>{v.name}</td>
-                                            <td style={{ padding: "1.5rem", borderTop: "1.5px solid var(--border-subtle)", borderBottom: "1.5px solid var(--border-subtle)" }}>
-                                                <span className="category-badge" style={{ background: "var(--bg-card)", color: "var(--text-primary)", border: "1.5px solid var(--border-subtle)", padding: "0.4rem 0.85rem", fontWeight: 800 }}>
-                                                    {v.service}
-                                                </span>
+                                        <tr key={v._id} style={{ borderBottom: "1px solid #f8fafc", transition: "background 0.2s" }} className="transaction-row">
+                                            <td style={{ padding: "1.5rem", fontWeight: 800, color: "#0f172a" }}>{v.name}</td>
+                                            <td style={{ padding: "1.5rem" }}>
+                                                <span style={{
+                                                    padding: "4px 10px",
+                                                    borderRadius: "8px",
+                                                    background: "#f1f5f9",
+                                                    fontSize: "11px",
+                                                    fontWeight: 800,
+                                                    color: "#64748b",
+                                                    textTransform: "uppercase"
+                                                }}>{v.service}</span>
                                             </td>
-                                            <td style={{ padding: "1.5rem", borderTop: "1.5px solid var(--border-subtle)", borderBottom: "1.5px solid var(--border-subtle)" }}>
-                                                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                                                    <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#10b981" }}></span>
-                                                    <span style={{ color: "var(--text-secondary)", fontSize: "0.95rem", fontWeight: 750 }}>Settled</span>
+                                            <td style={{ padding: "1.5rem" }}>
+                                                <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "#10b981", fontSize: "13px", fontWeight: 800 }}>
+                                                    <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "currentColor" }}></div>
+                                                    Settled
                                                 </div>
                                             </td>
-                                            <td style={{ padding: "1.5rem", borderRadius: "0 20px 20px 0", textAlign: "right", fontWeight: 950, fontSize: "1.25rem", border: "1.5px solid var(--border-subtle)", borderLeft: "none" }}>
-                                                <span style={{ fontSize: "0.9rem", color: "var(--text-muted)", marginRight: "4px" }}>₹</span>{v.cost.toLocaleString()}
+                                            <td style={{ padding: "1.5rem", textAlign: "right", fontWeight: 800, fontSize: "1.1rem" }}>
+                                                ₹{v.cost.toLocaleString()}
                                             </td>
                                         </tr>
                                     ))}
@@ -316,86 +375,65 @@ export default function Budget() {
             </div>
 
             {showModal && (
-                <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(12px)" }}>
-                    <div className="glass-panel-dark modal-reveal" style={{ width: "100%", maxWidth: "520px", padding: "3rem", borderRadius: "32px", position: "relative" }}>
+                <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2000, backdropFilter: "blur(8px)" }}>
+                    <div style={{ background: "#fff", width: "100%", maxWidth: "520px", padding: "3rem", borderRadius: "32px", boxShadow: "0 25px 60px rgba(0,0,0,0.2)", animation: "modalIn 0.3s ease-out" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2.5rem" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
-                                <div style={{ width: "52px", height: "52px", borderRadius: "16px", background: "rgba(30, 64, 175, 0.08)", color: "var(--accent-primary)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                    <Wallet size={28} strokeWidth={2.5} />
+                                <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                    <Wallet size={24} strokeWidth={2.5} />
                                 </div>
                                 <div>
-                                    <h2 style={{ fontSize: "1.75rem", fontWeight: 950, letterSpacing: "-0.04em", margin: 0 }}>Log Financial Impact</h2>
-                                    <p style={{ color: "var(--text-muted)", fontSize: "0.9rem", fontWeight: 600, margin: 0, marginTop: "0.25rem" }}>Update the transaction ledger with a new entry.</p>
+                                    <h2 style={{ fontSize: "1.75rem", fontWeight: 800, margin: 0, letterSpacing: "-0.03em" }}>Log Expense</h2>
+                                    <p style={{ color: "#64748b", fontSize: "0.9rem", fontWeight: 500, margin: "0.25rem 0 0" }}>Update the transaction ledger with a new entry.</p>
                                 </div>
                             </div>
                             <button
                                 onClick={() => setShowModal(false)}
-                                className="hover-lift"
-                                style={{ background: "var(--bg-elevated)", border: "1.5px solid var(--border-subtle)", color: "var(--text-primary)", width: "40px", height: "40px", borderRadius: "14px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
-                            >
-                                <X size={20} strokeWidth={3} />
-                            </button>
+                                style={{ background: "#f1f5f9", border: "none", color: "#64748b", width: "36px", height: "36px", borderRadius: "50%", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                            ><X size={20} strokeWidth={3} /></button>
                         </div>
-                        <form onSubmit={handleAddExpense} style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
+                        <form onSubmit={handleAddExpense} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
                             <div>
-                                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Entity / Vendor Name</label>
-                                <div style={{ position: "relative" }}>
-                                    <Sparkles size={18} style={{ position: "absolute", left: "1.25rem", top: "50%", transform: "translateY(-50%)", color: "var(--accent-primary)", opacity: 0.8 }} />
-                                    <input
-                                        className="auth-input"
-                                        placeholder="e.g. Grand Ballroom Reservation"
-                                        value={newExpense.name}
-                                        onChange={e => setNewExpense({ ...newExpense, name: e.target.value })}
-                                        style={{ padding: "1.1rem 1.1rem 1.1rem 3.25rem", borderRadius: "16px", fontWeight: 600, fontSize: "1rem" }}
-                                        required
-                                    />
-                                </div>
+                                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#64748b", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Entity / Item Name</label>
+                                <input style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "15px", fontWeight: 600 }} placeholder="e.g. Venue Booking Deposit" value={newExpense.name} onChange={e => setNewExpense({ ...newExpense, name: e.target.value })} required />
                             </div>
+
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
-                                <div style={{ position: "relative" }}>
-                                    <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Category</label>
-                                    <div style={{ position: "relative" }}>
-                                        <select
-                                            className="auth-input"
-                                            value={newExpense.service}
-                                            onChange={e => setNewExpense({ ...newExpense, service: e.target.value })}
-                                            style={{ padding: "1.1rem", borderRadius: "16px", appearance: "none", fontWeight: 750 }}
-                                            required
-                                        >
-                                            <option>Catering</option>
-                                            <option>Decor</option>
-                                            <option>Photography</option>
-                                            <option>Venue</option>
-                                            <option>Logistics</option>
-                                            <option>Entertainment</option>
-                                        </select>
-                                        <ChevronDown size={18} style={{ position: "absolute", right: "1rem", top: "50%", transform: "translateY(-50%)", pointerEvents: "none", opacity: 0.5 }} />
-                                    </div>
+                                <div>
+                                    <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#64748b", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Category</label>
+                                    <select style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "15px", fontWeight: 700 }} value={newExpense.service} onChange={e => setNewExpense({ ...newExpense, service: e.target.value })}>
+                                        <option>Catering</option>
+                                        <option>Decor</option>
+                                        <option>Photography</option>
+                                        <option>Venue</option>
+                                        <option>Logistics</option>
+                                        <option>Entertainment</option>
+                                    </select>
                                 </div>
-                                <div style={{ position: "relative" }}>
-                                    <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Financial Cost</label>
-                                    <div style={{ position: "relative" }}>
-                                        <IndianRupee size={16} style={{ position: "absolute", left: "1.15rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontWeight: 900, opacity: 0.6 }} />
-                                        <input
-                                            className="auth-input"
-                                            type="number"
-                                            placeholder="50000"
-                                            value={newExpense.cost}
-                                            onChange={e => setNewExpense({ ...newExpense, cost: e.target.value })}
-                                            style={{ padding: "1.1rem 1.1rem 1.1rem 2.8rem", borderRadius: "16px", fontWeight: 850, fontSize: "1.1rem" }}
-                                            required
-                                        />
-                                    </div>
+                                <div>
+                                    <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#64748b", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Amount (₹)</label>
+                                    <input type="number" style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "15px", fontWeight: 800 }} placeholder="50000" value={newExpense.cost} onChange={e => setNewExpense({ ...newExpense, cost: e.target.value })} required />
                                 </div>
                             </div>
-                            <div style={{ display: "flex", gap: "1.5rem", marginTop: "1rem" }}>
-                                <button className="btn btn-ghost" type="button" onClick={() => setShowModal(false)} style={{ flex: 1, borderRadius: "16px", fontWeight: 750, padding: "1.1rem" }}>Cancel</button>
-                                <button className="btn btn-primary shadow-glow hover-lift" type="submit" style={{ flex: 1.5, borderRadius: "16px", fontWeight: 900, padding: "1.1rem", fontSize: "1.05rem" }}>Update Ledger</button>
+
+                            <div style={{ display: "flex", gap: "1.25rem", marginTop: "1rem" }}>
+                                <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, padding: "1.1rem", borderRadius: "14px", border: "none", background: "#f1f5f9", fontWeight: 800, cursor: "pointer" }}>Cancel</button>
+                                <button type="submit" style={{ flex: 1.5, padding: "1.1rem", borderRadius: "14px", border: "none", background: "#2563eb", color: "#fff", fontWeight: 900, cursor: "pointer", boxShadow: "0 8px 20px rgba(37, 99, 235, 0.2)" }}>Update Ledger</button>
                             </div>
                         </form>
                     </div>
                 </div>
             )}
+
+            <style>{`
+                @keyframes modalIn {
+                    from { transform: translateY(40px); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+                .transaction-row:hover {
+                    background: #f8fafc !important;
+                }
+            `}</style>
         </div>
     );
 }

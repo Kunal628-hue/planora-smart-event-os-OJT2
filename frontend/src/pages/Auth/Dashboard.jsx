@@ -1,29 +1,17 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import { animate, stagger } from "animejs";
 import {
-    Activity,
     AlertTriangle,
-    TrendingDown,
-    Target,
-    ShieldCheck,
-    Zap,
-    Brain,
-    Utensils,
-    Sparkles,
-    Handshake,
-    ChevronRight,
-    Calendar,
     ArrowRight,
-    Search,
-    RefreshCw,
-    Star,
     LayoutDashboard,
-    AlertCircle
+    RefreshCw,
+    Calendar,
+    DollarSign,
+    Activity,
+    Users,
+    ChevronRight,
+    Search
 } from "lucide-react";
-import AiAssistant from "../../components/AiAssistant";
-
-const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Dashboard() {
     const { user, events, selectedEventId } = useOutletContext();
@@ -32,7 +20,6 @@ export default function Dashboard() {
     const [budgetOpts, setBudgetOpts] = useState([]);
     const [timeline, setTimeline] = useState([]);
     const [vendors, setVendors] = useState([]);
-    const [selectedVendor, setSelectedVendor] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -87,172 +74,182 @@ export default function Dashboard() {
         }
     }, [selectedEventId, events]);
 
-    useEffect(() => {
-        if (!loading && events.length > 0) {
-            animate('.stagger-dash', {
-                translateY: [15, 0],
-                opacity: [0, 1],
-                delay: stagger(60),
-                easing: 'cubicBezier(.22, 1, .36, 1)',
-                duration: 600
-            });
-        }
-    }, [loading, events.length]);
+    const [selectedVendorModal, setSelectedVendorModal] = useState(null);
+
+    const getDaysToEvent = (eventDate) => {
+        if (!eventDate) return 0;
+        const today = new Date();
+        const target = new Date(eventDate);
+        const diffTime = target - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays > 0 ? diffDays : 0;
+    };
 
     const getHealthColor = (score) => {
-        if (score >= 80) return "var(--accent-success)";
-        if (score >= 50) return "var(--accent-warning)";
-        return "var(--accent-danger)";
+        if (score >= 80) return "#10b981"; // Success Green
+        if (score >= 50) return "#f59e0b"; // Warning Orange
+        return "#ef4444"; // Danger Red
+    };
+
+    const getBudgetColor = (usage) => {
+        if (usage <= 80) return "#10b981";
+        if (usage <= 100) return "#f59e0b";
+        return "#ef4444";
+    };
+
+    const getCategoryStyles = (service) => {
+        const styles = {
+            "Catering": { bg: "#fff7ed", color: "#c2410c", icon: "🍱" },
+            "Decor": { bg: "#faf5ff", color: "#7e22ce", icon: "✨" },
+            "AV": { bg: "#eff6ff", color: "#1d4ed8", icon: "🎧" },
+            "Venue": { bg: "#f0fdf4", color: "#15803d", icon: "🏛️" },
+            "Other": { bg: "#f8fafc", color: "#475569", icon: "📍" }
+        };
+        return styles[service] || styles["Other"];
     };
 
     if (loading && events.length === 0) {
         return (
-            <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", minHeight: "70vh", gap: "1.5rem" }}>
-                <RefreshCw className="animate-spin" size={48} color="var(--accent-primary)" />
-                <p style={{ color: "var(--text-muted)", fontWeight: 750, textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.85rem" }}>Synchronizing Neural Core...</p>
-            </div>
-        );
-    }
-
-    if (error && events.length === 0) {
-        return (
-            <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", minHeight: "70vh", textAlign: "center", padding: "2rem" }}>
-                <div style={{ padding: "2rem", background: "rgba(239, 68, 68, 0.05)", borderRadius: "32px", marginBottom: "2rem" }}>
-                    <AlertCircle size={64} color="var(--accent-danger)" />
-                </div>
-                <h2 style={{ fontSize: "2.25rem", fontWeight: 900, letterSpacing: "-0.03em" }}>Intelligence Offline</h2>
-                <p style={{ color: "var(--text-secondary)", marginTop: "0.75rem", fontSize: "1.1rem", maxWidth: "400px" }}>{error}</p>
-                <button onClick={() => window.location.reload()} className="btn btn-primary btn-lg" style={{ marginTop: "2.5rem", borderRadius: "14px" }}>Re-establish Connection</button>
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "70vh" }}>
+                <RefreshCw className="animate-spin" size={24} color="#2563eb" />
             </div>
         );
     }
 
     if (events.length === 0 && !loading) {
         return (
-            <div className="glass-panel" style={{ textAlign: "center", padding: "10rem 2rem", borderRadius: "40px", border: "2px dashed var(--border-medium)", background: "var(--bg-elevated)", position: "relative", overflow: "hidden" }}>
-                <div style={{ marginBottom: "2.5rem", display: "flex", justifyContent: "center" }}>
-                    <div className="anim-float" style={{ width: "100px", height: "100px", borderRadius: "30px", background: "var(--bg-surface)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "var(--shadow-lg)" }}>
-                        <LayoutDashboard size={48} color="var(--accent-primary)" />
-                    </div>
-                </div>
-                <h1 style={{ fontSize: "3.5rem", fontWeight: 950, letterSpacing: "-0.05em", lineHeight: 1 }}>Architect your vision.</h1>
-                <p style={{ color: "var(--text-secondary)", marginTop: "1.5rem", fontSize: "1.25rem", maxWidth: "600px", margin: "1.5rem auto", fontWeight: 500 }}>
-                    Activate Planora's proprietary intelligence by initializing your first event. Experience real-time risk mitigation and fiscal optimization.
-                </p>
-                <button className="btn btn-primary btn-lg" onClick={() => window.location.href = '/events'} style={{ marginTop: "3rem", borderRadius: "16px", padding: "1.1rem 3rem" }}>Initialize Portfolio</button>
+            <div style={{ textAlign: "center", padding: "10rem 2rem", background: "#fff", border: "1px solid #f1f5f9", borderRadius: "16px", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.04)" }}>
+                <Activity size={48} color="#2563eb" style={{ margin: "0 auto 1.5rem" }} />
+                <h1 style={{ fontSize: "1.75rem", fontWeight: 800, color: "#0f172a", marginBottom: "0.75rem", letterSpacing: "-0.02em" }}>Initialize your workspace.</h1>
+                <p style={{ color: "#64748b", marginBottom: "2rem" }}>Connect your first event to see real-time insights.</p>
+                <button className="btn btn-primary px-8 py-3 rounded-full font-bold shadow-lg shadow-blue-500/20" onClick={() => window.location.href = '/events'}>Get Started</button>
             </div>
         );
     }
 
     const selectedEvent = events.find(e => (e.id || e._id) === selectedEventId);
+    const daysRemaining = getDaysToEvent(selectedEvent?.date);
 
     return (
-        <div className="stagger-in">
-            <div className="page-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "3.5rem" }}>
-                <div style={{ position: "relative", zIndex: 1 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", marginBottom: "0.75rem" }}>
-                        <h1 style={{ fontSize: "3rem", fontWeight: 950, letterSpacing: "-0.05em" }}>Operational <span className="gradient-text">Intelligence</span></h1>
-                        <div className="category-badge" style={{ background: "rgba(37, 92, 235, 0.08)", color: "var(--accent-primary)", border: "1px solid rgba(37, 92, 235, 0.15)", padding: "0.5rem 1rem", fontSize: "0.75rem", fontWeight: 800 }}>
-                            <span style={{ width: 8, height: 8, borderRadius: "50%", background: "currentColor", animation: "pulse 2s infinite" }}></span>
-                            CORE ENGINE v6.2
-                        </div>
-                    </div>
-                    <p style={{ color: "var(--text-secondary)", fontSize: "1.15rem", fontWeight: 500 }}>
-                        Real-time synchronization for <span style={{ color: "var(--accent-primary)", fontWeight: 900 }}>{selectedEvent?.name}</span>
-                    </p>
-                </div>
-            </div>
-
-            {/* Critical Vector Banners */}
+        <div style={{
+            fontFamily: "'Outfit', 'Inter', system-ui, sans-serif",
+            background: "#fcfdff",
+            minHeight: "100vh",
+            color: "#0f172a",
+            padding: "2.5rem"
+        }}>
+            {/* Glossy Top Alert Bar */}
             {risks.length > 0 && (
-                <div className="stagger-dash" style={{ display: "flex", flexDirection: "column", gap: "1.25rem", marginBottom: "3rem" }}>
-                    {risks.map((risk, idx) => (
-                        <div key={idx} className="glass-panel" style={{
-                            padding: "1.5rem 2.5rem",
-                            borderRadius: "20px",
-                            background: risk.type === "CRITICAL" ? "rgba(239, 68, 68, 0.04)" : "rgba(245, 158, 11, 0.04)",
-                            borderLeft: `6px solid ${risk.type === "CRITICAL" ? "var(--accent-danger)" : "var(--accent-warning)"}`,
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "1.75rem",
-                            boxShadow: "var(--shadow-sm)"
-                        }}>
-                            <div style={{ color: risk.type === "CRITICAL" ? "var(--accent-danger)" : "var(--accent-warning)" }}>
-                                <AlertTriangle size={28} strokeWidth={2.5} />
-                            </div>
-                            <div style={{ flex: 1 }}>
-                                <h4 style={{ fontSize: "1.1rem", fontWeight: 900, color: "var(--text-primary)", marginBottom: "0.25rem" }}>{risk.category}: {risk.message}</h4>
-                                <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", fontWeight: 500 }}>Resolution: <span style={{ fontWeight: 800, color: "var(--text-primary)" }}>{risk.suggestion}</span></p>
-                            </div>
+                <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "10px 20px",
+                    background: "rgba(255, 241, 242, 0.8)",
+                    backdropFilter: "blur(12px)",
+                    border: "1px solid rgba(255, 228, 230, 0.5)",
+                    borderRadius: "12px",
+                    marginBottom: "2rem",
+                    fontSize: "13px",
+                    boxShadow: "0 4px 12px rgba(225, 29, 72, 0.08)",
+                    animation: "slideDown 0.5s ease-out"
+                }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                        <div style={{ width: "24px", height: "24px", borderRadius: "50%", background: "#be123c", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <AlertTriangle size={14} color="#fff" />
                         </div>
-                    ))}
+                        <span style={{ fontWeight: 700, color: "#9f1239" }}>Action Item</span>
+                        <span style={{ color: "#be123c", fontWeight: 500 }}>{risks[0].message}</span>
+                    </div>
+                    <button style={{ color: "#be123c", fontWeight: 700, fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.05em", border: "none", background: "none" }}>Resolve Now →</button>
                 </div>
             )}
 
-            <div className="dashboard-grid">
-                {/* Health Diagnostic Ring */}
-                <div className="glass-panel stagger-dash" style={{ gridColumn: "span 8", padding: "3rem", borderRadius: "32px", border: "1px solid var(--border-subtle)" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "3rem" }}>
-                        <div>
-                            <h2 style={{ fontSize: "1.5rem", fontWeight: 950, letterSpacing: "-0.03em" }}>Readiness Diagnostic</h2>
-                            <p style={{ fontSize: "0.95rem", color: "var(--text-secondary)", fontWeight: 500, marginTop: "0.25rem" }}>Aggregated health score based on logistical & fiscal integrity.</p>
+            {/* Premium 3-Column KPI Strip */}
+            <div style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: "1.5rem",
+                marginBottom: "2.5rem"
+            }}>
+                {[
+                    { label: "Health Score", value: `${healthData?.score || 0}%`, color: getHealthColor(healthData?.score || 0), desc: "Live Project Health" },
+                    { label: "Budget Utilisation", value: `${healthData?.metrics?.budgetUsage || 0}%`, color: getBudgetColor(healthData?.metrics?.budgetUsage || 0), desc: "Real-time Spending" },
+                    { label: "Days to Event", value: daysRemaining, color: "#2563eb", desc: "Countdown Active" }
+                ].map((kpi, i) => (
+                    <div key={i} style={{
+                        padding: "1.75rem",
+                        background: "#fff",
+                        border: "1px solid #f1f5f9",
+                        borderRadius: "20px",
+                        boxShadow: "0 4px 20px rgba(0,0,0,0.02)",
+                        transition: "all 0.3s ease",
+                        cursor: "pointer",
+                        position: "relative",
+                        overflow: "hidden"
+                    }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
+                            <div style={{ fontSize: "12px", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em" }}>{kpi.label}</div>
+                            {i === 0 && (
+                                <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                                    <div style={{ width: "6px", height: "6px", background: kpi.color, borderRadius: "50%", animation: "pulse 2s infinite" }}></div>
+                                    <span style={{ fontSize: "10px", fontWeight: 800, color: kpi.color, textTransform: "uppercase" }}>Live</span>
+                                </div>
+                            )}
                         </div>
-                        {healthData && (
-                            <div className="category-badge" style={{
-                                background: `${getHealthColor(healthData.score)}12`,
-                                color: getHealthColor(healthData.score),
-                                fontSize: "0.8rem",
-                                fontWeight: 900,
-                                border: `1.5px solid ${getHealthColor(healthData.score)}25`,
-                                padding: "0.5rem 1rem"
-                            }}>
-                                {healthData.score >= 80 ? "Fully Optimized" : healthData.score >= 50 ? "Stable Condition" : "Critical Variance"}
-                            </div>
-                        )}
+                        <div style={{ fontSize: "48px", fontWeight: 800, color: kpi.color, letterSpacing: "-0.04em", lineHeight: 1 }}>{kpi.value}</div>
+                        <div style={{ fontSize: "12px", color: "#94a3b8", marginTop: "0.5rem", fontWeight: 500 }}>{kpi.desc}</div>
+                    </div>
+                ))}
+            </div>
+
+            {/* Split Row */}
+            <div style={{
+                display: "grid",
+                gridTemplateColumns: "2.1fr 0.9fr",
+                gap: "2rem",
+                marginBottom: "2.5rem"
+            }}>
+                {/* Milestone Timeline */}
+                <div style={{
+                    background: "#fff",
+                    border: "1px solid #f1f5f9",
+                    padding: "2rem",
+                    borderRadius: "24px",
+                    boxShadow: "0 4px 30px rgba(0,0,0,0.01)"
+                }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2.5rem" }}>
+                        <div style={{ fontSize: "14px", color: "#0f172a", fontWeight: 700, letterSpacing: "-0.01em" }}>Milestone Timeline</div>
+                        <div style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 600, background: "#f8fafc", padding: "4px 10px", borderRadius: "8px" }}>Auto-suggested by AI</div>
                     </div>
 
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", alignItems: "center" }}>
-                        <div style={{ display: "flex", justifyContent: "center" }}>
-                            <div className="budget-ring-container" style={{ width: 220, height: 220, position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                <svg width="220" height="220" viewBox="0 0 100 100" style={{ transform: "rotate(-90deg)" }}>
-                                    <defs>
-                                        <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                            <stop offset="0%" stopColor="var(--accent-primary)" />
-                                            <stop offset="100%" stopColor="var(--accent-secondary)" />
-                                        </linearGradient>
-                                    </defs>
-                                    <circle cx="50" cy="50" r="44" fill="none" stroke="var(--bg-elevated)" strokeWidth="8" />
-                                    <circle cx="50" cy="50" r="44" fill="none"
-                                        stroke="url(#ringGradient)"
-                                        strokeWidth="8"
-                                        strokeDasharray="276.46"
-                                        strokeDashoffset={276.46 * (1 - (healthData?.score || 0) / 100)}
-                                        strokeLinecap="round"
-                                        style={{ transition: "stroke-dashoffset 1.5s cubic-bezier(.16, 1, .3, 1)" }}
-                                    />
-                                </svg>
-                                <div style={{ position: "absolute", textAlign: "center" }}>
-                                    <div style={{ fontSize: "4.5rem", fontWeight: 950, color: "var(--text-primary)", lineHeight: 1, letterSpacing: "-0.05em" }}>{healthData?.score || 0}%</div>
-                                    <div style={{ fontSize: "0.8rem", fontWeight: 900, color: "var(--text-muted)", textTransform: "uppercase", marginTop: "0.15rem", letterSpacing: "0.1em" }}>Health Index</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
-                            {healthData && [
-                                { label: "Workflow Velocity", value: healthData.metrics.taskCompletion, icon: <Target size={18} /> },
-                                { label: "Fiscal Reserve", value: Math.max(0, 100 - (healthData.metrics.budgetUsage > 100 ? (healthData.metrics.budgetUsage - 100) : 0)), icon: <TrendingDown size={18} /> },
-                                { label: "Partner Alignment", value: healthData.metrics.vendorConfirmation, icon: <ShieldCheck size={18} /> },
-                                { label: "Network Response", value: healthData.metrics.rsvpRate, icon: <Zap size={18} /> },
-                            ].map(item => (
-                                <div key={item.label}>
-                                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.9rem", fontWeight: 800, marginBottom: "0.75rem" }}>
-                                        <span style={{ color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                                            <span style={{ opacity: 0.7, color: "var(--accent-primary)" }}>{item.icon}</span> {item.label}
-                                        </span>
-                                        <span style={{ color: "var(--text-primary)", letterSpacing: "-0.01em" }}>{item.value}%</span>
-                                    </div>
-                                    <div style={{ height: "8px", background: "var(--bg-elevated)", borderRadius: "100px", overflow: "hidden" }}>
-                                        <div style={{ width: `${item.value}%`, height: "100%", background: getHealthColor(item.value), borderRadius: "100px", transition: "width 1s cubic-bezier(0.34, 1.56, 0.64, 1)" }}></div>
+                    <div style={{ position: "relative", padding: "0 1.5rem" }}>
+                        <div style={{
+                            position: "absolute",
+                            top: "7px",
+                            left: "0",
+                            right: "0",
+                            height: "2px",
+                            background: "linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%)",
+                            borderRadius: "10px"
+                        }}></div>
+
+                        <div style={{ display: "flex", justifyContent: "space-between" }}>
+                            {(timeline.length > 0 ? timeline.slice(0, 5) : Array(5).fill({})).map((step, idx) => (
+                                <div key={idx} style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", maxWidth: "100px" }}>
+                                    <div style={{
+                                        width: "16px",
+                                        height: "16px",
+                                        borderRadius: "50%",
+                                        background: idx === 0 ? "#2563eb" : "#fff",
+                                        border: `3.5px solid ${idx === 0 ? "#dbeafe" : "#f1f5f9"}`,
+                                        zIndex: 2,
+                                        boxShadow: idx === 0 ? "0 4px 10px rgba(37, 99, 235, 0.4)" : "none",
+                                        transition: "all 0.3s ease"
+                                    }}></div>
+                                    <div style={{ marginTop: "1.25rem", textAlign: "center" }}>
+                                        <div style={{ fontSize: "12px", fontWeight: 700, color: idx === 0 ? "#2563eb" : "#0f172a", marginBottom: "2px" }}>{step.title ? step.title.split(' ')[0] : 'Phase'}</div>
+                                        <div style={{ fontSize: "11px", color: "#b4bbc5", fontWeight: 600 }}>{Math.floor(Math.random() * 8) + 1} tasks</div>
                                     </div>
                                 </div>
                             ))}
@@ -260,146 +257,154 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* Optimization Feed */}
-                <div className="glass-panel stagger-dash" style={{ gridColumn: "span 4", padding: "2.5rem", borderRadius: "32px", display: "flex", flexDirection: "column", border: "1px solid var(--border-subtle)" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "2rem" }}>
-                        <div style={{ width: "42px", height: "42px", borderRadius: "12px", background: "var(--accent-soft)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent-primary)" }}>
-                            <Brain size={24} />
+                {/* Dynamic Budget Summary */}
+                <div style={{
+                    background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
+                    padding: "2.8rem 2rem",
+                    borderRadius: "24px",
+                    color: "#fff",
+                    boxShadow: "0 20px 40px rgba(15, 23, 42, 0.15)",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between"
+                }}>
+                    <div>
+                        <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "1.5rem" }}>Budget Summary</div>
+                        <div style={{ marginBottom: "2rem" }}>
+                            <div style={{ fontSize: "32px", fontWeight: 800, color: "#fff" }}>₹{Math.round((healthData?.metrics?.budgetUsage / 100 || 0) * selectedEvent?.budget).toLocaleString()}</div>
+                            <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", fontWeight: 500 }}>Current Spend / ₹{selectedEvent?.budget?.toLocaleString()} Cap</div>
                         </div>
-                        <h3 style={{ fontSize: "1.25rem", fontWeight: 950, letterSpacing: "-0.02em" }}>Fiscal Insights</h3>
                     </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "1rem", flex: 1 }}>
-                        {budgetOpts.map((opt, i) => (
-                            <div key={i} style={{ padding: "1.25rem", borderRadius: "18px", background: "var(--bg-elevated)", fontSize: "0.9rem", fontWeight: 600, border: "1px solid var(--border-subtle)", color: "var(--text-secondary)", lineHeight: 1.5 }}>
-                                {opt}
-                            </div>
-                        ))}
-                    </div>
-                    <button onClick={() => window.location.href = '/budget'} className="btn btn-primary" style={{ marginTop: "2rem", borderRadius: "16px", padding: "1.1rem", fontWeight: 900, fontSize: "0.9rem" }}>
-                        Optimize Ledger <ArrowRight size={18} />
-                    </button>
-                </div>
-
-                {/* Predictive Timeline */}
-                <div className="glass-panel stagger-dash" style={{ gridColumn: "span 12", padding: "3rem", borderRadius: "32px", border: "1px solid var(--border-subtle)" }}>
-                    <div style={{ marginBottom: "2.5rem" }}>
-                        <h3 style={{ fontSize: "1.5rem", fontWeight: 950, letterSpacing: "-0.04em" }}>Predictive Milestone Flow</h3>
-                        <p style={{ fontSize: "1rem", color: "var(--text-muted)", fontWeight: 500 }}>Algorithmic synchronization for {selectedEvent?.type} execution.</p>
-                    </div>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: "2rem" }}>
-                        {timeline.map((step, idx) => (
-                            <div key={idx} style={{ textAlign: "center", position: "relative" }}>
-                                <div style={{
-                                    width: "56px",
-                                    height: "56px",
-                                    borderRadius: "18px",
-                                    background: "var(--bg-surface)",
-                                    color: "var(--accent-primary)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    margin: "0 auto 1.25rem",
-                                    fontWeight: 900,
-                                    fontSize: "1.25rem",
-                                    border: "2px solid var(--accent-soft)",
-                                    boxShadow: "var(--shadow-sm)"
-                                }}>
-                                    {idx + 1}
-                                </div>
-                                <h5 style={{ fontSize: "0.95rem", fontWeight: 900, marginBottom: "0.5rem", color: "var(--text-primary)" }}>{step.title}</h5>
-                                <div style={{ display: "inline-flex", padding: "0.3rem 0.75rem", background: "var(--bg-elevated)", borderRadius: "8px", fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase" }}>
-                                    T - {step.daysBefore}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Vendor Matchmaking Card */}
-                <div className="glass-panel stagger-dash" style={{ gridColumn: "span 12", padding: "3rem", borderRadius: "32px", border: "1px solid var(--border-subtle)" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "3rem" }}>
-                        <div>
-                            <h3 style={{ fontSize: "1.75rem", fontWeight: 950, letterSpacing: "-0.04em" }}>Neural Vendor Matching</h3>
-                            <p style={{ fontSize: "1.1rem", color: "var(--text-muted)", fontWeight: 500 }}>Premium-tier providers algorithmically matched to your project parameters.</p>
+                    <div>
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", fontWeight: 700, marginBottom: "0.5rem" }}>
+                            <span>UTILISATION</span>
+                            <span style={{ color: getBudgetColor(healthData?.metrics?.budgetUsage || 0) }}>{healthData?.metrics?.budgetUsage || 0}%</span>
                         </div>
-                        <button onClick={() => window.location.href = '/vendors'} className="btn btn-ghost" style={{ fontWeight: 800, padding: "0.8rem 1.5rem", borderRadius: "12px" }}>Explore Portfolio</button>
-                    </div>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "2rem" }}>
-                        {vendors.map((vendor, i) => (
-                            <div
-                                key={i}
-                                onClick={() => setSelectedVendor(vendor)}
-                                className="glass-panel hover-lift"
-                                style={{
-                                    padding: "2.5rem",
-                                    borderRadius: "28px",
-                                    cursor: "pointer",
-                                    background: "var(--bg-surface)",
-                                    border: "1px solid var(--border-medium)",
-                                    boxShadow: "var(--shadow-sm)"
-                                }}
-                            >
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "2rem" }}>
-                                    <div style={{ width: "54px", height: "54px", borderRadius: "16px", background: "var(--accent-soft)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent-primary)" }}>
-                                        {vendor.service === "Catering" ? <Utensils size={28} /> : vendor.service === "Decor" ? <Sparkles size={28} /> : <Handshake size={28} />}
-                                    </div>
-                                    <div className="category-badge" style={{ background: "rgba(245, 158, 11, 0.08)", color: "#d97706", border: "1.5px solid rgba(245, 158, 11, 0.15)", padding: "0.5rem 0.8rem", fontWeight: 900, display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                                        <Star size={14} fill="currentColor" /> {vendor.rating}
-                                    </div>
-                                </div>
-                                <h4 style={{ fontSize: "1.35rem", fontWeight: 900, marginBottom: "0.6rem", letterSpacing: "-0.02em" }}>{vendor.name}</h4>
-                                <div style={{ display: "flex", gap: "0.75rem", fontSize: "0.9rem", fontWeight: 700, color: "var(--text-muted)", alignItems: "center" }}>
-                                    <span>{vendor.service} Specialist</span>
-                                    <span style={{ width: 4, height: 4, borderRadius: "50%", background: "var(--border-medium)" }}></span>
-                                    <span style={{ color: "var(--accent-primary)", fontWeight: 850 }}>{vendor.priceRange}</span>
-                                </div>
-                            </div>
-                        ))}
+                        <div style={{ height: "6px", background: "rgba(255,255,255,0.1)", borderRadius: "10px", overflow: "hidden" }}>
+                            <div style={{
+                                width: `${Math.min(100, healthData?.metrics?.budgetUsage || 0)}%`,
+                                height: "100%",
+                                background: getBudgetColor(healthData?.metrics?.budgetUsage || 0),
+                                borderRadius: "10px",
+                                boxShadow: `0 0 10px ${getBudgetColor(healthData?.metrics?.budgetUsage || 0)}`
+                            }}></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <AiAssistant eventId={selectedEventId} />
+            {/* High-Fidelity Vendor Strip */}
+            <div style={{
+                background: "#fff",
+                border: "1px solid #f1f5f9",
+                padding: "1.25rem 2rem",
+                borderRadius: "100px",
+                display: "flex",
+                alignItems: "center",
+                gap: "2.5rem",
+                overflowX: "auto",
+                boxShadow: "0 4px 15px rgba(0,0,0,0.02)"
+            }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", borderRight: "1px solid #f1f5f9", paddingRight: "2rem" }}>
+                    <Search size={14} color="#94a3b8" />
+                    <span style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>Smart Matching</span>
+                </div>
+                <div style={{ display: "flex", gap: "3rem" }}>
+                    {vendors.length > 0 ? vendors.map((vendor, i) => {
+                        const styles = getCategoryStyles(vendor.service);
+                        return (
+                            <div
+                                key={i}
+                                onClick={() => setSelectedVendorModal(vendor)}
+                                style={{ display: "flex", alignItems: "center", gap: "0.75rem", whiteSpace: "nowrap", cursor: "pointer", transition: "all 0.2s ease" }}
+                                onMouseEnter={(e) => e.currentTarget.style.transform = "translateY(-2px)"}
+                                onMouseLeave={(e) => e.currentTarget.style.transform = "translateY(0)"}
+                            >
+                                <div style={{
+                                    width: "32px",
+                                    height: "32px",
+                                    background: styles.bg,
+                                    borderRadius: "10px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    fontSize: "14px",
+                                    boxShadow: `0 2px 8px ${styles.color}10`
+                                }}>{styles.icon}</div>
+                                <div style={{ display: "flex", flexDirection: "column" }}>
+                                    <div style={{ fontSize: "14px", fontWeight: 800, color: "#1e293b" }}>{vendor.name}</div>
+                                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                        <span style={{ fontSize: "10px", color: styles.color, fontWeight: 800, textTransform: "uppercase" }}>{vendor.service}</span>
+                                        <span style={{ width: "2px", height: "2px", background: "#cbd5e1", borderRadius: "50%" }}></span>
+                                        <span style={{ fontSize: "12px", color: "#94a3b8", fontWeight: 600 }}>{vendor.priceRange?.replace('$', '₹')}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    }) : (
+                        <div style={{ fontSize: "13px", color: "#94a3b8", fontWeight: 500, fontStyle: "italic" }}>Calculating optimal vendor matrix...</div>
+                    )}
+                </div>
+            </div>
 
-            {/* Match Detail Modal */}
-            {selectedVendor && (
-                <div
-                    style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.6)", backdropFilter: "blur(12px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2000, padding: "2rem" }}
-                    onClick={() => setSelectedVendor(null)}
-                >
-                    <div
-                        className="glass-panel"
-                        style={{ width: "100%", maxWidth: "540px", borderRadius: "40px", padding: 0, overflow: "hidden", border: "1px solid var(--border-medium)", background: "var(--bg-surface)" }}
-                        onClick={e => e.stopPropagation()}
-                    >
-                        <div style={{ padding: "4rem 3.5rem", background: "linear-gradient(135deg, var(--accent-primary), #1e3a8a)", color: "#fff", position: "relative" }}>
-                            <button onClick={() => setSelectedVendor(null)} style={{ position: "absolute", top: "2.5rem", right: "2.5rem", background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", width: "44px", height: "44px", borderRadius: "16px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                <RefreshCw size={20} strokeWidth={3} style={{ transform: "rotate(45deg)" }} />
-                            </button>
-                            <div style={{ width: "70px", height: "70px", borderRadius: "20px", background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "2rem", backdropFilter: "blur(4px)" }}>
-                                {selectedVendor.service === "Catering" ? <Utensils size={36} /> : <Sparkles size={36} />}
+            {/* Vendor Modal */}
+            {selectedVendorModal && (
+                <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem" }}>
+                    <div style={{ background: "#fff", width: "100%", maxWidth: "500px", borderRadius: "24px", padding: "2rem", boxShadow: "0 20px 50px rgba(0,0,0,0.2)", position: "relative", animation: "modalIn 0.3s ease-out" }}>
+                        <button onClick={() => setSelectedVendorModal(null)} style={{ position: "absolute", top: "1.5rem", right: "1.5rem", border: "none", background: "#f1f5f9", width: "32px", height: "32px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#64748b" }}>×</button>
+
+                        <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "2rem" }}>
+                            <div style={{ width: "64px", height: "64px", background: getCategoryStyles(selectedVendorModal.service).bg, borderRadius: "20px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "32px" }}>
+                                {getCategoryStyles(selectedVendorModal.service).icon}
                             </div>
-                            <h2 style={{ fontSize: "2.5rem", fontWeight: 950, letterSpacing: "-0.05em", lineHeight: 1 }}>{selectedVendor.name}</h2>
+                            <div>
+                                <h3 style={{ fontSize: "1.5rem", fontWeight: 800, color: "#0f172a", marginBottom: "0.25rem" }}>{selectedVendorModal.name}</h3>
+                                <p style={{ color: "#64748b", fontSize: "14px", fontWeight: 500 }}>{selectedVendorModal.service} Experts</p>
+                            </div>
                         </div>
-                        <div style={{ padding: "3.5rem" }}>
-                            <p style={{ fontSize: "1.15rem", color: "var(--text-secondary)", lineHeight: 1.7, marginBottom: "2.5rem", fontWeight: 500 }}>{selectedVendor.description}</p>
-                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2.5rem", marginBottom: "3rem" }}>
-                                <div>
-                                    <label style={{ fontSize: "0.75rem", fontWeight: 900, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Core Specialty</label>
-                                    <div style={{ fontSize: "1.1rem", fontWeight: 850, marginTop: "0.5rem", color: "var(--text-primary)" }}>{selectedVendor.specialty}</div>
-                                </div>
-                                <div>
-                                    <label style={{ fontSize: "0.75rem", fontWeight: 900, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Fiscal Tier</label>
-                                    <div style={{ fontSize: "1.1rem", fontWeight: 850, marginTop: "0.5rem", color: "var(--accent-primary)" }}>{selectedVendor.priceRange}</div>
-                                </div>
+
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", marginBottom: "2rem" }}>
+                            <div style={{ padding: "1rem", background: "#f8fafc", borderRadius: "16px" }}>
+                                <div style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 800, textTransform: "uppercase", marginBottom: "0.5rem" }}>Rating</div>
+                                <div style={{ fontSize: "18px", fontWeight: 800, color: "#0f172a" }}>⭐ {selectedVendorModal.rating}/5.0</div>
                             </div>
-                            <button className="btn btn-primary" style={{ width: "100%", borderRadius: "20px", padding: "1.4rem", fontWeight: 950, fontSize: "1rem" }}>
-                                Initialize Strategic Partnership <ArrowRight size={20} style={{ marginLeft: "0.5rem" }} />
-                            </button>
+                            <div style={{ padding: "1rem", background: "#f8fafc", borderRadius: "16px" }}>
+                                <div style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 800, textTransform: "uppercase", marginBottom: "0.5rem" }}>Pricing</div>
+                                <div style={{ fontSize: "18px", fontWeight: 800, color: "#0f172a" }}>{selectedVendorModal.priceRange?.replace('$', '₹')}</div>
+                            </div>
+                        </div>
+
+                        <div style={{ marginBottom: "2rem" }}>
+                            <div style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 800, textTransform: "uppercase", marginBottom: "0.75rem" }}>Core Specialty</div>
+                            <p style={{ color: "#475569", fontSize: "14px", lineHeight: "1.6" }}>Superior quality and reliability in {selectedVendorModal.service} services for small to medium scale events.</p>
+                        </div>
+
+                        <div style={{ display: "flex", gap: "1rem" }}>
+                            <button className="btn btn-primary" style={{ flex: 1, padding: "1rem", borderRadius: "12px", fontWeight: 800 }} onClick={() => setSelectedVendorModal(null)}>Book Consultation</button>
+                            <button style={{ flex: 1, padding: "1rem", borderRadius: "12px", background: "#f1f5f9", border: "none", color: "#1e293b", fontWeight: 800, cursor: "pointer" }}>Save for later</button>
                         </div>
                     </div>
                 </div>
             )}
+
+            <style>{`
+                @keyframes pulse {
+                    0% { transform: scale(0.95); opacity: 0.9; }
+                    50% { transform: scale(1.1); opacity: 1; }
+                    100% { transform: scale(0.95); opacity: 0.9; }
+                }
+                @keyframes slideDown {
+                    from { transform: translateY(-20px); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+                @keyframes modalIn {
+                    from { transform: translateY(40px); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+                *::-webkit-scrollbar { height: 4px; }
+                *::-webkit-scrollbar-track { background: transparent; }
+                *::-webkit-scrollbar-thumb { background: #f1f5f9; border-radius: 10px; }
+            `}</style>
         </div>
     );
 }

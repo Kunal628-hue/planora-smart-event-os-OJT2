@@ -139,203 +139,256 @@ export default function Analytics() {
     }, [loading, stats]);
 
     return (
-        <div className="stagger-in">
-            <div className="page-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "3.5rem" }}>
+        <div style={{
+            fontFamily: "'Outfit', 'Inter', system-ui, sans-serif",
+            padding: "2.5rem",
+            background: "#fcfdff",
+            minHeight: "100vh",
+            color: "#0f172a"
+        }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "3.5rem" }}>
                 <div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "1.25rem", marginBottom: "0.75rem" }}>
-                        <h1 style={{ fontSize: "3rem", fontWeight: 950, letterSpacing: "-0.05em" }}>
-                            Intelligent <span className="gradient-text">Insights</span>
-                        </h1>
-                        <div className="category-badge" style={{ background: "rgba(16, 185, 129, 0.08)", color: "var(--accent-success)", border: "1px solid rgba(16, 185, 129, 0.15)", padding: "0.5rem 1rem", fontSize: "0.75rem", fontWeight: 800, display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                            <span style={{ width: 8, height: 8, borderRadius: "50%", background: "currentColor", animation: "pulse 2s infinite" }}></span>
-                            LIVE ANALYSIS
-                        </div>
-                    </div>
-                    <p style={{ color: "var(--text-secondary)", fontSize: "1.2rem", fontWeight: 500 }}>
+                    <h1 style={{ fontSize: "2.75rem", fontWeight: 800, letterSpacing: "-0.04em", margin: "0 0 0.5rem" }}>
+                        Intelligent <span style={{ color: "#2563eb" }}>Insights</span>
+                    </h1>
+                    <p style={{ color: "#64748b", fontSize: "1.1rem", fontWeight: 500, margin: 0 }}>
                         Real-time cross-channel performance metrics and predictive event analytics.
                     </p>
                 </div>
-                <div style={{ display: "flex", gap: "1rem" }}>
-                    <button onClick={fetchData} className="btn btn-ghost" style={{ padding: "0.8rem 1.25rem", borderRadius: "12px", display: "flex", alignItems: "center", gap: "0.5rem", fontWeight: 800 }}>
-                        <RefreshCw size={18} className={loading ? "animate-spin" : ""} />
-                        Refresh Engine
-                    </button>
-                </div>
+                <button
+                    onClick={fetchData}
+                    style={{
+                        borderRadius: "16px",
+                        padding: "0.85rem 1.5rem",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.75rem",
+                        background: "#fff",
+                        color: "#0f172a",
+                        border: "1px solid #e2e8f0",
+                        fontWeight: 700,
+                        fontSize: "14px",
+                        cursor: "pointer",
+                        transition: "all 0.2s ease"
+                    }}
+                >
+                    <RefreshCw size={18} className={loading ? "animate-spin" : ""} />
+                    <span>Refresh Engine</span>
+                </button>
             </div>
 
             {loading && stats.visits === 0 ? (
                 <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "10rem 0", gap: "2rem" }}>
-                    <div className="anim-float" style={{ width: "100px", height: "100px", borderRadius: "30px", background: "var(--bg-elevated)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--border-subtle)" }}>
-                        <Brain size={48} color="var(--accent-primary)" strokeWidth={1.5} />
+                    <div style={{ width: "80px", height: "80px", borderRadius: "24px", background: "#f8fafc", display: "flex", alignItems: "center", justifyContent: "center", color: "#2563eb" }}>
+                        <Brain size={48} strokeWidth={1.5} style={{ animation: "pulse 2s infinite" }} />
                     </div>
-                    <p style={{ fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.2em", fontSize: "0.85rem" }}>Synchronizing Neural Core...</p>
+                    <p style={{ fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.2em", fontSize: "0.85rem" }}>Synchronizing Neural Core...</p>
                 </div>
             ) : stats.visits === 0 && !loading ? (
-                <div className="glass-panel" style={{ textAlign: "center", padding: "8rem 2rem", borderRadius: "40px", border: "2px dashed var(--border-medium)" }}>
+                <div style={{ textAlign: "center", padding: "8rem 2rem", background: "#fff", borderRadius: "40px", border: "1px dashed #e2e8f0" }}>
                     <div style={{ marginBottom: "2rem", display: "flex", justifyContent: "center" }}>
-                        <div className="anim-float" style={{ width: "80px", height: "80px", borderRadius: "24px", background: "var(--bg-elevated)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <Activity size={40} color="var(--accent-primary)" />
+                        <div style={{ width: "80px", height: "80px", borderRadius: "24px", background: "#f8fafc", display: "flex", alignItems: "center", justifyContent: "center", color: "#2563eb" }}>
+                            <Activity size={40} />
                         </div>
                     </div>
-                    <h2 style={{ fontSize: "2rem", fontWeight: 900, marginBottom: "1rem" }}>Insufficient Data Context</h2>
-                    <p style={{ color: "var(--text-secondary)", maxWidth: "500px", margin: "0 auto 3rem", fontSize: "1.1rem" }}>
+                    <h2 style={{ fontSize: "2rem", fontWeight: 800, marginBottom: "1rem", color: "#0f172a" }}>Insufficient Data Context</h2>
+                    <p style={{ color: "#64748b", maxWidth: "500px", margin: "0 auto 3rem", fontSize: "1.1rem", fontWeight: 500 }}>
                         Analytics requires active event streams. Initialize your first event and register guests to activate the intelligence matrix.
                     </p>
-                    <button className="btn btn-primary btn-lg" onClick={() => window.location.href = '/events'}>Initialize Project</button>
+                    <button
+                        style={{ background: "#2563eb", color: "#fff", padding: "1rem 2rem", borderRadius: "16px", border: "none", fontWeight: 800, cursor: "pointer" }}
+                        onClick={() => window.location.href = '/events'}
+                    >
+                        Initialize Project
+                    </button>
                 </div>
             ) : (
                 <>
-                    {/* Quick Stats Grid */}
-                    <div className="dashboard-grid" style={{ marginBottom: "2rem" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "2.5rem", marginBottom: "2.5rem" }}>
                         {[
-                            { label: "Attendee Velocity", val: stats.visits, sub: "Total registered in system", icon: <Users size={22} />, color: "var(--accent-primary)" },
-                            { label: "RSVP Depth", val: stats.confirmed, sub: "Confirmed active status", icon: <Ticket size={22} />, color: "var(--accent-success)" },
-                            { label: "Managed Volume", val: stats.revenue, prefix: "₹", sub: "Aggregate event budgets", icon: <DollarSign size={22} />, color: "#f59e0b" },
-                            { label: "Commitment Rate", val: stats.checkInRate, suffix: "%", sub: "Confirmed vs Total", icon: <CheckCircle2 size={22} />, color: "var(--accent-primary)" }
+                            { label: "Attendee Velocity", val: stats.visits, icon: <Users size={22} />, color: "#2563eb", bg: "#eff6ff" },
+                            { label: "RSVP Depth", val: stats.confirmed, icon: <Ticket size={22} />, color: "#10b981", bg: "#f0fdf4" },
+                            { label: "Managed Volume", val: stats.revenue, prefix: "₹", icon: <DollarSign size={22} />, color: "#f59e0b", bg: "#fffbeb" },
+                            { label: "Commitment Rate", val: stats.checkInRate, suffix: "%", icon: <CheckCircle2 size={22} />, color: "#8b5cf6", bg: "#f5f3ff" }
                         ].map((stat, i) => (
-                            <div key={i} className="glass-panel hover-lift" style={{ gridColumn: "span 3", padding: "2rem", borderRadius: "28px", border: "1px solid var(--border-subtle)" }}>
-                                <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "var(--bg-elevated)", display: "flex", alignItems: "center", justifyContent: "center", color: stat.color, marginBottom: "1.5rem" }}>
+                            <div key={i} style={{
+                                background: "#fff",
+                                padding: "2rem",
+                                borderRadius: "32px",
+                                border: "1px solid #f1f5f9",
+                                boxShadow: "0 4px 25px rgba(0,0,0,0.02)"
+                            }}>
+                                <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: stat.bg, display: "flex", alignItems: "center", justifyContent: "center", color: stat.color, marginBottom: "1.5rem" }}>
                                     {stat.icon}
                                 </div>
-                                <div style={{ fontSize: "0.75rem", fontWeight: 800, textTransform: "uppercase", color: "var(--text-muted)", letterSpacing: "0.08em", marginBottom: "0.5rem" }}>
+                                <div style={{ fontSize: "12px", fontWeight: 800, textTransform: "uppercase", color: "#64748b", letterSpacing: "0.05em", marginBottom: "0.5rem" }}>
                                     {stat.label}
                                 </div>
-                                <div style={{ fontSize: "2.25rem", fontWeight: 950, display: "flex", alignItems: "baseline", letterSpacing: "-0.03em" }}>
-                                    <span style={{ fontSize: "1.5rem", marginRight: "2px", opacity: 0.8 }}>{stat.prefix}</span>
-                                    <span className="count-metric" data-val={stat.val}>0</span>
-                                    <span style={{ fontSize: "1.5rem", marginLeft: "2px", opacity: 0.8 }}>{stat.suffix}</span>
+                                <div style={{ fontSize: "2.25rem", fontWeight: 800, display: "flex", alignItems: "baseline", color: "#0f172a", lineHeight: 1 }}>
+                                    {stat.prefix && <span style={{ fontSize: "1.25rem", marginRight: "2px", color: "#94a3b8" }}>{stat.prefix}</span>}
+                                    <span className="count-metric" data-val={stat.val}>{stat.val.toLocaleString()}</span>
+                                    {stat.suffix && <span style={{ fontSize: "1.25rem", marginLeft: "2px", color: "#94a3b8" }}>{stat.suffix}</span>}
                                 </div>
-                                <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: 600, marginTop: "0.75rem" }}>{stat.sub}</div>
                             </div>
                         ))}
                     </div>
 
-                    <div className="dashboard-grid">
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(12, 1fr)", gap: "2.5rem" }}>
                         {/* Main Trend Chart */}
-                        <div className="glass-panel" style={{ gridColumn: "span 8", padding: "3rem", borderRadius: "32px", border: "1px solid var(--border-subtle)" }}>
+                        <div style={{
+                            gridColumn: "span 8",
+                            background: "#fff",
+                            padding: "2.5rem",
+                            borderRadius: "40px",
+                            border: "1px solid #f1f5f9",
+                            boxShadow: "0 4px 25px rgba(0,0,0,0.02)"
+                        }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
                                 <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
-                                    <div style={{ width: "56px", height: "56px", borderRadius: "18px", background: "var(--accent-soft)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent-primary)" }}>
+                                    <div style={{ width: "52px", height: "52px", borderRadius: "16px", background: "#eff6ff", display: "flex", alignItems: "center", justifyContent: "center", color: "#2563eb" }}>
                                         <TrendingUp size={28} />
                                     </div>
                                     <div>
-                                        <h3 style={{ fontSize: "1.5rem", fontWeight: 900, letterSpacing: "-0.02em" }}>Engagement Velocity</h3>
-                                        <p style={{ fontSize: "0.95rem", color: "var(--text-secondary)" }}>RSVP conversion rates over the last 7 days</p>
+                                        <h3 style={{ fontSize: "1.5rem", fontWeight: 800, color: "#0f172a", margin: 0 }}>Engagement Velocity</h3>
+                                        <p style={{ fontSize: "0.95rem", color: "#64748b", fontWeight: 500, margin: "0.25rem 0 0" }}>Daily RSVP conversions</p>
                                     </div>
-                                </div>
-                                <div style={{ display: 'flex', gap: '8px' }}>
-                                    <span className="category-badge" style={{ background: 'var(--accent-primary)', color: 'white', border: 'none' }}>Daily</span>
-                                    <span className="category-badge" style={{ background: 'var(--bg-elevated)', color: 'var(--text-muted)' }}>Weekly</span>
                                 </div>
                             </div>
 
-                            <div className="chart-container" style={{ height: "280px", display: "flex", alignItems: "flex-end", gap: "1.5rem", paddingBottom: "2rem" }}>
+                            <div style={{ height: "280px", display: "flex", alignItems: "flex-end", gap: "1.25rem", paddingBottom: "1.5rem" }}>
                                 {stats.rsvpTrend.map((val, i) => (
-                                    <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-                                        <div className="chart-bar" style={{
+                                    <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+                                        <div style={{
                                             width: "100%",
-                                            maxWidth: "40px",
+                                            maxWidth: "36px",
                                             height: `${Math.max(val, 5)}%`,
-                                            background: `linear-gradient(to top, var(--accent-primary), var(--accent-soft))`,
-                                            borderRadius: "12px",
-                                            position: "relative",
-                                            transition: "height 1s cubic-bezier(0.22, 1, 0.36, 1)"
-                                        }}>
-                                            <div className="bar-tooltip" style={{
-                                                position: 'absolute',
-                                                top: '-45px',
-                                                left: '50%',
-                                                transform: 'translateX(-50%)',
-                                                fontSize: '0.8rem',
-                                                fontWeight: 900,
-                                                color: 'white',
-                                                background: 'var(--accent-primary)',
-                                                padding: '6px 12px',
-                                                borderRadius: '8px',
-                                                opacity: 0,
-                                                pointerEvents: "none",
-                                                transition: 'all 0.3s ease',
-                                                whiteSpace: "nowrap",
-                                                boxShadow: "0 10px 20px -5px rgba(var(--accent-primary-rgb), 0.4)"
-                                            }}>
-                                                {val.toFixed(0)}% Conversion
-                                            </div>
-                                        </div>
-                                        <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: "uppercase", letterSpacing: "0.05em" }}>Day {i + 1}</span>
+                                            background: i === 6 ? "#2563eb" : "#f1f5f9",
+                                            borderRadius: "10px",
+                                            transition: "all 0.3s ease",
+                                            cursor: "pointer"
+                                        }} className="chart-bar-v2" />
+                                        <span style={{ fontSize: '11px', fontWeight: 800, color: "#94a3b8", textTransform: "uppercase" }}>D{i + 1}</span>
                                     </div>
                                 ))}
                             </div>
                         </div>
 
-                        {/* Donut Chart / Channels */}
-                        <div className="glass-panel" style={{ gridColumn: "span 4", padding: "3rem", borderRadius: "32px", display: 'flex', flexDirection: 'column', border: "1px solid var(--border-subtle)" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "1.25rem", marginBottom: "2.5rem" }}>
-                                <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "rgba(245, 158, 11, 0.08)", display: "flex", alignItems: "center", justifyContent: "center", color: "#f59e0b" }}>
-                                    <PieChart size={24} strokeWidth={2.5} />
+                        {/* Acquisition Breakdown */}
+                        <div style={{
+                            gridColumn: "span 4",
+                            background: "#fff",
+                            padding: "2.5rem",
+                            borderRadius: "40px",
+                            border: "1px solid #f1f5f9",
+                            boxShadow: "0 4px 25px rgba(0,0,0,0.02)"
+                        }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "1.25rem", marginBottom: "3rem" }}>
+                                <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "#fffbeb", display: "flex", alignItems: "center", justifyContent: "center", color: "#f59e0b" }}>
+                                    <PieChart size={24} />
                                 </div>
-                                <h3 style={{ fontSize: "1.5rem", fontWeight: 900, letterSpacing: "-0.02em" }}>Acquisition</h3>
+                                <h3 style={{ fontSize: "1.5rem", fontWeight: 800, color: "#0f172a", margin: 0 }}>Category Mix</h3>
                             </div>
 
-                            <div style={{ position: 'relative', width: '200px', height: '200px', margin: '0 auto 3rem' }}>
-                                <svg width="200" height="200" viewBox="0 0 100 100">
-                                    <circle cx="50" cy="50" r="42" fill="transparent" stroke="var(--bg-elevated)" strokeWidth="12" />
-                                    <circle cx="50" cy="50" r="42" fill="transparent"
-                                        stroke="var(--accent-primary)"
+                            <div style={{ position: 'relative', width: '160px', height: '160px', margin: '0 auto 3rem' }}>
+                                <svg width="160" height="160" viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="42" fill="none" stroke="#f1f5f9" strokeWidth="12" />
+                                    <circle
+                                        cx="50"
+                                        cy="50"
+                                        r="42"
+                                        fill="none"
+                                        stroke="#2563eb"
                                         strokeWidth="12"
+                                        strokeLinecap="round"
                                         strokeDasharray="263.89"
                                         strokeDashoffset={263.89 * (1 - stats.checkInRate / 100)}
-                                        style={{ transform: 'rotate(-90deg)', transformOrigin: 'center', transition: 'stroke-dashoffset 1.5s cubic-bezier(0.22, 1, 0.36, 1)', strokeLinecap: "round" }}
+                                        style={{ transform: 'rotate(-90deg)', transformOrigin: 'center', transition: 'stroke-dashoffset 1s ease' }}
                                     />
                                 </svg>
                                 <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                    <div style={{ fontSize: '2.5rem', fontWeight: 950, letterSpacing: "-0.05em" }}>{stats.checkInRate}%</div>
-                                    <div style={{ fontSize: '0.7rem', fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Conversion</div>
+                                    <div style={{ fontSize: '2rem', fontWeight: 800, color: "#0f172a" }}>{stats.checkInRate}%</div>
+                                    <div style={{ fontSize: '10px', fontWeight: 800, color: "#94a3b8", textTransform: "uppercase" }}>Confirmed</div>
                                 </div>
                             </div>
 
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                                 {stats.channels.map(ch => (
                                     <div key={ch.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                            <div style={{ width: '12px', height: '12px', borderRadius: '4px', background: ch.color, boxShadow: `0 0 10px ${ch.color}44` }}></div>
-                                            <span style={{ fontSize: '0.95rem', fontWeight: 750, color: "var(--text-secondary)" }}>{ch.name}</span>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                            <div style={{ width: '10px', height: '10px', borderRadius: '3px', background: ch.color }}></div>
+                                            <span style={{ fontSize: '14px', fontWeight: 600, color: "#475569" }}>{ch.name}</span>
                                         </div>
-                                        <span style={{ fontSize: '1rem', fontWeight: 900, color: "var(--text-primary)" }}>{ch.value}%</span>
+                                        <span style={{ fontSize: '14px', fontWeight: 800, color: "#0f172a" }}>{ch.value}%</span>
                                     </div>
                                 ))}
                             </div>
                         </div>
 
-                        {/* Insight Section */}
-                        <div className="glass-panel hover-lift" style={{
+                        {/* Strategy Matrix Section */}
+                        <div style={{
                             gridColumn: "span 12",
-                            padding: "3rem",
-                            borderRadius: "32px",
-                            background: 'linear-gradient(90deg, var(--bg-card) 0%, var(--bg-elevated) 100%)',
-                            border: "1.5px solid var(--border-subtle)",
-                            marginTop: "1rem"
+                            padding: "2.5rem",
+                            background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+                            borderRadius: "40px",
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: "2.5rem",
+                            color: "#fff",
+                            boxShadow: "0 20px 40px rgba(0,0,0,0.1)"
                         }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem' }}>
-                                <div style={{ width: "80px", height: "80px", background: "var(--accent-primary)", borderRadius: "24px", display: "flex", alignItems: "center", justifyContent: "center", color: "white", flexShrink: 0, boxShadow: "0 15px 30px -10px rgba(var(--accent-primary-rgb), 0.4)" }}>
-                                    <Brain size={40} strokeWidth={2} />
-                                </div>
-                                <div style={{ flex: 1 }}>
-                                    <div style={{ display: "flex", alignItems: "center", gap: "1.25rem", marginBottom: "0.75rem" }}>
-                                        <h4 style={{ fontSize: '1.5rem', fontWeight: 950, color: "var(--text-primary)", letterSpacing: "-0.02em" }}>Neural Strategy Matrix</h4>
-                                        <span className="category-badge" style={{ background: "rgba(16, 185, 129, 0.1)", color: "var(--accent-success)", fontSize: "0.7rem", fontWeight: 800 }}>V6.2 STABLE</span>
-                                    </div>
-                                    <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: 1.6, fontWeight: 500 }}>
-                                        Based on current {stats.visits} registered guests, increasing social media output by <span style={{ color: 'var(--accent-primary)', fontWeight: 900 }}>15.4%</span> could drive <span style={{ color: 'var(--accent-success)', fontWeight: 900 }}>~28% higher</span> commitment rates for your upcoming events.
-                                        <span style={{ marginLeft: '2rem', color: 'var(--accent-primary)', cursor: 'pointer', fontWeight: 900, display: "inline-flex", alignItems: "center", gap: "0.6rem", borderBottom: "2px solid currentColor" }}>
-                                            Execute Analysis <ArrowRight size={18} />
-                                        </span>
-                                    </p>
-                                </div>
+                            <div style={{
+                                width: "80px",
+                                height: "80px",
+                                background: "rgba(37, 99, 235, 0.2)",
+                                borderRadius: "24px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                color: "#3b82f6",
+                                flexShrink: 0,
+                                border: "1px solid rgba(59, 130, 246, 0.2)"
+                            }}>
+                                <Brain size={40} />
                             </div>
+                            <div style={{ flex: 1 }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "0.75rem" }}>
+                                    <h4 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0 }}>Neural Strategy Matrix</h4>
+                                    <span style={{ background: "#10b981", color: "#fff", fontSize: "10px", fontWeight: 800, padding: "4px 8px", borderRadius: "100px", textTransform: "uppercase" }}>V6.2 Stable</span>
+                                </div>
+                                <p style={{ color: '#94a3b8', fontSize: '1.1rem', lineHeight: 1.6, fontWeight: 500, margin: 0 }}>
+                                    Based on current {stats.visits} registered guests, increasing engagement by <span style={{ color: '#3b82f6', fontWeight: 800 }}>15.4%</span> could drive <span style={{ color: '#10b981', fontWeight: 800 }}>~28% higher</span> commitment rates for your upcoming events.
+                                </p>
+                            </div>
+                            <button style={{
+                                background: "#fff",
+                                color: "#0f172a",
+                                padding: "1rem 1.5rem",
+                                borderRadius: "14px",
+                                border: "none",
+                                fontWeight: 800,
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "0.75rem",
+                                cursor: "pointer"
+                            }}>
+                                View Analysis <ArrowRight size={18} />
+                            </button>
                         </div>
                     </div>
                 </>
             )}
+
+            <style>{`
+                @keyframes pulse {
+                    0% { transform: scale(1); opacity: 1; }
+                    50% { transform: scale(1.1); opacity: 0.7; }
+                    100% { transform: scale(1); opacity: 1; }
+                }
+                .chart-bar-v2:hover {
+                    background: #2563eb !important;
+                    transform: scaleX(1.1);
+                }
+            `}</style>
         </div>
     );
 }

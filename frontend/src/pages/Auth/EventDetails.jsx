@@ -166,181 +166,349 @@ export default function EventDetails() {
     if (!event) return null;
 
     return (
-        <div className="stagger-in" style={{ paddingBottom: "5rem" }}>
+        <div style={{
+            fontFamily: "'Outfit', 'Inter', system-ui, sans-serif",
+            padding: "2.5rem",
+            background: "#fcfdff",
+            minHeight: "100vh",
+            color: "#0f172a"
+        }}>
             {/* Header Area */}
-            <div className="stagger-detail" style={{ display: "flex", alignItems: "center", gap: "2rem", marginBottom: "3rem" }}>
-                <button onClick={() => navigate("/events")} className="btn-icon" style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)", width: "48px", height: "48px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <ChevronLeft size={24} strokeWidth={3} />
+            <div className="stagger-detail" style={{ display: "flex", alignItems: "center", gap: "2.5rem", marginBottom: "3.5rem" }}>
+                <button
+                    onClick={() => navigate("/events")}
+                    style={{
+                        background: "#fff",
+                        border: "1px solid #f1f5f9",
+                        width: "56px",
+                        height: "56px",
+                        borderRadius: "18px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                        boxShadow: "0 4px 15px rgba(0,0,0,0.03)",
+                        transition: "all 0.2s ease"
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.transform = "translateX(-3px)"}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = "translateX(0)"}
+                >
+                    <ChevronLeft size={24} color="#64748b" strokeWidth={2.5} />
                 </button>
                 <div style={{ flex: 1 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
-                        <h1 style={{ fontSize: "2.5rem", fontWeight: 900, letterSpacing: "-0.03em" }}>{event.name}</h1>
-                        <span className="category-badge" style={{ background: "var(--accent-soft)", color: "var(--accent-primary)", fontSize: "0.8rem", padding: "0.5rem 1rem" }}>{event.type}</span>
+                        <h1 style={{ fontSize: "2.75rem", fontWeight: 800, letterSpacing: "-0.04em", margin: 0 }}>{event.name}</h1>
+                        <span style={{
+                            background: "#eff6ff",
+                            color: "#2563eb",
+                            fontSize: "12px",
+                            fontWeight: 800,
+                            padding: "6px 14px",
+                            borderRadius: "100px",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.05em"
+                        }}>{event.type}</span>
                     </div>
-                    <p style={{ color: "var(--text-secondary)", fontSize: "1.1rem", marginTop: "0.5rem" }}>Predictive logistical intelligence active.</p>
+                    <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", marginTop: "0.75rem", color: "#64748b", fontWeight: 500 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            <Calendar size={16} />
+                            {new Date(event.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                        </div>
+                        <span style={{ width: "4px", height: "4px", background: "#cbd5e1", borderRadius: "50%" }}></span>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            <MapPin size={16} />
+                            {event.location}
+                        </div>
+                    </div>
                 </div>
                 <div style={{ display: "flex", gap: "1rem" }}>
-                    <button onClick={() => setShowEditModal(true)} className="btn btn-ghost" style={{ borderRadius: "14px", fontWeight: 800, display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                        <Settings size={18} /> Adjust Config
+                    <button
+                        onClick={() => setShowEditModal(true)}
+                        style={{
+                            borderRadius: "14px",
+                            padding: "1rem 1.5rem",
+                            border: "1px solid #e2e8f0",
+                            background: "#fff",
+                            color: "#0f172a",
+                            fontWeight: 800,
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.75rem",
+                            cursor: "pointer",
+                            fontSize: "14px",
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.02)"
+                        }}>
+                        <Settings size={18} color="#64748b" /> Adjust Config
                     </button>
-                    <button onClick={handleDelete} className="btn" style={{ borderRadius: "14px", fontWeight: 800, color: "var(--accent-danger)", border: "1px solid rgba(239,68,68,0.2)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <button
+                        onClick={handleDelete}
+                        style={{
+                            borderRadius: "14px",
+                            padding: "1rem 1.5rem",
+                            background: "#fff1f2",
+                            border: "1px solid #fee2e2",
+                            color: "#be123c",
+                            fontWeight: 800,
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.75rem",
+                            cursor: "pointer",
+                            fontSize: "14px"
+                        }}>
                         <Trash2 size={18} /> Terminate
                     </button>
                 </div>
             </div>
 
-            {/* AI Risk Vectoring */}
-            {risks.length > 0 && (
-                <div className="stagger-detail" style={{ marginBottom: "3rem" }}>
-                    {risks.map((risk, idx) => (
-                        <div key={idx} className="glass-panel" style={{
-                            padding: "1.5rem 2rem",
-                            background: risk.type === "CRITICAL" ? "rgba(239, 68, 68, 0.05)" : "rgba(245, 158, 11, 0.05)",
-                            borderLeft: `6px solid ${risk.type === "CRITICAL" ? "var(--accent-danger)" : "var(--accent-warning)"}`,
-                            borderRadius: "20px",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "1.5rem",
-                            marginBottom: "1rem"
-                        }}>
-                            <div style={{ color: risk.type === "CRITICAL" ? "var(--accent-danger)" : "var(--accent-warning)" }}>
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>
+            <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1.2fr", gap: "2.5rem" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
+                    {/* Operational Pulse Diagnostic */}
+                    <div style={{
+                        background: "#fff",
+                        padding: "3rem",
+                        borderRadius: "32px",
+                        border: "1px solid #f1f5f9",
+                        boxShadow: "0 10px 40px rgba(0,0,0,0.02)"
+                    }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "3.5rem" }}>
+                            <div>
+                                <h2 style={{ fontSize: "1.75rem", fontWeight: 800, letterSpacing: "-0.02em", margin: "0 0 0.5rem" }}>Operational Pulse</h2>
+                                <p style={{ color: "#64748b", margin: 0, fontWeight: 500 }}>Live diagnostic benchmark for your {event.type.toLowerCase()} event.</p>
                             </div>
-                            <div style={{ flex: 1 }}>
-                                <h4 style={{ fontSize: "1.05rem", fontWeight: 900, color: "var(--text-primary)" }}>{risk.category}: {risk.message}</h4>
-                                <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", marginTop: "0.25rem" }}>Operational suggestion: {risk.suggestion}</p>
-                            </div>
+                            {healthData && (
+                                <div style={{
+                                    background: `${getHealthColor(healthData.score)}15`,
+                                    color: getHealthColor(healthData.score),
+                                    fontSize: "11px",
+                                    fontWeight: 900,
+                                    padding: "8px 16px",
+                                    borderRadius: "100px",
+                                    textTransform: "uppercase",
+                                    letterSpacing: "0.1em",
+                                    border: `1px solid ${getHealthColor(healthData.score)}25`
+                                }}>
+                                    {healthData.score >= 80 ? "Mission Ready" : healthData.score >= 50 ? "Stable Context" : "Critical Divergence"}
+                                </div>
+                            )}
                         </div>
-                    ))}
-                </div>
-            )}
 
-            <div className="dashboard-grid stagger-detail">
-                {/* Visual Health Diagnostic */}
-                <div className="glass-panel" style={{ gridColumn: "span 8", padding: "3rem", borderRadius: "32px" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "3rem" }}>
-                        <div>
-                            <h2 style={{ fontSize: "1.5rem", fontWeight: 900, letterSpacing: "-0.02em" }}>Operational Pulse</h2>
-                            <p style={{ color: "var(--text-secondary)", fontSize: "1rem" }}>Diagnostic integrity based on {event.type} heuristics.</p>
-                        </div>
-                        {healthData && (
-                            <div className="category-badge" style={{
-                                background: `${getHealthColor(healthData.score)}20`,
-                                color: getHealthColor(healthData.score),
-                                fontSize: "0.9rem",
-                                fontWeight: 900,
-                                padding: "0.6rem 1.25rem"
-                            }}>
-                                {healthData.score >= 80 ? "Mission Ready" : healthData.score >= 50 ? "Stable Context" : "Critical Divergence"}
+                        <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1.8fr", gap: "3.5rem", alignItems: "center" }}>
+                            <div style={{ display: "flex", justifyContent: "center", position: "relative" }}>
+                                <svg width="240" height="240" viewBox="0 0 100 100">
+                                    <defs>
+                                        <linearGradient id="healthGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stopColor={getHealthColor(healthData?.score || 0)} />
+                                            <stop offset="100%" stopColor={getHealthColor(healthData?.score || 0)} stopOpacity="0.8" />
+                                        </linearGradient>
+                                    </defs>
+                                    <circle cx="50" cy="50" r="44" fill="none" stroke="#f8fafc" strokeWidth="10" />
+                                    <circle
+                                        className="health-ring-path"
+                                        cx="50" cy="50" r="44"
+                                        fill="none"
+                                        stroke="url(#healthGradient)"
+                                        strokeWidth="10"
+                                        strokeDasharray="276.46"
+                                        strokeDashoffset={276.46 * (1 - (healthData?.score || 0) / 100)}
+                                        strokeLinecap="round"
+                                        transform="rotate(-90 50 50)"
+                                        style={{ transition: "stroke-dashoffset 2s cubic-bezier(0.2, 1, 0.3, 1)" }}
+                                    />
+                                    <text x="50" y="52" textAnchor="middle" style={{ fontSize: "22px", fontWeight: 800, fill: "#0f172a", fontFamily: "Outfit" }}>
+                                        {healthData?.score || 0}<tspan style={{ fontSize: "11px", opacity: 0.5 }}>%</tspan>
+                                    </text>
+                                    <text x="50" y="65" textAnchor="middle" style={{ fontSize: "6px", fontWeight: 800, fill: "#94a3b8", textTransform: "uppercase", letterSpacing: "1px" }}>
+                                        Score
+                                    </text>
+                                </svg>
+                                <div style={{
+                                    position: "absolute",
+                                    bottom: "-10px",
+                                    background: "#fff",
+                                    padding: "6px 14px",
+                                    borderRadius: "100px",
+                                    boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                                    border: "1px solid #f1f5f9",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "6px"
+                                }}>
+                                    <div style={{ width: "6px", height: "6px", background: getHealthColor(healthData?.score || 0), borderRadius: "50%", animation: "pulse 2s infinite" }}></div>
+                                    <span style={{ fontSize: "10px", fontWeight: 800, color: "#1e293b" }}>LIVE AI ENGINE</span>
+                                </div>
                             </div>
-                        )}
+                            <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
+                                {healthData && [
+                                    { label: "Logistics", value: healthData.metrics.taskCompletion, color: "#2563eb", icon: <LayoutList size={18} /> },
+                                    { label: "Stability", value: Math.max(0, 100 - (healthData.metrics.budgetUsage > 100 ? (healthData.metrics.budgetUsage - 100) : 0)), color: "#10b981", icon: <DollarSign size={18} /> },
+                                    { label: "Synergy", value: healthData.metrics.vendorConfirmation, color: "#7e22ce", icon: <Handshake size={18} /> },
+                                    { label: "Velocity", value: healthData.metrics.rsvpRate, color: "#f59e0b", icon: <Zap size={18} /> },
+                                ].map(item => (
+                                    <div key={item.label}>
+                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "13px", fontWeight: 700, marginBottom: "0.75rem" }}>
+                                            <span style={{ color: "#64748b", display: "flex", alignItems: "center", gap: "10px" }}>
+                                                <span style={{ color: item.color, background: `${item.color}15`, width: "32px", height: "32px", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center" }}>{item.icon}</span>
+                                                {item.label}
+                                            </span>
+                                            <span style={{ color: "#0f172a" }}>{item.value}%</span>
+                                        </div>
+                                        <div style={{ height: "6px", background: "#f1f5f9", borderRadius: "100px" }}>
+                                            <div style={{ width: `${item.value}%`, background: item.color, height: "100%", borderRadius: "100px", transition: "width 1.5s ease-out" }}></div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
 
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", alignItems: "center" }}>
-                        <div style={{ display: "flex", justifyContent: "center", position: "relative" }}>
-                            <svg width="220" height="220" viewBox="0 0 100 100">
-                                <circle cx="50" cy="50" r="45" fill="none" stroke="var(--bg-elevated)" strokeWidth="8" />
-                                <circle
-                                    className="health-ring-path"
-                                    cx="50" cy="50" r="45"
-                                    fill="none"
-                                    stroke={getHealthColor(healthData?.score || 0)}
-                                    strokeWidth="8"
-                                    strokeDasharray="282.7"
-                                    strokeDashoffset={282.7 * (1 - (healthData?.score || 0) / 100)}
-                                    strokeLinecap="round"
-                                    transform="rotate(-90 50 50)"
-                                />
-                                <text x="50" y="52" textAnchor="middle" style={{ fontSize: "20px", fontWeight: 900, fill: "var(--text-primary)" }}>
-                                    {healthData?.score || 0}
-                                </text>
-                                <text x="50" y="65" textAnchor="middle" style={{ fontSize: "6px", fontWeight: 800, fill: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "1px" }}>
-                                    Health
-                                </text>
-                            </svg>
-                        </div>
-                        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-                            {healthData && [
-                                { label: "Logistics Tracking", value: healthData.metrics.taskCompletion, icon: <LayoutList size={20} /> },
-                                { label: "Financial Stability", value: Math.max(0, 100 - (healthData.metrics.budgetUsage > 100 ? (healthData.metrics.budgetUsage - 100) : 0)), icon: <DollarSign size={20} /> },
-                                { label: "Provider Synergy", value: healthData.metrics.vendorConfirmation, icon: <Handshake size={20} /> },
-                                { label: "Interaction Velocity", value: healthData.metrics.rsvpRate, icon: <Zap size={20} /> },
-                            ].map(item => (
-                                <div key={item.label}>
-                                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.9rem", fontWeight: 800, marginBottom: "0.75rem" }}>
-                                        <span style={{ color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                                            <span style={{ opacity: 0.8, color: "var(--accent-primary)" }}>{item.icon}</span> {item.label}
-                                        </span>
-                                        <span style={{ color: "var(--text-primary)" }}>{item.value}%</span>
+                    {/* AI Risk Analysis */}
+                    {risks.length > 0 && (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                            {risks.map((risk, idx) => (
+                                <div key={idx} style={{
+                                    padding: "2rem",
+                                    background: risk.type === "CRITICAL" ? "#fff1f2" : "#fffbeb",
+                                    border: `1px solid ${risk.type === "CRITICAL" ? "#fee2e2" : "#fef3c7"}`,
+                                    borderRadius: "24px",
+                                    display: "flex",
+                                    alignItems: "flex-start",
+                                    gap: "1.25rem",
+                                    boxShadow: "0 4px 12px rgba(0,0,0,0.02)"
+                                }}>
+                                    <div style={{
+                                        width: "44px",
+                                        height: "44px",
+                                        borderRadius: "14px",
+                                        background: risk.type === "CRITICAL" ? "#be123c" : "#d97706",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        flexShrink: 0
+                                    }}>
+                                        <AlertTriangle size={20} color="#fff" />
                                     </div>
-                                    <div className="progress-bar" style={{ height: "10px", background: "var(--bg-elevated)", borderRadius: "100px" }}>
-                                        <div className="progress-fill" style={{ width: `${item.value}%`, background: getHealthColor(item.value), height: "100%", borderRadius: "100px" }}></div>
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
+                                            <h4 style={{ fontSize: "16px", fontWeight: 800, color: risk.type === "CRITICAL" ? "#9f1239" : "#92400e", margin: 0 }}>{risk.category} Risk Identified</h4>
+                                            <span style={{
+                                                fontSize: "10px",
+                                                fontWeight: 900,
+                                                color: risk.type === "CRITICAL" ? "#be123c" : "#d97706",
+                                                background: risk.type === "CRITICAL" ? "#be123c10" : "#d9770610",
+                                                padding: "4px 8px",
+                                                borderRadius: "6px",
+                                                textTransform: "uppercase"
+                                            }}>{risk.type}</span>
+                                        </div>
+                                        <p style={{ fontSize: "14px", color: risk.type === "CRITICAL" ? "#be123c" : "#92400e", margin: "0 0 1rem", fontWeight: 600 }}>{risk.message}</p>
+                                        <div style={{
+                                            background: "rgba(255,255,255,0.4)",
+                                            padding: "1rem",
+                                            borderRadius: "16px",
+                                            fontSize: "13px",
+                                            color: "#1e293b",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: "10px"
+                                        }}>
+                                            <Target size={14} color="#64748b" />
+                                            <span><strong>Smart Vector:</strong> {risk.suggestion}</span>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
                         </div>
-                    </div>
+                    )}
                 </div>
 
-                {/* Event Parametrics */}
-                <div className="glass-panel" style={{ gridColumn: "span 4", padding: "2.5rem", borderRadius: "32px", display: "flex", flexDirection: "column" }}>
-                    <h3 style={{ fontSize: "1.25rem", fontWeight: 900, marginBottom: "2rem", letterSpacing: "-0.01em" }}>Parametric Data</h3>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "2rem", flex: 1 }}>
-                        <div style={{ padding: "1.5rem", background: "var(--bg-elevated)", borderRadius: "20px" }}>
-                            <label style={{ fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Operational Date</label>
-                            <div style={{ marginTop: "0.5rem", fontWeight: 800, color: "var(--text-primary)", fontSize: "1.15rem" }}>
-                                {new Date(event.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
+                    {/* Financial Summary */}
+                    <div style={{
+                        background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
+                        padding: "2.5rem",
+                        borderRadius: "32px",
+                        color: "#fff",
+                        boxShadow: "0 20px 40px rgba(15, 23, 42, 0.15)",
+                        position: "relative",
+                        overflow: "hidden"
+                    }}>
+                        <div style={{ position: "absolute", top: "-20px", right: "-20px", width: "120px", height: "120px", background: "rgba(255,255,255,0.03)", borderRadius: "50%" }}></div>
+                        <h3 style={{ fontSize: "14px", color: "rgba(255,255,255,0.5)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "2rem" }}>Budget Allocation</h3>
+                        <div style={{ marginBottom: "2.5rem" }}>
+                            <div style={{ fontSize: "42px", fontWeight: 800, letterSpacing: "-0.04em", marginBottom: "0.5rem" }}>₹{parseInt(event.budget).toLocaleString()}</div>
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "rgba(255,255,255,0.4)", fontSize: "12px", fontWeight: 500 }}>
+                                <TrendingUp size={14} /> Recommended allocation for {event.type.toLowerCase()} niche.
                             </div>
                         </div>
-                        <div style={{ padding: "1.5rem", background: "var(--bg-elevated)", borderRadius: "20px" }}>
-                            <label style={{ fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Coordinates</label>
-                            <div style={{ marginTop: "0.5rem", fontWeight: 800, color: "var(--text-primary)", fontSize: "1.15rem" }}>{event.location}</div>
-                        </div>
-                        <div style={{ padding: "2rem", background: "var(--accent-soft)", borderRadius: "24px", border: "1.5px solid var(--border-accent)" }}>
-                            <label style={{ fontSize: "0.7rem", fontWeight: 900, color: "var(--accent-primary)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Target Budget Allocation</label>
-                            <div style={{ marginTop: "0.75rem", fontWeight: 950, color: "var(--accent-primary)", fontSize: "2.25rem", letterSpacing: "-0.04em" }}>₹{parseInt(event.budget).toLocaleString()}</div>
-                        </div>
+                        <button
+                            onClick={() => navigate("/vendors")}
+                            style={{
+                                width: "100%",
+                                background: "rgba(255,255,255,0.1)",
+                                border: "1px solid rgba(255,255,255,0.1)",
+                                padding: "1.1rem",
+                                borderRadius: "18px",
+                                color: "#fff",
+                                fontWeight: 800,
+                                cursor: "pointer",
+                                backdropFilter: "blur(10px)",
+                                transition: "all 0.2s ease"
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.15)"}
+                            onMouseLeave={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.1)"}
+                        >Explore Vendor Matrix ➔</button>
                     </div>
-                    <button onClick={() => navigate("/vendors")} className="btn btn-primary" style={{ width: "100%", marginTop: "2.5rem", borderRadius: "16px", padding: "1.1rem", fontWeight: 900 }}>Financial Controller ➔</button>
-                </div>
 
-                {/* Analytical Mini-Summary */}
-                <div className="glass-panel" style={{ gridColumn: "span 12", padding: "2rem", borderRadius: "24px", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "2rem" }}>
-                    {[
-                        { label: "Overdue Vectors", value: healthData?.metrics.overdueTasks || 0, color: "var(--accent-danger)", icon: <AlertCircle size={22} /> },
-                        { label: "Attendee Velocity", value: `${healthData?.metrics.rsvpRate || 0}%`, color: "var(--accent-primary)", icon: <TrendingUp size={22} /> },
-                        { label: "Synergy Readiness", value: `${healthData?.metrics.vendorConfirmation || 0}%`, color: "var(--accent-success)", icon: <Activity size={22} /> },
-                        { label: "Current State", value: event.status, color: "var(--accent-primary)", icon: <Target size={22} /> }
-                    ].map(st => (
-                        <div key={st.label} style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
-                            <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "var(--bg-elevated)", display: "flex", alignItems: "center", justifyContent: "center", color: st.color }}>{st.icon}</div>
-                            <div>
-                                <div style={{ fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase" }}>{st.label}</div>
-                                <div style={{ fontSize: "1.25rem", fontWeight: 900, color: st.color }}>{st.value}</div>
+                    {/* Operational Vectors Tracking */}
+                    <div style={{
+                        background: "#fff",
+                        padding: "2.5rem",
+                        borderRadius: "32px",
+                        border: "1px solid #f1f5f9",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "1.5rem"
+                    }}>
+                        <h3 style={{ fontSize: "15px", fontWeight: 800, color: "#0f172a", marginBottom: "0.5rem" }}>Analytical Vectors</h3>
+                        {[
+                            { label: "Critical Delays", value: healthData?.metrics.overdueTasks || 0, color: "#ef4444", icon: <AlertCircle size={18} />, bg: "#fef2f2" },
+                            { label: "Guest RSVP Velocity", value: `${healthData?.metrics.rsvpRate || 0}%`, color: "#2563eb", icon: <TrendingUp size={18} />, bg: "#eff6ff" },
+                            { label: "Provider Synergy", value: `${healthData?.metrics.vendorConfirmation || 0}%`, color: "#10b981", icon: <Handshake size={18} />, bg: "#f0fdf4" },
+                            { label: "Deployment State", value: event.status, color: "#6366f1", icon: <Target size={18} />, bg: "#f5f3ff" }
+                        ].map(st => (
+                            <div key={st.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "1.25rem", background: "#f8fafc", borderRadius: "18px" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                                    <div style={{ width: "40px", height: "40px", borderRadius: "12px", background: "#fff", border: "1px solid #f1f5f9", display: "flex", alignItems: "center", justifyContent: "center", color: st.color, boxShadow: "0 2px 6px rgba(0,0,0,0.02)" }}>{st.icon}</div>
+                                    <span style={{ fontSize: "13px", fontWeight: 700, color: "#475569" }}>{st.label}</span>
+                                </div>
+                                <span style={{ fontSize: "14px", fontWeight: 800, color: st.color }}>{st.value}</span>
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
             </div>
 
             {/* Config Adjustment Modal */}
             {showEditModal && (
-                <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(12px)" }}>
-                    <div className="glass-panel" style={{ width: "100%", maxWidth: "550px", padding: "3rem", borderRadius: "32px" }}>
-                        <h2 style={{ fontSize: "1.75rem", fontWeight: 900, marginBottom: "2.5rem", letterSpacing: "-0.03em" }}>Adjust System Context</h2>
+                <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2000, backdropFilter: "blur(8px)" }}>
+                    <div style={{ background: "#fff", width: "100%", maxWidth: "550px", padding: "3rem", borderRadius: "32px", boxShadow: "0 25px 60px rgba(0,0,0,0.2)", animation: "modalIn 0.3s ease-out" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2.5rem" }}>
+                            <h2 style={{ fontSize: "1.75rem", fontWeight: 800, margin: 0, letterSpacing: "-0.03em" }}>Adjust Context</h2>
+                            <button onClick={() => setShowEditModal(false)} style={{ border: "none", background: "#f1f5f9", width: "32px", height: "32px", borderRadius: "50%", cursor: "pointer" }}>×</button>
+                        </div>
                         <form onSubmit={handleUpdate} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
                             <div>
-                                <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.6rem", textTransform: "uppercase" }}>Project Identity</label>
-                                <input className="auth-input" value={editData.name} onChange={e => setEditData({ ...editData, name: e.target.value })} required style={{ borderRadius: "14px" }} />
+                                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#64748b", marginBottom: "8px", textTransform: "uppercase" }}>Event Identity</label>
+                                <input style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "15px", fontWeight: 600 }} value={editData.name} onChange={e => setEditData({ ...editData, name: e.target.value })} required />
                             </div>
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
                                 <div>
-                                    <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.6rem", textTransform: "uppercase" }}>Target Date</label>
-                                    <input type="date" className="auth-input" value={editData.date} onChange={e => setEditData({ ...editData, date: e.target.value })} required style={{ borderRadius: "14px" }} />
+                                    <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#64748b", marginBottom: "8px", textTransform: "uppercase" }}>Target Date</label>
+                                    <input type="date" style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "15px", fontWeight: 600 }} value={editData.date} onChange={e => setEditData({ ...editData, date: e.target.value })} required />
                                 </div>
                                 <div>
-                                    <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.6rem", textTransform: "uppercase" }}>Logic Type</label>
-                                    <select className="auth-input" value={editData.type} onChange={e => setEditData({ ...editData, type: e.target.value })} style={{ borderRadius: "14px", fontWeight: 700 }}>
+                                    <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#64748b", marginBottom: "8px", textTransform: "uppercase" }}>Logic Type</label>
+                                    <select style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "15px", fontWeight: 700 }} value={editData.type} onChange={e => setEditData({ ...editData, type: e.target.value })}>
                                         <option>Wedding</option>
                                         <option>Conference</option>
                                         <option>College Fest</option>
@@ -351,16 +519,16 @@ export default function EventDetails() {
                                 </div>
                             </div>
                             <div>
-                                <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.6rem", textTransform: "uppercase" }}>Coordinates</label>
-                                <input className="auth-input" value={editData.location} onChange={e => setEditData({ ...editData, location: e.target.value })} required style={{ borderRadius: "14px" }} />
+                                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#64748b", marginBottom: "8px", textTransform: "uppercase" }}>Geographical Coordinates</label>
+                                <input style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "15px", fontWeight: 600 }} value={editData.location} onChange={e => setEditData({ ...editData, location: e.target.value })} required />
                             </div>
                             <div>
-                                <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 800, color: "var(--text-muted)", marginBottom: "0.6rem", textTransform: "uppercase" }}>Budget Allocation (₹)</label>
-                                <input type="number" className="auth-input" value={editData.budget} onChange={e => setEditData({ ...editData, budget: e.target.value })} required style={{ borderRadius: "14px" }} />
+                                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#64748b", marginBottom: "8px", textTransform: "uppercase" }}>Budget Allocation (₹)</label>
+                                <input type="number" style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "16px", fontWeight: 800 }} value={editData.budget} onChange={e => setEditData({ ...editData, budget: e.target.value })} required />
                             </div>
-                            <div style={{ display: "flex", gap: "1.25rem", marginTop: "1.5rem" }}>
-                                <button type="button" onClick={() => setShowEditModal(false)} className="btn btn-ghost" style={{ flex: 1, borderRadius: "14px" }}>Abort</button>
-                                <button type="submit" className="btn btn-primary" style={{ flex: 2, borderRadius: "14px", fontWeight: 900 }} disabled={updateLoading}>
+                            <div style={{ display: "flex", gap: "1.25rem", marginTop: "1rem" }}>
+                                <button type="button" onClick={() => setShowEditModal(false)} style={{ flex: 1, padding: "1.1rem", borderRadius: "14px", border: "none", background: "#f1f5f9", fontWeight: 800, cursor: "pointer" }}>Abort</button>
+                                <button type="submit" style={{ flex: 2, padding: "1.1rem", borderRadius: "14px", border: "none", background: "#2563eb", color: "#fff", fontWeight: 900, cursor: "pointer", boxShadow: "0 8px 20px rgba(37, 99, 235, 0.2)" }} disabled={updateLoading}>
                                     {updateLoading ? "Synchronizing..." : "Apply Transformations"}
                                 </button>
                             </div>
@@ -370,6 +538,18 @@ export default function EventDetails() {
             )}
 
             <AiAssistant eventId={eventId} />
+
+            <style>{`
+                @keyframes pulse {
+                    0% { transform: scale(0.95); opacity: 0.8; }
+                    50% { transform: scale(1.1); opacity: 1; }
+                    100% { transform: scale(0.95); opacity: 0.8; }
+                }
+                @keyframes modalIn {
+                    from { transform: translateY(40px); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+            `}</style>
         </div>
     );
 }
