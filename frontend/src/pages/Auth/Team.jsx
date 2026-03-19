@@ -1,153 +1,285 @@
+import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
-import { UserPlus, UserCircle, Briefcase, Share2, Crown, Activity } from "lucide-react";
+import { Plus, User, Mail, Shield, Check, ChevronRight, LayoutGrid, Users2, MoreHorizontal, Trash2, Edit2, X } from "lucide-react";
 
 export default function Team() {
     const { user } = useOutletContext();
-    const teammates = [
-        { name: user?.displayName || user?.email?.split('@')[0] || "Owner", role: "Event Lead", status: "Active", icon: <Crown size={20} /> }
-    ];
+    const [isInviting, setIsInviting] = useState(false);
+    const [editingIndex, setEditingIndex] = useState(null);
+    const [inviteData, setInviteData] = useState({ name: "", email: "", role: "Editor" });
+    const [editData, setEditData] = useState({ name: "", role: "" });
+
+    const [members, setMembers] = useState([
+        {
+            name: user?.displayName || "Workspace Owner",
+            email: user?.email || "owner@planora.os",
+            role: "Event Lead",
+            status: "Active",
+            permissions: "Full administrative control over workspace"
+        },
+        {
+            name: "Sarah Chen",
+            email: "sarah@nexus.com",
+            role: "Editor",
+            status: "Active",
+            permissions: "Can modify budget, vendor SLAs, and guest lists"
+        },
+        {
+            name: "Marcus Roe",
+            email: "marcus@vertex.io",
+            role: "Viewer",
+            status: "Active",
+            permissions: "Read-only access to financial and analytical logs"
+        }
+    ]);
+
+    const handleInvite = (e) => {
+        e.preventDefault();
+        setMembers([...members, {
+            name: inviteData.name,
+            email: inviteData.email,
+            role: inviteData.role,
+            status: "Active",
+            permissions: inviteData.role === "Editor" ? "Can modify core modules" : inviteData.role === "Event Lead" ? "Full administrative control" : "Read-only access"
+        }]);
+        setIsInviting(false);
+        setInviteData({ name: "", email: "", role: "Editor" });
+    };
+
+    const handleDelete = (index) => {
+        if (members[index].role === "Event Lead" && index === 0) {
+            alert("Cannot terminate the primary owner's session.");
+            return;
+        }
+        if (window.confirm("Permanently revoke workspace access for this collaborator?")) {
+            setMembers(members.filter((_, i) => i !== index));
+        }
+    };
+
+    const startEditing = (index) => {
+        setEditingIndex(index);
+        setEditData({ name: members[index].name, role: members[index].role });
+    };
+
+    const saveEdit = (index) => {
+        const updated = [...members];
+        updated[index] = {
+            ...updated[index],
+            name: editData.name,
+            role: editData.role,
+            permissions: editData.role === "Editor" ? "Can modify core modules" : editData.role === "Event Lead" ? "Full administrative control" : "Read-only access"
+        };
+        setMembers(updated);
+        setEditingIndex(null);
+    };
+
+    const getInitials = (name) => name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+
+    const getRoleColor = (role) => {
+        switch (role) {
+            case 'Event Lead': return { bg: '#eff6ff', text: '#2563eb', border: '#dbeafe' };
+            case 'Editor': return { bg: '#f0fdf4', text: '#16a34a', border: '#dcfce7' };
+            case 'Viewer': return { bg: '#f8fafc', text: '#64748b', border: '#f1f5f9' };
+            default: return { bg: '#f1f5f9', text: '#475569', border: '#e2e8f0' };
+        }
+    };
 
     return (
         <div style={{
             fontFamily: "'Outfit', 'Inter', system-ui, sans-serif",
-            padding: "2.5rem",
+            padding: "2rem",
             background: "#fcfdff",
             minHeight: "100vh",
             color: "#0f172a"
         }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "3.5rem" }}>
-                <div>
-                    <h1 style={{ fontSize: "2.75rem", fontWeight: 800, letterSpacing: "-0.04em", margin: "0 0 0.5rem" }}>
-                        Neural <span style={{ color: "#2563eb" }}>Hive</span>
-                    </h1>
-                    <p style={{ color: "#64748b", fontSize: "1.1rem", fontWeight: 500, margin: 0 }}>
-                        Orchestrate your planning collective and manage permission boundaries.
-                    </p>
-                </div>
+            <div style={{ marginBottom: "2.5rem" }}>
+                <h1 style={{ fontSize: "2rem", fontWeight: 850, letterSpacing: "-0.04em", margin: "0 0 0.25rem" }}>
+                    Neural <span style={{ color: "#2563eb" }}>Hive</span>
+                </h1>
+                <p style={{ color: "#64748b", fontSize: "0.95rem", fontWeight: 500, margin: 0 }}>
+                    Manage and synchronize your planning collective.
+                </p>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(12, 1fr)", gap: "2.5rem" }}>
-                <div style={{
-                    gridColumn: "span 8",
-                    background: "#fff",
-                    padding: "2.5rem",
-                    borderRadius: "40px",
-                    border: "1px solid #f1f5f9",
-                    boxShadow: "0 4px 25px rgba(0,0,0,0.02)"
-                }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2.5rem" }}>
-                        <h3 style={{ fontSize: "1.5rem", fontWeight: 800, color: "#0f172a", margin: 0 }}>Active Collaborators</h3>
-                        <span style={{
-                            background: "#eff6ff",
-                            color: "#2563eb",
-                            fontWeight: 800,
-                            fontSize: "12px",
-                            padding: "6px 14px",
-                            borderRadius: "100px",
-                            textTransform: "uppercase"
-                        }}>1 Member</span>
-                    </div>
+            <div style={{
+                background: "#fff",
+                borderRadius: "24px",
+                border: "1px solid #f1f5f9",
+                boxShadow: "0 4px 20px rgba(0,0,0,0.015)",
+                overflow: "hidden"
+            }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                    <thead>
+                        <tr style={{ background: "#f8fafc", borderBottom: "1px solid #f1f5f9" }}>
+                            <th style={{ padding: "1rem 1.5rem", textAlign: "left", fontSize: "11px", fontWeight: 850, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em" }}>Collaborator</th>
+                            <th style={{ padding: "1rem 1.5rem", textAlign: "left", fontSize: "11px", fontWeight: 850, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em" }}>Role</th>
+                            <th style={{ padding: "1rem 1.5rem", textAlign: "left", fontSize: "11px", fontWeight: 850, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em" }}>Access Logic</th>
+                            <th style={{ padding: "1rem 1.5rem", textAlign: "right", width: "100px" }}>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {members.map((member, i) => {
+                            const colors = getRoleColor(member.role);
+                            const isEditing = editingIndex === i;
 
-                    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                        {teammates.map((member, i) => (
-                            <div key={i} className="member-row" style={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                                padding: "1.25rem 1.75rem",
-                                background: "#f8fafc",
-                                borderRadius: "24px",
-                                border: "1px solid #f1f5f9",
-                                transition: "all 0.2s ease"
-                            }}>
-                                <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
-                                    <div style={{
-                                        width: "52px",
-                                        height: "52px",
-                                        borderRadius: "16px",
-                                        background: member.role === "Event Lead" ? "#fffbeb" : "#fff",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        color: member.role === "Event Lead" ? "#f59e0b" : "#2563eb",
-                                        border: "1px solid #f1f5f9",
-                                        boxShadow: "0 4px 10px rgba(0,0,0,0.03)"
-                                    }}>
-                                        {member.icon}
+                            return (
+                                <tr key={i} style={{ borderBottom: "1px solid #f8fafc", transition: "background 0.2s" }} className="member-row">
+                                    <td style={{ padding: "0.85rem 1.5rem" }}>
+                                        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                                            <div style={{
+                                                width: "32px",
+                                                height: "32px",
+                                                borderRadius: "50%",
+                                                background: colors.bg,
+                                                color: colors.text,
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                fontSize: "12px",
+                                                fontWeight: 800,
+                                                border: `1.5px solid ${colors.border}`
+                                            }}>
+                                                {getInitials(member.name)}
+                                            </div>
+                                            {isEditing ? (
+                                                <input
+                                                    style={{ padding: "0.4rem 0.8rem", borderRadius: "8px", border: "1.5px solid #2563eb", fontSize: "13px", fontWeight: 700, width: "180px" }}
+                                                    value={editData.name}
+                                                    onChange={e => setEditData({ ...editData, name: e.target.value })}
+                                                    autoFocus
+                                                />
+                                            ) : (
+                                                <div>
+                                                    <div style={{ fontSize: "14px", fontWeight: 750, color: "#1e293b", display: "flex", alignItems: "center", gap: "6px" }}>
+                                                        {member.name}
+                                                        <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#10b981" }} title="Active"></div>
+                                                    </div>
+                                                    <div style={{ fontSize: "12px", color: "#94a3b8", fontWeight: 500 }}>{member.email}</div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td style={{ padding: "0.85rem 1.5rem" }}>
+                                        {isEditing ? (
+                                            <select
+                                                style={{ padding: "0.4rem 0.8rem", borderRadius: "8px", border: "1.5px solid #2563eb", fontSize: "12px", fontWeight: 700 }}
+                                                value={editData.role}
+                                                onChange={e => setEditData({ ...editData, role: e.target.value })}
+                                            >
+                                                <option>Event Lead</option>
+                                                <option>Editor</option>
+                                                <option>Viewer</option>
+                                            </select>
+                                        ) : (
+                                            <span style={{
+                                                background: colors.bg,
+                                                color: colors.text,
+                                                padding: "3px 10px",
+                                                borderRadius: "8px",
+                                                fontSize: "10px",
+                                                fontWeight: 900,
+                                                border: `1px solid ${colors.border}`,
+                                                textTransform: "uppercase",
+                                                letterSpacing: "0.02em"
+                                            }}>
+                                                {member.role}
+                                            </span>
+                                        )}
+                                    </td>
+                                    <td style={{ padding: "0.85rem 1.5rem" }}>
+                                        <span style={{ fontSize: "12px", color: "#64748b", fontWeight: 550 }}>
+                                            {member.permissions}
+                                        </span>
+                                    </td>
+                                    <td style={{ padding: "0.85rem 1.5rem", textAlign: "right" }}>
+                                        <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem" }}>
+                                            {isEditing ? (
+                                                <>
+                                                    <button onClick={() => saveEdit(i)} style={{ background: "#2563eb", color: "#fff", border: "none", width: "30px", height: "30px", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}><Check size={16} /></button>
+                                                    <button onClick={() => setEditingIndex(null)} style={{ background: "#f1f5f9", color: "#64748b", border: "none", width: "30px", height: "30px", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}><X size={16} /></button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <button onClick={() => startEditing(i)} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", padding: "6px", borderRadius: "8px" }} className="action-btn"><Edit2 size={16} /></button>
+                                                    <button onClick={() => handleDelete(i)} style={{ background: "none", border: "none", color: "#f87171", cursor: "pointer", padding: "6px", borderRadius: "8px" }} className="action-btn-danger"><Trash2 size={16} /></button>
+                                                </>
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+                            );
+                        })}
+
+                        {/* Integrated Invite Section - Expanded for Name, Email, Role */}
+                        {!isInviting ? (
+                            <tr
+                                onClick={() => setIsInviting(true)}
+                                style={{ cursor: "pointer", borderTop: "1px dashed #e2e8f0" }}
+                                className="invite-trigger"
+                            >
+                                <td colSpan="4" style={{ padding: "1.1rem 1.5rem" }}>
+                                    <div style={{ display: "flex", alignItems: "center", gap: "1rem", color: "#94a3b8" }}>
+                                        <div style={{ width: "32px", height: "32px", borderRadius: "50%", border: "1.5px dashed #cbd5e1", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                            <Plus size={16} />
+                                        </div>
+                                        <span style={{ fontSize: "14px", fontWeight: 600 }}>Invite a collaborator...</span>
                                     </div>
-                                    <div>
-                                        <h4 style={{ fontWeight: 800, fontSize: "1.15rem", color: "#0f172a", margin: 0 }}>{member.name}</h4>
-                                        <p style={{ fontSize: "13px", color: "#64748b", fontWeight: 500, margin: "2px 0 0" }}>{member.role}</p>
-                                    </div>
-                                </div>
-                                <div style={{
-                                    background: "#f0fdf4",
-                                    color: "#10b981",
-                                    fontSize: "11px",
-                                    fontWeight: 800,
-                                    padding: "4px 10px",
-                                    borderRadius: "8px",
-                                    textTransform: "uppercase"
-                                }}>
-                                    {member.status}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                <div style={{
-                    gridColumn: "span 4",
-                    padding: "3rem",
-                    borderRadius: "40px",
-                    background: "linear-gradient(135deg, #2563eb 0%, #4f46e5 100%)",
-                    color: "white",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                    position: "relative",
-                    overflow: "hidden"
-                }}>
-                    <div style={{ position: "relative", zIndex: 1 }}>
-                        <div style={{ width: "64px", height: "64px", background: "rgba(255,255,255,0.15)", borderRadius: "20px", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "2.5rem", border: "1px solid rgba(255,255,255,0.2)" }}>
-                            <Share2 size={32} strokeWidth={2.5} />
-                        </div>
-                        <h3 style={{ fontSize: "1.75rem", fontWeight: 800, marginBottom: "1rem", lineHeight: 1.2 }}>Expand the Hive</h3>
-                        <p style={{ opacity: 0.8, marginBottom: "3rem", lineHeight: 1.6, fontWeight: 500, fontSize: "1.1rem" }}>
-                            Invite multi-disciplinary partners to synchronize on your event trajectory in real-time.
-                        </p>
-                    </div>
-                    <button style={{
-                        background: "white",
-                        color: "#2563eb",
-                        width: "100%",
-                        padding: "1.1rem",
-                        borderRadius: "18px",
-                        fontWeight: 800,
-                        border: "none",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "0.75rem",
-                        boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-                        zIndex: 1
-                    }}>
-                        <UserPlus size={20} />
-                        <span>Expand Team</span>
-                    </button>
-
-                    {/* Decorative blobs */}
-                    <div style={{ position: "absolute", top: "-20px", right: "-20px", width: "120px", height: "120px", background: "rgba(255,255,255,0.05)", borderRadius: "50%" }}></div>
-                </div>
+                                </td>
+                            </tr>
+                        ) : (
+                            <tr style={{ background: "#fcfdff", borderTop: "1px solid #e2e8f0" }}>
+                                <td colSpan="4" style={{ padding: "1.5rem" }}>
+                                    <form onSubmit={handleInvite} style={{ display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "center" }}>
+                                        <div style={{ position: "relative", minWidth: "150px" }}>
+                                            <User size={14} style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+                                            <input
+                                                autoFocus
+                                                required
+                                                placeholder="Full Name"
+                                                value={inviteData.name}
+                                                onChange={e => setInviteData({ ...inviteData, name: e.target.value })}
+                                                style={{ width: "100%", padding: "0.6rem 1rem 0.6rem 2.5rem", borderRadius: "10px", border: "1.5px solid #e2e8f0", fontSize: "13px", fontWeight: 600, outline: "none" }}
+                                            />
+                                        </div>
+                                        <div style={{ position: "relative", flex: 1, minWidth: "180px" }}>
+                                            <Mail size={14} style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+                                            <input
+                                                required
+                                                type="email"
+                                                placeholder="Email Address"
+                                                value={inviteData.email}
+                                                onChange={e => setInviteData({ ...inviteData, email: e.target.value })}
+                                                style={{ width: "100%", padding: "0.6rem 1rem 0.6rem 2.5rem", borderRadius: "10px", border: "1.5px solid #e2e8f0", fontSize: "13px", fontWeight: 600, outline: "none" }}
+                                            />
+                                        </div>
+                                        <select
+                                            value={inviteData.role}
+                                            onChange={e => setInviteData({ ...inviteData, role: e.target.value })}
+                                            style={{ padding: "0.6rem 1rem", borderRadius: "10px", border: "1.5px solid #e2e8f0", fontSize: "13px", fontWeight: 700, background: "#fff", cursor: "pointer" }}
+                                        >
+                                            <option>Editor</option>
+                                            <option>Viewer</option>
+                                            <option>Event Lead</option>
+                                        </select>
+                                        <div style={{ display: "flex", gap: "0.5rem" }}>
+                                            <button type="button" onClick={() => setIsInviting(false)} style={{ padding: "0.6rem 1.25rem", borderRadius: "10px", border: '1px solid #e2e8f0', background: "#fff", fontSize: "13px", fontWeight: 750, cursor: "pointer" }}>Cancel</button>
+                                            <button type="submit" style={{ padding: "0.6rem 1.25rem", borderRadius: "10px", border: "none", background: "#2563eb", color: "#fff", fontSize: "13px", fontWeight: 850, cursor: "pointer", boxShadow: "0 4px 10px rgba(37, 99, 235, 0.2)" }}>Invite Member</button>
+                                        </div>
+                                    </form>
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
             </div>
 
             <style>{`
-                .member-row:hover {
-                    background: #fff !important;
-                    transform: translateX(8px);
-                    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-                }
+                .member-row:hover { background: #fafafc !important; }
+                .action-btn:hover { background: #f1f5f9 !important; }
+                .action-btn-danger:hover { background: #fef2f2 !important; }
+                .invite-trigger:hover { background: #fcfdff !important; }
+                .invite-trigger:hover span { color: #2563eb !important; }
+                .invite-trigger:hover div { border-color: #2563eb !important; color: #2563eb !important; }
             `}</style>
         </div>
     );

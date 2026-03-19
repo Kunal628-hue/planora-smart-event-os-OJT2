@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import { animate, stagger } from "animejs";
-import { Plus, Calendar, MapPin, ChevronRight, Loader2, X, Sparkles } from "lucide-react";
+import { Plus, Calendar, MapPin, ChevronRight, Loader2, X, Sparkles, LayoutGrid, Package, Wallet } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -115,39 +115,66 @@ export default function Events() {
         }
     };
 
+    const inputStyle = {
+        width: "100%",
+        padding: "0.65rem 0.85rem 0.65rem 2.5rem",
+        background: "#f8fafc",
+        border: "1px solid #e2e8f0",
+        borderRadius: "12px",
+        fontSize: "0.85rem",
+        fontWeight: "650",
+        color: "#0f172a",
+        transition: "all 0.2s ease",
+        outline: "none"
+    };
+
+    const labelStyle = {
+        display: "block",
+        fontSize: "10px",
+        fontWeight: "850",
+        color: "#94a3b8",
+        marginBottom: "0.4rem",
+        textTransform: "uppercase",
+        letterSpacing: "0.06em"
+    };
+
     return (
-        <div style={{ fontFamily: "'Inter', system-ui, sans-serif", padding: "1rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2.5rem" }}>
+        <div style={{ fontFamily: "'Inter', system-ui, sans-serif", padding: "1.5rem" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "3rem" }}>
                 <div>
-                    <h1 style={{ fontSize: "1.75rem", fontWeight: 800, color: "#0f172a", marginBottom: "0.25rem", letterSpacing: "-0.02em" }}>Event Portfolio</h1>
-                    <p style={{ color: "#64748b", fontSize: "0.9rem" }}>Manage and track your operational event streams.</p>
+                    <h1 style={{ fontSize: "2rem", fontWeight: 850, color: "#0f172a", marginBottom: "0.25rem", letterSpacing: "-0.03em" }}>Event Portfolio</h1>
+                    <p style={{ color: "#64748b", fontSize: "1rem", fontWeight: 500 }}>Manage and coordinate your high-impact operational streams.</p>
                 </div>
                 <button
                     onClick={() => setShowModal(true)}
                     className="btn btn-primary"
-                    style={{ borderRadius: "8px", padding: "0.75rem 1.5rem", fontWeight: 700, fontSize: "14px", boxShadow: "0 4px 12px rgba(37, 99, 235, 0.2)" }}
+                    style={{ borderRadius: "14px", padding: "0.85rem 1.75rem", fontWeight: 800, fontSize: "14px", boxShadow: "0 8px 20px rgba(37, 99, 235, 0.2)" }}
                 >
+                    <Plus size={18} strokeWidth={3} />
                     Initialize Event
                 </button>
             </div>
 
             <div className="portfolio-grid" style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-                gap: "1.25rem"
+                gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
+                gap: "1.5rem"
             }}>
                 {fetchLoading ? (
-                    <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "5rem" }}>
-                        <Loader2 className="animate-spin" size={32} color="#2563eb" style={{ margin: "0 auto" }} />
+                    <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "8rem" }}>
+                        <Loader2 className="animate-spin" size={40} color="#2563eb" style={{ margin: "0 auto" }} />
                     </div>
                 ) : events.length === 0 ? (
-                    <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "5rem", background: "#fff", border: "1px dashed #e2e8f0", borderRadius: "12px" }}>
-                        <p style={{ color: "#64748b" }}>Your portfolio is empty. Initialize your first event to get started.</p>
+                    <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "6rem", background: "#fff", border: "2px dashed #e2e8f0", borderRadius: "32px" }}>
+                        <div style={{ width: "64px", height: "64px", background: "#f8fafc", borderRadius: "20px", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1.5rem", color: "#94a3b8" }}>
+                            <Package size={32} />
+                        </div>
+                        <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "#0f172a", marginBottom: "0.5rem" }}>Portfolio Empty</h2>
+                        <p style={{ color: "#64748b", fontWeight: 500 }}>Initialize your first planning stream to activate management tools.</p>
                     </div>
                 ) : (
                     events.map(event => {
                         const statusColor = getStatusColor(event.status);
-                        // Mocking utilization for UI beauty (spent/total)
                         const spent = Math.floor(Math.random() * (event.budget * 0.8));
                         const remaining = event.budget - spent;
                         const utilization = (spent / event.budget) * 100;
@@ -155,56 +182,50 @@ export default function Events() {
                         return (
                             <div
                                 key={event.id || event._id}
+                                className="event-card"
                                 onClick={() => navigate(`/events/${event.id || event._id}`)}
                                 style={{
                                     background: "#fff",
-                                    height: "170px",
-                                    maxHeight: "180px",
-                                    borderLeft: `4px solid ${statusColor}`,
-                                    borderRadius: "8px",
-                                    padding: "16px",
-                                    boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+                                    borderRadius: "24px",
+                                    padding: "1.5rem",
+                                    boxShadow: "0 4px 20px rgba(0,0,0,0.02)",
+                                    border: "1px solid #f1f5f9",
                                     cursor: "pointer",
+                                    transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
                                     display: "flex",
                                     flexDirection: "column",
-                                    justifyContent: "space-between",
-                                    transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                                    position: "relative",
-                                    overflow: "hidden"
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.transform = "translateY(-2px)";
-                                    e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.05)";
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.transform = "translateY(0)";
-                                    e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.08)";
+                                    gap: "1.5rem"
                                 }}
                             >
-                                <div>
-                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px" }}>
-                                        <h3 style={{ fontSize: "16px", fontWeight: 700, margin: 0, color: "#0f172a", letterSpacing: "-0.01em" }}>{event.name}</h3>
-                                        <div style={{ fontSize: "10px", fontWeight: 800, color: statusColor, textTransform: "uppercase", letterSpacing: "0.05em" }}>{event.status}</div>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                                    <div>
+                                        <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "#0f172a", margin: "0 0 0.5rem", letterSpacing: "-0.01em" }}>{event.name}</h3>
+                                        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", color: "#94a3b8", fontSize: "12px", fontWeight: 600 }}>
+                                            <div style={{ display: "flex", alignItems: "center", gap: "4px" }}><Calendar size={13} /> {event.date}</div>
+                                            <div style={{ display: "flex", alignItems: "center", gap: "4px" }}><MapPin size={13} /> {event.location}</div>
+                                        </div>
                                     </div>
-                                    <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "#64748b", fontSize: "12px", fontWeight: 500 }}>
-                                        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                                            <Calendar size={12} />
-                                            {event.date}
-                                        </div>
-                                        <span style={{ color: "#e2e8f0" }}>|</span>
-                                        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                                            <MapPin size={12} />
-                                            {event.location}
-                                        </div>
+                                    <div style={{
+                                        padding: "4px 10px",
+                                        borderRadius: "8px",
+                                        background: `${statusColor}10`,
+                                        color: statusColor,
+                                        fontSize: "10px",
+                                        fontWeight: 900,
+                                        textTransform: "uppercase",
+                                        letterSpacing: "0.05em",
+                                        border: `1px solid ${statusColor}20`
+                                    }}>
+                                        {event.status}
                                     </div>
                                 </div>
 
-                                <div style={{ borderTop: "1px solid #f8fafc", paddingTop: "12px" }}>
-                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "6px" }}>
-                                        <div style={{ fontSize: "10px", color: "#94a3b8", fontWeight: 700, textTransform: "uppercase" }}>Utilisation</div>
-                                        <div style={{ fontSize: "11px", color: "#1e293b", fontWeight: 700 }}>₹{remaining.toLocaleString()} remaining</div>
+                                <div style={{ background: "#f8fafc", padding: "1rem", borderRadius: "16px" }}>
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
+                                        <div style={{ fontSize: "10px", fontWeight: 800, color: "#64748b", textTransform: "uppercase" }}>Capital Utilization</div>
+                                        <div style={{ fontSize: "12px", fontWeight: 800, color: "#0f172a" }}>₹{remaining.toLocaleString()} left</div>
                                     </div>
-                                    <div style={{ height: "6px", background: "#f1f5f9", borderRadius: "10px", overflow: "hidden" }}>
+                                    <div style={{ height: "6px", background: "#e2e8f0", borderRadius: "10px", overflow: "hidden" }}>
                                         <div style={{
                                             width: `${utilization}%`,
                                             height: "100%",
@@ -220,125 +241,152 @@ export default function Events() {
                 )}
             </div>
 
+            {/* Redesigned Modal - Compressed Scale */}
             {showModal && (
-                <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(12px)" }}>
-                    <div className="glass-panel-dark modal-reveal" style={{ width: "100%", maxWidth: "550px", padding: "3rem", borderRadius: "32px" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "3rem" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
-                                <div style={{ width: "52px", height: "52px", borderRadius: "16px", background: "var(--accent-soft)", color: "var(--accent-primary)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                    <Plus size={28} strokeWidth={3} />
-                                </div>
-                                <div>
-                                    <h2 style={{ fontSize: "1.75rem", fontWeight: 950, letterSpacing: "-0.04em", margin: 0, color: "#fff" }}>Initialize Context</h2>
-                                    <p style={{ color: "var(--text-muted)", fontSize: "0.9rem", fontWeight: 600, margin: 0, marginTop: "0.25rem" }}>Establish a new operational event stream.</p>
-                                </div>
+                <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(4px)" }}>
+                    <div className="modal-reveal" style={{
+                        width: "100%",
+                        maxWidth: "400px",
+                        background: "#ffffff",
+                        padding: "1.75rem",
+                        borderRadius: "24px",
+                        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.2)",
+                        position: "relative"
+                    }}>
+                        <button
+                            onClick={() => setShowModal(false)}
+                            style={{
+                                position: "absolute",
+                                top: "1.25rem",
+                                right: "1.25rem",
+                                background: "#f8fafc",
+                                color: "#94a3b8",
+                                width: "28px",
+                                height: "28px",
+                                borderRadius: "8px",
+                                cursor: "pointer",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                transition: "all 0.2s"
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.color = "#475569"}
+                            onMouseLeave={e => e.currentTarget.style.color = "#94a3b8"}
+                        >
+                            <X size={16} strokeWidth={2.5} />
+                        </button>
+
+                        <div style={{ marginBottom: "1.75rem" }}>
+                            <div style={{ width: "40px", height: "40px", borderRadius: "12px", background: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1rem" }}>
+                                <Sparkles size={20} strokeWidth={2.5} />
                             </div>
-                            <button onClick={() => setShowModal(false)} className="hover-lift" style={{ background: "var(--bg-elevated)", border: "1.5px solid var(--border-subtle)", color: "var(--text-primary)", width: "36px", height: "36px", borderRadius: "12px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                <X size={18} strokeWidth={3} />
-                            </button>
+                            <h2 style={{ fontSize: "1.45rem", fontWeight: 850, letterSpacing: "-0.03em", margin: "0 0 0.15rem", color: "#0f172a" }}>Initialize Context</h2>
+                            <p style={{ color: "#64748b", fontSize: "0.85rem", fontWeight: 550, margin: 0 }}>Define operational parameters for the new stream.</p>
                         </div>
-                        <form onSubmit={handleCreateEvent} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+
+                        <form onSubmit={handleCreateEvent} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                             <div>
-                                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Event Title</label>
+                                <label style={labelStyle}>Project Title</label>
                                 <div style={{ position: "relative" }}>
-                                    <Sparkles size={18} style={{ position: "absolute", left: "1.25rem", top: "50%", transform: "translateY(-50%)", color: "var(--accent-primary)", opacity: 0.8 }} />
+                                    <LayoutGrid size={15} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
                                     <input
-                                        className="auth-input"
-                                        placeholder="e.g. Neo-Tech Conference 2026"
+                                        required
+                                        placeholder="Global Tech Summit 2026"
                                         value={newEvent.name}
                                         onChange={e => setNewEvent({ ...newEvent, name: e.target.value })}
-                                        required
-                                        style={{ borderRadius: "14px", padding: "1.1rem 1.1rem 1.1rem 3.25rem", fontWeight: 600, fontSize: "1rem" }}
+                                        style={inputStyle}
                                     />
                                 </div>
                             </div>
-                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                                 <div>
-                                    <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Operational Date</label>
+                                    <label style={labelStyle}>Date</label>
                                     <div style={{ position: "relative" }}>
-                                        <Calendar size={18} style={{ position: "absolute", left: "1.25rem", top: "50%", transform: "translateY(-50%)", color: "var(--accent-primary)", opacity: 0.8, pointerEvents: "none" }} />
+                                        <Calendar size={15} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
                                         <input
+                                            required
                                             type="date"
-                                            className="auth-input"
                                             value={newEvent.date}
                                             onChange={e => setNewEvent({ ...newEvent, date: e.target.value })}
-                                            required
-                                            style={{ borderRadius: "14px", padding: "1.1rem 1.1rem 1.1rem 3.25rem", fontWeight: 750, fontSize: "1rem" }}
+                                            style={inputStyle}
                                         />
                                     </div>
                                 </div>
                                 <div>
-                                    <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Context Type</label>
+                                    <label style={labelStyle}>Category</label>
                                     <select
-                                        className="auth-input"
                                         value={newEvent.type}
                                         onChange={e => setNewEvent({ ...newEvent, type: e.target.value })}
-                                        style={{ borderRadius: "14px", padding: "1.1rem", fontWeight: 750, fontSize: "1rem" }}
+                                        style={{ ...inputStyle, paddingLeft: "0.85rem" }}
                                     >
                                         <option>Wedding</option>
                                         <option>Conference</option>
-                                        <option>College Fest</option>
-                                        <option>Birthday</option>
                                         <option>Corporate</option>
                                         <option>Other</option>
                                     </select>
                                 </div>
                             </div>
+
                             <div>
-                                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Geographical Location</label>
+                                <label style={labelStyle}>Geographical Location</label>
                                 <div style={{ position: "relative" }}>
-                                    <MapPin size={18} style={{ position: "absolute", left: "1.25rem", top: "50%", transform: "translateY(-50%)", color: "var(--accent-primary)", opacity: 0.8 }} />
+                                    <MapPin size={15} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
                                     <input
-                                        className="auth-input"
-                                        placeholder="e.g. Jio World Convention Centre"
+                                        required
+                                        placeholder="Venue or coordinate..."
                                         value={newEvent.location}
                                         onChange={e => setNewEvent({ ...newEvent, location: e.target.value })}
-                                        required
-                                        style={{ borderRadius: "14px", padding: "1.1rem 1.1rem 1.1rem 3.25rem", fontWeight: 600, fontSize: "1rem" }}
+                                        style={inputStyle}
                                     />
                                 </div>
                             </div>
+
                             <div>
-                                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Project Budget Allocation (₹)</label>
+                                <label style={labelStyle}>Budget (₹)</label>
                                 <div style={{ position: "relative" }}>
-                                    <span style={{ position: "absolute", left: "1.25rem", top: "50%", transform: "translateY(-50%)", color: "var(--accent-primary)", fontWeight: 900, opacity: 0.8 }}>₹</span>
+                                    <Wallet size={15} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
                                     <input
+                                        required
                                         type="number"
-                                        className="auth-input"
-                                        placeholder="e.g. 500000"
+                                        placeholder="0.00"
                                         value={newEvent.budget}
                                         onChange={e => setNewEvent({ ...newEvent, budget: e.target.value })}
-                                        required
-                                        style={{ borderRadius: "14px", padding: "1.1rem 1.1rem 1.1rem 2.8rem", fontWeight: 850, fontSize: "1.1rem" }}
+                                        style={{ ...inputStyle, paddingLeft: "2.5rem" }}
                                     />
                                 </div>
                             </div>
+
                             <button
                                 type="submit"
-                                className="btn btn-primary"
                                 disabled={loading}
                                 style={{
                                     width: "100%",
-                                    padding: "1.25rem",
+                                    padding: "0.85rem",
                                     marginTop: "1rem",
-                                    borderRadius: "16px",
-                                    fontWeight: 900,
-                                    letterSpacing: "0.02em",
+                                    borderRadius: "12px",
+                                    background: "#2563eb",
+                                    color: "#fff",
+                                    fontWeight: 850,
+                                    fontSize: "0.9rem",
+                                    border: "none",
+                                    cursor: "pointer",
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
-                                    gap: "0.75rem"
+                                    gap: "0.6rem",
+                                    boxShadow: "0 10px 20px rgba(37, 99, 235, 0.15)",
+                                    transition: "all 0.2s"
                                 }}
+                                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.background = "#1d4ed8"; }}
+                                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.background = "#2563eb"; }}
                             >
                                 {loading ? (
-                                    <>
-                                        <div style={{ width: "22px", height: "22px", border: "3px solid #fff", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }}></div>
-                                        Processing Matrix...
-                                    </>
+                                    <Loader2 className="animate-spin" size={18} />
                                 ) : (
                                     <>
                                         Initialize Project
-                                        <ChevronRight size={20} />
+                                        <ChevronRight size={16} strokeWidth={3} />
                                     </>
                                 )}
                             </button>
