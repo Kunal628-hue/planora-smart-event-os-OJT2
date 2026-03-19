@@ -20,6 +20,7 @@ import {
     Cpu,
     User,
     ChevronRight,
+    ChevronDown,
     Sparkles
 } from "lucide-react";
 import DashboardBackground from "./DashboardBackground";
@@ -124,7 +125,7 @@ export default function DashboardLayout() {
     return (
         <div className="dashboard-layout">
             <aside className="dashboard-sidebar">
-                <div style={{ padding: "1.5rem 1.5rem 2.5rem" }}>
+                <div style={{ padding: "1.5rem 1rem 1.5rem" }}>
                     <Link to="/dashboard" style={{ display: "block" }}>
                         <img
                             src="/logo-new.svg"
@@ -138,19 +139,69 @@ export default function DashboardLayout() {
                     </Link>
                 </div>
 
-                <nav style={{ flex: 1, padding: "0 1rem", overflowY: "auto" }}>
+                {/* Project Selector - Functional Specification */}
+                <div style={{ padding: "0 1rem 1.5rem" }}>
+                    <div style={{
+                        background: "rgba(255, 255, 255, 0.03)",
+                        border: "1px solid rgba(255, 255, 255, 0.1)",
+                        borderRadius: "12px",
+                        padding: "0.5rem 0.75rem",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        position: "relative"
+                    }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>Active Project</div>
+                            <select
+                                value={selectedEventId}
+                                onChange={(e) => handleEventChange(e.target.value)}
+                                style={{
+                                    background: "none",
+                                    border: "none",
+                                    fontSize: "12px",
+                                    color: "#fff",
+                                    fontWeight: 700,
+                                    width: "100%",
+                                    cursor: "pointer",
+                                    outline: "none",
+                                    appearance: "none",
+                                    paddingRight: "1.5rem",
+                                    textOverflow: "ellipsis"
+                                }}
+                            >
+                                {events.length === 0 ? (
+                                    <option value="">No events</option>
+                                ) : (
+                                    events.map(event => (
+                                        <option key={event.id || event._id} value={event.id || event._id} style={{ background: "#1a1a2e", color: "#fff" }}>
+                                            {event.name}
+                                        </option>
+                                    ))
+                                )}
+                            </select>
+                            <ChevronDown
+                                size={12}
+                                color="rgba(255,255,255,0.4)"
+                                style={{ position: "absolute", right: "12px", bottom: "10px", pointerEvents: "none" }}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <nav style={{ flex: 1, padding: "0 0.75rem", overflowY: "auto" }}>
                     {NAV_ITEMS.map((item) => (
                         <Link
                             key={item.id}
                             to={item.path}
                             className={`sidebar-item${location.pathname === item.path ? " active" : ""}`}
                             style={{
-                                marginBottom: "0.5rem",
-                                padding: "0.85rem 1.25rem",
-                                borderRadius: "12px",
+                                marginBottom: "2px",
+                                padding: "0.6rem 0.85rem",
+                                borderRadius: "10px",
                                 display: "flex",
                                 alignItems: "center",
-                                gap: "1rem",
+                                gap: "0.75rem",
                                 textDecoration: "none",
                                 transition: "all 0.2s ease"
                             }}
@@ -159,15 +210,17 @@ export default function DashboardLayout() {
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                opacity: location.pathname === item.path ? 1 : 0.6,
-                                color: "inherit"
+                                opacity: location.pathname === item.path ? 1 : 0.5,
+                                color: "inherit",
+                                transform: "scale(0.85)"
                             }}>
                                 {item.icon}
                             </span>
                             <span style={{
-                                fontSize: "0.95rem",
+                                fontSize: "0.85rem",
                                 fontWeight: location.pathname === item.path ? 700 : 500,
-                                color: "inherit"
+                                color: "inherit",
+                                letterSpacing: "-0.2px"
                             }}>
                                 {item.label}
                             </span>
@@ -175,101 +228,64 @@ export default function DashboardLayout() {
                     ))}
                 </nav>
 
-                <div style={{ padding: "1.5rem", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-                    <button
+                <div style={{
+                    padding: "1rem",
+                    marginTop: "auto",
+                    borderTop: "1px solid rgba(255,255,255,0.05)",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px"
+                }}>
+                    <div style={{
+                        width: "36px",
+                        height: "36px",
+                        borderRadius: "50%",
+                        background: "linear-gradient(135deg, #6C5CE7 0%, #E84393 100%)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "#fff",
+                        fontWeight: 700,
+                        fontSize: "13px"
+                    }}>{user?.displayName?.split(' ').map(n => n[0]).join('') || "U"}</div>
+                    <div
                         onClick={handleLogout}
-                        className="sidebar-item"
-                        style={{
-                            width: "100%",
-                            padding: "0.85rem 1.25rem",
-                            color: "rgba(255, 77, 77, 0.9)",
-                            background: "rgba(255, 77, 77, 0.08)",
-                            border: "1px solid rgba(255, 77, 77, 0.15)",
-                            borderRadius: "12px",
-                            cursor: "pointer",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "1rem",
-                            fontWeight: 700,
-                            transition: "all 0.2s ease"
-                        }}
+                        style={{ flex: 1, overflow: "hidden", cursor: "pointer" }}
+                        className="logout-trigger"
                     >
-                        <LogOut size={18} />
-                        <span>Sign Out</span>
-                    </button>
+                        <div style={{ fontSize: "12px", fontWeight: 700, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{user?.displayName || "User"}</div>
+                        <div style={{ fontSize: "9px", fontWeight: 800, color: "#E84393", textTransform: "uppercase", display: "flex", alignItems: "center", gap: "4px" }}>
+                            <LogOut size={10} /> Sign Out
+                        </div>
+                    </div>
                 </div>
             </aside>
 
-            <main className="dashboard-main" style={{ position: "relative" }}>
-                <DashboardBackground />
+            <main className="dashboard-main" style={{ position: "relative", background: "#fcfdff" }}>
                 <header className="top-bar" style={{
-                    height: "85px",
-                    padding: "0 2.5rem",
+                    height: "58px",
+                    padding: "0 2rem",
                     position: "sticky",
                     top: 0,
                     zIndex: 100,
-                    backdropFilter: "blur(20px)",
-                    background: "rgba(255, 255, 255, 0.85)",
-                    borderBottom: "1px solid var(--border-subtle)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between"
                 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "2rem", flex: 1 }}>
-                        {/* Global Event Selector */}
-                        <div style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "1rem",
-                            background: "var(--bg-elevated)",
-                            padding: "0.5rem 1rem",
-                            borderRadius: "16px",
-                            border: "1px solid var(--border-subtle)",
-                            minWidth: "280px"
-                        }}>
-                            <Calendar size={18} color="var(--accent-primary)" strokeWidth={2.5} />
-                            <div style={{ flex: 1 }}>
-                                <div style={{ fontSize: "0.65rem", fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "2px" }}>Active Project</div>
-                                <select
-                                    value={selectedEventId}
-                                    onChange={(e) => handleEventChange(e.target.value)}
-                                    style={{
-                                        background: "none",
-                                        border: "none",
-                                        fontSize: "0.95rem",
-                                        fontWeight: 850,
-                                        color: "var(--text-primary)",
-                                        width: "100%",
-                                        cursor: "pointer",
-                                        outline: "none"
-                                    }}
-                                >
-                                    {events.length === 0 ? (
-                                        <option value="">No events found</option>
-                                    ) : (
-                                        events.map(event => (
-                                            <option key={event.id || event._id} value={event.id || event._id}>
-                                                {event.name}
-                                            </option>
-                                        ))
-                                    )}
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="search-input-wrapper" style={{ flex: 1, position: "relative", maxWidth: "400px" }}>
-                            <Search style={{ position: "absolute", left: "1.25rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", opacity: 0.5 }} size={16} />
+                    <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", flex: 1 }}>
+                        <div className="search-input-wrapper" style={{ flex: 1, position: "relative", maxWidth: "320px" }}>
+                            <Search style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: "#64748b" }} size={14} />
                             <input
                                 className="search-input"
                                 placeholder="Search workspace..."
                                 style={{
-                                    height: "44px",
-                                    border: "1px solid var(--border-subtle)",
-                                    borderRadius: "14px",
+                                    height: "36px",
+                                    border: "1px solid #e8e8f5",
+                                    borderRadius: "10px",
                                     width: "100%",
-                                    paddingLeft: "3rem",
-                                    background: "var(--bg-elevated)",
-                                    fontSize: "0.9rem",
+                                    paddingLeft: "2.5rem",
+                                    background: "#f7f7fe",
+                                    fontSize: "0.85rem",
                                     fontWeight: 500
                                 }}
                             />
@@ -283,21 +299,19 @@ export default function DashboardLayout() {
                                 style={{
                                     position: "relative",
                                     cursor: "pointer",
-                                    width: "44px",
-                                    height: "44px",
-                                    borderRadius: "12px",
-                                    transition: "all 0.2s",
-                                    border: "1.5px solid var(--border-subtle)",
-                                    background: showNotifications ? "var(--bg-elevated)" : "#fff",
+                                    width: "34px",
+                                    height: "34px",
+                                    borderRadius: "8px",
+                                    border: "1.5px solid #e8e8f5",
+                                    background: "#fff",
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
-                                    color: "var(--text-primary)"
+                                    color: "#64748b"
                                 }}
-                                className="hover-lift"
                             >
-                                <Bell size={20} />
-                                <span style={{ position: "absolute", top: "10px", right: "10px", width: "8px", height: "8px", background: "var(--accent-primary)", borderRadius: "50%", border: "2px solid #fff" }}></span>
+                                <Bell size={16} />
+                                <span style={{ position: "absolute", top: "2px", right: "2px", width: "6px", height: "6px", background: "#E84393", borderRadius: "50%", border: "1.5px solid #fff" }}></span>
                             </button>
 
                             {showNotifications && (
@@ -395,7 +409,7 @@ export default function DashboardLayout() {
                         </div>
                     </div>
                 </header>
-                <div className="dashboard-content" style={{ padding: "3rem" }}>
+                <div className="dashboard-content" style={{ padding: "40px" }}>
                     <Outlet context={{
                         user,
                         events,

@@ -2,6 +2,7 @@
    Planora — Global CSS
    Premium dark SaaS design system
    ───────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 /* ── Google Fonts via index.html preload ── */
@@ -57,36 +58,62 @@
 }
 
 .dashboard-sidebar {
-  background: linear-gradient(180deg, #0f172a 0%, #020617 100%) !important;
+  width: 220px !important;
+  background: #1a1a2e !important;
   color: #fff !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.03) !important;
-  box-shadow: 10px 0 40px rgba(0, 0, 0, 0.2) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+  box-shadow: 10px 0 40px rgba(0, 0, 0, 0.1) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-sidebar::before {
+  content: "";
+  position: absolute;
+  top: -100px;
+  left: -100px;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(108, 92, 231, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.dashboard-sidebar::after {
+  content: "";
+  position: absolute;
+  bottom: -100px;
+  right: -100px;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(232, 67, 147, 0.1) 0%, transparent 70%);
+  pointer-events: none;
 }
 
 .dashboard-sidebar .sidebar-item {
   color: rgba(255, 255, 255, 0.5) !important;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  margin-bottom: 0.25rem !important;
+  padding: 0.75rem 1rem !important;
+  transition: all 0.25s ease !important;
 }
 
 .dashboard-sidebar .sidebar-item:hover {
-  background: rgba(255, 255, 255, 0.08) !important;
-  color: #fff !important;
-  transform: translateX(4px);
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: rgba(255, 255, 255, 0.8) !important;
 }
 
 .dashboard-sidebar .sidebar-item.active {
-  background: rgba(37, 99, 235, 0.1) !important;
-  color: #3b82f6 !important;
+  background: linear-gradient(90deg, rgba(108, 92, 231, 0.25) 0%, rgba(232, 67, 147, 0.1) 100%) !important;
+  color: #fff !important;
   font-weight: 700 !important;
-  border-left: 4px solid #3b82f6 !important;
-  box-shadow: inset 0 0 12px rgba(37, 99, 235, 0.05) !important;
+  border-left: 3px solid #6c5ce7 !important;
+  box-shadow: none !important;
 }
 
 .top-bar {
-  background: rgba(255, 255, 255, 0.8) !important;
-  backdrop-filter: blur(20px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+  height: 58px !important;
+  background: #ffffff !important;
+  backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid #e8e8f5 !important;
 }
 
 .dark-theme .planora-nav.scrolled {
