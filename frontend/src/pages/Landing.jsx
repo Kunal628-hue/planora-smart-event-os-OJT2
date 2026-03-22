@@ -100,7 +100,7 @@ export default function Landing() {
                     backdropFilter: "blur(12px)",
                     WebkitBackdropFilter: "blur(12px)",
                 }}>
-                    <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 1.5rem" }}>
+                    <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 5rem" }}>
                         <div style={{
                             display: "grid",
                             gridTemplateColumns: "2fr 1fr 1fr 1fr",
@@ -115,7 +115,7 @@ export default function Landing() {
                                     </Link>
                                 </div>
                                 <p style={{ fontSize: "0.85rem", color: "rgba(148,163,184,0.55)", lineHeight: 1.72, maxWidth: 300 }}>
-                                    Planora is a next-generation Campus Event Operating System designed to modernize how student-led organizations plan, execute, and analyze events.
+                                    Planora is a next-generation Event Operating System designed to modernize how organizations plan, execute, and analyze events of all scales.
                                 </p>
                                 <div style={{ display: "flex", gap: "0.75rem", marginTop: "1.5rem" }}>
                                     {["T", "G", "L"].map((s) => (
@@ -168,7 +168,7 @@ export default function Landing() {
 
                         <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "1.5rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem" }}>
                             <p style={{ fontSize: "0.8rem", color: "rgba(148,163,184,0.3)" }}>
-                                © {new Date().getFullYear()} Planora Technologies. Built for student organizers everywhere.
+                                © {new Date().getFullYear()} Planora Technologies. Built for event organizers everywhere.
                             </p>
                             <div style={{ display: "flex", gap: "1.25rem", alignItems: "center" }}>
                                 <Link to="/login" style={{ fontSize: "0.8rem", color: "rgba(148,163,184,0.4)", transition: "color 0.2s", textDecoration: "none" }}
@@ -181,7 +181,7 @@ export default function Landing() {
                                     onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
                                     onMouseLeave={(e) => (e.currentTarget.style.color = "#c4b5fd")}
                                 >
-                                    Get Started Free
+                                    Get Started
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                         <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
                                     </svg>

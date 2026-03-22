@@ -3,7 +3,15 @@ import useReveal from "../../hooks/useReveal";
 
 const TRUST_ITEMS = [
   {
-    name: "IEEE Campus",
+    name: "Concerts & Music Festivals",
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" />
+      </svg>
+    ),
+  },
+  {
+    name: "Corporate Launches",
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
         <rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8M12 17v4" />
@@ -11,23 +19,23 @@ const TRUST_ITEMS = [
     ),
   },
   {
-    name: "ACM Student Chapter",
+    name: "Luxury Weddings & Galas",
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
       </svg>
     ),
   },
   {
-    name: "TEDx Events",
+    name: "Trade Fairs & Expos",
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <polygon points="5 3 19 12 5 21 5 3" />
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
       </svg>
     ),
   },
   {
-    name: "Google DSC",
+    name: "Tech Meetups & Seminars",
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
         <circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" />
@@ -36,19 +44,10 @@ const TRUST_ITEMS = [
     ),
   },
   {
-    name: "Hackathon Club",
+    name: "TEDx & Conferences",
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" />
-      </svg>
-    ),
-  },
-  {
-    name: "NSS & NCC",
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        <polygon points="5 3 19 12 5 21 5 3" />
       </svg>
     ),
   },
@@ -102,10 +101,12 @@ export default function Trust() {
         zIndex: 1, pointerEvents: "none",
       }} />
 
-      <div className="reveal" style={{ textAlign: "center", marginBottom: "2rem" }}>
-        <p style={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(148,163,184,0.4)" }}>
-          Trusted by student organizations across campuses
-        </p>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 5rem", position: "relative", zIndex: 1 }}>
+        <div className="reveal" style={{ textAlign: "left", marginBottom: "2rem" }}>
+          <p style={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(148,163,184,0.4)" }}>
+            Trusted by organizations for events of all scales
+          </p>
+        </div>
       </div>
 
       {/* Marquee */}

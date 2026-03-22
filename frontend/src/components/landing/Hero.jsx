@@ -303,7 +303,7 @@ export default function Hero() {
         WebkitMaskImage: "radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent)",
       }} />
 
-      <div style={{ position: "relative", zIndex: 2, width: "100%", maxWidth: "1280px", margin: "0 auto", padding: "0 1.5rem" }}>
+      <div style={{ position: "relative", zIndex: 2, width: "100%", maxWidth: "1280px", margin: "0 auto", padding: "0 5rem" }}>
         <style>{`
           .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
           @media (max-width: 960px) {
@@ -329,16 +329,16 @@ export default function Hero() {
                 <span style={{ width: 8, height: 8, background: "#a78bfa", borderRadius: "50%", position: "relative" }} />
               </span>
               <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "#c4b5fd", letterSpacing: "0.03em" }}>
-                Introducing Planora — The Smart Campus Event OS
+                Introducing Planora — The Smart Event OS
               </span>
             </div>
 
             {/* Headline */}
             <h1 ref={headlineRef} style={{
               opacity: 0,
-              fontSize: "clamp(2.6rem, 4.8vw, 4rem)",
-              fontWeight: 900, lineHeight: 1.1, marginBottom: "1.5rem",
-              color: "#fff", letterSpacing: "-0.03em",
+              fontSize: "clamp(2.2rem, 4vw, 3.4rem)",
+              fontWeight: 900, lineHeight: 1.25, marginBottom: "2rem",
+              color: "#fff", letterSpacing: "-0.035em",
               fontFamily: "'Outfit', 'Inter', sans-serif",
             }}>
               The Operating System<br />
@@ -347,16 +347,16 @@ export default function Hero() {
                 background: "linear-gradient(135deg, #c4b5fd 0%, #818cf8 40%, #60a5fa 100%)",
                 WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
               }}>
-                Smart Campus Events
+                All Your Events
               </span>
             </h1>
 
             {/* Subheadline */}
             <p ref={subRef} style={{
               opacity: 0,
-              fontSize: "clamp(1rem, 1.3vw, 1.15rem)",
-              color: "rgba(148,163,184,0.85)", lineHeight: 1.75,
-              marginBottom: "2.5rem", maxWidth: "500px",
+              fontSize: "0.95rem",
+              color: "rgba(148,163,184,0.8)", lineHeight: 1.8,
+              marginBottom: "3rem", maxWidth: "480px",
             }}>
               Planora centralizes planning, budgeting, volunteer coordination, and execution into one intelligent dashboard.
             </p>
@@ -364,8 +364,8 @@ export default function Hero() {
             {/* CTAs */}
             <div ref={ctaRef} className="hero-cta-group" style={{
               opacity: 0,
-              display: "flex", gap: "1rem", flexWrap: "wrap",
-              marginBottom: "2.5rem", alignItems: "center",
+              display: "flex", gap: "1.25rem", flexWrap: "wrap",
+              marginBottom: "3.5rem", alignItems: "center",
             }}>
               <Link
                 to="/signup"
@@ -383,7 +383,7 @@ export default function Hero() {
                 onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 20px 40px -8px rgba(124,58,237,0.65), inset 0 1px 0 rgba(255,255,255,0.2)"; }}
                 onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 10px 30px -8px rgba(124,58,237,0.55), inset 0 1px 0 rgba(255,255,255,0.15)"; }}
               >
-                Get Started Free
+                Get Started
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
                 </svg>
@@ -419,14 +419,14 @@ export default function Hero() {
             </div>
 
             {/* Stats */}
-            <div ref={statsRef} style={{ opacity: 0, display: "flex", gap: "2rem", flexWrap: "wrap" }}>
+            <div ref={statsRef} style={{ opacity: 0, display: "flex", gap: "3rem", flexWrap: "wrap" }}>
               {[
                 { value: "10k+", label: "Events Managed" },
                 { value: "98%", label: "Satisfaction Rate" },
                 { value: "40%", label: "Time Saved" },
               ].map((s) => (
-                <div key={s.label} style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
-                  <span style={{ fontSize: "1.4rem", fontWeight: 800, color: "#fff", lineHeight: 1, fontFamily: "'Outfit', sans-serif" }}>{s.value}</span>
+                <div key={s.label} style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+                  <span style={{ fontSize: "1.5rem", fontWeight: 800, color: "#fff", lineHeight: 1, fontFamily: "'Outfit', sans-serif" }}>{s.value}</span>
                   <span style={{ fontSize: "0.72rem", color: "rgba(148,163,184,0.5)", fontWeight: 500, letterSpacing: "0.04em" }}>{s.label}</span>
                 </div>
               ))}

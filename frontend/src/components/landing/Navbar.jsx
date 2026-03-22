@@ -45,7 +45,7 @@ export default function Navbar() {
           width: "100%",
           maxWidth: 1280,
           margin: "0 auto",
-          padding: "0 1.5rem",
+          padding: "0 5rem",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",

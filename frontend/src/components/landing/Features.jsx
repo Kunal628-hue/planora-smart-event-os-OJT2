@@ -85,7 +85,7 @@ export default function Features() {
         borderRadius: "50%",
       }} />
 
-      <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 1.5rem", position: "relative", zIndex: 1 }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 5rem", position: "relative", zIndex: 1 }}>
 
         {/* Header */}
         <div className="reveal" style={{ maxWidth: 600, marginBottom: "4rem" }}>
@@ -116,7 +116,7 @@ export default function Features() {
             Everything you need to run a flawless event.
           </h2>
           <p style={{ fontSize: "1rem", color: "rgba(148,163,184,0.7)", lineHeight: 1.7 }}>
-            Planora is purpose-built for student organizers — combining the depth of enterprise tools with the speed you need on the ground.
+            Planora is purpose-built for event organizers — combining the depth of enterprise tools with the speed you need on the ground.
           </p>
         </div>
 

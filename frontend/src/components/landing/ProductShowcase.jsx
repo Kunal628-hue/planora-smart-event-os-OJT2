@@ -226,10 +226,10 @@ export default function ProductShowcase() {
         borderRadius: "50%",
       }} />
 
-      <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 1.5rem", position: "relative", zIndex: 1 }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 5rem", position: "relative", zIndex: 1 }}>
 
         {/* Header */}
-        <div className="reveal" style={{ maxWidth: 640, margin: "0 auto 4rem", textAlign: "center" }}>
+        <div className="reveal" style={{ maxWidth: 640, marginBottom: "4rem", textAlign: "left" }}>
           <div style={{
             display: "inline-block",
             fontSize: "0.72rem",

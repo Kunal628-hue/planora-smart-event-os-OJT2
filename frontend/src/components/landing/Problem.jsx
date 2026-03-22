@@ -51,10 +51,10 @@ export default function Problem() {
         borderRadius: "50%",
       }} />
 
-      <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 1.5rem", position: "relative", zIndex: 1 }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 5rem", position: "relative", zIndex: 1 }}>
 
         {/* Section header */}
-        <div className="reveal" style={{ textAlign: "center", maxWidth: 640, margin: "0 auto 4rem" }}>
+        <div className="reveal" style={{ textAlign: "left", maxWidth: 640, marginBottom: "4rem" }}>
           <div style={{
             display: "inline-block",
             fontSize: "0.72rem",
@@ -82,7 +82,7 @@ export default function Problem() {
             Event planning is still running on spreadsheets and group chats.
           </h2>
           <p style={{ fontSize: "1rem", color: "rgba(148,163,184,0.75)", lineHeight: 1.7 }}>
-            Student organizers deserve better tools. Here's what they deal with every single time.
+            Organizers deserve better tools. Here's what they deal with every single time.
           </p>
         </div>
 
