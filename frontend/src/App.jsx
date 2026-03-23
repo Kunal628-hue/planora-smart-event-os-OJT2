@@ -14,32 +14,36 @@ import Team from "./pages/Auth/Team";
 import Settings from "./pages/Auth/Settings";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import DashboardLayout from "./components/layout/DashboardLayout";
+import { AuthProvider } from "./context/AuthContext";
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
 
-        {/* Protected Dashboard Routes */}
-        <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/events" element={<Events />} />
-          <Route path="/events/:eventId" element={<EventDetails />} />
-          <Route path="/vendors" element={<Vendors />} />
-          <Route path="/guests" element={<Guests />} />
-          <Route path="/budget" element={<Budget />} />
-          <Route path="/tasks" element={<Tasks />} />
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/team" element={<Team />} />
-          <Route path="/settings" element={<Settings />} />
-          {/* Redirect empty paths to dashboard */}
-          <Route path="/auth" element={<Navigate to="/dashboard" replace />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+          {/* Protected Dashboard Routes */}
+          <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/events" element={<Events />} />
+            <Route path="/events/:eventId" element={<EventDetails />} />
+            <Route path="/vendors" element={<Vendors />} />
+            <Route path="/guests" element={<Guests />} />
+            <Route path="/budget" element={<Budget />} />
+            <Route path="/tasks" element={<Tasks />} />
+            <Route path="/analytics" element={<Analytics />} />
+            <Route path="/team" element={<Team />} />
+            <Route path="/settings" element={<Settings />} />
+            {/* Redirect empty paths to dashboard */}
+            <Route path="/auth" element={<Navigate to="/dashboard" replace />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
+

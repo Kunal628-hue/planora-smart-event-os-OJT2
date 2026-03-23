@@ -544,21 +544,38 @@ h6 {
   align-items: center;
   justify-content: center;
   gap: 0.6rem;
-  padding: 0.6rem;
+  padding: 0.7rem;
   border-radius: var(--radius-md);
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #fff;
-  font-size: 0.85rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
 }
 
 .social-btn:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.2);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
+
+.social-btn.microsoft:hover {
+  background: rgba(0, 164, 239, 0.1);
+  border-color: rgba(0, 164, 239, 0.4);
+  box-shadow: 0 0 20px rgba(0, 164, 239, 0.15);
+}
+
+
+.social-btn.google:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
+}
+
 
 .social-divider {
   display: flex;

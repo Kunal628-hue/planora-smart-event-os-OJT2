@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, FacebookAuthProvider } from "firebase/auth";
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore, enableIndexedDbPersistence } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -26,7 +26,7 @@ if (isFirebaseConfigValid) {
     console.warn("Firebase configuration is missing or invalid. Check your .env file.");
     // Provide dummy objects to prevent top-level crashes
     app = {};
-    auth = { onAuthStateChanged: (cb) => { cb(null); return () => {}; } };
+    auth = { onAuthStateChanged: (cb) => { cb(null); return () => { }; } };
     db = {};
 }
 
@@ -50,4 +50,5 @@ const initPersistence = () => {
 initPersistence();
 
 export const googleProvider = new GoogleAuthProvider();
-export const facebookProvider = new FacebookAuthProvider();
+
+

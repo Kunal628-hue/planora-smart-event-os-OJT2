@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation, Outlet } from "react-router-dom";
-import { auth } from "../../firebase";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import { useAuth } from "../../context/AuthContext";
 import {
     LayoutDashboard,
     Calendar,
@@ -40,26 +39,23 @@ const NAV_ITEMS = [
 export default function DashboardLayout() {
     const navigate = useNavigate();
     const location = useLocation();
-    const [user, setUser] = useState(null);
+    const { user, logout } = useAuth();
     const [events, setEvents] = useState([]);
     const [selectedEventId, setSelectedEventId] = useState("");
-    const [loading, setLoading] = useState(true);
+    const [localLoading, setLocalLoading] = useState(true);
     const [showNotifications, setShowNotifications] = useState(false);
 
     const API_URL = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            setUser(currentUser);
-            if (!currentUser) {
-                setLoading(false);
-                navigate("/login");
-            } else {
-                fetchEvents(currentUser.uid);
-            }
-        });
-        return () => unsubscribe();
-    }, [navigate]);
+        if (user) {
+            fetchEvents(user.uid);
+        } else {
+            setLocalLoading(false);
+            navigate("/login");
+        }
+    }, [user, navigate]);
+
 
     const fetchEvents = async (uid) => {
         try {
@@ -81,9 +77,10 @@ export default function DashboardLayout() {
         } catch (err) {
             console.error("Layout fetch error:", err);
         } finally {
-            setLoading(false);
+            setLocalLoading(false);
         }
     };
+
 
     // Effect to sync dropdown selection with URL changes
     useEffect(() => {
@@ -102,7 +99,7 @@ export default function DashboardLayout() {
         }
     };
 
-    if (loading) {
+    if (localLoading) {
         return (
             <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", minHeight: "100vh", background: "var(--bg-base)", gap: "1.5rem" }}>
                 <div style={{ width: "48px", height: "48px", border: "4px solid var(--accent-primary)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 1s linear infinite" }}></div>
@@ -113,7 +110,7 @@ export default function DashboardLayout() {
 
     const handleLogout = async () => {
         try {
-            await signOut(auth);
+            await logout();
             navigate("/login");
         } catch (err) {
             console.error("Error signing out:", err);
