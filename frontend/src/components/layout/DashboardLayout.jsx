@@ -12,13 +12,7 @@ import {
     Users2,
     Settings as SettingsIcon,
     LogOut,
-    Search,
-    Bell,
-    CheckCircle2,
-    AlertCircle,
-    Cpu,
     User,
-    ChevronRight,
     ChevronDown,
     Sparkles
 } from "lucide-react";
@@ -43,7 +37,7 @@ export default function DashboardLayout() {
     const [events, setEvents] = useState([]);
     const [selectedEventId, setSelectedEventId] = useState("");
     const [localLoading, setLocalLoading] = useState(true);
-    const [showNotifications, setShowNotifications] = useState(false);
+    const [showUserMenu, setShowUserMenu] = useState(false);
 
     const API_URL = import.meta.env.VITE_API_URL;
 
@@ -122,7 +116,7 @@ export default function DashboardLayout() {
     return (
         <div className="dashboard-layout">
             <aside className="dashboard-sidebar">
-                <div style={{ padding: "1.5rem 1rem 1.5rem" }}>
+                <div style={{ padding: "0.75rem 1rem" }}>
                     <Link to="/dashboard" style={{ display: "block" }}>
                         <img
                             src="/logo-new.svg"
@@ -225,37 +219,7 @@ export default function DashboardLayout() {
                     ))}
                 </nav>
 
-                <div style={{
-                    padding: "1rem",
-                    marginTop: "auto",
-                    borderTop: "1px solid rgba(255,255,255,0.05)",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "10px"
-                }}>
-                    <div style={{
-                        width: "36px",
-                        height: "36px",
-                        borderRadius: "50%",
-                        background: "linear-gradient(135deg, #6C5CE7 0%, #E84393 100%)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        color: "#fff",
-                        fontWeight: 700,
-                        fontSize: "13px"
-                    }}>{user?.displayName?.split(' ').map(n => n[0]).join('') || "U"}</div>
-                    <div
-                        onClick={handleLogout}
-                        style={{ flex: 1, overflow: "hidden", cursor: "pointer" }}
-                        className="logout-trigger"
-                    >
-                        <div style={{ fontSize: "12px", fontWeight: 700, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{user?.displayName || "User"}</div>
-                        <div style={{ fontSize: "9px", fontWeight: 800, color: "#E84393", textTransform: "uppercase", display: "flex", alignItems: "center", gap: "4px" }}>
-                            <LogOut size={10} /> Sign Out
-                        </div>
-                    </div>
-                </div>
+
             </aside>
 
             <main className="dashboard-main" style={{ position: "relative", background: "#fcfdff" }}>
@@ -270,139 +234,92 @@ export default function DashboardLayout() {
                     justifyContent: "space-between"
                 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", flex: 1 }}>
-                        <div className="search-input-wrapper" style={{ flex: 1, position: "relative", maxWidth: "320px" }}>
-                            <Search style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: "#64748b" }} size={14} />
-                            <input
-                                className="search-input"
-                                placeholder="Search workspace..."
-                                style={{
-                                    height: "36px",
-                                    border: "1px solid #e8e8f5",
-                                    borderRadius: "10px",
-                                    width: "100%",
-                                    paddingLeft: "2.5rem",
-                                    background: "#f7f7fe",
-                                    fontSize: "0.85rem",
-                                    fontWeight: 500
-                                }}
-                            />
-                        </div>
+
                     </div>
 
                     <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
+
+
                         <div style={{ position: "relative" }}>
-                            <button
-                                onClick={() => setShowNotifications(!showNotifications)}
+                            <div
+                                onClick={() => setShowUserMenu(!showUserMenu)}
                                 style={{
-                                    position: "relative",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "0.75rem",
                                     cursor: "pointer",
-                                    width: "34px",
-                                    height: "34px",
-                                    borderRadius: "8px",
-                                    border: "1.5px solid #e8e8f5",
+                                    padding: "0.25rem 0.75rem",
+                                    borderRadius: "12px",
+                                    transition: "all 0.2s",
+                                    border: `1px solid ${showUserMenu ? 'var(--accent-primary)' : '#e8e8f5'}`,
                                     background: "#fff",
+                                    boxShadow: showUserMenu ? "0 4px 12px rgba(0,0,0,0.05)" : "none"
+                                }}>
+                                <div style={{
+                                    width: 36,
+                                    height: 36,
+                                    borderRadius: "50%",
+                                    background: "#f1f5f9",
+                                    color: "#64748b",
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
-                                    color: "#64748b"
-                                }}
-                            >
-                                <Bell size={16} />
-                                <span style={{ position: "absolute", top: "2px", right: "2px", width: "6px", height: "6px", background: "#E84393", borderRadius: "50%", border: "1.5px solid #fff" }}></span>
-                            </button>
+                                    overflow: "hidden",
+                                    border: "1px solid #e2e8f0"
+                                }}>
+                                    {user?.photoURL ? (
+                                        <img src={user.photoURL} alt="Avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                    ) : (
+                                        <User size={18} />
+                                    )}
+                                </div>
+                                <div style={{ textAlign: "left" }}>
+                                    <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "#1e293b", lineHeight: 1.2 }}>{user?.displayName?.split(' ')[0] || "Planner"}</div>
+                                    <div style={{ fontSize: "0.65rem", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.025em" }}>User Account</div>
+                                </div>
+                                <ChevronDown size={14} style={{ marginLeft: "4px", opacity: 0.5, transform: showUserMenu ? "rotate(180deg)" : "none", transition: "transform 0.2s" }} />
+                            </div>
 
-                            {showNotifications && (
+                            {showUserMenu && (
                                 <div style={{
                                     position: "absolute",
-                                    top: "calc(100% + 1rem)",
+                                    top: "calc(100% + 8px)",
                                     right: 0,
-                                    width: "380px",
+                                    width: "180px",
                                     background: "#fff",
-                                    borderRadius: "24px",
-                                    boxShadow: "0 25px 50px -12px rgba(0,0,0,0.15)",
-                                    border: "1.5px solid var(--border-subtle)",
+                                    border: "1px solid #e8e8f5",
+                                    borderRadius: "12px",
+                                    boxShadow: "0 15px 30px -5px rgba(0,0,0,0.1)",
+                                    padding: "6px",
                                     zIndex: 1000,
-                                    overflow: "hidden",
                                     animation: "fade-up 0.2s ease-out"
                                 }}>
-                                    <div style={{ padding: "1.5rem 1.75rem", borderBottom: "1.5px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--bg-elevated)" }}>
-                                        <h4 style={{ fontWeight: 900, fontSize: "1.1rem", margin: 0 }}>Intelligence Feed</h4>
-                                        <button style={{ background: "none", border: "none", fontSize: "0.75rem", color: "var(--accent-primary)", fontWeight: 800, cursor: "pointer", textTransform: "uppercase" }}>Mark All</button>
-                                    </div>
-                                    <div style={{ maxHeight: "400px", overflowY: "auto" }}>
-                                        {[
-                                            { id: 1, title: "RSVP Confirmed", msg: "Kunal Singhi confirmed for Wedding", time: "2m ago", icon: <CheckCircle2 size={18} />, color: "#10b981" },
-                                            { id: 2, title: "Budget Variance", msg: "Logistics spending is 8% above target", time: "1h ago", icon: <AlertCircle size={18} />, color: "#f59e0b" },
-                                            { id: 3, title: "Neural Matrix Sync", msg: "Event timeline optimized for latency", time: "3h ago", icon: <Cpu size={18} />, color: "#3b82f6" },
-                                        ].map((n, i) => (
-                                            <div key={n.id} style={{ padding: "1.25rem 1.75rem", borderBottom: i === 2 ? "none" : "1px solid var(--border-subtle)", cursor: "pointer" }} className="hover-dim">
-                                                <div style={{ display: "flex", gap: "1.25rem" }}>
-                                                    <div style={{
-                                                        width: "44px",
-                                                        height: "44px",
-                                                        borderRadius: "12px",
-                                                        background: `${n.color}12`,
-                                                        display: "flex",
-                                                        alignItems: "center",
-                                                        justifyContent: "center",
-                                                        color: n.color,
-                                                        flexShrink: 0
-                                                    }}>{n.icon}</div>
-                                                    <div style={{ flex: 1 }}>
-                                                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.25rem" }}>
-                                                            <span style={{ fontWeight: 800, fontSize: "0.95rem" }}>{n.title}</span>
-                                                            <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontWeight: 700 }}>{n.time}</span>
-                                                        </div>
-                                                        <p style={{ fontSize: "0.875rem", color: "var(--text-secondary)", lineHeight: 1.5, fontWeight: 500, margin: 0 }}>{n.msg}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <button style={{ width: "100%", padding: "1.25rem", textAlign: "center", border: "none", borderTop: "1.5px solid var(--border-subtle)", fontSize: "0.9rem", fontWeight: 800, color: "var(--accent-primary)", cursor: "pointer", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem" }}>
-                                        Full Engine Logs <ChevronRight size={16} />
+                                    <button
+                                        onClick={handleLogout}
+                                        style={{
+                                            width: "100%",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: "10px",
+                                            padding: "0.6rem 0.85rem",
+                                            borderRadius: "8px",
+                                            color: "#ef4444",
+                                            fontSize: "0.85rem",
+                                            fontWeight: 600,
+                                            cursor: "pointer",
+                                            background: "rgba(239, 68, 68, 0.05)",
+                                            border: "none",
+                                            textAlign: "left",
+                                            transition: "all 0.2s"
+                                        }}
+                                        onMouseEnter={e => e.currentTarget.style.background = "rgba(239, 68, 68, 0.1)"}
+                                        onMouseLeave={e => e.currentTarget.style.background = "rgba(239, 68, 68, 0.05)"}
+                                    >
+                                        <LogOut size={14} />
+                                        Sign Out
                                     </button>
                                 </div>
                             )}
-                        </div>
-
-                        <div style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "1rem",
-                            cursor: "pointer",
-                            padding: "0.5rem",
-                            paddingRight: "1rem",
-                            borderRadius: "16px",
-                            transition: "all 0.2s",
-                            background: "var(--accent-soft)",
-                            border: "1.5px solid transparent"
-                        }} className="hover-lift">
-                            <div style={{
-                                width: 44,
-                                height: 44,
-                                borderRadius: "12px",
-                                background: "var(--accent-primary)",
-                                color: "#fff",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                fontWeight: 900,
-                                fontSize: "1.1rem",
-                                overflow: "hidden",
-                                border: "2px solid #fff",
-                                boxShadow: "0 8px 16px -4px rgba(var(--accent-primary-rgb), 0.3)"
-                            }}>
-                                {user?.photoURL ? (
-                                    <img src={user.photoURL} alt="Avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                                ) : (
-                                    <User size={24} />
-                                )}
-                            </div>
-                            <div style={{ textAlign: "left" }}>
-                                <div style={{ fontSize: "0.95rem", fontWeight: 850, color: "var(--text-primary)", lineHeight: 1 }}>{user?.displayName?.split(' ')[0] || "Planner"}</div>
-                                <div style={{ fontSize: "0.7rem", color: "var(--accent-primary)", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em", marginTop: "4px" }}>Core Engine</div>
-                            </div>
                         </div>
                     </div>
                 </header>

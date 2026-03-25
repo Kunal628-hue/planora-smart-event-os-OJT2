@@ -363,11 +363,11 @@ export default function Analytics() {
                 }
                 .module-title {
                     font-size: 14px;
-                    fontWeight: 900;
+                    font-weight: 800;
                     color: #0f172a;
                     margin: 0 0 2.5rem;
                     display: flex;
-                    alignHeight: center;
+                    align-items: center;
                     gap: 12px;
                     text-transform: uppercase;
                     letter-spacing: 0.05em;

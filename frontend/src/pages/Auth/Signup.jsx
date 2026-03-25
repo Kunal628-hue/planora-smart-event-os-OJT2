@@ -86,13 +86,13 @@ export default function Signup() {
 
             <div className="auth-card" ref={cardRef} style={{ opacity: 0, zIndex: 2 }}>
                 {/* Logo */}
-                <div style={{ display: "flex", justifyContent: "center", marginBottom: "2.5rem" }}>
+                <div style={{ display: "flex", justifyContent: "center", marginBottom: "2rem" }}>
                     <Link to="/" style={{ display: "block" }}>
                         <img
                             src="/logo-new.svg"
                             alt="Planora Logo"
                             style={{
-                                height: "4.5rem",
+                                height: "4rem",
                                 width: "auto",
                                 display: "block",
                                 filter: "drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3))"
@@ -101,10 +101,7 @@ export default function Signup() {
                     </Link>
                 </div>
 
-                <h1 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "0.25rem", color: "#ffffff" }}>Create your account</h1>
-                <p style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.6)", marginBottom: "1.5rem" }}>
-                    Start your 14-day free trial. No credit card required.
-                </p>
+                <h1 style={{ fontSize: "1.75rem", fontWeight: 800, marginBottom: "1.5rem", color: "#ffffff", textAlign: 'center' }}>Create your account</h1>
 
                 {/* Social Auth Components */}
                 <SocialAuth onLogin={handleSocialLogin} loading={loading} />
@@ -128,9 +125,9 @@ export default function Signup() {
                 )}
 
                 <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                        <div style={{ gridColumn: "span 2" }}>
-                            <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: "0.35rem", color: "rgba(255,255,255,0.5)" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                        <div>
+                            <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, marginBottom: "0.5rem", color: "rgba(255,255,255,0.7)" }}>
                                 Full name
                             </label>
                             <input
@@ -145,7 +142,7 @@ export default function Signup() {
                         </div>
 
                         <div>
-                            <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: "0.35rem", color: "rgba(255,255,255,0.5)" }}>
+                            <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, marginBottom: "0.5rem", color: "rgba(255,255,255,0.7)" }}>
                                 Work email
                             </label>
                             <input
@@ -154,13 +151,13 @@ export default function Signup() {
                                 name="email"
                                 value={form.email}
                                 onChange={handleChange}
-                                placeholder="you@company.com"
+                                placeholder="name@company.com"
                                 autoComplete="email"
                             />
                         </div>
 
                         <div>
-                            <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: "0.35rem", color: "rgba(255,255,255,0.5)" }}>
+                            <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, marginBottom: "0.5rem", color: "rgba(255,255,255,0.7)" }}>
                                 Password
                             </label>
                             <input
@@ -213,7 +210,7 @@ export default function Signup() {
                         Sign in
                     </Link>
                 </p>
-                <p style={{ marginTop: "0.75rem", textAlign: "center" }}>
+                <p style={{ marginTop: "0.5rem", textAlign: "center" }}>
                     <Link to="/" style={{
                         fontSize: "0.8rem",
                         color: "var(--text-muted)",

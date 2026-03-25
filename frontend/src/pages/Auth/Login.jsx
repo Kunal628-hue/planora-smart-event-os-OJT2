@@ -82,13 +82,13 @@ export default function Login() {
 
             <div className="auth-card" ref={cardRef} style={{ opacity: 0, zIndex: 2 }}>
                 {/* Logo */}
-                <div style={{ display: "flex", justifyContent: "center", marginBottom: "2.5rem" }}>
+                <div style={{ display: "flex", justifyContent: "center", marginBottom: "2rem" }}>
                     <Link to="/" style={{ display: "block" }}>
                         <img
                             src="/logo-new.svg"
                             alt="Planora Logo"
                             style={{
-                                height: "4.5rem",
+                                height: "4rem",
                                 width: "auto",
                                 display: "block",
                                 filter: "drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3))"
@@ -97,8 +97,8 @@ export default function Login() {
                     </Link>
                 </div>
 
-                <h1 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "0.25rem", color: "#ffffff" }}>Welcome back</h1>
-                <p style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.6)", marginBottom: "1.5rem" }}>
+                <h1 style={{ fontSize: "1.75rem", fontWeight: 800, marginBottom: "0.25rem", color: "#ffffff", textAlign: 'center' }}>Welcome back</h1>
+                <p style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.5)", marginBottom: "1.5rem", textAlign: 'center' }}>
                     Sign in to your account to continue.
                 </p>
 
@@ -124,9 +124,9 @@ export default function Login() {
                 )}
 
                 <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                         <div>
-                            <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: "0.35rem", color: "rgba(255,255,255,0.5)" }}>
+                            <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, marginBottom: "0.5rem", color: "rgba(255,255,255,0.7)" }}>
                                 Email address
                             </label>
                             <input
@@ -135,15 +135,17 @@ export default function Login() {
                                 name="email"
                                 value={form.email}
                                 onChange={handleChange}
-                                placeholder="you@example.com"
+                                placeholder="name@example.com"
                                 autoComplete="email"
                             />
                         </div>
 
                         <div>
-                            <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, marginBottom: "0.35rem", color: "rgba(255,255,255,0.5)" }}>
-                                Password
-                            </label>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
+                                <label style={{ fontSize: "0.85rem", fontWeight: 600, color: "rgba(255,255,255,0.7)" }}>
+                                    Password
+                                </label>
+                            </div>
                             <input
                                 className="auth-input"
                                 type="password"
@@ -174,13 +176,13 @@ export default function Login() {
                     </button>
                 </form>
 
-                <p style={{ marginTop: "1.25rem", textAlign: "center", fontSize: "0.85rem", color: "var(--text-muted)" }}>
+                <p style={{ marginTop: "1rem", textAlign: "center", fontSize: "0.85rem", color: "var(--text-muted)" }}>
                     Don't have an account?{" "}
                     <Link to="/signup" style={{ color: "var(--accent-primary)", fontWeight: 600 }}>
                         Sign up free
                     </Link>
                 </p>
-                <p style={{ marginTop: "0.75rem", textAlign: "center" }}>
+                <p style={{ marginTop: "0.5rem", textAlign: "center" }}>
                     <Link to="/" style={{
                         fontSize: "0.8rem",
                         color: "var(--text-muted)",

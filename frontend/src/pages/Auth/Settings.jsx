@@ -54,25 +54,18 @@ export default function Settings() {
             animation: "fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1)"
         }}>
             {/* Page Header */}
-            <div style={{ marginBottom: "3.5rem" }}>
+            <div style={{ marginBottom: "2.5rem" }}>
                 <h1 style={{
-                    fontFamily: "'Syne', sans-serif",
-                    fontSize: "42px",
-                    fontWeight: 800,
-                    letterSpacing: "-2px",
-                    margin: "0 0 8px 0",
-                    lineHeight: 1
+                    fontSize: "32px",
+                    fontWeight: 700,
+                    letterSpacing: "-0.03em",
+                    margin: "0 0 4px 0",
+                    color: "#1e293b"
                 }}>
-                    Core <span style={{
-                        background: "linear-gradient(135deg, #6C5CE7 0%, #E84393 100%)",
-                        WebkitBackgroundClip: "text",
-                        WebkitTextFillColor: "transparent",
-                        backgroundClip: "text",
-                        display: "inline-block"
-                    }}>Configuration</span>
+                    Account Settings
                 </h1>
-                <p style={{ fontSize: "15px", color: "#64748b", fontWeight: 400, margin: 0, opacity: 0.8 }}>
-                    Calibrate your operational workspace and personal identity parameters.
+                <p style={{ fontSize: "14px", color: "#64748b", fontWeight: 500, margin: 0 }}>
+                    Manage your personal profile, workspace preferences, and security.
                 </p>
             </div>
 
@@ -87,88 +80,87 @@ export default function Settings() {
                 {/* Identity Profile Card (Left Panel) */}
                 <div className="settings-card" style={{
                     background: "#fff",
-                    borderRadius: "20px",
-                    border: "1px solid #e8e8f5",
-                    padding: "24px",
-                    transition: "all 0.3s ease"
+                    borderRadius: "16px",
+                    border: "1px solid #e2e8f0",
+                    padding: "2rem",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.02)"
                 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "2rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "2.5rem" }}>
                         <div style={{
-                            width: "42px", height: "42px", borderRadius: "50%", background: "#f0eeff",
-                            display: "flex", alignItems: "center", justifyContent: "center", color: "#6C5CE7"
+                            width: "40px", height: "40px", borderRadius: "10px", background: "#f1f5f9",
+                            display: "flex", alignItems: "center", justifyContent: "center", color: "#475569"
                         }}>
                             <User size={20} />
                         </div>
                         <div>
-                            <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: "16px", fontWeight: 700, margin: 0 }}>Identity Profile</h3>
-                            <p style={{ fontSize: "12px", color: "#a0aec0", margin: 0 }}>Global identifiers for collaborative sessions</p>
+                            <h3 style={{ fontSize: "16px", fontWeight: 700, margin: 0, color: "#1e293b" }}>Public Profile</h3>
+                            <p style={{ fontSize: "13px", color: "#64748b", margin: 0 }}>Manage how you appear across the platform</p>
                         </div>
                     </div>
 
                     {/* Avatar Section */}
-                    <div style={{ display: "flex", alignItems: "center", gap: "20px", marginBottom: "2rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "20px", marginBottom: "2.5rem" }}>
                         <div style={{ position: "relative" }}>
                             <div style={{
-                                width: "64px", height: "64px", borderRadius: "18px",
-                                background: "linear-gradient(135deg, #6C5CE7 0%, #E84393 100%)",
+                                width: "64px", height: "64px", borderRadius: "12px",
+                                background: "#1e293b",
                                 display: "flex", alignItems: "center", justifyContent: "center",
-                                color: "#fff", fontSize: "24px", fontWeight: 800
+                                color: "#fff", fontSize: "22px", fontWeight: 700
                             }}>
                                 {name.split(' ').map(n => n[0]).join('')}
                             </div>
                             <button style={{
-                                position: "absolute", bottom: "-4px", right: "-4px",
+                                position: "absolute", bottom: "-6px", right: "-6px",
                                 width: "24px", height: "24px", borderRadius: "50%",
-                                background: "#6C5CE7", border: "2px solid #fff",
+                                background: "#fff", border: "1px solid #e2e8f0",
                                 display: "flex", alignItems: "center", justifyContent: "center",
-                                color: "#fff", cursor: "pointer"
+                                color: "#64748b", cursor: "pointer", boxShadow: "0 2px 4px rgba(0,0,0,0.05)"
                             }}>
-                                <Edit3 size={11} />
+                                <Edit3 size={12} />
                             </button>
                         </div>
                         <div>
-                            <div style={{ fontWeight: 800, fontSize: "18px", letterSpacing: "-0.5px" }}>{name}</div>
+                            <div style={{ fontWeight: 700, fontSize: "18px", color: "#1e293b" }}>{name}</div>
                             <div style={{
-                                display: "inline-block", padding: "2px 10px", borderRadius: "20px",
-                                background: "#f0eeff", color: "#6C5CE7", fontSize: "10px", fontWeight: 800,
-                                marginTop: "4px", textTransform: "uppercase"
-                            }}>Core Engine</div>
+                                display: "inline-flex", alignItems: "center", padding: "2px 8px", borderRadius: "4px",
+                                background: "#f1f5f9", color: "#475569", fontSize: "11px", fontWeight: 700,
+                                marginTop: "6px", textTransform: "uppercase", letterSpacing: "0.02em"
+                            }}>Workspace Admin</div>
                         </div>
                     </div>
 
                     {/* Form Fields */}
-                    <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
                         <div>
-                            <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px", fontWeight: 800, color: "#a0aec0", textTransform: "uppercase", marginBottom: "8px" }}>
-                                <User size={12} /> UNIVERSAL NAME
-                            </label>
+                            <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "8px" }}>Full Name</label>
                             <div style={{ position: "relative" }}>
-                                <User size={16} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "#cbd5e0" }} />
+                                <User size={16} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
                                 <input
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     style={{
-                                        width: "100%", padding: "12px 12px 12px 42px",
-                                        background: "#f7f7fe", border: "1.5px solid #e8e8f5", borderRadius: "12px",
-                                        fontSize: "14px", fontWeight: 600, color: "#0f172a", outline: "none"
+                                        width: "100%", padding: "10px 12px 10px 38px",
+                                        background: "#fff", border: "1px solid #e2e8f0", borderRadius: "8px",
+                                        fontSize: "14px", fontWeight: 500, color: "#1e293b", outline: "none",
+                                        transition: "border-color 0.2s"
                                     }}
+                                    onFocus={(e) => e.target.style.borderColor = "#2563eb"}
+                                    onBlur={(e) => e.target.style.borderColor = "#e2e8f0"}
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px", fontWeight: 800, color: "#a0aec0", textTransform: "uppercase", marginBottom: "8px" }}>
-                                <Mail size={12} /> COMMUNICATION NODE
-                            </label>
+                            <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "8px" }}>Email Address</label>
                             <div style={{ position: "relative" }}>
-                                <Mail size={16} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "#cbd5e0" }} />
+                                <Mail size={16} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
                                 <input
                                     readOnly
                                     value={user?.email || "lmsinghI2016@gmail.com"}
                                     style={{
-                                        width: "100%", padding: "12px 12px 12px 42px",
-                                        background: "#f7f7fe", border: "1.5px solid #e8e8f5", borderRadius: "12px",
-                                        fontSize: "14px", fontWeight: 600, color: "#718096", outline: "none"
+                                        width: "100%", padding: "10px 12px 10px 38px",
+                                        background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px",
+                                        fontSize: "14px", fontWeight: 500, color: "#64748b", outline: "none", cursor: "not-allowed"
                                     }}
                                 />
                             </div>
@@ -177,17 +169,16 @@ export default function Settings() {
                         <button
                             onClick={handleSynchronize}
                             style={{
-                                marginTop: "1rem", width: "100%", padding: "14px",
-                                background: "linear-gradient(135deg, #6C5CE7 0%, #E84393 100%)",
-                                border: "none", borderRadius: "12px", color: "#fff",
-                                fontFamily: "'Syne', sans-serif", fontSize: "14px", fontWeight: 800,
-                                display: "flex", alignItems: "center", justifyContent: "center", gap: "10px",
-                                cursor: "pointer", boxShadow: "0 10px 20px rgba(108, 92, 231, 0.2)",
-                                transition: "all 0.2s"
-                            }} className="premium-btn"
+                                marginTop: "1rem", width: "100%", padding: "12px",
+                                background: "#1e293b",
+                                border: "none", borderRadius: "8px", color: "#fff",
+                                fontSize: "14px", fontWeight: 700,
+                                display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
+                                cursor: "pointer", transition: "all 0.2s"
+                            }} className="save-btn"
                         >
-                            <RefreshCw size={18} />
-                            Synchronize Profile
+                            <RefreshCw size={16} />
+                            Save Changes
                         </button>
                     </div>
                 </div>
@@ -195,67 +186,64 @@ export default function Settings() {
                 {/* Workspace Meta Card (Right Panel) */}
                 <div className="settings-card" style={{
                     background: "#fff",
-                    borderRadius: "20px",
-                    border: "1px solid #e8e8f5",
-                    padding: "24px",
-                    transition: "all 0.3s ease",
-                    animationDelay: "0.1s"
+                    borderRadius: "16px",
+                    border: "1px solid #e2e8f0",
+                    padding: "2rem",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.02)"
                 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "2rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "2.5rem" }}>
                         <div style={{
-                            width: "42px", height: "42px", borderRadius: "50%", background: "#fffbf0",
+                            width: "40px", height: "40px", borderRadius: "10px", background: "#fff7ed",
                             display: "flex", alignItems: "center", justifyContent: "center", color: "#f59e0b"
                         }}>
                             <SettingsIcon size={20} />
                         </div>
                         <div>
-                            <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: "16px", fontWeight: 700, margin: 0 }}>Workspace Meta</h3>
-                            <p style={{ fontSize: "12px", color: "#a0aec0", margin: 0 }}>Control operational matrix parameters</p>
+                            <h3 style={{ fontSize: "16px", fontWeight: 700, margin: 0, color: "#1e293b" }}>Preferences</h3>
+                            <p style={{ fontSize: "13px", color: "#64748b", margin: 0 }}>Configure workspace behavior</p>
                         </div>
                     </div>
 
                     {/* Toggles List */}
-                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
                         {[
-                            { id: "notify", label: "System Notifications", desc: "Push alerts for event milestones", icon: <Zap size={16} />, color: "#f0eeff", iconColor: "#6C5CE7", state: neuralAnims, setter: setNeuralAnims },
-                            { id: "visibility", label: "Collaborator Visibility", desc: "Allow profile discovery in shared logs", icon: <User size={16} />, color: "#e6fff9", iconColor: "#10b981", state: analyticOverlays, setter: setAnalyticOverlays }
+                            { id: "notify", label: "Smart Notifications", desc: "AI-driven alerts for project risks", icon: <Zap size={16} />, color: "#f1f5f9", iconColor: "#475569", state: neuralAnims, setter: setNeuralAnims },
+                            { id: "visibility", label: "Team Visibility", desc: "Allow colleagues to see your activity", icon: <User size={16} />, color: "#f1f5f9", iconColor: "#475569", state: analyticOverlays, setter: setAnalyticOverlays }
                         ].map((item) => (
                             <div
                                 key={item.id}
-                                onClick={() => item.setter(!item.state)}
                                 style={{
                                     display: "flex", alignItems: "center",
-                                    padding: "12px", borderRadius: "14px",
-                                    transition: "all 0.2s ease",
-                                    cursor: "pointer",
-                                    background: item.id === "dark" && darkModeMatrix ? "#f8fafc" : "transparent"
-                                }} className="toggle-row">
-                                <div style={{
-                                    width: "36px", height: "36px", borderRadius: "10px",
-                                    background: item.color, color: item.iconColor,
-                                    display: "flex", alignItems: "center", justifyContent: "center",
-                                    marginRight: "14px"
+                                    justifyContent: "space-between"
                                 }}>
-                                    {item.icon}
-                                </div>
-                                <div style={{ flex: 1 }}>
-                                    <div style={{ fontSize: "14px", fontWeight: 700, color: "#0f172a" }}>{item.label}</div>
-                                    <div style={{ fontSize: "12px", color: "#a0aec0" }}>{item.desc}</div>
+                                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                                    <div style={{
+                                        width: "36px", height: "36px", borderRadius: "8px",
+                                        background: item.color, color: item.iconColor,
+                                        display: "flex", alignItems: "center", justifyContent: "center"
+                                    }}>
+                                        {item.icon}
+                                    </div>
+                                    <div>
+                                        <div style={{ fontSize: "14px", fontWeight: 700, color: "#1e293b" }}>{item.label}</div>
+                                        <div style={{ fontSize: "12px", color: "#64748b" }}>{item.desc}</div>
+                                    </div>
                                 </div>
                                 <div
+                                    onClick={() => item.setter(!item.state)}
                                     style={{
-                                        width: "42px", height: "22px", borderRadius: "100px",
-                                        background: item.state ? "linear-gradient(135deg, #6C5CE7 0%, #E84393 100%)" : "#e2e8f0",
-                                        position: "relative", cursor: "pointer", transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
+                                        width: "36px", height: "20px", borderRadius: "100px",
+                                        background: item.state ? "#1e293b" : "#e2e8f0",
+                                        position: "relative", cursor: "pointer", transition: "all 0.2s"
                                     }}
                                 >
                                     <div style={{
                                         position: "absolute",
-                                        top: "3px",
-                                        left: item.state ? "23px" : "3px",
+                                        top: "2px",
+                                        left: item.state ? "18px" : "2px",
                                         width: "16px", height: "16px", borderRadius: "50%",
-                                        background: "#fff", boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                                        transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
+                                        background: "#fff", boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
+                                        transition: "all 0.2s"
                                     }} />
                                 </div>
                             </div>
@@ -266,41 +254,35 @@ export default function Settings() {
                     <div
                         onClick={handleTerminate}
                         style={{
-                            marginTop: "2.5rem", padding: "14px", borderRadius: "14px",
-                            background: "#fff8f8", border: "1.5px solid #ffe0e0",
+                            marginTop: "3rem", padding: "1.25rem", borderRadius: "12px",
+                            background: "#fff", border: "1px solid #fee2e2",
                             display: "flex", alignItems: "center", justifyContent: "space-between",
                             cursor: "pointer", transition: "all 0.2s"
                         }} className="danger-row">
                         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                             <div style={{
-                                width: "32px", height: "32px", borderRadius: "50%",
-                                background: "#ffe0e0", display: "flex", alignItems: "center", justifyContent: "center",
+                                width: "32px", height: "32px", borderRadius: "8px",
+                                background: "#fef2f2", display: "flex", alignItems: "center", justifyContent: "center",
                                 color: "#ef4444"
                             }}>
                                 <Flame size={18} />
                             </div>
                             <div>
-                                <div style={{ fontSize: "13px", fontWeight: 700, color: "#c0392b" }}>Terminate Workspace Instance</div>
-                                <div style={{ fontSize: "11px", color: "#f87171" }}>This action is irreversible</div>
+                                <div style={{ fontSize: "13px", fontWeight: 700, color: "#991b1b" }}>Delete Workspace</div>
+                                <div style={{ fontSize: "12px", color: "#ef4444", opacity: 0.8 }}>This action is irreversible</div>
                             </div>
                         </div>
-                        <ChevronRight size={16} color="#f87171" />
+                        <ChevronRight size={16} color="#ef4444" />
                     </div>
                 </div>
             </div>
 
             <style>{`
-                @keyframes fade-up {
-                    from { opacity: 0; transform: translateY(20px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-                .settings-card:hover { 
-                    transform: translateY(-2px); 
-                    box-shadow: 0 15px 35px rgba(0,0,0,0.05); 
-                }
-                .toggle-row:hover { background: #f8fafc; }
-                .danger-row:hover { background: #fff0f0; }
-                .premium-btn:active { transform: scale(0.98); }
+                .settings-card { border-color: #e2e8f0; transition: all 0.2s; }
+                .settings-card:hover { border-color: #cbd5e1; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+                .save-btn:hover { background: #334155 !important; transform: translateY(-1px); }
+                .save-btn:active { transform: translateY(0); }
+                .danger-row:hover { border-color: #fecaca; background: #fffafb; }
             `}</style>
         </div>
     );
