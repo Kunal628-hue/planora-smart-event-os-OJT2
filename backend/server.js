@@ -45,6 +45,11 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-app.listen(PORT, () => {
-  console.log(`✅ Planora backend running at http://localhost:${PORT}`);
-});
+// Only listen if not in a serverless environment
+if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`✅ Planora backend running at http://localhost:${PORT}`);
+  });
+}
+
+export default app;
