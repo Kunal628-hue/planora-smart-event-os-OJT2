@@ -6,22 +6,12 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   build: {
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            if (id.includes('three') || id.includes('@react-three')) return 'vendor-three';
-            if (id.includes('firebase')) return 'vendor-firebase';
-            if (id.includes('gsap') || id.includes('animejs')) return 'vendor-animation';
-            return 'vendor';
-          }
-        },
-      },
-    },
-    chunkSizeWarningLimit: 600,
+    // Turning off manualChunks temporarily to fix the 500 resource error
+    chunkSizeWarningLimit: 1000,
     cssCodeSplit: true,
   },
+  // Ensure console logs are kept for debugging the deployment
   esbuild: {
-    drop: ['console', 'debugger'],
+    drop: [],
   },
 });
