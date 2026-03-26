@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -88,7 +89,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section ref={containerRef} style={{
+    <section ref={containerRef} id="hero" style={{
       position: "relative",
       paddingTop: "9rem",
       paddingBottom: "4rem",
@@ -249,7 +250,7 @@ export default function Hero() {
           </p>
 
           <div ref={ctaRef}>
-            <button style={{
+            <Link to="/signup" style={{
               background: "#111827",
               color: "#fff",
               border: "none",
@@ -262,15 +263,13 @@ export default function Hero() {
               gap: "0.6rem",
               cursor: "pointer",
               transition: "transform 0.2s, background 0.2s",
+              textDecoration: "none"
             }}
             onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.background = "#1F2937"; }}
             onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.background = "#111827"; }}
             >
               Try Planora Today ↗
-            </button>
-            <div style={{ marginTop: "0.8rem", fontSize: "0.8rem", color: "#9CA3AF", fontWeight: 500 }}>
-              Free for 14 Days!
-            </div>
+            </Link>
           </div>
         </div>
 

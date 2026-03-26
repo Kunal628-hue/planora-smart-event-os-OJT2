@@ -7,7 +7,6 @@ const NAV_LINKS = [
   { label: "About", href: "#problem" },
   { label: "Features", href: "#features" },
   { label: "Testimonials", href: "#testimonials" },
-  { label: "Pricing", href: "#pricing" },
 ];
 
 export default function Navbar() {
@@ -134,12 +133,6 @@ export default function Navbar() {
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
             <Link to="/login" className="lp-login-link">
               Log in
-            </Link>
-            <Link to="/signup" className="lp-cta-btn">
-              Get Started
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="7" y1="17" x2="17" y2="7" /><polyline points="7 7 17 7 17 17" />
-              </svg>
             </Link>
           </div>
         </div>

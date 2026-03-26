@@ -156,7 +156,7 @@ export default function Connect() {
   }, []);
 
   return (
-    <section ref={containerRef} style={{ background: "#FAFAFA", padding: "8rem 0 0", fontFamily: "'Inter', sans-serif" }}>
+    <section ref={containerRef} id="testimonials" style={{ background: "#FAFAFA", padding: "8rem 0 0", fontFamily: "'Inter', sans-serif" }}>
       
       {/* Upper Grid Section */}
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 2.5rem", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", alignItems: "center", marginBottom: "8rem" }}>

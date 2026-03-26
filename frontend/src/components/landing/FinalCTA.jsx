@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -107,43 +108,24 @@ export default function FinalCTA() {
             Join 10,000+ organizers who are saving time, cutting costs, and delivering unforgettable experiences with Planora today.
           </p>
           
-          <div style={{ display: "flex", gap: "1.5rem", justifyContent: "center", alignItems: "center", flexWrap: "wrap", marginBottom: "1.5rem" }}>
+          <div style={{ display: "flex", gap: "1.5rem", justifyContent: "center", alignItems: "center", flexWrap: "wrap" }}>
             
             <div style={{ position: "relative" }}>
-              {/* Hand-sketched arrow pointing to CTA to humanize */}
-              <svg style={{ position: "absolute", top: -45, right: -40, color: "#DB2777", transform: "rotate(10deg)", pointerEvents: "none", zIndex: 10 }} width="60" height="60" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M10,80 Q30,10 90,80 M70,75 L90,80 L85,60" style={{ animation: "draw-arrow 0.8s ease-out forwards 1.2s" }} strokeDasharray="300" strokeDashoffset="300" />
-              </svg>
 
-              <button className="cta-btn-primary" style={{
+              <Link to="/signup" className="cta-btn-primary" style={{
                 background: "#fff", color: "#111827",
                 border: "none", padding: "0.9rem 2rem",
                 borderRadius: "999px", fontSize: "0.95rem", fontWeight: 700,
                 display: "inline-flex", alignItems: "center", gap: "0.5rem",
-                cursor: "pointer", transition: "transform 0.2s, box-shadow 0.2s"
+                cursor: "pointer", transition: "transform 0.2s, box-shadow 0.2s",
+                textDecoration: "none"
               }}
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 10px 25px rgba(255,255,255,0.15)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
               >
                 Get Started for Free ↗
-              </button>
+              </Link>
             </div>
-
-            <button style={{
-              background: "rgba(255,255,255,0.1)", color: "#fff",
-              border: "1px solid rgba(255,255,255,0.2)", padding: "0.9rem 2rem",
-              borderRadius: "999px", fontSize: "0.95rem", fontWeight: 600,
-              cursor: "pointer", transition: "background 0.2s, transform 0.2s"
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.15)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; e.currentTarget.style.transform = "translateY(0)"; }}
-            >
-              Schedule a Demo
-            </button>
-          </div>
-          
-          <div style={{ fontSize: "0.85rem", color: "#6B7280", fontWeight: 500 }}>
-            No credit card required. Cancel anytime.
           </div>
         </div>
       </div>
