@@ -10,7 +10,9 @@ import {
     Activity,
     Users,
     ChevronRight,
-    Search
+    Search,
+    Sparkles,
+    ShieldCheck
 } from "lucide-react";
 
 const AiAssistant = lazy(() => import("../../components/AiAssistant"));
@@ -131,11 +133,106 @@ export default function Dashboard() {
 
     if (events.length === 0 && !loading) {
         return (
-            <div style={{ textAlign: "center", padding: "10rem 2rem", background: "#fff", border: "1px solid #f1f5f9", borderRadius: "16px", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.04)" }}>
-                <Activity size={48} color="#2563eb" style={{ margin: "0 auto 1.5rem" }} />
-                <h1 style={{ fontSize: "1.75rem", fontWeight: 800, color: "#0f172a", marginBottom: "0.75rem", letterSpacing: "-0.02em" }}>Initialize your workspace.</h1>
-                <p style={{ color: "#64748b", marginBottom: "2rem" }}>Connect your first event to see real-time insights.</p>
-                <button className="btn btn-primary px-8 py-3 rounded-full font-bold shadow-lg shadow-blue-500/20" onClick={() => window.location.href = '/events'}>Get Started</button>
+            <div style={{ 
+                display: "flex", 
+                flexDirection: "column", 
+                alignItems: "center", 
+                justifyContent: "center", 
+                padding: "6rem 2rem",
+                textAlign: "center"
+            }}>
+                <div style={{
+                    background: "rgba(255, 255, 255, 0.7)",
+                    backdropFilter: "blur(24px)",
+                    border: "1px solid rgba(255, 255, 255, 0.4)",
+                    borderRadius: "32px",
+                    padding: "4rem 3rem",
+                    maxWidth: "600px",
+                    width: "100%",
+                    boxShadow: "0 20px 50px rgba(0, 0, 0, 0.05)",
+                    position: "relative",
+                    overflow: "hidden"
+                }}>
+                    <div style={{
+                        position: "absolute",
+                        top: "-50px",
+                        left: "-50px",
+                        width: "150px",
+                        height: "150px",
+                        background: "radial-gradient(circle, rgba(37, 99, 235, 0.08) 0%, transparent 70%)",
+                        borderRadius: "50%",
+                        zIndex: 0
+                    }}></div>
+
+                    <div style={{ position: "relative", zIndex: 1 }}>
+                        <div style={{ 
+                            width: "80px", 
+                            height: "80px", 
+                            background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)", 
+                            borderRadius: "24px", 
+                            display: "flex", 
+                            alignItems: "center", 
+                            justifyContent: "center", 
+                            margin: "0 auto 2rem",
+                            boxShadow: "0 15px 30px rgba(37, 99, 235, 0.25)",
+                            transform: "rotate(-5deg)"
+                        }}>
+                            <Sparkles size={36} color="#fff" />
+                        </div>
+
+                        <h1 style={{ 
+                            fontSize: "2.5rem", 
+                            fontWeight: 800, 
+                            color: "#1e293b", 
+                            marginBottom: "1rem", 
+                            letterSpacing: "-0.04em",
+                            lineHeight: 1.1 
+                        }}>
+                            Welcome to <span style={{ color: "#2563eb" }}>Planora OS</span>.
+                        </h1>
+                        
+                        <p style={{ 
+                            fontSize: "1.05rem", 
+                            color: "#64748b", 
+                            marginBottom: "2.5rem", 
+                            maxWidth: "400px", 
+                            marginInline: "auto",
+                            lineHeight: 1.6,
+                            fontWeight: 500
+                        }}>
+                            The next-generation workspace for event managers. Connect your first project to unlock AI-powered insights and real-time automation.
+                        </p>
+
+                        <div style={{ display: "flex", gap: "1rem", justifyContent: "center" }}>
+                            <button 
+                                className="btn btn-primary" 
+                                style={{ 
+                                    padding: "1rem 2.5rem", 
+                                    borderRadius: "14px", 
+                                    fontSize: "0.95rem", 
+                                    fontWeight: 700,
+                                    boxShadow: "0 10px 25px rgba(37, 99, 235, 0.3)" 
+                                }}
+                                onClick={() => navigate('/events')}
+                            >
+                                Get Started
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style={{ marginTop: "3rem", display: "flex", gap: "2rem" }}>
+                    {[
+                        { icon: <ShieldCheck size={18} />, label: "Secure Data" },
+                        { icon: <Activity size={18} />, label: "Real-time Sync" },
+                        { icon: <LayoutDashboard size={18} />, label: "Smart Layout" }
+                    ].map((feat, i) => (
+                        <div key={i} style={{ display: "flex", alignItems: "center", gap: "8px", color: "#94a3b8", fontSize: "0.85rem", fontWeight: 600 }}>
+                            <span style={{ color: "#2563eb" }}>{feat.icon}</span>
+                            {feat.label}
+                        </div>
+                    ))}
+                </div>
             </div>
         );
     }

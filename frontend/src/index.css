@@ -73,13 +73,14 @@ body::before {
 }
 
 .dashboard-sidebar {
-  width: 220px !important;
-  background: #1a1a2e !important;
+  width: 260px !important;
+  background: #0f172a !important; /* Deeper slate for higher contrast */
   color: #fff !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
-  box-shadow: 10px 0 40px rgba(0, 0, 0, 0.1) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.03) !important;
+  box-shadow: 15px 0 50px rgba(0, 0, 0, 0.15) !important;
   position: relative;
   overflow: hidden;
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .dashboard-sidebar::before {
@@ -89,46 +90,42 @@ body::before {
   left: -100px;
   width: 300px;
   height: 300px;
-  background: radial-gradient(circle, rgba(108, 92, 231, 0.15) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.dashboard-sidebar::after {
-  content: "";
-  position: absolute;
-  bottom: -100px;
-  right: -100px;
-  width: 300px;
-  height: 300px;
-  background: radial-gradient(circle, rgba(232, 67, 147, 0.1) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
   pointer-events: none;
 }
 
 .dashboard-sidebar .sidebar-item {
-  color: rgba(255, 255, 255, 0.5) !important;
-  margin-bottom: 0.25rem !important;
-  padding: 0.75rem 1rem !important;
-  transition: all 0.25s ease !important;
+  color: #94a3b8 !important;
+  margin: 4px 12px !important;
+  padding: 0.7rem 1rem !important;
+  border-radius: 12px !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: 1px solid transparent !important;
 }
 
 .dashboard-sidebar .sidebar-item:hover {
-  background: rgba(255, 255, 255, 0.05) !important;
-  color: rgba(255, 255, 255, 0.8) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  color: #f8fafc !important;
+  transform: translateX(4px);
 }
 
 .dashboard-sidebar .sidebar-item.active {
-  background: linear-gradient(90deg, rgba(108, 92, 231, 0.25) 0%, rgba(232, 67, 147, 0.1) 100%) !important;
-  color: #fff !important;
+  background: rgba(37, 99, 235, 0.1) !important;
+  color: #3b82f6 !important;
   font-weight: 700 !important;
-  border-left: 3px solid #6c5ce7 !important;
-  box-shadow: none !important;
+  border: 1px solid rgba(59, 130, 246, 0.2) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+.dashboard-sidebar .sidebar-item.active svg {
+  filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.5));
 }
 
 .top-bar {
-  height: 58px !important;
-  background: #ffffff !important;
+  height: 72px !important;
+  background: rgba(255, 255, 255, 0.8) !important;
   backdrop-filter: blur(20px) !important;
-  border-bottom: 1px solid #e8e8f5 !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.5) !important;
 }
 
 .dark-theme .planora-nav.scrolled {
