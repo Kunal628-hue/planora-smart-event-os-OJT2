@@ -14,7 +14,6 @@ function DashboardPreview() {
         if (entry.isIntersecting && !animated.current) {
           animated.current = true;
 
-          // Draw the line
           const path = lineRef.current;
           if (path) {
             animate(path, {
@@ -25,7 +24,6 @@ function DashboardPreview() {
             });
           }
 
-          // Fade in the area
           if (areaRef.current) {
             animate(areaRef.current, {
               opacity: [0, 1],
@@ -35,7 +33,6 @@ function DashboardPreview() {
             });
           }
 
-          // Animate the stat numbers
           const stats = containerRef.current?.querySelectorAll(".stat-number");
           if (stats && stats.length) {
             animate(stats, {
@@ -69,11 +66,11 @@ function DashboardPreview() {
     <div
       ref={containerRef}
       style={{
-        background: "rgba(13,16,28,0.98)",
-        border: "1px solid rgba(139,92,246,0.2)",
+        background: "#fff",
+        border: "1.5px solid rgba(0,0,0,0.07)",
         borderRadius: "1.5rem",
         padding: "2rem",
-        boxShadow: "0 40px 80px -20px rgba(0,0,0,0.7), 0 0 1px rgba(255,255,255,0.05)",
+        boxShadow: "0 20px 60px -10px rgba(0,0,0,0.1), 0 4px 20px rgba(0,0,0,0.04)",
         position: "relative",
         overflow: "hidden",
       }}
@@ -81,83 +78,79 @@ function DashboardPreview() {
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
         <div>
-          <div style={{ fontSize: "0.7rem", color: "rgba(148,163,184,0.5)", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "0.25rem" }}>
+          <div style={{ fontSize: "0.65rem", color: "#9CA3AF", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "0.25rem" }}>
             RSVP Analytics — Oct 2026
           </div>
-          <div style={{ fontSize: "1.2rem", fontWeight: 800, color: "#fff" }}>Registrations Overview</div>
+          <div style={{ fontSize: "1.15rem", fontWeight: 800, color: "#111827" }}>Registrations Overview</div>
         </div>
         <div style={{
-          padding: "0.35rem 0.9rem",
-          background: "rgba(167,139,250,0.1)",
-          border: "1px solid rgba(167,139,250,0.25)",
-          borderRadius: "0.6rem",
-          fontSize: "0.75rem",
+          padding: "0.3rem 0.8rem",
+          background: "rgba(94,90,219,0.08)",
+          border: "1.5px solid rgba(94,90,219,0.2)",
+          borderRadius: "999px",
+          fontSize: "0.72rem",
           fontWeight: 700,
-          color: "#c4b5fd",
+          color: "#5E5ADB",
+          display: "flex",
+          alignItems: "center",
+          gap: "0.3rem",
         }}>
-          This Month ↑ 24%
+          ↑ 24% This Month
         </div>
       </div>
 
       {/* Stats row */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem", marginBottom: "2rem" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem", marginBottom: "1.75rem" }}>
         {[
-          { label: "Total RSVPs", value: "1,284", color: "#a78bfa" },
-          { label: "Confirmed", value: "947", color: "#34d399" },
-          { label: "Pending VIP", value: "128", color: "#fb923c" },
-          { label: "Dropped", value: "209", color: "#f87171" },
+          { label: "Total RSVPs", value: "1,284", color: "#5E5ADB" },
+          { label: "Confirmed", value: "947", color: "#059669" },
+          { label: "Pending VIP", value: "128", color: "#D97706" },
+          { label: "Dropped", value: "209", color: "#DC2626" },
         ].map((s) => (
           <div key={s.label} style={{
-            background: "rgba(255,255,255,0.025)",
-            border: "1px solid rgba(255,255,255,0.05)",
+            background: "#F9FAFB",
+            border: "1.5px solid rgba(0,0,0,0.07)",
             borderRadius: "0.875rem",
             padding: "1rem 0.875rem",
           }}>
-            <div className="stat-number" style={{ fontSize: "1.5rem", fontWeight: 800, color: s.color, lineHeight: 1, opacity: 0 }}>{s.value}</div>
-            <div style={{ fontSize: "0.68rem", color: "rgba(148,163,184,0.5)", marginTop: "0.3rem", fontWeight: 500, letterSpacing: "0.04em", textTransform: "uppercase" }}>{s.label}</div>
+            <div className="stat-number" style={{ fontSize: "1.4rem", fontWeight: 800, color: s.color, lineHeight: 1, opacity: 0 }}>{s.value}</div>
+            <div style={{ fontSize: "0.65rem", color: "#9CA3AF", marginTop: "0.3rem", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase" }}>{s.label}</div>
           </div>
         ))}
       </div>
 
       {/* Chart */}
       <div style={{
-        background: "rgba(255,255,255,0.02)",
-        border: "1px solid rgba(255,255,255,0.05)",
+        background: "#F9FAFB",
+        border: "1.5px solid rgba(0,0,0,0.06)",
         borderRadius: "1rem",
         padding: "1.5rem",
-        marginBottom: "1.5rem",
+        marginBottom: "1.25rem",
       }}>
-        <svg viewBox={`0 0 ${chartW} ${chartH}`} style={{ width: "100%", height: "140px", overflow: "visible" }}>
+        <svg viewBox={`0 0 ${chartW} ${chartH}`} style={{ width: "100%", height: "130px", overflow: "visible" }}>
           <defs>
-            <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#a78bfa" stopOpacity="0.25" />
-              <stop offset="100%" stopColor="#a78bfa" stopOpacity="0" />
+            <linearGradient id="areaGradLight" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#5E5ADB" stopOpacity="0.18" />
+              <stop offset="100%" stopColor="#5E5ADB" stopOpacity="0" />
             </linearGradient>
           </defs>
-          {/* Grid lines */}
           {[0, 25, 50, 75, 100].map((y) => (
             <line key={y} x1="0" y1={chartH - (y / 100) * chartH * 0.85 - 5} x2={chartW} y2={chartH - (y / 100) * chartH * 0.85 - 5}
-              stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+              stroke="rgba(0,0,0,0.05)" strokeWidth="1" />
           ))}
-          {/* Area */}
-          <path ref={areaRef} d={areaD} fill="url(#areaGrad)" style={{ opacity: 0 }} />
-          {/* Line */}
+          <path ref={areaRef} d={areaD} fill="url(#areaGradLight)" style={{ opacity: 0 }} />
           <path
             ref={lineRef}
             d={pathD}
             fill="none"
-            stroke="#a78bfa"
+            stroke="#5E5ADB"
             strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            style={{
-              strokeDasharray: 2000,
-              strokeDashoffset: 2000,
-            }}
+            style={{ strokeDasharray: 2000, strokeDashoffset: 2000 }}
           />
-          {/* Data points */}
           {points.map(([x, y], i) => (
-            <circle key={i} cx={x} cy={y} r="3.5" fill="#a78bfa" opacity="0.8" />
+            <circle key={i} cx={x} cy={y} r="3.5" fill="#5E5ADB" opacity="0.85" />
           ))}
         </svg>
       </div>
@@ -165,37 +158,25 @@ function DashboardPreview() {
       {/* Bottom row */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
         {[
-          { label: "Budget Used", value: "78%", color: "#60a5fa", bar: 78 },
-          { label: "Task Completion", value: "91%", color: "#34d399", bar: 91 },
+          { label: "Budget Used", value: "78%", color: "#2563EB", bar: 78 },
+          { label: "Task Completion", value: "91%", color: "#059669", bar: 91 },
         ].map((b) => (
           <div key={b.label} style={{
-            background: "rgba(255,255,255,0.025)",
-            border: "1px solid rgba(255,255,255,0.05)",
+            background: "#F9FAFB",
+            border: "1.5px solid rgba(0,0,0,0.07)",
             borderRadius: "0.875rem",
             padding: "1rem",
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.6rem" }}>
-              <span style={{ fontSize: "0.75rem", color: "rgba(148,163,184,0.6)", fontWeight: 600 }}>{b.label}</span>
+              <span style={{ fontSize: "0.75rem", color: "#6B7280", fontWeight: 600 }}>{b.label}</span>
               <span style={{ fontSize: "0.75rem", color: b.color, fontWeight: 700 }}>{b.value}</span>
             </div>
-            <div style={{ height: "5px", background: "rgba(255,255,255,0.06)", borderRadius: "3px", overflow: "hidden" }}>
-              <div style={{ width: `${b.bar}%`, height: "100%", background: b.color, borderRadius: "3px", boxShadow: `0 0 8px ${b.color}50` }} />
+            <div style={{ height: "5px", background: "rgba(0,0,0,0.07)", borderRadius: "3px", overflow: "hidden" }}>
+              <div style={{ width: `${b.bar}%`, height: "100%", background: b.color, borderRadius: "3px" }} />
             </div>
           </div>
         ))}
       </div>
-
-      {/* Shine */}
-      <div style={{
-        position: "absolute",
-        top: -60,
-        left: -60,
-        width: 200,
-        height: 200,
-        background: "radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 65%)",
-        pointerEvents: "none",
-        borderRadius: "50%",
-      }} />
     </div>
   );
 }
@@ -208,61 +189,39 @@ export default function ProductShowcase() {
       ref={ref}
       id="product"
       style={{
-        paddingBottom: "5rem",
+        padding: "5rem 0 7rem",
         position: "relative",
         overflow: "hidden",
+        background: "#fff",
       }}
     >
-      {/* Glow */}
-      <div style={{
-        position: "absolute",
-        width: 700,
-        height: 700,
-        bottom: "-20%",
-        left: "-10%",
-        background: "radial-gradient(circle, rgba(139,92,246,0.07) 0%, transparent 65%)",
-        filter: "blur(80px)",
-        pointerEvents: "none",
-        borderRadius: "50%",
-      }} />
-
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 5rem", position: "relative", zIndex: 1 }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 2.5rem", position: "relative", zIndex: 1 }}>
 
         {/* Header */}
-        <div className="reveal" style={{ maxWidth: 640, marginBottom: "4rem", textAlign: "left" }}>
+        <div className="reveal" style={{ textAlign: "center", maxWidth: 640, margin: "0 auto 4rem" }}>
           <div style={{
             display: "inline-block",
-            fontSize: "0.72rem",
-            fontWeight: 700,
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
-            color: "#a78bfa",
-            background: "rgba(167,139,250,0.08)",
-            border: "1px solid rgba(167,139,250,0.2)",
-            borderRadius: "2rem",
-            padding: "0.3rem 1rem",
-            marginBottom: "1.25rem",
+            fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.12em",
+            textTransform: "uppercase", color: "#5E5ADB",
+            background: "rgba(94,90,219,0.07)", border: "1.5px solid rgba(94,90,219,0.18)",
+            borderRadius: "999px", padding: "0.3rem 1rem", marginBottom: "1.25rem",
           }}>
             Product
           </div>
           <h2 style={{
-            fontSize: "clamp(1.9rem, 3.2vw, 2.75rem)",
-            fontWeight: 900,
-            color: "#fff",
-            lineHeight: 1.15,
-            letterSpacing: "-0.025em",
-            marginBottom: "1rem",
-            fontFamily: "'Outfit', 'Inter', sans-serif",
+            fontSize: "clamp(1.9rem, 3.2vw, 2.75rem)", fontWeight: 900,
+            color: "#111827", lineHeight: 1.15, letterSpacing: "-0.03em",
+            marginBottom: "1rem", fontFamily: "'Outfit', 'Inter', sans-serif",
           }}>
             Your events. Completely under control.
           </h2>
-          <p style={{ fontSize: "1rem", color: "rgba(148,163,184,0.7)", lineHeight: 1.7 }}>
+          <p style={{ fontSize: "1rem", color: "#6B7280", lineHeight: 1.7 }}>
             See your registration trends, financial health, and task progress — all in one intelligent dashboard.
           </p>
         </div>
 
         {/* Dashboard Preview */}
-        <div className="reveal" style={{ maxWidth: 900, margin: "0 auto" }}>
+        <div className="reveal" style={{ maxWidth: 860, margin: "0 auto" }}>
           <DashboardPreview />
         </div>
       </div>

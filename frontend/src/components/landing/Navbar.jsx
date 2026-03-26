@@ -1,154 +1,149 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import useMagnetic from "../../hooks/useMagnetic";
-import useNavbarStyle from "../../hooks/useNavbarStyle";
+import gsap from "gsap";
 
 const NAV_LINKS = [
+  { label: "Home", href: "#hero" },
+  { label: "About", href: "#problem" },
   { label: "Features", href: "#features" },
-  { label: "How It Works", href: "#how-it-works" },
-  { label: "Product", href: "#product" },
+  { label: "Testimonials", href: "#testimonials" },
+  { label: "Pricing", href: "#pricing" },
 ];
 
 export default function Navbar() {
-  const [mounted, setMounted] = useState(false);
-  const navRef = useRef(null);
-  const ctaBtnRef = useMagnetic(0.3);
-  const { bg, borderColor, shadow } = useNavbarStyle();
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => setMounted(true), 100);
+    // Entry animation — slide down from top
+    gsap.fromTo(
+      "#planora-navbar",
+      { opacity: 0, y: -16 },
+      { opacity: 1, y: 0, duration: 0.7, delay: 0.1, ease: "power3.out" }
+    );
+
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
-    <header
-      ref={navRef}
-      style={{
-        position: "fixed",
-        inset: "0 0 auto 0",
-        zIndex: 999,
-        height: 66,
-        display: "flex",
-        alignItems: "center",
-        backdropFilter: "blur(24px)",
-        WebkitBackdropFilter: "blur(24px)",
-        background: bg,
-        borderBottom: `1px solid ${borderColor}`,
-        boxShadow: shadow,
-        transition: "background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease",
-        opacity: mounted ? 1 : 0,
-        transform: mounted ? "translateY(0)" : "translateY(-12px)",
-        transitionDelay: mounted ? "0s" : "0s",
-      }}
-    >
-      <div
+    <>
+      <style>{`
+        .lp-nav-link {
+          padding: 0.45rem 1rem;
+          font-size: 0.9rem;
+          font-weight: 500;
+          color: #374151;
+          border-radius: 0.5rem;
+          transition: color 0.2s, background 0.2s;
+          text-decoration: none;
+          letter-spacing: -0.01em;
+        }
+        .lp-nav-link:hover {
+          color: #111827;
+          background: rgba(17,24,39,0.06);
+        }
+        .lp-login-link {
+          padding: 0.45rem 1.1rem;
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: #374151;
+          border-radius: 0.6rem;
+          transition: color 0.2s, background 0.2s;
+          text-decoration: none;
+        }
+        .lp-login-link:hover {
+          color: #111827;
+          background: rgba(17,24,39,0.06);
+        }
+        .lp-cta-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.45rem;
+          padding: 0.55rem 1.3rem;
+          font-size: 0.875rem;
+          font-weight: 700;
+          color: #fff;
+          background: #111827;
+          border-radius: 999px;
+          text-decoration: none;
+          border: none;
+          transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+          letter-spacing: -0.01em;
+        }
+        .lp-cta-btn:hover {
+          background: #1f2937;
+          transform: translateY(-1px);
+          box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+      `}</style>
+      <header
+        id="planora-navbar"
         style={{
-          width: "100%",
-          maxWidth: 1280,
-          margin: "0 auto",
-          padding: "0 5rem",
+          position: "fixed",
+          inset: "0 0 auto 0",
+          zIndex: 999,
+          height: 66,
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between",
-          gap: "2rem",
+          opacity: 0, // GSAP takes over
+          backdropFilter: scrolled ? "blur(20px) saturate(180%)" : "none",
+          WebkitBackdropFilter: scrolled ? "blur(20px) saturate(180%)" : "none",
+          background: scrolled
+            ? "rgba(255,255,255,0.88)"
+            : "transparent",
+          borderBottom: scrolled
+            ? "1px solid rgba(0,0,0,0.07)"
+            : "1px solid transparent",
+          boxShadow: scrolled ? "0 2px 24px rgba(0,0,0,0.06)" : "none",
+          transition: "background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, backdrop-filter 0.35s ease",
         }}
       >
-        {/* Logo */}
-        <Link to="/" style={{ display: "block", flexShrink: 0 }}>
-          <img
-            src="/logo-new.svg"
-            alt="Planora Logo"
-            style={{ height: "3rem", width: "auto", display: "block" }}
-          />
-        </Link>
-
-        {/* Center nav */}
-        <nav style={{ display: "flex", gap: "0.2rem", alignItems: "center" }}>
-          {NAV_LINKS.map(({ label, href }) => (
-            <a
-              key={label}
-              href={href}
-              style={{
-                padding: "0.45rem 0.9rem",
-                fontSize: "0.875rem",
-                fontWeight: 500,
-                color: "rgba(148,163,184,0.85)",
-                borderRadius: "0.5rem",
-                transition: "color 0.2s ease, background 0.2s ease",
-                textDecoration: "none",
-                letterSpacing: "0.01em",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = "#fff";
-                e.currentTarget.style.background = "rgba(255,255,255,0.06)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = "rgba(148,163,184,0.85)";
-                e.currentTarget.style.background = "transparent";
-              }}
-            >
-              {label}
-            </a>
-          ))}
-        </nav>
-
-        {/* Right CTAs */}
-        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", flexShrink: 0 }}>
-          <Link
-            to="/login"
-            style={{
-              padding: "0.45rem 1.1rem",
-              fontSize: "0.85rem",
-              fontWeight: 600,
-              color: "rgba(148,163,184,0.8)",
-              borderRadius: "0.6rem",
-              transition: "color 0.2s ease, background 0.2s ease",
-              textDecoration: "none",
-              border: "1px solid transparent",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = "#fff";
-              e.currentTarget.style.background = "rgba(255,255,255,0.05)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = "rgba(148,163,184,0.8)";
-              e.currentTarget.style.background = "transparent";
-            }}
-          >
-            Log in
+        <div
+          style={{
+            width: "100%",
+            maxWidth: 1200,
+            margin: "0 auto",
+            padding: "0 2.5rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "2rem",
+          }}
+        >
+          {/* Logo */}
+          <Link to="/" style={{ display: "block", flexShrink: 0 }}>
+            <img
+              src="/logo-new.svg"
+              alt="Planora Logo"
+              style={{ height: "2.4rem", width: "auto", display: "block" }}
+            />
           </Link>
-          <Link
-            to="/signup"
-            ref={ctaBtnRef}
-            style={{
-              padding: "0.5rem 1.3rem",
-              fontSize: "0.85rem",
-              fontWeight: 700,
-              color: "#fff",
-              borderRadius: "0.7rem",
-              background: "linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)",
-              textDecoration: "none",
-              boxShadow: "0 4px 15px -4px rgba(124,58,237,0.5)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              transition: "box-shadow 0.3s ease",
-              willChange: "transform",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.4rem",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = "0 8px 25px -4px rgba(124,58,237,0.65)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = "0 4px 15px -4px rgba(124,58,237,0.5)";
-            }}
-          >
-            Get Started
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
-            </svg>
-          </Link>
+
+          {/* Center nav */}
+          <nav style={{ display: "flex", gap: "0.1rem", alignItems: "center" }}>
+            {NAV_LINKS.map(({ label, href }) => (
+              <a key={label} href={href} className="lp-nav-link">
+                {label}
+              </a>
+            ))}
+          </nav>
+
+          {/* Right CTAs */}
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
+            <Link to="/login" className="lp-login-link">
+              Log in
+            </Link>
+            <Link to="/signup" className="lp-cta-btn">
+              Get Started
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="7" y1="17" x2="17" y2="7" /><polyline points="7 7 17 7 17 17" />
+              </svg>
+            </Link>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+    </>
   );
 }
