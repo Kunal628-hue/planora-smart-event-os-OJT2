@@ -32,9 +32,10 @@ if (isFirebaseConfigValid) {
 
 export { auth, db };
 
-// Enable persistence only once
+// Enable persistence - lazy triggered
 let persistencePromise = null;
-const initPersistence = () => {
+export const initPersistence = () => {
+    if (!db) return Promise.resolve();
     if (!persistencePromise) {
         persistencePromise = enableIndexedDbPersistence(db).catch((err) => {
             if (err.code === 'failed-precondition') {
@@ -46,8 +47,6 @@ const initPersistence = () => {
     }
     return persistencePromise;
 };
-
-initPersistence();
 
 export const googleProvider = new GoogleAuthProvider();
 

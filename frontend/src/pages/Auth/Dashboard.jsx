@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import {
     AlertTriangle,
@@ -12,7 +12,8 @@ import {
     ChevronRight,
     Search
 } from "lucide-react";
-import AiAssistant from "../../components/AiAssistant";
+
+const AiAssistant = lazy(() => import("../../components/AiAssistant"));
 
 export default function Dashboard() {
     const navigate = useNavigate();
@@ -175,6 +176,7 @@ export default function Dashboard() {
                     </div>
                     <button
                         onClick={handleResolve}
+                        aria-label="Resolve active risk"
                         style={{ color: "#be123c", fontWeight: 700, fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.05em", border: "none", background: "none", cursor: "pointer" }}
                     >
                         Resolve Now →
@@ -383,7 +385,13 @@ export default function Dashboard() {
             {selectedVendorModal && (
                 <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem" }}>
                     <div style={{ background: "#fff", width: "100%", maxWidth: "500px", borderRadius: "24px", padding: "2rem", boxShadow: "0 20px 50px rgba(0,0,0,0.2)", position: "relative", animation: "modalIn 0.3s ease-out" }}>
-                        <button onClick={() => setSelectedVendorModal(null)} style={{ position: "absolute", top: "1.5rem", right: "1.5rem", border: "none", background: "#f1f5f9", width: "32px", height: "32px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#64748b" }}>×</button>
+                        <button 
+                            onClick={() => setSelectedVendorModal(null)} 
+                            aria-label="Close vendor details"
+                            style={{ position: "absolute", top: "1.5rem", right: "1.5rem", border: "none", background: "#f1f5f9", width: "32px", height: "32px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#64748b" }}
+                        >
+                            ×
+                        </button>
 
                         <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "2rem" }}>
                             <div style={{ width: "64px", height: "64px", background: getCategoryStyles(selectedVendorModal.service).bg, borderRadius: "20px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "32px" }}>
@@ -419,7 +427,9 @@ export default function Dashboard() {
                 </div>
             )}
 
-            <AiAssistant eventId={selectedEventId} />
+            <Suspense fallback={null}>
+                <AiAssistant eventId={selectedEventId} />
+            </Suspense>
             <style>{`
                 @keyframes pulse {
                     0% { transform: scale(0.95); opacity: 0.9; }

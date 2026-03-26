@@ -243,6 +243,12 @@ export default function DashboardLayout() {
                         <div style={{ position: "relative" }}>
                             <div
                                 onClick={() => setShowUserMenu(!showUserMenu)}
+                                onKeyDown={(e) => e.key === "Enter" && setShowUserMenu(!showUserMenu)}
+                                role="button"
+                                tabIndex="0"
+                                aria-expanded={showUserMenu}
+                                aria-haspopup="true"
+                                aria-label="User Menu"
                                 style={{
                                     display: "flex",
                                     alignItems: "center",
@@ -253,7 +259,8 @@ export default function DashboardLayout() {
                                     transition: "all 0.2s",
                                     border: `1px solid ${showUserMenu ? 'var(--accent-primary)' : '#e8e8f5'}`,
                                     background: "#fff",
-                                    boxShadow: showUserMenu ? "0 4px 12px rgba(0,0,0,0.05)" : "none"
+                                    boxShadow: showUserMenu ? "0 4px 12px rgba(0,0,0,0.05)" : "none",
+                                    outline: "none"
                                 }}>
                                 <div style={{
                                     width: 36,
