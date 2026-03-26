@@ -55,19 +55,26 @@ export default function DashboardLayout() {
     const fetchEvents = async (uid) => {
         try {
             const res = await fetch(`${API_URL}/events?user=${uid}`);
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            
             const data = await res.json();
-            setEvents(data);
+            
+            if (Array.isArray(data)) {
+                setEvents(data);
 
-            // Sync with URL first if possible
-            const match = location.pathname.match(/\/events\/([^/]+)/);
-            if (match && match[1]) {
-                setSelectedEventId(match[1]);
-            } else if (data.length > 0) {
-                // Otherwise keep existing selection or pick first
-                setSelectedEventId(prev => {
-                    const exists = data.find(e => (e.id || e._id) === prev);
-                    return exists ? prev : (data[0].id || data[0]._id);
-                });
+                // Sync with URL first if possible
+                const match = location.pathname.match(/\/events\/([^/]+)/);
+                if (match && match[1]) {
+                    setSelectedEventId(match[1]);
+                } else if (data.length > 0) {
+                    // Otherwise keep existing selection or pick first
+                    setSelectedEventId(prev => {
+                        const exists = data.find(e => (e.id || e._id) === prev);
+                        return exists ? prev : (data[0].id || data[0]._id);
+                    });
+                }
+            } else {
+                setEvents([]);
             }
         } catch (err) {
             console.error("Layout fetch error:", err);
@@ -112,7 +119,8 @@ export default function DashboardLayout() {
         }
     };
 
-    const selectedEvent = events.find(e => (e.id || e._id) === selectedEventId);
+    const safeEvents = Array.isArray(events) ? events : [];
+    const selectedEvent = safeEvents.find(e => (e.id || e._id) === selectedEventId);
 
     return (
         <div className="dashboard-layout">
@@ -162,10 +170,10 @@ export default function DashboardLayout() {
                                     textOverflow: "ellipsis"
                                 }}
                             >
-                                {events.length === 0 ? (
+                                {safeEvents.length === 0 ? (
                                     <option value="">No events</option>
                                 ) : (
-                                    events.map(event => (
+                                    safeEvents.map(event => (
                                         <option key={event.id || event._id} value={event.id || event._id} style={{ background: "#1a1a2e", color: "#fff" }}>
                                             {event.name}
                                         </option>

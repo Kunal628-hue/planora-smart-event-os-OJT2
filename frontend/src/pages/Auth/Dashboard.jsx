@@ -123,7 +123,9 @@ export default function Dashboard() {
         return styles[service] || styles["Other"];
     };
 
-    if (loading && events.length === 0) {
+    const safeEvents = Array.isArray(events) ? events : [];
+
+    if (loading && safeEvents.length === 0) {
         return (
             <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "70vh" }}>
                 <RefreshCw className="animate-spin" size={24} color="#2563eb" />
@@ -131,7 +133,7 @@ export default function Dashboard() {
         );
     }
 
-    if (events.length === 0 && !loading) {
+    if (safeEvents.length === 0 && !loading) {
         return (
             <div style={{ 
                 display: "flex", 
