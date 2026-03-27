@@ -1,4 +1,6 @@
 {
+  "framework": "vite",
+  "buildCommand": "vite build",
   "routes": [
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/index.html" }
