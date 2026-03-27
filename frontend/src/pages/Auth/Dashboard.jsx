@@ -354,7 +354,8 @@ export default function Dashboard() {
 
                         <div style={{ display: "flex", justifyContent: "space-between" }}>
                             {timeline.slice(0, 5).map((step, idx) => {
-                                const currentPhaseIdx = timeline.findIndex(s => daysRemaining <= s.daysBefore);
+                                // Find the CURRENT active step (the first one where we have MORE or equal days left than the milestone)
+                                const currentPhaseIdx = timeline.findIndex(s => daysRemaining >= s.daysBefore);
                                 const isActive = idx === (currentPhaseIdx === -1 ? timeline.length - 1 : currentPhaseIdx);
                                 const isPast = idx < (currentPhaseIdx === -1 ? timeline.length - 1 : currentPhaseIdx);
 
