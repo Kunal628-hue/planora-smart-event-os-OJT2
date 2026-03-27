@@ -1,4 +1,5 @@
 import Event from "../models/Event.js";
+import Vendor from "../models/Vendor.js";
 
 // @desc    Create a new event
 // @route   POST /api/events
@@ -38,6 +39,18 @@ export const getEvents = async (req, res) => {
         console.log(`[Backend] Fetching events for user: ${userId}`);
         const events = await Event.find(filter).sort({ createdAt: -1 });
 
+        // Calculate actual spent for each event
+        const eventIds = events.map(e => e._id);
+        const spendings = await Vendor.aggregate([
+            { $match: { event: { $in: eventIds } } },
+            { $group: { _id: "$event", total: { $sum: "$cost" } } }
+        ]);
+
+        const spendMap = spendings.reduce((acc, curr) => {
+            acc[curr._id.toString()] = curr.total;
+            return acc;
+        }, {});
+
         // Map 'title' back to 'name' and '_id' to 'id' for frontend compatibility
         const formattedEvents = events.map(event => ({
             id: event._id,
@@ -47,7 +60,8 @@ export const getEvents = async (req, res) => {
             type: event.type || "Other",
             budget: event.budget,
             status: event.status,
-            userId: event.user
+            userId: event.user,
+            spent: spendMap[event._id.toString()] || 0
         }));
 
         res.json(formattedEvents);

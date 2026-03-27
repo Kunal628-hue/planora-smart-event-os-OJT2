@@ -179,9 +179,9 @@ export default function Events() {
                 ) : (
                     events.map(event => {
                         const statusColor = getStatusColor(event.status);
-                        const spent = Math.floor(Math.random() * (event.budget * 0.8));
+                        const spent = event.spent || 0;
                         const remaining = event.budget - spent;
-                        const utilization = (spent / event.budget) * 100;
+                        const utilization = event.budget > 0 ? (spent / event.budget) * 100 : 0;
 
                         return (
                             <div
