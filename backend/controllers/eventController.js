@@ -30,8 +30,12 @@ export const createEvent = async (req, res) => {
 export const getEvents = async (req, res) => {
     try {
         const userId = req.query.user;
-        const filter = userId ? { user: userId } : {};
+        if (!userId) {
+            return res.status(400).json({ message: "User ID is required" });
+        }
+        const filter = { user: userId };
 
+        console.log(`[Backend] Fetching events for user: ${userId}`);
         const events = await Event.find(filter).sort({ createdAt: -1 });
 
         // Map 'title' back to 'name' and '_id' to 'id' for frontend compatibility
@@ -48,7 +52,8 @@ export const getEvents = async (req, res) => {
 
         res.json(formattedEvents);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error("[Backend] Error in getEvents:", error);
+        res.status(500).json({ message: "Failed to retrieve events. Check database connectivity.", error: error.message });
     }
 };
 

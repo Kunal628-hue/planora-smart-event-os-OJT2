@@ -1,10 +1,12 @@
+import { Suspense, lazy } from "react";
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero";
-import Features from "../components/landing/Features";
-import Testimonials from "../components/landing/Testimonials";
-import Connect from "../components/landing/Connect";
-import FinalCTA from "../components/landing/FinalCTA";
 import CustomCursor from "../components/landing/CustomCursor";
+
+const Features = lazy(() => import("../components/landing/Features"));
+const Testimonials = lazy(() => import("../components/landing/Testimonials"));
+const Connect = lazy(() => import("../components/landing/Connect"));
+const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
 import { Link } from "react-router-dom";
 
 const FOOTER_LINKS = {
@@ -20,10 +22,12 @@ export default function Landing() {
       <CustomCursor />
       <Navbar />
       <Hero />
-      <Features />
-      <Testimonials />
-      <Connect />
-      <FinalCTA />
+      <Suspense fallback={null}>
+        <Features />
+        <Testimonials />
+        <Connect />
+        <FinalCTA />
+      </Suspense>
 
       {/* Footer matching reference video style (simple dark or light, video shows light footer at end) */}
       <footer style={{ background: "#FAFAFA", paddingTop: "4rem", paddingBottom: "2.5rem", borderTop: "1px solid #E5E7EB" }}>

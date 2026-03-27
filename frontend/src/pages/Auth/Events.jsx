@@ -24,7 +24,11 @@ export default function Events() {
         try {
             const response = await fetch(`${API_URL}/events?user=${user.uid}`);
             const data = await response.json();
-            setEvents(data);
+            if (Array.isArray(data)) {
+                setEvents(data);
+            } else {
+                setEvents([]);
+            }
         } catch (err) {
             console.error("Fetch error:", err);
         } finally {

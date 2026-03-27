@@ -229,40 +229,7 @@ export default function DashboardLayout() {
                     ))}
                 </nav>
 
-                <div style={{ marginTop: "auto", padding: "1.25rem 0.75rem" }}>
-                    <div style={{ 
-                        background: "rgba(108, 92, 231, 0.1)", 
-                        border: "1px solid rgba(108, 92, 231, 0.2)",
-                        borderRadius: "16px",
-                        padding: "1.25rem",
-                        position: "relative",
-                        overflow: "hidden"
-                    }}>
-                        <div style={{ 
-                            position: "absolute", 
-                            top: -10, right: -10, 
-                            width: "50px", height: "50px", 
-                            background: "rgba(108, 92, 231, 0.2)", 
-                            filter: "blur(20px)", borderRadius: "50%" 
-                        }}></div>
-                        <div style={{ position: "relative", zIndex: 1 }}>
-                            <div style={{ fontSize: "0.75rem", fontWeight: 800, color: "#6c5ce7", marginBottom: "0.25rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Pro Access</div>
-                            <p style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.4)", fontWeight: 500, marginBottom: "0.75rem", lineHeight: 1.4 }}>Unlock advanced AI insights and automation.</p>
-                            <button style={{ 
-                                width: "100%", 
-                                padding: "0.5rem", 
-                                background: "#6c5ce7", 
-                                border: "none", 
-                                borderRadius: "8px", 
-                                color: "#fff", 
-                                fontSize: "0.75rem", 
-                                fontWeight: 700,
-                                cursor: "pointer",
-                                boxShadow: "0 4px 12px rgba(108, 92, 231, 0.3)"
-                            }}>Upgrade Now</button>
-                        </div>
-                    </div>
-                </div>
+
 
 
             </aside>
