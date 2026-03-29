@@ -135,11 +135,11 @@ export default function Dashboard() {
 
     if (safeEvents.length === 0 && !loading) {
         return (
-            <div style={{ 
-                display: "flex", 
-                flexDirection: "column", 
-                alignItems: "center", 
-                justifyContent: "center", 
+            <div style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
                 padding: "6rem 2rem",
                 textAlign: "center"
             }}>
@@ -167,14 +167,14 @@ export default function Dashboard() {
                     }}></div>
 
                     <div style={{ position: "relative", zIndex: 1 }}>
-                        <div style={{ 
-                            width: "80px", 
-                            height: "80px", 
-                            background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)", 
-                            borderRadius: "24px", 
-                            display: "flex", 
-                            alignItems: "center", 
-                            justifyContent: "center", 
+                        <div style={{
+                            width: "80px",
+                            height: "80px",
+                            background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
+                            borderRadius: "24px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
                             margin: "0 auto 2rem",
                             boxShadow: "0 15px 30px rgba(37, 99, 235, 0.25)",
                             transform: "rotate(-5deg)"
@@ -182,22 +182,22 @@ export default function Dashboard() {
                             <Sparkles size={36} color="#fff" />
                         </div>
 
-                        <h1 style={{ 
-                            fontSize: "2.5rem", 
-                            fontWeight: 800, 
-                            color: "#1e293b", 
-                            marginBottom: "1rem", 
+                        <h1 style={{
+                            fontSize: "2.5rem",
+                            fontWeight: 800,
+                            color: "#1e293b",
+                            marginBottom: "1rem",
                             letterSpacing: "-0.04em",
-                            lineHeight: 1.1 
+                            lineHeight: 1.1
                         }}>
                             Welcome to <span style={{ color: "#2563eb" }}>Planora OS</span>.
                         </h1>
-                        
-                        <p style={{ 
-                            fontSize: "1.05rem", 
-                            color: "#64748b", 
-                            marginBottom: "2.5rem", 
-                            maxWidth: "400px", 
+
+                        <p style={{
+                            fontSize: "1.05rem",
+                            color: "#64748b",
+                            marginBottom: "2.5rem",
+                            maxWidth: "400px",
                             marginInline: "auto",
                             lineHeight: 1.6,
                             fontWeight: 500
@@ -206,14 +206,14 @@ export default function Dashboard() {
                         </p>
 
                         <div style={{ display: "flex", gap: "1rem", justifyContent: "center" }}>
-                            <button 
-                                className="btn btn-primary" 
-                                style={{ 
-                                    padding: "1rem 2.5rem", 
-                                    borderRadius: "14px", 
-                                    fontSize: "0.95rem", 
+                            <button
+                                className="btn btn-primary"
+                                style={{
+                                    padding: "1rem 2.5rem",
+                                    borderRadius: "14px",
+                                    fontSize: "0.95rem",
                                     fontWeight: 700,
-                                    boxShadow: "0 10px 25px rgba(37, 99, 235, 0.3)" 
+                                    boxShadow: "0 10px 25px rgba(37, 99, 235, 0.3)"
                                 }}
                                 onClick={() => navigate('/events')}
                             >
@@ -485,8 +485,8 @@ export default function Dashboard() {
             {selectedVendorModal && (
                 <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem" }}>
                     <div style={{ background: "#fff", width: "100%", maxWidth: "500px", borderRadius: "24px", padding: "2rem", boxShadow: "0 20px 50px rgba(0,0,0,0.2)", position: "relative", animation: "modalIn 0.3s ease-out" }}>
-                        <button 
-                            onClick={() => setSelectedVendorModal(null)} 
+                        <button
+                            onClick={() => setSelectedVendorModal(null)}
                             aria-label="Close vendor details"
                             style={{ position: "absolute", top: "1.5rem", right: "1.5rem", border: "none", background: "#f1f5f9", width: "32px", height: "32px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#64748b" }}
                         >

@@ -295,7 +295,7 @@ export default function Events() {
                                     <LayoutGrid size={15} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
                                     <input
                                         required
-                                        placeholder="Global Tech Summit 2026"
+                                        placeholder=""
                                         value={newEvent.name}
                                         onChange={e => setNewEvent({ ...newEvent, name: e.target.value })}
                                         style={inputStyle}
@@ -327,6 +327,8 @@ export default function Events() {
                                         <option>Wedding</option>
                                         <option>Conference</option>
                                         <option>Corporate</option>
+                                        <option>Birthday</option>
+                                        <option>Tech Summits</option>
                                         <option>Other</option>
                                     </select>
                                 </div>
