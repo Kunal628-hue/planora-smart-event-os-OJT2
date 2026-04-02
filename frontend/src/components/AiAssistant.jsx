@@ -15,7 +15,7 @@ export default function AiAssistant({ eventId }) {
         if (scrollRef.current) {
             scrollRef.current.scrollTo({
                 top: scrollRef.current.scrollHeight,
-                behavior: "smooth"
+                behavior: "smooth"        // Scrolls to bottom when messages update.
             });
         }
     }, [messages, loading]);

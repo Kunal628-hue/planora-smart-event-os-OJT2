@@ -209,19 +209,27 @@ export default function Events() {
                                             <div style={{ display: "flex", alignItems: "center", gap: "4px" }}><MapPin size={13} /> {event.location}</div>
                                         </div>
                                     </div>
-                                    <div style={{
-                                        padding: "4px 10px",
-                                        borderRadius: "8px",
-                                        background: `${statusColor}10`,
-                                        color: statusColor,
-                                        fontSize: "10px",
-                                        fontWeight: 900,
-                                        textTransform: "uppercase",
-                                        letterSpacing: "0.05em",
-                                        border: `1px solid ${statusColor}20`
-                                    }}>
+                                    <button
+                                        onClick={(e) => handleToggleStatus(e, event.id || event._id, event.status)}
+                                        style={{
+                                            padding: "4px 10px",
+                                            borderRadius: "8px",
+                                            background: `${statusColor}10`,
+                                            color: statusColor,
+                                            fontSize: "10px",
+                                            fontWeight: 900,
+                                            textTransform: "uppercase",
+                                            letterSpacing: "0.05em",
+                                            border: `1px solid ${statusColor}20`,
+                                            cursor: "pointer",
+                                            transition: "all 0.2s ease"
+                                        }}
+                                        onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.05)"; e.currentTarget.style.boxShadow = `0 2px 8px ${statusColor}30`; }}
+                                        onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "none"; }}
+                                        title={`Click to mark as ${event.status === "Completed" ? "Planned" : "Completed"}`}
+                                    >
                                         {event.status}
-                                    </div>
+                                    </button>
                                 </div>
 
                                 <div style={{ background: "#f8fafc", padding: "1rem", borderRadius: "16px" }}>

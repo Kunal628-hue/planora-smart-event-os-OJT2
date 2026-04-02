@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import { animate, stagger } from "animejs";
-import { Plus, ListTodo, Calendar, Clock, AlertCircle, Loader2, X } from "lucide-react";
+import { Plus, ListTodo, Calendar, Clock, AlertCircle, Loader2, X, Edit2, Trash2 } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -10,6 +10,7 @@ export default function Tasks() {
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
+    const [editingTask, setEditingTask] = useState(null);
     const [newTask, setNewTask] = useState({
         title: "",
         dueDate: "",
@@ -58,8 +59,10 @@ export default function Tasks() {
     const handleCreateTask = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch(`${API_URL}/tasks`, {
-                method: "POST",
+            const method = editingTask ? "PATCH" : "POST";
+            const url = editingTask ? `${API_URL}/tasks/${editingTask._id}` : `${API_URL}/tasks`;
+            const response = await fetch(url, {
+                method,
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     title: newTask.title,
@@ -71,6 +74,7 @@ export default function Tasks() {
             });
             if (response.ok) {
                 setShowModal(false);
+                setEditingTask(null);
                 setNewTask({
                     title: "",
                     dueDate: "",
@@ -80,7 +84,32 @@ export default function Tasks() {
                 fetchData();
             }
         } catch (err) {
-            console.error("Failed to add task:", err);
+            console.error("Failed to save task:", err);
+        }
+    };
+
+    const handleEditTask = (task) => {
+        setEditingTask(task);
+        setNewTask({
+            title: task.title,
+            dueDate: task.dueDate ? task.dueDate.split('T')[0] : "",
+            priority: task.priority || "Medium",
+            eventId: task.event?._id || task.event || ""
+        });
+        setShowModal(true);
+    };
+
+    const handleDeleteTask = async (taskId) => {
+        if (!window.confirm("Are you sure you want to remove this task?")) return;
+        try {
+            const response = await fetch(`${API_URL}/tasks/${taskId}`, {
+                method: "DELETE"
+            });
+            if (response.ok) {
+                setTasks(tasks.filter(t => t._id !== taskId));
+            }
+        } catch (err) {
+            console.error("Failed to delete task:", err);
         }
     };
 
@@ -206,7 +235,7 @@ export default function Tasks() {
                 <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                     <div style={{
                         display: "grid",
-                        gridTemplateColumns: "1fr 180px 180px 140px",
+                        gridTemplateColumns: "1fr 180px 180px 140px 100px",
                         padding: "0 2.5rem 1rem",
                         color: "#94a3b8",
                         fontSize: "11px",
@@ -217,14 +246,15 @@ export default function Tasks() {
                         <span>Requirement</span>
                         <span style={{ textAlign: "center" }}>Context</span>
                         <span style={{ textAlign: "center" }}>Deadline</span>
-                        <span style={{ textAlign: "right" }}>Priority</span>
+                        <span style={{ textAlign: "center" }}>Priority</span>
+                        <span style={{ textAlign: "right" }}>Actions</span>
                     </div>
                     {filteredTasks.map(task => (
                         <div key={task._id} className="task-row" style={{
                             background: "#fff",
                             padding: "1.5rem 2.5rem",
                             display: "grid",
-                            gridTemplateColumns: "1fr 180px 180px 140px",
+                            gridTemplateColumns: "1fr 180px 180px 140px 100px",
                             alignItems: "center",
                             borderRadius: "24px",
                             border: "1px solid #f1f5f9",
@@ -282,7 +312,7 @@ export default function Tasks() {
                                 </div>
                             </div>
 
-                            <div style={{ textAlign: "right" }}>
+                            <div style={{ textAlign: "center" }}>
                                 <span style={{
                                     fontSize: "10px",
                                     padding: "6px 14px",
@@ -294,6 +324,29 @@ export default function Tasks() {
                                     letterSpacing: "0.05em",
                                     border: `1px solid ${task.priority === "High" ? "#be123c20" : task.priority === "Medium" ? "#92400e20" : "#2563eb20"}`
                                 }}>{task.priority}</span>
+                            </div>
+
+                            <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem" }}>
+                                <button
+                                    onClick={() => handleEditTask(task)}
+                                    className="task-action-btn"
+                                    style={{ background: "#f8fafc", border: "1px solid #e2e8f0", color: "#64748b", width: "32px", height: "32px", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.2s" }}
+                                    onMouseEnter={e => { e.currentTarget.style.background = "#eff6ff"; e.currentTarget.style.color = "#2563eb"; e.currentTarget.style.borderColor = "#dbeafe"; }}
+                                    onMouseLeave={e => { e.currentTarget.style.background = "#f8fafc"; e.currentTarget.style.color = "#64748b"; e.currentTarget.style.borderColor = "#e2e8f0"; }}
+                                    title="Edit task"
+                                >
+                                    <Edit2 size={14} />
+                                </button>
+                                <button
+                                    onClick={() => handleDeleteTask(task._id)}
+                                    className="task-action-btn"
+                                    style={{ background: "#fef2f2", border: "1px solid #fee2e2", color: "#ef4444", width: "32px", height: "32px", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.2s" }}
+                                    onMouseEnter={e => { e.currentTarget.style.background = "#fee2e2"; e.currentTarget.style.borderColor = "#fecaca"; }}
+                                    onMouseLeave={e => { e.currentTarget.style.background = "#fef2f2"; e.currentTarget.style.borderColor = "#fee2e2"; }}
+                                    title="Delete task"
+                                >
+                                    <Trash2 size={14} />
+                                </button>
                             </div>
                         </div>
                     ))}
@@ -308,10 +361,10 @@ export default function Tasks() {
                                 <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "#eff6ff", display: "flex", alignItems: "center", justifyContent: "center", color: "#2563eb" }}>
                                     <ListTodo size={24} strokeWidth={2.5} />
                                 </div>
-                                <h2 style={{ fontSize: "1.75rem", fontWeight: 800, margin: 0, letterSpacing: "-0.03em" }}>Define Milestone</h2>
+                                <h2 style={{ fontSize: "1.75rem", fontWeight: 800, margin: 0, letterSpacing: "-0.03em" }}>{editingTask ? "Edit Milestone" : "Define Milestone"}</h2>
                             </div>
                             <button
-                                onClick={() => setShowModal(false)}
+                                onClick={() => { setShowModal(false); setEditingTask(null); setNewTask({ title: "", dueDate: "", priority: "Medium", eventId: selectedEventId }); }}
                                 style={{ background: "#f1f5f9", border: "none", color: "#64748b", width: "36px", height: "36px", borderRadius: "50%", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
                             ><X size={20} strokeWidth={2.5} /></button>
                         </div>
@@ -350,8 +403,8 @@ export default function Tasks() {
                                 </div>
                             </div>
                             <div style={{ display: "flex", gap: "1.25rem", marginTop: "1rem" }}>
-                                <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, padding: "1.1rem", borderRadius: "14px", border: "none", background: "#f1f5f9", fontWeight: 800, cursor: "pointer" }}>Cancel</button>
-                                <button type="submit" style={{ flex: 2, padding: "1.1rem", borderRadius: "14px", border: "none", background: "#2563eb", color: "#fff", fontWeight: 900, cursor: "pointer", boxShadow: "0 8px 20px rgba(37, 99, 235, 0.2)" }}>Create Milestone</button>
+                                <button type="button" onClick={() => { setShowModal(false); setEditingTask(null); setNewTask({ title: "", dueDate: "", priority: "Medium", eventId: selectedEventId }); }} style={{ flex: 1, padding: "1.1rem", borderRadius: "14px", border: "none", background: "#f1f5f9", fontWeight: 800, cursor: "pointer" }}>Cancel</button>
+                                <button type="submit" style={{ flex: 2, padding: "1.1rem", borderRadius: "14px", border: "none", background: "#2563eb", color: "#fff", fontWeight: 900, cursor: "pointer", boxShadow: "0 8px 20px rgba(37, 99, 235, 0.2)" }}>{editingTask ? "Save Changes" : "Create Milestone"}</button>
                             </div>
                         </form>
                     </div>

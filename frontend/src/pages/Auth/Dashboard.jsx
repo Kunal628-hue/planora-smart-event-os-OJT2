@@ -405,7 +405,7 @@ export default function Dashboard() {
                     <div>
                         <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "1.5rem" }}>Budget Summary</div>
                         <div style={{ marginBottom: "2rem" }}>
-                            <div style={{ fontSize: "32px", fontWeight: 800, color: "#fff" }}>₹{Math.round((healthData?.metrics?.budgetUsage / 100 || 0) * selectedEvent?.budget).toLocaleString()}</div>
+                            <div style={{ fontSize: "32px", fontWeight: 800, color: "#fff" }}>₹{(healthData?.metrics?.totalSpent || 0).toLocaleString()}</div>
                             <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", fontWeight: 500 }}>Current Spend / ₹{selectedEvent?.budget?.toLocaleString()} Cap</div>
                         </div>
                     </div>

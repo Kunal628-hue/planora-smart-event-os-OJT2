@@ -85,7 +85,8 @@ export default function Guests() {
     };
 
     const toggleStatus = async (guestId, currentStatus) => {
-        const newStatus = currentStatus === "Confirmed" ? "Pending" : "Confirmed";
+        const statusCycle = { "Pending": "Confirmed", "Confirmed": "Declined", "Declined": "Pending" };
+        const newStatus = statusCycle[currentStatus] || "Pending";
         try {
             const response = await fetch(`${API_URL}/guests/${guestId}`, {
                 method: "PATCH",
@@ -247,7 +248,7 @@ export default function Guests() {
                                             background: guest.status === "Confirmed" ? "#f0fdf4" : guest.status === "Declined" ? "#fff1f2" : "#f8fafc",
                                             color: guest.status === "Confirmed" ? "#10b981" : guest.status === "Declined" ? "#ef4444" : "#64748b",
                                             cursor: "pointer",
-                                            border: `1px solid ${guest.status === "Confirmed" ? "#10b98120" : "#64748b20"}`,
+                                            border: `1px solid ${guest.status === "Confirmed" ? "#10b98120" : guest.status === "Declined" ? "#ef444420" : "#64748b20"}`,
                                             fontWeight: 800,
                                             padding: "6px 14px",
                                             borderRadius: "100px",

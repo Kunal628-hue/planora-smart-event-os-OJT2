@@ -110,7 +110,7 @@ export default function AuthBackground() {
                 }}
             />
 
-            {/* Mouse following glow - now much hotter */}
+            {/* Mouse following glow - now much better */}
             <div
                 ref={mouseGlowRef}
                 style={{
@@ -146,7 +146,7 @@ export default function AuthBackground() {
                 />
             ))}
 
-            {/* Floating shards/geometric shapes */}
+            {/* Floating shards/geometric shapes remove shards */}
             {SHARDS.map((shard, i) => (
                 <div
                     key={i}

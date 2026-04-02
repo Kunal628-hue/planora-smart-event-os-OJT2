@@ -62,6 +62,7 @@ export const getEventHealth = async (req, res) => {
             metrics: {
                 taskCompletion: Math.round(taskRate),
                 budgetUsage: Math.round(budgetUsage),
+                totalSpent: totalCost,
                 vendorConfirmation: Math.round(vendorRate),
                 rsvpRate: Math.round(rsvpRate),
                 overdueTasks

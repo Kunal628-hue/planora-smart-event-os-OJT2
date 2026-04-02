@@ -31,9 +31,13 @@ export default function Budget() {
         if (!user) return;
         setLoading(true);
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/vendors?user=${user.uid}`);
+            let url = `${import.meta.env.VITE_API_URL}/vendors?user=${user.uid}`;
+            if (selectedEventId) {
+                url += `&eventId=${selectedEventId}`;
+            }
+            const res = await fetch(url);
             const vendorsData = await res.json();
-            setVendors(vendorsData);
+            setVendors(Array.isArray(vendorsData) ? vendorsData : []);
         } catch (err) {
             console.error("Fetch error:", err);
         } finally {
@@ -43,10 +47,12 @@ export default function Budget() {
 
     useEffect(() => {
         fetchData();
-    }, [user]);
+    }, [user, selectedEventId]);
 
     const activeEvent = events.find(e => (e.id || e._id) === selectedEventId);
-    const eventVendors = vendors.filter(v => v.event === selectedEventId);
+    const eventVendors = selectedEventId
+        ? vendors.filter(v => String(v.event?._id || v.event) === String(selectedEventId))
+        : vendors;
 
     const totalAllocated = activeEvent ? activeEvent.budget : 0;
     const totalSpent = eventVendors.reduce((sum, v) => sum + (v.cost || 0), 0);

@@ -1,5 +1,5 @@
 import React from 'react';
-
+// Google auth button 
 const SocialAuth = ({ onLogin, loading }) => {
     return (
         <div className="social-group" style={{ display: 'flex', justifyContent: 'center' }}>
