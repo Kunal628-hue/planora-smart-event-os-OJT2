@@ -173,15 +173,8 @@ const GooeyNav = ({
           }
           .effect.filter {
             filter: blur(8px) contrast(25);
-            mix-blend-mode: multiply;
             z-index: 1;
-          }
-          .effect.filter::before {
-            content: "";
-            position: absolute;
-            inset: -100px;
-            z-index: -2;
-            background: white;
+            /* White background and multiply removed to fix white box issue */
           }
           .effect.filter::after {
             content: "";

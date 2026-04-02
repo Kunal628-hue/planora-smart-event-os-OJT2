@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import DarkVeil from "../ui/DarkVeil";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -133,6 +134,27 @@ export default function Hero() {
         }
       `}} />
 
+      {/* DarkVeil Background Animation */}
+      <div style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        zIndex: 0,
+        opacity: 0.15, // Subtle matching effect
+        pointerEvents: "none"
+      }}>
+        <DarkVeil 
+          speed={0.15} 
+          hueShift={-80} 
+          noiseIntensity={0.02} 
+          scanlineIntensity={0.05} 
+          scanlineFrequency={150}
+          warpAmount={0.2}
+        />
+      </div>
+
       {/* Glowing Rotating Orb */}
       <div className="scroll-color-shift" style={{
         position: "absolute",
@@ -140,7 +162,7 @@ export default function Hero() {
         left: "20%",
         width: "60vw",
         height: "60vw",
-        background: "radial-gradient(circle, rgba(99,102,241,0.08) 0%, rgba(236,72,153,0.04) 40%, transparent 70%)",
+        background: "radial-gradient(circle, rgba(99,102,241,0.06) 0%, rgba(236,72,153,0.03) 40%, transparent 70%)",
         animation: "orb-spin 20s linear infinite",
         pointerEvents: "none",
         zIndex: 0
@@ -219,7 +241,7 @@ export default function Hero() {
               <svg className="planora-box scroll-color-shift" style={{ 
                 position: "absolute", top: 0, left: 0, width: "100%", height: "100%", zIndex: -1 
               }} preserveAspectRatio="none">
-                <rect width="100%" height="100%" rx="8" fill="rgba(37,99,235,0.05)" stroke="url(#box-gradient)" strokeWidth="3" strokeDasharray="1000" strokeDashoffset="1000" />
+                <rect width="100%" height="100%" rx="8" fill="rgba(37,99,235,0.06)" stroke="url(#box-gradient)" strokeWidth="3" strokeDasharray="1000" strokeDashoffset="1000" />
                 <defs>
                   <linearGradient id="box-gradient" x1="0" y1="0" x2="1" y2="1">
                     <stop stopColor="#3B82F6" />

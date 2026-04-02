@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import SpotlightCard from "../ui/SpotlightCard";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -175,11 +176,10 @@ export default function Features() {
           100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
         }
         .feature-card {
-          transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .feature-card:hover {
           transform: translateY(-8px) scale(1.01) rotate(1deg);
-          box-shadow: 0 30px 60px -12px rgba(0,0,0,0.12), 0 18px 36px -18px rgba(0,0,0,0.05);
         }
       `}} />
 
@@ -217,21 +217,18 @@ export default function Features() {
           gap: "2rem"
         }}>
           {FEATURES.map((f, i) => (
-            <div
+            <SpotlightCard
               key={f.title}
               ref={el => cardsRef.current[i] = el}
               className="feature-card"
+              spotlightColor="rgba(37, 99, 235, 0.15)"
               style={{
-                background: "#fff",
-                borderRadius: "1.5rem",
                 padding: "3rem",
-                border: "1px solid rgba(0,0,0,0.05)",
-                boxShadow: "0 10px 30px -10px rgba(0,0,0,0.05)",
                 display: "flex",
                 flexDirection: "column",
                 gap: "2rem",
-                position: "relative",
-                overflow: "hidden"
+                boxShadow: "0 10px 30px -10px rgba(0,0,0,0.05)",
+                border: "1px solid rgba(0,0,0,0.05)"
               }}
             >
               <div>
@@ -256,7 +253,7 @@ export default function Features() {
               <div style={{ flexShrink: 0 }}>
                 {f.mockup}
               </div>
-            </div>
+            </SpotlightCard>
           ))}
         </div>
       </div>

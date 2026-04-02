@@ -8,6 +8,7 @@ const Testimonials = lazy(() => import("../components/landing/Testimonials"));
 const Connect = lazy(() => import("../components/landing/Connect"));
 const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
 import { Link } from "react-router-dom";
+import ClickSpark from "../components/ui/ClickSpark";
 
 const FOOTER_LINKS = {
   "How it Work": ["Features", "Pricing", "Integrations", "Demo"],
@@ -30,40 +31,48 @@ export default function Landing() {
       </Suspense>
 
       {/* Footer matching reference video style (simple dark or light, video shows light footer at end) */}
-      <footer style={{ background: "#FAFAFA", paddingTop: "4rem", paddingBottom: "2.5rem", borderTop: "1px solid #E5E7EB" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 2.5rem" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "2rem", marginBottom: "3rem" }}>
-            <div>
-              <Link to="/" style={{ display: "block", marginBottom: "1.5rem" }}>
-                <img src="/logo-new.svg" alt="Planora" style={{ height: "2.2rem", width: "auto" }} />
-              </Link>
-              <p style={{ fontSize: "0.85rem", color: "#6B7280", lineHeight: 1.7, maxWidth: 260 }}>
-                Effortlessly manage tasks, set reminders, and stay organized – all in one intuitive platform.
-              </p>
-            </div>
-            {Object.entries(FOOTER_LINKS).map(([heading, links]) => (
-              <div key={heading}>
-                <p style={{ fontSize: "0.85rem", fontWeight: 700, color: "#111827", marginBottom: "1.2rem" }}>
-                  {heading}
+      <footer style={{ background: "#FAFAFA", borderTop: "1px solid #E5E7EB" }}>
+        <ClickSpark
+          sparkColor="#111827"
+          sparkSize={10}
+          sparkRadius={15}
+          sparkCount={8}
+          duration={400}
+        >
+          <div style={{ maxWidth: 1200, margin: "0 auto", padding: "4rem 2.5rem 2.5rem" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "2rem", marginBottom: "3rem" }}>
+              <div>
+                <Link to="/" style={{ display: "block", marginBottom: "1.5rem" }}>
+                  <img src="/logo-new.svg" alt="Planora" style={{ height: "2.2rem", width: "auto" }} />
+                </Link>
+                <p style={{ fontSize: "0.85rem", color: "#6B7280", lineHeight: 1.7, maxWidth: 260 }}>
+                  Effortlessly manage tasks, set reminders, and stay organized – all in one intuitive platform.
                 </p>
-                <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "0.8rem", padding: 0, margin: 0 }}>
-                  {links.map((l) => (
-                    <li key={l}>
-                      <span style={{ fontSize: "0.85rem", color: "#6B7280", cursor: "pointer" }}>{l}</span>
-                    </li>
-                  ))}
-                </ul>
               </div>
-            ))}
-          </div>
-          <div style={{ borderTop: "1px solid #E5E7EB", paddingTop: "1.5rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <p style={{ fontSize: "0.8rem", color: "#9CA3AF" }}>© {new Date().getFullYear()} Planora Technologies.</p>
-            <div style={{ display: "flex", gap: "1rem" }}>
-              <span style={{ fontSize: "0.8rem", color: "#9CA3AF", cursor: "pointer" }}>Privacy Policy</span>
-              <span style={{ fontSize: "0.8rem", color: "#9CA3AF", cursor: "pointer" }}>Terms of Service</span>
+              {Object.entries(FOOTER_LINKS).map(([heading, links]) => (
+                <div key={heading}>
+                  <p style={{ fontSize: "0.85rem", fontWeight: 700, color: "#111827", marginBottom: "1.2rem" }}>
+                    {heading}
+                  </p>
+                  <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "0.8rem", padding: 0, margin: 0 }}>
+                    {links.map((l) => (
+                      <li key={l}>
+                        <span style={{ fontSize: "0.85rem", color: "#6B7280", cursor: "pointer" }}>{l}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+            <div style={{ borderTop: "1px solid #E5E7EB", paddingTop: "1.5rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <p style={{ fontSize: "0.8rem", color: "#9CA3AF" }}>© {new Date().getFullYear()} Planora Technologies.</p>
+              <div style={{ display: "flex", gap: "1rem" }}>
+                <span style={{ fontSize: "0.8rem", color: "#9CA3AF", cursor: "pointer" }}>Privacy Policy</span>
+                <span style={{ fontSize: "0.8rem", color: "#9CA3AF", cursor: "pointer" }}>Terms of Service</span>
+              </div>
             </div>
           </div>
-        </div>
+        </ClickSpark>
       </footer>
     </div>
   );
