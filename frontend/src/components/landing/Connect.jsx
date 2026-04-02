@@ -1,6 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import ElectricBorder from "../ui/ElectricBorder";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -130,6 +131,63 @@ const TRUST_ITEMS = [
   },
 ];
 
+function StepCard({ step }) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div
+      className="step-card"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={{ position: "relative", height: "100%" }}
+    >
+      <ElectricBorder
+        color={step.color}
+        speed={1.5}
+        chaos={0.15}
+        borderRadius={24}
+        isActive={isHovered}
+        style={{ height: "100%" }}
+      >
+        <div style={{
+          background: "#fff",
+          borderRadius: "1.5rem",
+          padding: "2rem",
+          border: isHovered ? `1px solid ${step.color}40` : "1px solid rgba(0,0,0,0.06)",
+          boxShadow: isHovered ? `0 20px 40px rgba(${step.colorRgb}, 0.1)` : "0 10px 30px rgba(0,0,0,0.04)",
+          position: "relative",
+          height: "100%",
+          transition: "all 0.3s ease",
+          transform: isHovered ? "translateY(-4px)" : "translateY(0)"
+        }}>
+          <div style={{
+            fontSize: "2.5rem",
+            fontWeight: 900,
+            color: `rgba(${step.colorRgb}, ${isHovered ? 0.2 : 0.1})`,
+            position: "absolute",
+            top: "1.5rem",
+            right: "1.5rem",
+            lineHeight: 1,
+            transition: "color 0.3s ease"
+          }}>
+            {step.number}
+          </div>
+          <div style={{
+            width: 48, height: 48, borderRadius: "1rem",
+            background: `rgba(${step.colorRgb}, 0.1)`, color: step.color,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            marginBottom: "1.5rem"
+          }}>
+            {step.icon}
+          </div>
+          <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#111827", marginBottom: "0.5rem" }}>{step.title}</h3>
+          <p style={{ fontSize: "0.85rem", color: "#6B7280", lineHeight: 1.6 }}>{step.desc}</p>
+        </div>
+      </ElectricBorder>
+    </div>
+  );
+}
+
 export default function Connect() {
   const containerRef = useRef(null);
 
@@ -189,28 +247,7 @@ export default function Connect() {
         {/* Right Side: 2x2 Grid of Step Cards mirroring video's app integration icons */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
           {STEPS.map((step, i) => (
-            <div key={i} className="step-card" style={{
-              background: "#fff",
-              borderRadius: "1.5rem",
-              padding: "2rem",
-              border: "1px solid rgba(0,0,0,0.06)",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.04)",
-              position: "relative"
-            }}>
-              <div style={{ fontSize: "2.5rem", fontWeight: 900, color: `rgba(${step.colorRgb}, 0.1)`, position: "absolute", top: "1.5rem", right: "1.5rem", lineHeight: 1 }}>
-                {step.number}
-              </div>
-              <div style={{
-                width: 48, height: 48, borderRadius: "1rem",
-                background: `rgba(${step.colorRgb}, 0.1)`, color: step.color,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                marginBottom: "1.5rem"
-              }}>
-                {step.icon}
-              </div>
-              <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#111827", marginBottom: "0.5rem" }}>{step.title}</h3>
-              <p style={{ fontSize: "0.85rem", color: "#6B7280", lineHeight: 1.6 }}>{step.desc}</p>
-            </div>
+            <StepCard key={i} step={step} />
           ))}
         </div>
       </div>

@@ -1,4 +1,6 @@
+import { useState } from "react";
 import useReveal from "../../hooks/useReveal";
+import ElectricBorder from "../ui/ElectricBorder";
 
 const STEPS = [
   {
@@ -49,6 +51,73 @@ const STEPS = [
     ),
   },
 ];
+
+function StepCard({ step, index }) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div
+      className={`reveal delay-${index + 1}`}
+      style={{ position: "relative", height: "100%" }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <ElectricBorder
+        color={step.color}
+        speed={1.5}
+        chaos={0.15}
+        borderRadius={20}
+        isActive={isHovered}
+        style={{ height: "100%" }}
+      >
+        <div
+          style={{
+            background: isHovered ? "#fff" : "#F9FAFB",
+            border: isHovered ? `1.5px solid ${step.color}30` : "1.5px solid rgba(0,0,0,0.07)",
+            borderRadius: "1.25rem",
+            padding: "2rem",
+            height: "100%",
+            transition: "all 0.35s ease",
+            cursor: "default",
+            boxShadow: isHovered ? `0 20px 40px -10px rgba(0,0,0,0.08)` : "none",
+            transform: isHovered ? "translateY(-5px)" : "translateY(0)",
+          }}
+        >
+          {/* Number + Icon */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.5rem" }}>
+            <div style={{
+              width: 48, height: 48,
+              borderRadius: "0.875rem",
+              background: `${step.color}10`,
+              border: `1.5px solid ${step.color}25`,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: step.color,
+            }}>
+              {step.icon}
+            </div>
+            <span style={{
+              fontSize: "2.5rem",
+              fontWeight: 900,
+              color: `${step.color}15`,
+              lineHeight: 1,
+              fontFamily: "'Outfit', 'Inter', sans-serif",
+              letterSpacing: "-0.04em",
+            }}>
+              {step.number}
+            </span>
+          </div>
+
+          <h3 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#111827", marginBottom: "0.7rem", lineHeight: 1.3 }}>
+            {step.title}
+          </h3>
+          <p style={{ fontSize: "0.875rem", color: "#6B7280", lineHeight: 1.7 }}>
+            {step.desc}
+          </p>
+        </div>
+      </ElectricBorder>
+    </div>
+  );
+}
 
 export default function HowItWorks() {
   const ref = useReveal();
@@ -104,68 +173,10 @@ export default function HowItWorks() {
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
           gap: "1.5rem",
+          alignItems: "stretch"
         }}>
           {STEPS.map((step, i) => (
-            <div
-              key={step.number}
-              className={`reveal delay-${i + 1}`}
-              style={{ position: "relative" }}
-            >
-              <div
-                style={{
-                  background: "#F9FAFB",
-                  border: "1.5px solid rgba(0,0,0,0.07)",
-                  borderRadius: "1.25rem",
-                  padding: "2rem",
-                  height: "100%",
-                  transition: "all 0.35s ease",
-                  cursor: "default",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = `${step.color}30`;
-                  e.currentTarget.style.transform = "translateY(-5px)";
-                  e.currentTarget.style.background = "#fff";
-                  e.currentTarget.style.boxShadow = `0 20px 40px -10px rgba(0,0,0,0.08)`;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(0,0,0,0.07)";
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.background = "#F9FAFB";
-                  e.currentTarget.style.boxShadow = "none";
-                }}
-              >
-                {/* Number + Icon */}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.5rem" }}>
-                  <div style={{
-                    width: 48, height: 48,
-                    borderRadius: "0.875rem",
-                    background: `${step.color}10`,
-                    border: `1.5px solid ${step.color}25`,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    color: step.color,
-                  }}>
-                    {step.icon}
-                  </div>
-                  <span style={{
-                    fontSize: "2.5rem",
-                    fontWeight: 900,
-                    color: `${step.color}15`,
-                    lineHeight: 1,
-                    fontFamily: "'Outfit', 'Inter', sans-serif",
-                    letterSpacing: "-0.04em",
-                  }}>
-                    {step.number}
-                  </span>
-                </div>
-
-                <h3 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#111827", marginBottom: "0.7rem", lineHeight: 1.3 }}>
-                  {step.title}
-                </h3>
-                <p style={{ fontSize: "0.875rem", color: "#6B7280", lineHeight: 1.7 }}>
-                  {step.desc}
-                </p>
-              </div>
-            </div>
+            <StepCard key={step.number} step={step} index={i} />
           ))}
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
+import GooeyNav from "../ui/GooeyNav";
 
 const NAV_LINKS = [
   { label: "Home", href: "#hero" },
@@ -28,20 +29,6 @@ export default function Navbar() {
   return (
     <>
       <style>{`
-        .lp-nav-link {
-          padding: 0.45rem 1rem;
-          font-size: 0.9rem;
-          font-weight: 500;
-          color: #374151;
-          border-radius: 0.5rem;
-          transition: color 0.2s, background 0.2s;
-          text-decoration: none;
-          letter-spacing: -0.01em;
-        }
-        .lp-nav-link:hover {
-          color: #111827;
-          background: rgba(17,24,39,0.06);
-        }
         .lp-login-link {
           padding: 0.45rem 1.1rem;
           font-size: 0.875rem;
@@ -121,12 +108,8 @@ export default function Navbar() {
           </Link>
 
           {/* Center nav */}
-          <nav style={{ display: "flex", gap: "0.1rem", alignItems: "center" }}>
-            {NAV_LINKS.map(({ label, href }) => (
-              <a key={label} href={href} className="lp-nav-link">
-                {label}
-              </a>
-            ))}
+          <nav style={{ display: "flex", alignItems: "center" }}>
+            <GooeyNav items={NAV_LINKS} scrolled={scrolled} />
           </nav>
 
           {/* Right CTAs */}
