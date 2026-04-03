@@ -11,15 +11,22 @@ import collaboratorRoutes from "./routes/collaboratorRoutes.js";
 
 dotenv.config();
 
-// Connect to Database
-connectDB();
-
 const app = express();
 const PORT = process.env.PORT || 5001;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Ensure DB connection for every request (singleton handles efficiency)
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    res.status(503).json({ message: "Database connection failed. Please check backend logs and IP whitelisting." });
+  }
+});
 
 // Request Logger
 app.use((req, res, next) => {
