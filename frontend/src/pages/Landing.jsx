@@ -1,8 +1,6 @@
 import { Suspense, lazy } from "react";
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero";
-import CustomCursor from "../components/landing/CustomCursor";
-
 const Features = lazy(() => import("../components/landing/Features"));
 const Testimonials = lazy(() => import("../components/landing/Testimonials"));
 const Connect = lazy(() => import("../components/landing/Connect"));
@@ -20,7 +18,6 @@ export default function Landing() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#FAFAFA", color: "#111827", overflowX: "hidden" }}>
-      <CustomCursor />
       <Navbar />
       <Hero />
       <Suspense fallback={null}>

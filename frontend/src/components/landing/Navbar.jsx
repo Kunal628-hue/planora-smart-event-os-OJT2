@@ -78,10 +78,10 @@ export default function Navbar() {
           WebkitBackdropFilter: scrolled ? "blur(20px) saturate(180%)" : "none",
           background: scrolled
             ? "rgba(255,255,255,0.88)"
-            : "transparent",
+            : "rgba(255,255,255,0.45)",
           borderBottom: scrolled
             ? "1px solid rgba(0,0,0,0.07)"
-            : "1px solid transparent",
+            : "1px solid rgba(0,0,0,0.03)",
           boxShadow: scrolled ? "0 2px 24px rgba(0,0,0,0.06)" : "none",
           transition: "background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, backdrop-filter 0.35s ease",
         }}

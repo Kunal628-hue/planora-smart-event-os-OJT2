@@ -107,12 +107,39 @@ export default function Analytics() {
                 color: name === "VIP" ? "#f59e0b" : name === "Business" ? "#3b82f6" : "#10b981"
             })) : [];
 
+            // Real-time Trajectory Calculation
+            const daysOrder = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+            const dailyCounts = { "Mon": 0, "Tue": 0, "Wed": 0, "Thu": 0, "Fri": 0, "Sat": 0, "Sun": 0 };
+            const daysMap = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+            filteredGuests.forEach(g => {
+                if (g.status === "Confirmed" && g.createdAt) {
+                    const date = new Date(g.createdAt);
+                    const dayName = daysMap[date.getDay()];
+                    if (dailyCounts[dayName] !== undefined) {
+                        dailyCounts[dayName]++;
+                    }
+                }
+            });
+
+            let runningTotal = 0;
+            const rsvpTrend = daysOrder.map((day, i) => {
+                runningTotal += dailyCounts[day];
+                // Project a 20% growth target over the actual for visualization
+                const projectionBase = (totalConfirmed / 7) * (i + 1);
+                return {
+                    day,
+                    actual: runningTotal,
+                    projected: Math.round(projectionBase * 1.2) + 5
+                };
+            });
+
             setStats({
                 visits: filteredGuests.length,
                 confirmed: totalConfirmed,
                 checkInRate,
                 revenue: totalRevenue,
-                rsvpTrend: trend,
+                rsvpTrend,
                 channels
             });
         } catch (err) {
@@ -126,7 +153,9 @@ export default function Analytics() {
         fetchData();
     }, [user, selectedEventId, events]);
 
-    const sparklinePoints = stats.rsvpTrend.map((v, i) => `${(i / 6) * 100},${100 - v}`).join(' ');
+    const maxVal = stats.rsvpTrend.length > 0 ? Math.max(...stats.rsvpTrend.map(t => Math.max(t.actual, t.projected))) * 1.2 : 100;
+    const sparklinePoints = stats.rsvpTrend.map((v, i) => `${(i / (stats.rsvpTrend.length - 1)) * 400},${180 - (v.actual / maxVal) * 180}`).join(' ');
+    const projectionPoints = stats.rsvpTrend.map((v, i) => `${(i / (stats.rsvpTrend.length - 1)) * 400},${180 - (v.projected / maxVal) * 180}`).join(' ');
 
     const handleExecute = () => {
         // Since it mentions Catering Protocol, navigate to Vendors
@@ -201,27 +230,79 @@ export default function Analytics() {
                             Strategic Trajectory
                         </h3>
                         <div style={{ display: "flex", gap: "10px" }}>
-                            <span className="chart-legend"><div style={{ background: "#2563eb" }}></div> RSVPs</span>
-                            <span className="chart-legend"><div style={{ background: "#e2e8f0" }}></div> Projected</span>
+                            <span className="chart-legend"><div style={{ background: "#2563eb" }}></div> Actual RSVPs</span>
+                            <span className="chart-legend"><div style={{ background: "#e2e8f0" }}></div> Projected Target</span>
                         </div>
                     </div>
 
-                    {stats.visits > 0 ? (
-                        <div style={{ flex: 1, position: "relative", minHeight: "200px" }}>
-                            <svg width="100%" height="200" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ overflow: "visible" }}>
+                    {stats.rsvpTrend.length > 0 ? (
+                        <div style={{ flex: 1, position: "relative", minHeight: "280px" }}>
+                            <svg width="100%" height="240" viewBox="0 0 400 200" style={{ overflow: "visible" }}>
                                 <defs>
-                                    <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stopColor="#2563eb" stopOpacity="0.15" />
+                                    <linearGradient id="actualFill" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stopColor="#2563eb" stopOpacity="0.1" />
                                         <stop offset="100%" stopColor="#2563eb" stopOpacity="0" />
                                     </linearGradient>
                                 </defs>
-                                <path d={`M 0,100 L 0,${100 - stats.rsvpTrend[0]} ${stats.rsvpTrend.map((v, i) => `L ${(i / 6) * 100},${100 - v}`).join(' ')} L 100,100 Z`} fill="url(#chartFill)" />
-                                <polyline points={sparklinePoints} fill="none" stroke="#2563eb" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                                {stats.rsvpTrend.map((v, i) => (
-                                    <g key={i}>
-                                        <circle cx={(i / 6) * 100} cy={100 - v} r="4" fill="#fff" stroke="#2563eb" strokeWidth="2" style={{ transition: "all 0.3s ease", cursor: "pointer" }} />
-                                    </g>
+                                
+                                {/* Background Grid Lines */}
+                                {[0, 0.25, 0.5, 0.75, 1].map(r => (
+                                    <line key={r} x1="0" y1={180 - r * 180} x2="400" y2={180 - r * 180} stroke="#f1f5f9" strokeWidth="1" />
                                 ))}
+
+                                {/* Bars for Projected */}
+                                {stats.rsvpTrend.map((v, i) => {
+                                    const x = (i / (stats.rsvpTrend.length - 1)) * 400;
+                                    const barHeight = (v.projected / maxVal) * 180;
+                                    return (
+                                        <rect 
+                                            key={i} 
+                                            x={x - 12} 
+                                            y={180 - barHeight} 
+                                            width="4" 
+                                            height={barHeight} 
+                                            fill="#e2e8f0" 
+                                            rx="2"
+                                        />
+                                    );
+                                })}
+
+                                {/* Path Area */}
+                                <path 
+                                    d={`M 0,180 L 0,${180 - (stats.rsvpTrend[0].actual / maxVal) * 180} ${stats.rsvpTrend.map((v, i) => `L ${(i / (stats.rsvpTrend.length - 1)) * 400},${180 - (v.actual / maxVal) * 180}`).join(' ')} L 400,180 Z`} 
+                                    fill="url(#actualFill)" 
+                                />
+
+                                {/* Projection Line */}
+                                <polyline 
+                                    points={projectionPoints} 
+                                    fill="none" 
+                                    stroke="#e2e8f0" 
+                                    strokeWidth="1.5" 
+                                    strokeDasharray="4 4" 
+                                />
+
+                                {/* Actual Line */}
+                                <polyline 
+                                    points={sparklinePoints} 
+                                    fill="none" 
+                                    stroke="#2563eb" 
+                                    strokeWidth="3" 
+                                    strokeLinecap="round" 
+                                    strokeLinejoin="round" 
+                                />
+
+                                {/* Interaction Points */}
+                                {stats.rsvpTrend.map((v, i) => {
+                                    const x = (i / (stats.rsvpTrend.length - 1)) * 400;
+                                    const y = 180 - (v.actual / maxVal) * 180;
+                                    return (
+                                        <g key={i}>
+                                            <circle cx={x} cy={y} r="6" fill="#fff" stroke="#2563eb" strokeWidth="2.5" />
+                                            <text x={x} y="195" textAnchor="middle" style={{ fontSize: "7px", fontWeight: 800, fill: "#94a3b8" }}>{v.day}</text>
+                                        </g>
+                                    );
+                                })}
                             </svg>
                         </div>
                     ) : (
@@ -274,7 +355,7 @@ export default function Analytics() {
                 </div>
             </div>
 
-            {/* Immersive Tactical Action Card - Scaled Down */}
+            {/* Immersive Tactical Action Card */}
             <div className="tactical-matrix-card">
                 <div style={{ pointerEvents: "none", position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundImage: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.03) 50%, transparent 100%)", backgroundSize: "200% 100%", animation: "sweep 4s linear infinite" }}></div>
                 <div style={{ position: "relative", zIndex: 2 }}>

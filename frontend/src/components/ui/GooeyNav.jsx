@@ -129,7 +129,8 @@ const GooeyNav = ({
       const timer = setTimeout(() => {
         updateEffectPosition(activeLi);
         textRef.current?.classList.add('active');
-      }, 100);
+        filterRef.current?.classList.add('active'); // Added to show pill on load
+      }, 150);
       return () => clearTimeout(timer);
     }
   }, [activeIndex]);
@@ -170,6 +171,14 @@ const GooeyNav = ({
           }
           .effect.text.active {
             color: white;
+            z-index: 4;
+          }
+           /* Increased precision for text overlay to avoid ghosting */
+          .effect.text {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
           }
           .effect.filter {
             filter: blur(8px) contrast(25);
@@ -226,7 +235,7 @@ const GooeyNav = ({
           }
           .gooey-nav-list {
             display: flex;
-            gap: 0.5rem;
+            gap: 1.25rem;
             list-style: none;
             padding: 0 0.5rem;
             margin: 0;
@@ -247,7 +256,13 @@ const GooeyNav = ({
             white-space: nowrap;
           }
           .gooey-nav-item.active .gooey-nav-link {
-            color: transparent; /* Hide underlying text to let effect.text show white */
+            opacity: 0;
+            pointer-events: none;
+          }
+          .gooey-nav-item:not(.active):hover .gooey-nav-link {
+            color: #111827;
+            background: rgba(0,0,0,0.03);
+            border-radius: 9999px;
           }
         `}
       </style>

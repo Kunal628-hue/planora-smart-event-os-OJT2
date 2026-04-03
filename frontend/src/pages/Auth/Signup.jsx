@@ -28,7 +28,11 @@ export default function Signup() {
         setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
-    const handleSocialLogin = async () => {
+    const handleSocialLogin = async (provider = 'google') => {
+        if (provider !== 'google') {
+            setError(`${provider.charAt(0).toUpperCase() + provider.slice(1)} login is coming soon!`);
+            return;
+        }
         try {
             setError("");
             setLoading(true);
@@ -81,152 +85,216 @@ export default function Signup() {
     };
 
     return (
-        <div className="auth-page" style={{ position: "relative" }}>
+        <div className="auth-page-new">
             <AuthBackground />
-
-            <div className="auth-card" ref={cardRef} style={{ opacity: 0, zIndex: 2 }}>
-                {/* Logo */}
-                <div style={{ display: "flex", justifyContent: "center", marginBottom: "2rem" }}>
-                    <Link to="/" style={{ display: "block" }}>
-                        <img
-                            src="/logo-new.svg"
-                            alt="Planora Logo"
-                            style={{
-                                height: "4rem",
-                                width: "auto",
-                                display: "block",
-                                filter: "drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3))"
-                            }}
-                        />
+            
+            <div className="auth-card-new" ref={cardRef} style={{ opacity: 0 }}>
+                {/* Switcher */}
+                <div className="auth-switcher">
+                    <Link to="/login" className="switcher-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3" />
+                        </svg>
+                        Login
                     </Link>
+                    <button className="switcher-btn active">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                            <circle cx="8.5" cy="7" r="4" />
+                            <line x1="20" y1="8" x2="20" y2="14" />
+                            <line x1="23" y1="11" x2="17" y2="11" />
+                        </svg>
+                        Sign Up
+                    </button>
                 </div>
 
-                <h1 style={{ fontSize: "1.75rem", fontWeight: 800, marginBottom: "1.5rem", color: "#ffffff", textAlign: 'center' }}>Create your account</h1>
-
-                {/* Social Auth Components */}
-                <SocialAuth onLogin={handleSocialLogin} loading={loading} />
-
-                <div className="social-divider">Or continue with</div>
-
-                {error && (
-                    <div
-                        style={{
-                            background: "#fff1f2",
-                            border: "1px solid #fecaca",
-                            borderRadius: "0.5rem",
-                            padding: "0.6rem 1rem",
-                            fontSize: "0.85rem",
-                            color: "#b91c1c",
-                            marginBottom: "1rem",
-                        }}
-                    >
-                        {error}
+                <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                    <div>
+                        <label className="auth-label-new">Full name</label>
+                        <input
+                            className="auth-input-new"
+                            type="text"
+                            name="name"
+                            value={form.name}
+                            onChange={handleChange}
+                            placeholder="Jane Doe"
+                        />
                     </div>
-                )}
 
-                <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                        <div>
-                            <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, marginBottom: "0.5rem", color: "rgba(255,255,255,0.7)" }}>
-                                Full name
-                            </label>
-                            <input
-                                className="auth-input"
-                                type="text"
-                                name="name"
-                                value={form.name}
-                                onChange={handleChange}
-                                placeholder="Jane Doe"
-                                autoComplete="name"
-                            />
-                        </div>
+                    <div>
+                        <label className="auth-label-new">Work email</label>
+                        <input
+                            className="auth-input-new"
+                            type="email"
+                            name="email"
+                            value={form.email}
+                            onChange={handleChange}
+                            placeholder="name@company.com"
+                        />
+                    </div>
 
-                        <div>
-                            <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, marginBottom: "0.5rem", color: "rgba(255,255,255,0.7)" }}>
-                                Work email
-                            </label>
+                    <div>
+                        <label className="auth-label-new">Password</label>
+                        <div style={{ position: 'relative' }}>
                             <input
-                                className="auth-input"
-                                type="email"
-                                name="email"
-                                value={form.email}
-                                onChange={handleChange}
-                                placeholder="name@company.com"
-                                autoComplete="email"
-                            />
-                        </div>
-
-                        <div>
-                            <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, marginBottom: "0.5rem", color: "rgba(255,255,255,0.7)" }}>
-                                Password
-                            </label>
-                            <input
-                                className="auth-input"
+                                className="auth-input-new"
                                 type="password"
                                 name="password"
                                 value={form.password}
                                 onChange={handleChange}
                                 placeholder="Min. 8 characters"
-                                autoComplete="new-password"
                             />
+                            <svg 
+                                style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', cursor: 'pointer' }}
+                                width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                            >
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
                         </div>
                     </div>
 
-                    <button
-                        type="submit"
-                        className="btn btn-primary"
-                        style={{ width: "100%", justifyContent: "center", marginTop: "0.25rem", padding: "0.7rem" }}
-                        disabled={loading}
-                    >
-                        {loading ? "Creating account…" : (
-                            <>
-                                Create Account
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <line x1="5" y1="12" x2="19" y2="12" />
-                                    <polyline points="12 5 19 12 12 19" />
-                                </svg>
-                            </>
-                        )}
+                    {error && (
+                        <div className="auth-error-new">{error}</div>
+                    )}
+
+                    <button type="submit" className="auth-submit-btn" disabled={loading}>
+                        {loading ? "Creating account..." : "Create Account"}
                     </button>
                 </form>
 
-                <p
-                    style={{
-                        marginTop: "1rem",
-                        fontSize: "0.75rem",
-                        color: "var(--text-muted)",
-                        textAlign: "center",
-                        lineHeight: 1.5,
-                    }}
-                >
-                    By signing up you agree to our{" "}
-                    <span style={{ color: "var(--accent-primary)", fontWeight: 600 }}>Terms</span> and{" "}
-                    <span style={{ color: "var(--accent-primary)", fontWeight: 600 }}>Privacy</span>.
+                <p style={{ marginTop: "1.25rem", fontSize: "0.75rem", color: "#6b7280", textAlign: "center", lineHeight: 1.5 }}>
+                    By signing up you agree to our <span style={{ color: "#111827", fontWeight: 600 }}>Terms</span> and <span style={{ color: "#111827", fontWeight: 600 }}>Privacy</span>.
                 </p>
 
-                <p style={{ marginTop: "1rem", textAlign: "center", fontSize: "0.85rem", color: "var(--text-muted)" }}>
-                    Already have an account?{" "}
-                    <Link to="/login" style={{ color: "var(--accent-primary)", fontWeight: 600 }}>
-                        Sign in
-                    </Link>
-                </p>
-                <p style={{ marginTop: "0.5rem", textAlign: "center" }}>
-                    <Link to="/" style={{
-                        fontSize: "0.8rem",
-                        color: "var(--text-muted)",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "0.4rem",
-                        transition: "color 0.2s"
-                    }} onMouseEnter={e => e.currentTarget.style.color = "var(--text-secondary)"} onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <line x1="19" y1="12" x2="5" y2="12" />
-                            <polyline points="12 19 5 12 12 5" />
-                        </svg>
-                        Back to Planora.io
-                    </Link>
-                </p>
+                <div className="auth-divider-new">
+                    <span>OR</span>
+                </div>
+
+                <SocialAuth onLogin={handleSocialLogin} loading={loading} />
+
+                <div className="auth-footer-new">
+                    Already have an account? <Link to="/login" style={{ color: '#111827', fontWeight: 700, textDecoration: 'underline' }}>Sign in</Link>
+                </div>
             </div>
+
+            <style>{`
+                .auth-page-new {
+                    min-height: 100vh;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    position: relative;
+                    padding: 1.5rem;
+                    overflow: hidden;
+                }
+                .auth-card-new {
+                    background: #ffffff;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 2rem;
+                    padding: 2.5rem;
+                    width: 100%;
+                    max-width: 440px;
+                    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+                    z-index: 1;
+                }
+                .auth-switcher {
+                    display: flex;
+                    background: #f9fafb;
+                    padding: 4px;
+                    border-radius: 0.75rem;
+                    margin-bottom: 2rem;
+                }
+                .switcher-btn {
+                    flex: 1;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 8px;
+                    border-radius: 0.6rem;
+                    font-size: 0.9rem;
+                    font-weight: 600;
+                    color: #6b7280;
+                    transition: all 0.2s;
+                    text-decoration: none;
+                }
+                .switcher-btn.active {
+                    background: #ffffff;
+                    color: #111827;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+                .auth-label-new {
+                    display: block;
+                    font-size: 0.9rem;
+                    font-weight: 600;
+                    color: #374151;
+                    margin-bottom: 0.5rem;
+                }
+                .auth-input-new {
+                    width: 100%;
+                    padding: 0.75rem 1rem;
+                    background: #fff;
+                    border: 1px solid #d1d5db;
+                    border-radius: 0.75rem;
+                    font-size: 1rem;
+                    color: #111827;
+                    transition: border-color 0.2s;
+                }
+                .auth-input-new:focus {
+                    border-color: #111827;
+                    outline: none;
+                }
+                .auth-submit-btn {
+                    width: 100%;
+                    padding: 0.85rem;
+                    background: #1f2937;
+                    color: #ffffff;
+                    border-radius: 0.75rem;
+                    font-size: 1rem;
+                    font-weight: 700;
+                    transition: background 0.2s;
+                    margin-top: 0.5rem;
+                }
+                .auth-submit-btn:hover {
+                    background: #111827;
+                }
+                .auth-divider-new {
+                    position: relative;
+                    text-align: center;
+                    margin: 1.75rem 0;
+                }
+                .auth-divider-new::before {
+                    content: "";
+                    position: absolute;
+                    top: 50%;
+                    left: 0;
+                    right: 0;
+                    height: 1px;
+                    background: #e5e7eb;
+                }
+                .auth-divider-new span {
+                    position: relative;
+                    background: #fff;
+                    padding: 0 1rem;
+                    color: #9ca3af;
+                    font-size: 0.75rem;
+                    font-weight: 600;
+                }
+                .auth-error-new {
+                    background: #fff1f2;
+                    border: 1px solid #fecaca;
+                    color: #b91c1c;
+                    padding: 0.75rem;
+                    border-radius: 0.75rem;
+                    font-size: 0.85rem;
+                }
+                .auth-footer-new {
+                    margin-top: 2rem;
+                    text-align: center;
+                    font-size: 0.9rem;
+                    color: #4b5563;
+                }
+            `}</style>
         </div>
     );
 }
