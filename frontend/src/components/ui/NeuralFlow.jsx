@@ -51,10 +51,6 @@ const NeuralFlow = () => {
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(96, 165, 250, ${this.opacity})`;
         ctx.fill();
-        
-        // Add a subtle glow
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = 'rgba(59, 130, 246, 0.5)';
       }
     }
 

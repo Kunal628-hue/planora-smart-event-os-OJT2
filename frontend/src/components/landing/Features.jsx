@@ -56,7 +56,7 @@ const FEATURES = [
             <circle cx="50" cy="50" r="42" fill="none" stroke="#60A5FA" strokeWidth="10" strokeDasharray="264" strokeDashoffset="145" strokeLinecap="round" />
           </svg>
           <div style={{ position: "absolute", textAlign: "center" }}>
-            <div style={{ fontSize: "1.4rem", fontWeight: 800 }}>$52k</div>
+            <div style={{ fontSize: "1.4rem", fontWeight: 800 }}>₹4.2L</div>
           </div>
         </div>
       </div>
@@ -232,7 +232,7 @@ export default function Features() {
                 background: "rgba(255,255,255,0.01)",
                 borderRadius: "2rem",
                 border: "1px solid rgba(255,255,255,0.05)",
-                backdropFilter: "blur(20px)"
+                backdropFilter: "blur(12px)"
               }}
             >
               <div>

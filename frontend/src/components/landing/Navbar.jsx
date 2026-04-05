@@ -74,16 +74,16 @@ export default function Navbar() {
           display: "flex",
           alignItems: "center",
           opacity: 0, // GSAP takes over
-          backdropFilter: scrolled ? "blur(24px) saturate(160%)" : "none",
-          WebkitBackdropFilter: scrolled ? "blur(24px) saturate(160%)" : "none",
+          backdropFilter: scrolled ? "blur(20px) saturate(180%)" : "none",
+          WebkitBackdropFilter: scrolled ? "blur(20px) saturate(180%)" : "none",
           background: scrolled
-            ? "rgba(3, 7, 18, 0.75)"
+            ? "rgba(3, 7, 18, 0.7)"
             : "transparent",
           borderBottom: scrolled
-            ? "1px solid rgba(255,255,255,0.08)"
+            ? "1px solid rgba(255,255,255,0.1)"
             : "1px solid transparent",
-          boxShadow: scrolled ? "0 8px 32px rgba(0,0,0,0.3)" : "none",
-          transition: "background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease",
+          boxShadow: scrolled ? "0 15px 40px -10px rgba(0,0,0,0.5)" : "none",
+          transition: "all 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
         }}
       >
         <div
@@ -120,20 +120,29 @@ export default function Navbar() {
           {/* Right CTA */}
           <div style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
             <Link to="/login" style={{
-              background: "linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)",
+              background: "#3B82F6",
               color: "#fff",
-              padding: "0.6rem 1.4rem",
+              padding: "0.65rem 1.65rem",
               borderRadius: "999px",
-              fontSize: "0.875rem",
-              fontWeight: 700,
+              fontSize: "0.85rem",
+              fontWeight: 800,
               textDecoration: "none",
-              boxShadow: "0 4px 12px rgba(37, 99, 235, 0.3)",
-              transition: "transform 0.2s, box-shadow 0.2s"
+              boxShadow: "0 4px 20px rgba(59, 130, 246, 0.3)",
+              transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+              border: "1px solid rgba(255,255,255,0.1)"
             }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 6px 20px rgba(37, 99, 235, 0.4)"; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 12px rgba(37, 99, 235, 0.3)"; }}
+              onMouseEnter={e => { 
+                e.currentTarget.style.transform = "translateY(-2px)"; 
+                e.currentTarget.style.boxShadow = "0 8px 25px rgba(59, 130, 246, 0.5)";
+                e.currentTarget.style.background = "#2563EB";
+              }}
+              onMouseLeave={e => { 
+                e.currentTarget.style.transform = "translateY(0)"; 
+                e.currentTarget.style.boxShadow = "0 4px 20px rgba(59, 130, 246, 0.3)";
+                e.currentTarget.style.background = "#3B82F6";
+              }}
             >
-              Login
+              Get Started
             </Link>
           </div>
         </div>

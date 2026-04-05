@@ -151,7 +151,7 @@ function StepCard({ step }) {
       >
         <div style={{
           background: "rgba(255,255,255,0.015)",
-          backdropFilter: "blur(20px)",
+          backdropFilter: "blur(10px)",
           borderRadius: "1.5rem",
           padding: "2.5rem",
           border: isHovered ? `1px solid ${step.color}40` : "1px solid rgba(255,255,255,0.05)",

@@ -18,7 +18,7 @@ export default function Hero() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      const tl = gsap.timeline({ defaults: { ease: "power3.out", force3D: true } });
 
       tl.fromTo(
         titleRef.current,
@@ -161,6 +161,7 @@ export default function Hero() {
           scanlineIntensity={0.05} 
           scanlineFrequency={150}
           warpAmount={0.2}
+          resolutionScale={0.5}
         />
       </div>
 
@@ -177,14 +178,20 @@ export default function Hero() {
         zIndex: 0
       }} />
 
-      {/* Background Grid */}
+      {/* Architectural Grid Background */}
       <div style={{
         position: "absolute",
         inset: 0,
-        backgroundImage: "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
-        backgroundSize: "60px 60px",
+        backgroundImage: `
+          linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px),
+          linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px)
+        `,
+        backgroundSize: "60px 60px, 60px 60px, 12px 12px, 12px 12px",
         opacity: 0.8,
-        pointerEvents: "none"
+        pointerEvents: "none",
+        zIndex: -1
       }} />
 
       <div style={{ maxWidth: 1200, margin: "0 auto", position: "relative", zIndex: 1, padding: "0 2rem" }}>
@@ -193,43 +200,46 @@ export default function Hero() {
         <div style={{ textAlign: "center", position: "relative", marginBottom: "4rem" }}>
           
           {/* Top Badge Row */}
-          <div style={{ display: "flex", justifyContent: "center", gap: "6rem", marginBottom: "3rem" }}>
-            <div ref={pill1Ref} style={{ animation: "float-slow 4s ease-in-out infinite" }}>
+          <div style={{ display: "flex", justifyContent: "center", gap: "2.5rem", marginBottom: "3.5rem" }}>
+            <div ref={pill1Ref} style={{ animation: "float-slow 6s ease-in-out infinite" }}>
               <div style={{
-                background: "#312E81", color: "#fff",
+                background: "rgba(49,46,129,0.3)", color: "#fff",
                 padding: "0.6rem 1.4rem", borderRadius: "999px",
-                fontSize: "0.8rem", fontWeight: 600,
+                fontSize: "0.85rem", fontWeight: 700,
                 display: "flex", alignItems: "center", gap: "0.5rem",
-                boxShadow: "0 10px 25px -5px rgba(49,46,129,0.4)",
+                backdropFilter: "blur(8px)",
+                border: "1px solid rgba(255,255,255,0.1)",
+                boxShadow: "0 10px 25px -5px rgba(0,0,0,0.3), 0 0 15px rgba(49,46,129,0.4)",
               }}>
+                <span style={{ fontSize: "1.1rem" }}>✨</span>
                 AI Powered
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 3v4M3 5h4M6 17v4M4 19h4M13 3l2.22 8.88a2 2 0 0 0 1.42 1.42L25.5 15.5l-8.88 2.22a2 2 0 0 0-1.42 1.42L13 28l-2.22-8.88a2 2 0 0 0-1.42-1.42L.5 15.5l8.88-2.22a2 2 0 0 0 1.42-1.42L13 3z"/></svg>
               </div>
             </div>
-
-            <div ref={pill2Ref} style={{ animation: "float-fast 3.5s ease-in-out infinite 0.5s" }}>
+            <div ref={pill2Ref} style={{ animation: "float-fast 5s ease-in-out infinite 0.5s" }}>
               <div style={{
-                background: "#7F1D1D", color: "#fff",
+                background: "rgba(127,29,29,0.3)", color: "#fff",
                 padding: "0.6rem 1.4rem", borderRadius: "999px",
-                fontSize: "0.8rem", fontWeight: 600,
-                display: "flex", alignItems: "center", gap: "0.5rem",
-                boxShadow: "0 10px 25px -5px rgba(127,29,29,0.4)",
+                fontSize: "0.85rem", fontWeight: 700,
+                display: "flex", alignItems: "center", gap: "0.6rem",
+                backdropFilter: "blur(8px)",
+                border: "1px solid rgba(255,255,255,0.1)",
+                boxShadow: "0 10px 25px -5px rgba(0,0,0,0.3), 0 0 15px rgba(127,29,29,0.4)",
               }}>
+                <span style={{ fontSize: "1.1rem" }}>⚡</span>
                 Team Sync
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 3v4M3 5h4M6 17v4M4 19h4M13 3l2.22 8.88a2 2 0 0 0 1.42 1.42L25.5 15.5l-8.88 2.22a2 2 0 0 0-1.42 1.42L13 28l-2.22-8.88a2 2 0 0 0-1.42-1.42L.5 15.5l8.88-2.22a2 2 0 0 0 1.42-1.42L13 3z"/></svg>
               </div>
             </div>
           </div>
 
           {/* Title Box Outline effect */}
           <h1 ref={titleRef} style={{
-            fontSize: "clamp(3rem, 6vw, 4.8rem)",
-            fontWeight: 800,
+            fontSize: "clamp(3.2rem, 6.5vw, 5.2rem)",
+            fontWeight: 900,
             color: "#F9FAFB",
-            lineHeight: 1.05,
-            letterSpacing: "-0.04em",
-            maxWidth: 900,
-            margin: "0 auto 1.8rem",
+            lineHeight: 1,
+            letterSpacing: "-0.05em",
+            maxWidth: 1000,
+            margin: "0 auto 2.2rem",
             position: "relative",
             display: "inline-block",
             fontFamily: "'Outfit', sans-serif"
@@ -283,35 +293,46 @@ export default function Hero() {
           </p>
 
           <div ref={ctaRef}>
-            <Link to="/signup" style={{
-              background: "#F9FAFB",
+            <Link to="/signup" className="magnetic-cta" style={{
+              background: "linear-gradient(to right, #F9FAFB 0%, #FFFFFF 100%)",
               color: "#030712",
               border: "none",
-              padding: "1rem 2.2rem",
+              padding: "1.1rem 2.8rem",
               borderRadius: "999px",
-              fontSize: "1rem",
-              fontWeight: 700,
+              fontSize: "1.05rem",
+              fontWeight: 800,
               display: "inline-flex",
               alignItems: "center",
-              gap: "0.75rem",
+              gap: "0.85rem",
               cursor: "pointer",
-              transition: "transform 0.3s, background 0.3s, box-shadow 0.3s",
+              transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
               textDecoration: "none",
-              boxShadow: "0 10px 40px rgba(255,255,255,0.1)"
+              boxShadow: "0 10px 40px rgba(255,255,255,0.15), 0 0 0 1px rgba(255,255,255,0.05)",
+              position: "relative",
+              overflow: "hidden"
             }}
-            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 15px 50px rgba(255,255,255,0.15)"; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 10px 40px rgba(255,255,255,0.1)"; }}
+            onMouseEnter={e => { 
+                e.currentTarget.style.transform = "translateY(-4px) scale(1.02)"; 
+                e.currentTarget.style.boxShadow = "0 20px 60px rgba(255,255,255,0.2), 0 0 0 4px rgba(255,255,255,0.1)"; 
+            }}
+            onMouseLeave={e => { 
+                e.currentTarget.style.transform = "translateY(0) scale(1)"; 
+                e.currentTarget.style.boxShadow = "0 10px 40px rgba(255,255,255,0.15), 0 0 0 1px rgba(255,255,255,0.05)"; 
+            }}
             >
               Start Planning Free
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+              <svg className="cta-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "transform 0.4s ease" }}><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
             </Link>
+            <style dangerouslySetInnerHTML={{__html: `
+              .magnetic-cta:hover .cta-arrow { transform: translate(3px, -3px) rotate(45deg); }
+            `}} />
           </div>
         </div>
 
         {/* 3-Column Dashboard Mockup - Redesigned as Sleek Glass Panel */}
         <div ref={dashboardRef} style={{
           background: "rgba(17, 24, 39, 0.4)",
-          backdropFilter: "blur(40px)",
+          backdropFilter: "blur(12px)",
           borderRadius: "2.5rem",
           padding: "3rem",
           boxShadow: "0 40px 100px -20px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255,255,255,0.1)",

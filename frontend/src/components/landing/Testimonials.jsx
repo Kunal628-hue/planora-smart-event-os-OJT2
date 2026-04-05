@@ -18,7 +18,7 @@ const PROBLEMS = [
   {
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#FBBF24" }}>
-        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+        <path d="M6 3h12" /><path d="M6 8h12" /><path d="M6 13l6.5-6.5" /><path d="M11.5 13H18" /><path d="M6 13c0 4.5 4.5 7.5 7.5 7.5" />
       </svg>
     ),
     title: "Budget Black Holes",
