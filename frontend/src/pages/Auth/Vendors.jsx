@@ -401,7 +401,7 @@ export default function Vendors() {
                                         </td>
                                         <td style={{ padding: "1.25rem 2rem", textAlign: "right" }}>
                                             <div style={{ fontSize: "15px", fontWeight: 950, color: "#0f172a", letterSpacing: "-0.02em" }}>
-                                                ₹{parseInt(vendor.cost).toLocaleString()}
+                                                ₹{parseInt(vendor.cost).toLocaleString('en-IN')}
                                             </div>
                                         </td>
                                         <td style={{ padding: "1.25rem 2rem", textAlign: "right" }}>

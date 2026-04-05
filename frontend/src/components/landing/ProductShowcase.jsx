@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { TrendingUp } from "lucide-react";
 import useReveal from "../../hooks/useReveal";
 import { animate, stagger } from "animejs";
 
@@ -95,7 +96,7 @@ function DashboardPreview() {
           alignItems: "center",
           gap: "0.3rem",
         }}>
-          ↑ 24% This Month
+          <TrendingUp size={14} /> 24% This Month
         </div>
       </div>
 

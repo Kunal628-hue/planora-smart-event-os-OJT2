@@ -1,15 +1,25 @@
 import { useEffect, useRef } from "react";
+import { 
+  Music, 
+  Building2, 
+  Gem, 
+  School, 
+  Monitor, 
+  Mic, 
+  Trophy, 
+  Heart 
+} from "lucide-react";
 import useReveal from "../../hooks/useReveal";
 
 const TRUST_ITEMS = [
-  { name: "Concerts & Music Festivals", icon: "🎵" },
-  { name: "Corporate Launches", icon: "🏢" },
-  { name: "Luxury Weddings & Galas", icon: "💍" },
-  { name: "Trade Fairs & Expos", icon: "🏛️" },
-  { name: "Tech Meetups & Seminars", icon: "💻" },
-  { name: "TEDx & Conferences", icon: "🎤" },
-  { name: "Sports Events", icon: "🏆" },
-  { name: "Charity Fundraisers", icon: "❤️" },
+  { name: "Concerts & Music Festivals", icon: <Music size={18} /> },
+  { name: "Corporate Launches", icon: <Building2 size={18} /> },
+  { name: "Luxury Weddings & Galas", icon: <Gem size={18} /> },
+  { name: "Trade Fairs & Expos", icon: <School size={18} /> },
+  { name: "Tech Meetups & Seminars", icon: <Monitor size={18} /> },
+  { name: "TEDx & Conferences", icon: <Mic size={18} /> },
+  { name: "Sports Events", icon: <Trophy size={18} /> },
+  { name: "Charity Fundraisers", icon: <Heart size={18} /> },
 ];
 
 export default function Trust() {

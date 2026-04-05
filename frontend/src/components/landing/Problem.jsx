@@ -1,23 +1,29 @@
+import { 
+  ClipboardList, 
+  Banknote, 
+  Brain, 
+  BarChart3 
+} from "lucide-react";
 import useReveal from "../../hooks/useReveal";
 
 const PROBLEMS = [
   {
-    emoji: "📋",
+    icon: <ClipboardList size={24} />,
     title: "Scattered Spreadsheets",
     desc: "Plans, budgets, guest lists — saved across 10 different files shared over WhatsApp. One wrong edit breaks everything.",
   },
   {
-    emoji: "💸",
+    icon: <Banknote size={24} />,
     title: "Budget Black Holes",
     desc: "Nobody knows how much has been spent until the invoice arrives. By then, it's too late to course-correct.",
   },
   {
-    emoji: "🤯",
+    icon: <Brain size={24} />,
     title: "Volunteer Chaos",
     desc: "Chasing team members across platforms. No visibility into who's doing what or whether it's getting done.",
   },
   {
-    emoji: "📊",
+    icon: <BarChart3 size={24} />,
     title: "Zero Insights",
     desc: "After every event, you have no data. No idea what worked, what didn't, or how to improve next time.",
   },
@@ -112,7 +118,7 @@ export default function Problem() {
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: "1.4rem", marginBottom: "1.25rem",
               }}>
-                {p.emoji}
+                {p.icon}
               </div>
               <h3 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#111827", marginBottom: "0.6rem", lineHeight: 1.3 }}>
                 {p.title}

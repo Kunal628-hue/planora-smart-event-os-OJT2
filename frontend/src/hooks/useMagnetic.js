@@ -34,7 +34,7 @@ export default function useMagnetic(intensity = 0.4) {
         translateX: 0,
         translateY: 0,
         duration: 900,
-        easing: "easeOutElastic(1, 0.4)",
+        easing: "easeOutExpo",
       });
     };
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import { Plus, User, Mail, Shield, Check, ChevronRight, LayoutGrid, Users2, MoreHorizontal, Trash2, Edit2, X, Loader2 } from "lucide-react";
+import { Plus, User, Mail, Shield, Check, ChevronRight, LayoutGrid, Users2, MoreHorizontal, Trash2, Edit2, X } from "lucide-react";
+import { NeuralLoader } from "../../components/ui/Loader";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -160,7 +161,7 @@ export default function Team() {
                         {loading ? (
                             <tr>
                                 <td colSpan="4" style={{ padding: "4rem", textAlign: "center" }}>
-                                    <Loader2 className="animate-spin" size={24} color="#2563eb" style={{ margin: "0 auto" }} />
+                                    <NeuralLoader text="Synchronizing Hive Mind..." />
                                 </td>
                             </tr>
                         ) : members.map((member) => {

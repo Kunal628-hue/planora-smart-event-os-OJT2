@@ -12,8 +12,17 @@ import {
     ChevronRight,
     Search,
     Sparkles,
-    ShieldCheck
+    ShieldCheck,
+    Utensils,
+    Music,
+    Building,
+    MapPin,
+    Star,
+    X,
+    Check,
+    AlertCircle
 } from "lucide-react";
+import { NeuralLoader } from "../../components/ui/Loader";
 
 const AiAssistant = lazy(() => import("../../components/AiAssistant"));
 
@@ -114,21 +123,21 @@ export default function Dashboard() {
 
     const getCategoryStyles = (service) => {
         const styles = {
-            "Catering": { bg: "#fff7ed", color: "#c2410c", icon: "🍱" },
-            "Decor": { bg: "#faf5ff", color: "#7e22ce", icon: "✨" },
-            "AV": { bg: "#eff6ff", color: "#1d4ed8", icon: "🎧" },
-            "Venue": { bg: "#f0fdf4", color: "#15803d", icon: "🏛️" },
-            "Other": { bg: "#f8fafc", color: "#475569", icon: "📍" }
+            "Catering": { bg: "#fff7ed", color: "#c2410c", icon: <Utensils size={14} /> },
+            "Decor": { bg: "#faf5ff", color: "#7e22ce", icon: <Sparkles size={14} /> },
+            "AV": { bg: "#eff6ff", color: "#1d4ed8", icon: <Music size={14} /> },
+            "Venue": { bg: "#f0fdf4", color: "#15803d", icon: <Building size={14} /> },
+            "Other": { bg: "#f8fafc", color: "#475569", icon: <MapPin size={14} /> }
         };
         return styles[service] || styles["Other"];
     };
 
     const safeEvents = Array.isArray(events) ? events : [];
 
-    if (loading && safeEvents.length === 0) {
+    if (loading) {
         return (
             <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "70vh" }}>
-                <RefreshCw className="animate-spin" size={24} color="#2563eb" />
+                <NeuralLoader text="Scanning Neural Pathways..." />
             </div>
         );
     }
@@ -278,7 +287,7 @@ export default function Dashboard() {
                         aria-label="Resolve active risk"
                         style={{ color: "#be123c", fontWeight: 700, fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.05em", border: "none", background: "none", cursor: "pointer" }}
                     >
-                        Resolve Now →
+                        Resolve Now <ArrowRight size={14} />
                     </button>
                 </div>
             )}
@@ -305,7 +314,16 @@ export default function Dashboard() {
                         cursor: "pointer",
                         position: "relative",
                         overflow: "hidden"
-                    }}>
+                    }}
+                    onMouseEnter={e => {
+                        e.currentTarget.style.transform = "translateY(-4px)";
+                        e.currentTarget.style.boxShadow = "0 10px 30px rgba(0,0,0,0.05)";
+                    }}
+                    onMouseLeave={e => {
+                        e.currentTarget.style.transform = "translateY(0)";
+                        e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.02)";
+                    }}
+                >
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
                             <div style={{ fontSize: "12px", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em" }}>{kpi.label}</div>
                             {i === 0 && (
@@ -405,8 +423,8 @@ export default function Dashboard() {
                     <div>
                         <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "1.5rem" }}>Budget Summary</div>
                         <div style={{ marginBottom: "2rem" }}>
-                            <div style={{ fontSize: "32px", fontWeight: 800, color: "#fff" }}>₹{(healthData?.metrics?.totalSpent || 0).toLocaleString()}</div>
-                            <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", fontWeight: 500 }}>Current Spend / ₹{selectedEvent?.budget?.toLocaleString()} Cap</div>
+                            <div style={{ fontSize: "32px", fontWeight: 800, color: "#fff" }}>₹{(healthData?.metrics?.totalSpent || 0).toLocaleString('en-IN')}</div>
+                            <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", fontWeight: 500 }}>Current Spend / ₹{selectedEvent?.budget?.toLocaleString('en-IN')} Cap</div>
                         </div>
                     </div>
                     <div>
@@ -470,7 +488,7 @@ export default function Dashboard() {
                                     <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                                         <span style={{ fontSize: "10px", color: styles.color, fontWeight: 800, textTransform: "uppercase" }}>{vendor.service}</span>
                                         <span style={{ width: "2px", height: "2px", background: "#cbd5e1", borderRadius: "50%" }}></span>
-                                        <span style={{ fontSize: "12px", color: "#94a3b8", fontWeight: 600 }}>{vendor.priceRange?.replace('$', '₹')}</span>
+                                        <span style={{ fontSize: "12px", color: "#94a3b8", fontWeight: 600 }}>{vendor.priceRange}</span>
                                     </div>
                                 </div>
                             </div>
@@ -490,7 +508,7 @@ export default function Dashboard() {
                             aria-label="Close vendor details"
                             style={{ position: "absolute", top: "1.5rem", right: "1.5rem", border: "none", background: "#f1f5f9", width: "32px", height: "32px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#64748b" }}
                         >
-                            ×
+                            <X size={16} />
                         </button>
 
                         <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "2rem" }}>
@@ -506,11 +524,13 @@ export default function Dashboard() {
                         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", marginBottom: "2rem" }}>
                             <div style={{ padding: "1rem", background: "#f8fafc", borderRadius: "16px" }}>
                                 <div style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 800, textTransform: "uppercase", marginBottom: "0.5rem" }}>Rating</div>
-                                <div style={{ fontSize: "18px", fontWeight: 800, color: "#0f172a" }}>⭐ {selectedVendorModal.rating}/5.0</div>
+                                <div style={{ fontSize: "18px", fontWeight: 800, color: "#0f172a", display: "flex", alignItems: "center", gap: "6px" }}>
+                                    <Star size={18} fill="#f59e0b" color="#f59e0b" /> {selectedVendorModal.rating}/5.0
+                                </div>
                             </div>
                             <div style={{ padding: "1rem", background: "#f8fafc", borderRadius: "16px" }}>
                                 <div style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 800, textTransform: "uppercase", marginBottom: "0.5rem" }}>Pricing</div>
-                                <div style={{ fontSize: "18px", fontWeight: 800, color: "#0f172a" }}>{selectedVendorModal.priceRange?.replace('$', '₹')}</div>
+                                <div style={{ fontSize: "18px", fontWeight: 800, color: "#0f172a" }}>{selectedVendorModal.priceRange}</div>
                             </div>
                         </div>
 

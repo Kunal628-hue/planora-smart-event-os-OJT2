@@ -5,7 +5,7 @@ import {
     Activity,
     Users,
     Ticket,
-    DollarSign,
+    IndianRupee,
     CheckCircle2,
     TrendingUp,
     PieChart,
@@ -203,9 +203,9 @@ export default function Analytics() {
             {/* KPI Executive Strip - Compact */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem", marginBottom: "2rem" }}>
                 {[
-                    { label: "Guest Velocity", val: stats.visits.toLocaleString(), icon: Users, color: "#2563eb", trend: "+12%" },
-                    { label: "RSVP Conversion", val: stats.confirmed.toLocaleString(), icon: Ticket, color: "#10b981", trend: "+5.2%" },
-                    { label: "Strategic Capital", val: `₹${(stats.revenue / 1000).toFixed(1)}k`, icon: DollarSign, color: "#f59e0b", trend: "Target" },
+                    { label: "Guest Velocity", val: stats.visits.toLocaleString('en-IN'), icon: Users, color: "#2563eb", trend: "+12%" },
+                    { label: "RSVP Conversion", val: stats.confirmed.toLocaleString('en-IN'), icon: Ticket, color: "#10b981", trend: "+5.2%" },
+                    { label: "Strategic Capital", val: `₹${(stats.revenue).toLocaleString('en-IN')}`, icon: IndianRupee, color: "#f59e0b", trend: "Target" },
                     { label: "Operational Grip", val: `${stats.checkInRate}%`, icon: Activity, color: "#7e22ce", trend: "Stable" }
                 ].map((stat, i) => (
                     <div key={i} className="kpi-card">
@@ -425,7 +425,7 @@ export default function Analytics() {
                     border-radius: 28px;
                     border: 1px solid #f1f5f9;
                     box-shadow: 0 4px 20px rgba(0,0,0,0.015);
-                    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
                     cursor: pointer;
                 }
                 .kpi-card:hover {

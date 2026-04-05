@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
-import { animate, stagger } from "animejs";
 import { Plus, Calendar, MapPin, ChevronRight, Loader2, X, Sparkles, LayoutGrid, Package, Wallet } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -40,17 +39,6 @@ export default function Events() {
         fetchEvents();
     }, [user]);
 
-    useEffect(() => {
-        if (!fetchLoading && events.length > 0) {
-            animate('.event-card', {
-                translateY: [20, 0],
-                opacity: [0, 1],
-                delay: stagger(60),
-                easing: 'cubicBezier(.22, 1, .36, 1)',
-                duration: 600
-            });
-        }
-    }, [fetchLoading, events.length]);
 
     const [loading, setLoading] = useState(false);
 
@@ -128,7 +116,6 @@ export default function Events() {
         fontSize: "0.85rem",
         fontWeight: "650",
         color: "#0f172a",
-        transition: "all 0.2s ease",
         outline: "none"
     };
 
@@ -152,7 +139,7 @@ export default function Events() {
                 <button
                     onClick={() => setShowModal(true)}
                     className="btn btn-primary"
-                    style={{ borderRadius: "14px", padding: "0.85rem 1.75rem", fontWeight: 800, fontSize: "14px", boxShadow: "0 8px 20px rgba(37, 99, 235, 0.2)" }}
+                    style={{ borderRadius: "14px", padding: "0.85rem 1.75rem", fontWeight: 800, fontSize: "14px" }}
                 >
                     <Plus size={18} strokeWidth={3} />
                     Initialize Event
@@ -166,7 +153,7 @@ export default function Events() {
             }}>
                 {fetchLoading ? (
                     <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "8rem" }}>
-                        <Loader2 className="animate-spin" size={40} color="#2563eb" style={{ margin: "0 auto" }} />
+                        <Loader2 size={40} color="#2563eb" style={{ margin: "0 auto" }} />
                     </div>
                 ) : events.length === 0 ? (
                     <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "6rem", background: "#fff", border: "2px dashed #e2e8f0", borderRadius: "32px" }}>
@@ -195,7 +182,6 @@ export default function Events() {
                                     boxShadow: "0 4px 20px rgba(0,0,0,0.02)",
                                     border: "1px solid #f1f5f9",
                                     cursor: "pointer",
-                                    transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
                                     display: "flex",
                                     flexDirection: "column",
                                     gap: "1.5rem"
@@ -222,10 +208,8 @@ export default function Events() {
                                             letterSpacing: "0.05em",
                                             border: `1px solid ${statusColor}20`,
                                             cursor: "pointer",
-                                            transition: "all 0.2s ease"
+                                            cursor: "pointer"
                                         }}
-                                        onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.05)"; e.currentTarget.style.boxShadow = `0 2px 8px ${statusColor}30`; }}
-                                        onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "none"; }}
                                         title={`Click to mark as ${event.status === "Completed" ? "Planned" : "Completed"}`}
                                     >
                                         {event.status}
@@ -235,7 +219,7 @@ export default function Events() {
                                 <div style={{ background: "#f8fafc", padding: "1rem", borderRadius: "16px" }}>
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
                                         <div style={{ fontSize: "10px", fontWeight: 800, color: "#64748b", textTransform: "uppercase" }}>Capital Utilization</div>
-                                        <div style={{ fontSize: "12px", fontWeight: 800, color: "#0f172a" }}>₹{remaining.toLocaleString()} left</div>
+                                        <div style={{ fontSize: "12px", fontWeight: 800, color: "#0f172a" }}>₹{remaining.toLocaleString('en-IN')} left</div>
                                     </div>
                                     <div style={{ height: "6px", background: "#e2e8f0", borderRadius: "10px", overflow: "hidden" }}>
                                         <div style={{
@@ -243,7 +227,7 @@ export default function Events() {
                                             height: "100%",
                                             background: utilization > 90 ? "#ef4444" : statusColor,
                                             borderRadius: "10px",
-                                            transition: "width 1s ease"
+                                            borderRadius: "10px"
                                         }}></div>
                                     </div>
                                 </div>
@@ -279,11 +263,8 @@ export default function Events() {
                                 cursor: "pointer",
                                 display: "flex",
                                 alignItems: "center",
-                                justifyContent: "center",
-                                transition: "all 0.2s"
+                                justifyContent: "center"
                             }}
-                            onMouseEnter={e => e.currentTarget.style.color = "#475569"}
-                            onMouseLeave={e => e.currentTarget.style.color = "#94a3b8"}
                         >
                             <X size={16} strokeWidth={2.5} />
                         </button>
@@ -389,14 +370,11 @@ export default function Events() {
                                     alignItems: "center",
                                     justifyContent: "center",
                                     gap: "0.6rem",
-                                    boxShadow: "0 10px 20px rgba(37, 99, 235, 0.15)",
-                                    transition: "all 0.2s"
+                                    boxShadow: "0 10px 20px rgba(37, 99, 235, 0.15)"
                                 }}
-                                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.background = "#1d4ed8"; }}
-                                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.background = "#2563eb"; }}
                             >
                                 {loading ? (
-                                    <Loader2 className="animate-spin" size={18} />
+                                    <Loader2 size={18} />
                                 ) : (
                                     <>
                                         Initialize Project

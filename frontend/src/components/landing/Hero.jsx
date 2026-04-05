@@ -44,7 +44,7 @@ export default function Hero() {
       .fromTo(
         [pill1Ref.current, pill2Ref.current],
         { scale: 0.5, opacity: 0, y: 40 },
-        { scale: 1, opacity: 1, y: 0, duration: 0.8, stagger: 0.2, ease: "back.out(1.8)" },
+        { scale: 1, opacity: 1, y: 0, duration: 0.8, stagger: 0.2, ease: "power3.out" },
         "-=0.6"
       )
       .fromTo(
@@ -56,7 +56,7 @@ export default function Hero() {
       .fromTo(
         ".dash-widget",
         { y: 30, opacity: 0, scale: 0.95 },
-        { y: 0, opacity: 1, scale: 1, duration: 0.8, stagger: 0.15, ease: "back.out(1.2)" },
+        { y: 0, opacity: 1, scale: 1, duration: 0.8, stagger: 0.15, ease: "power3.out" },
         "-=0.6"
       )
       .to(".dash-progress", { width: "90%", duration: 1.5, ease: "power3.out" }, "-=0.2")
@@ -92,13 +92,16 @@ export default function Hero() {
   return (
     <section ref={containerRef} id="hero" style={{
       position: "relative",
-      paddingTop: "9rem",
-      paddingBottom: "4rem",
-      background: "#FAFAFA",
+      paddingTop: "10rem",
+      paddingBottom: "6rem",
+      background: "#030712",
       overflow: "hidden",
       fontFamily: "'Inter', sans-serif"
     }}>
       <style dangerouslySetInnerHTML={{__html: `
+        @media (max-width: 1024px) {
+          .floating-pill { display: none !important; }
+        }
         @keyframes orb-spin {
           0% { transform: rotate(0deg) scale(1); }
           50% { transform: rotate(180deg) scale(1.1); }
@@ -172,9 +175,9 @@ export default function Hero() {
       <div style={{
         position: "absolute",
         inset: 0,
-        backgroundImage: "linear-gradient(#E5E7EB 1px, transparent 1px), linear-gradient(90deg, #E5E7EB 1px, transparent 1px)",
-        backgroundSize: "80px 80px",
-        opacity: 0.4,
+        backgroundImage: "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
+        backgroundSize: "60px 60px",
+        opacity: 0.8,
         pointerEvents: "none"
       }} />
 
@@ -183,58 +186,59 @@ export default function Hero() {
         {/* Main Text Area */}
         <div style={{ textAlign: "center", position: "relative", marginBottom: "4rem" }}>
           
-          {/* Floating Pill 1 (Left) */}
-          <div ref={pill1Ref} style={{ position: "absolute", top: "15%", left: "8%", zIndex: 10, animation: "float-slow 4s ease-in-out infinite", transform: "rotate(-3deg)" }}>
-            <div style={{
-              background: "#312E81", color: "#fff",
-              padding: "0.6rem 1.4rem", borderRadius: "999px",
-              fontSize: "0.85rem", fontWeight: 600,
-              display: "flex", alignItems: "center", gap: "0.5rem",
-              boxShadow: "0 10px 25px -5px rgba(49,46,129,0.4)",
-            }}>
-              AI Powered
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 3v4M3 5h4M6 17v4M4 19h4M13 3l2.22 8.88a2 2 0 0 0 1.42 1.42L25.5 15.5l-8.88 2.22a2 2 0 0 0-1.42 1.42L13 28l-2.22-8.88a2 2 0 0 0-1.42-1.42L.5 15.5l8.88-2.22a2 2 0 0 0 1.42-1.42L13 3z"/></svg>
+          {/* Top Badge Row */}
+          <div style={{ display: "flex", justifyContent: "center", gap: "6rem", marginBottom: "3rem" }}>
+            <div ref={pill1Ref} style={{ animation: "float-slow 4s ease-in-out infinite" }}>
+              <div style={{
+                background: "#312E81", color: "#fff",
+                padding: "0.6rem 1.4rem", borderRadius: "999px",
+                fontSize: "0.8rem", fontWeight: 600,
+                display: "flex", alignItems: "center", gap: "0.5rem",
+                boxShadow: "0 10px 25px -5px rgba(49,46,129,0.4)",
+              }}>
+                AI Powered
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 3v4M3 5h4M6 17v4M4 19h4M13 3l2.22 8.88a2 2 0 0 0 1.42 1.42L25.5 15.5l-8.88 2.22a2 2 0 0 0-1.42 1.42L13 28l-2.22-8.88a2 2 0 0 0-1.42-1.42L.5 15.5l8.88-2.22a2 2 0 0 0 1.42-1.42L13 3z"/></svg>
+              </div>
             </div>
-          </div>
 
-          {/* Floating Pill 2 (Right) */}
-          <div ref={pill2Ref} style={{ position: "absolute", top: "-10%", right: "10%", zIndex: 10, animation: "float-fast 3.5s ease-in-out infinite 0.5s", transform: "rotate(4deg)" }}>
-            <div style={{
-              background: "#7F1D1D", color: "#fff",
-              padding: "0.6rem 1.4rem", borderRadius: "999px",
-              fontSize: "0.85rem", fontWeight: 600,
-              display: "flex", alignItems: "center", gap: "0.5rem",
-              boxShadow: "0 10px 25px -5px rgba(127,29,29,0.4)",
-            }}>
-              Team Sync
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 3v4M3 5h4M6 17v4M4 19h4M13 3l2.22 8.88a2 2 0 0 0 1.42 1.42L25.5 15.5l-8.88 2.22a2 2 0 0 0-1.42 1.42L13 28l-2.22-8.88a2 2 0 0 0-1.42-1.42L.5 15.5l8.88-2.22a2 2 0 0 0 1.42-1.42L13 3z"/></svg>
+            <div ref={pill2Ref} style={{ animation: "float-fast 3.5s ease-in-out infinite 0.5s" }}>
+              <div style={{
+                background: "#7F1D1D", color: "#fff",
+                padding: "0.6rem 1.4rem", borderRadius: "999px",
+                fontSize: "0.8rem", fontWeight: 600,
+                display: "flex", alignItems: "center", gap: "0.5rem",
+                boxShadow: "0 10px 25px -5px rgba(127,29,29,0.4)",
+              }}>
+                Team Sync
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 3v4M3 5h4M6 17v4M4 19h4M13 3l2.22 8.88a2 2 0 0 0 1.42 1.42L25.5 15.5l-8.88 2.22a2 2 0 0 0-1.42 1.42L13 28l-2.22-8.88a2 2 0 0 0-1.42-1.42L.5 15.5l8.88-2.22a2 2 0 0 0 1.42-1.42L13 3z"/></svg>
+              </div>
             </div>
           </div>
 
           {/* Title Box Outline effect */}
           <h1 ref={titleRef} style={{
-            fontSize: "clamp(2.5rem, 5vw, 4.2rem)",
+            fontSize: "clamp(3rem, 6vw, 4.8rem)",
             fontWeight: 800,
-            color: "#111827",
-            lineHeight: 1.15,
+            color: "#F9FAFB",
+            lineHeight: 1.05,
             letterSpacing: "-0.04em",
-            maxWidth: 800,
-            margin: "0 auto 1.5rem",
+            maxWidth: 900,
+            margin: "0 auto 1.8rem",
             position: "relative",
-            display: "inline-block"
+            display: "inline-block",
+            fontFamily: "'Outfit', sans-serif"
           }}>
-            Take Control of Your<br />Events with{" "}
+            Master Every Detail of Your<br />Events with{" "}
             <span style={{ 
               position: "relative", display: "inline-block",
               padding: "0.2rem 0.5rem", zIndex: 1
             }}>
               <span className="scroll-color-shift" style={{
                 display: "inline-block",
-                background: "linear-gradient(-45deg, #2563EB, #7C3AED, #DB2777, #2563EB)",
-                backgroundSize: "300%",
+                background: "linear-gradient(to right, #60A5FA, #A855F7, #EC4899)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
-                animation: "gradient-text 4s ease infinite, text-pulse 2s ease-in-out infinite"
+                animation: "gradient-text 6s ease infinite"
               }}>
                 Planora.
               </span>
@@ -262,113 +266,125 @@ export default function Hero() {
           </h1>
 
           <p ref={subRef} style={{
-            fontSize: "1.05rem",
-            color: "#6B7280",
-            maxWidth: 500,
-            margin: "0 auto 2.5rem",
-            lineHeight: 1.6
+            fontSize: "1.15rem",
+            color: "#94A3B8",
+            maxWidth: 600,
+            margin: "0 auto 3rem",
+            lineHeight: 1.6,
+            fontWeight: 400
           }}>
-            Planora centralizes planning, budgeting, volunteer coordination, and execution into one intelligent dashboard.
+            The professional operating system for event planners. Centralize planning, budgeting, and coordination in one sleek interface.
           </p>
 
           <div ref={ctaRef}>
             <Link to="/signup" style={{
-              background: "#111827",
-              color: "#fff",
+              background: "#F9FAFB",
+              color: "#030712",
               border: "none",
-              padding: "0.8rem 1.8rem",
+              padding: "1rem 2.2rem",
               borderRadius: "999px",
-              fontSize: "0.95rem",
-              fontWeight: 600,
+              fontSize: "1rem",
+              fontWeight: 700,
               display: "inline-flex",
               alignItems: "center",
-              gap: "0.6rem",
+              gap: "0.75rem",
               cursor: "pointer",
-              transition: "transform 0.2s, background 0.2s",
-              textDecoration: "none"
+              transition: "transform 0.3s, background 0.3s, box-shadow 0.3s",
+              textDecoration: "none",
+              boxShadow: "0 10px 40px rgba(255,255,255,0.1)"
             }}
-            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.background = "#1F2937"; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.background = "#111827"; }}
+            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 15px 50px rgba(255,255,255,0.15)"; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 10px 40px rgba(255,255,255,0.1)"; }}
             >
-              Try Planora Today ↗
+              Start Planning Free
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
             </Link>
           </div>
         </div>
 
-        {/* 3-Column Dashboard Mockup */}
+        {/* 3-Column Dashboard Mockup - Redesigned as Sleek Glass Panel */}
         <div ref={dashboardRef} style={{
-          background: "linear-gradient(180deg, #FFFFFF 0%, #F9FAFB 100%)",
-          borderRadius: "2rem",
-          padding: "2.5rem",
-          boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.08)",
-          border: "1px solid rgba(0,0,0,0.05)",
+          background: "rgba(17, 24, 39, 0.4)",
+          backdropFilter: "blur(40px)",
+          borderRadius: "2.5rem",
+          padding: "3rem",
+          boxShadow: "0 40px 100px -20px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255,255,255,0.1)",
+          border: "1px solid rgba(255,255,255,0.08)",
           display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "2rem",
+          gridTemplateColumns: "1.2fr 0.8fr",
+          gap: "3rem",
           position: "relative"
         }}>
           {/* Top Left: Task Today */}
           <div>
-            <div className="dash-widget" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-              <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#111827" }}>Task Today</h3>
+            <div className="dash-widget" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
+              <h3 style={{ fontSize: "1.25rem", fontWeight: 700, color: "#F9FAFB", letterSpacing: "-0.02em" }}>Active Insights</h3>
             </div>
             
-            <div className="dash-widget" style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "1rem", padding: "1.25rem", marginBottom: "1.5rem" }}>
-              <div style={{ fontSize: "0.9rem", fontWeight: 600, color: "#111827" }}>Creating Company Profile</div>
-              <div style={{ fontSize: "0.75rem", color: "#6B7280", marginBottom: "1rem" }}>UI/UX Designer</div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", marginBottom: "0.5rem" }}>
-                <span style={{ color: "#6B7280" }}>Progress</span>
-                <span style={{ fontWeight: 600, color: "#111827" }}>90%</span>
+            <div className="dash-widget" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "1.5rem", padding: "1.5rem", marginBottom: "2rem", backdropFilter: "blur(10px)" }}>
+              <div style={{ fontSize: "1rem", fontWeight: 600, color: "#F3F4F6", marginBottom: "0.25rem" }}>Global Tech Summit 2024</div>
+              <div style={{ fontSize: "0.85rem", color: "#94A3B8", marginBottom: "1.5rem" }}>Lead Organizer View</div>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem", marginBottom: "0.75rem" }}>
+                <span style={{ color: "#94A3B8" }}>Budget Utilization</span>
+                <span style={{ fontWeight: 600, color: "#60A5FA" }}>92%</span>
               </div>
-              <div style={{ height: 6, background: "#E5E7EB", borderRadius: "999px", overflow: "hidden", marginBottom: "1.5rem" }}>
-                <div className="dash-progress" style={{ height: "100%", width: "0%", background: "#111827", borderRadius: "999px" }} />
+              <div style={{ height: 8, background: "rgba(255,255,255,0.05)", borderRadius: "999px", overflow: "hidden", marginBottom: "2rem" }}>
+                <div className="dash-progress" style={{ height: "100%", width: "0%", background: "linear-gradient(90deg, #3B82F6, #60A5FA)", borderRadius: "999px" }} />
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
-                  <div style={{ fontSize: "0.7rem", color: "#6B7280" }}>Deadline</div>
-                  <div style={{ fontSize: "0.75rem", fontWeight: 500, color: "#111827" }}>30 Nov 2024 - 11:30AM</div>
+                  <div style={{ fontSize: "0.75rem", color: "#64748B", textTransform: "uppercase", letterSpacing: "0.05em" }}>Next Milestone</div>
+                  <div style={{ fontSize: "0.9rem", fontWeight: 500, color: "#F9FAFB" }}>Venue Contract Signing</div>
                 </div>
-                <button style={{ background: "#111827", color: "#fff", border: "none", padding: "0.4rem 0.8rem", borderRadius: "999px", fontSize: "0.7rem", fontWeight: 600 }}>See More</button>
+                <button style={{ background: "rgba(255,255,255,0.1)", color: "#fff", border: "none", padding: "0.6rem 1.2rem", borderRadius: "12px", fontSize: "0.8rem", fontWeight: 600, transition: "background 0.2s" }}>Manage</button>
               </div>
             </div>
 
             {/* Statistics Graph */}
-            <div className="dash-widget" style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "1rem", padding: "1.25rem" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-                <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#111827" }}>Statistics</h3>
-                <span style={{ fontSize: "0.75rem", color: "#6B7280" }}>This week ∨</span>
+            <div className="dash-widget" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "1.5rem", padding: "1.5rem", backdropFilter: "blur(10px)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+                <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#F3F4F6" }}>Engagement</h3>
+                <span style={{ fontSize: "0.8rem", color: "#64748B", background: "rgba(255,255,255,0.05)", padding: "0.2rem 0.6rem", borderRadius: "6px" }}>Real-time</span>
               </div>
-              <div style={{ position: "relative", height: 80 }}>
+              <div style={{ position: "relative", height: 100 }}>
                 {/* Mock Graph using SVG path */}
                 <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 100 40">
-                  <path d="M0,40 Q10,10 20,30 T40,20 T60,35 T80,10 T100,5" fill="none" stroke="#111827" strokeWidth="2" strokeLinecap="round" />
-                  <path d="M0,40 Q10,10 20,30 T40,20 T60,35 T80,10 T100,5 L100,40 L0,40 Z" fill="rgba(17,24,39,0.05)" />
-                  <circle cx="80" cy="10" r="2" fill="#fff" stroke="#111827" strokeWidth="1" />
+                  <defs>
+                    <linearGradient id="graph-grad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.4" />
+                      <stop offset="100%" stopColor="#3B82F6" stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M0,35 Q10,5 25,25 T50,15 T75,30 T100,10" fill="none" stroke="#60A5FA" strokeWidth="2.5" strokeLinecap="round" />
+                  <path d="M0,35 Q10,5 25,25 T50,15 T75,30 T100,10 L100,40 L0,40 Z" fill="url(#graph-grad)" />
+                  <circle cx="100" cy="10" r="3.5" fill="#60A5FA" />
+                  <circle cx="100" cy="10" r="6" fill="#60A5FA" fillOpacity="0.2" />
                 </svg>
-                <div style={{ position: "absolute", right: "15%", top: 0, background: "#111827", color: "#fff", fontSize: "0.6rem", padding: "0.2rem 0.4rem", borderRadius: "4px" }}>6 Task</div>
               </div>
             </div>
           </div>
 
           {/* Top Right: Calendar & Recent Activity */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
             
             {/* Recent Activity */}
-            <div className="dash-widget" style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "1rem", padding: "1.25rem", flex: 1 }}>
-              <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#111827", marginBottom: "1rem" }}>Recent Activity</h3>
-              <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            <div className="dash-widget" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "1.5rem", padding: "1.5rem", flex: 1, backdropFilter: "blur(10px)" }}>
+              <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#F3F4F6", marginBottom: "1.5rem" }}>Live Feed</h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
                 {[
-                  { n: "Mark", t: "leave some comments on Konsep Ilustrasi", d: "Nov 12" },
-                  { n: "Niki", t: "change project info on Project Homepage", d: "Nov 11" },
-                  { n: "Karen", t: "leave some comments on Konsep Ilustrasi", d: "Oct 28" }
+                  { n: "Alex", t: "uploaded new venue blueprints", d: "Just now" },
+                  { n: "Sarah", t: "confirmed 12 new volunteers", d: "2m ago" },
+                  { n: "Mike", t: "finalized catering spreadsheet", d: "15m ago" }
                 ].map((act, i) => (
-                  <div key={i} style={{ display: "flex", gap: "0.8rem", alignItems: "flex-start" }}>
-                    <div style={{ width: 20, height: 20, borderRadius: "50%", background: "#E5E7EB", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.5rem" }}>✓</div>
+                  <div key={i} style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+                    <div style={{ width: 32, height: 32, borderRadius: "10px", background: "rgba(59, 130, 246, 0.1)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(59, 130, 246, 0.2)" }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    </div>
                     <div>
-                      <div style={{ fontSize: "0.8rem", color: "#4B5563", lineHeight: 1.4 }}>
-                        <span style={{ fontWeight: 600, color: "#111827" }}>{act.n}</span> {act.t}
+                      <div style={{ fontSize: "0.85rem", color: "#E2E8F0", lineHeight: 1.4 }}>
+                        <span style={{ fontWeight: 600, color: "#fff" }}>{act.n}</span> {act.t}
                       </div>
-                      <div style={{ fontSize: "0.7rem", color: "#9CA3AF", marginTop: "0.2rem" }}>{act.d}</div>
+                      <div style={{ fontSize: "0.75rem", color: "#64748B", marginTop: "0.1rem" }}>{act.d}</div>
                     </div>
                   </div>
                 ))}
@@ -376,53 +392,60 @@ export default function Hero() {
             </div>
 
             {/* Weekly Progress Dark Card */}
-            <div className="dash-widget" style={{ background: "#1B3A2E", borderRadius: "1rem", padding: "1.5rem", color: "#fff", display: "flex",flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-              <div style={{ fontSize: "0.9rem", fontWeight: 600, marginBottom: "0.2rem" }}>Weekly Progress</div>
-              <div style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.7)", marginBottom: "1rem" }}>10 task in progress</div>
-              
-              <div style={{ position: "relative", width: 80, height: 80, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <svg width="80" height="80" viewBox="0 0 100 100" style={{ transform: "rotate(-90deg)" }}>
-                  <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="8" />
-                  <circle className="dash-circle" cx="50" cy="50" r="40" fill="none" stroke="#fff" strokeWidth="8" strokeDasharray="251" strokeDashoffset="251" strokeLinecap="round" />
+            <div className="dash-widget" style={{ background: "linear-gradient(135deg, #1E1B4B 0%, #312E81 100%)", borderRadius: "1.5rem", padding: "1.8rem", color: "#fff", display: "flex", alignItems: "center", gap: "1.5rem", border: "1px solid rgba(255,255,255,0.05)" }}>
+              <div style={{ position: "relative", width: 70, height: 70, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <svg width="70" height="70" viewBox="0 0 100 100" style={{ transform: "rotate(-90deg)" }}>
+                  <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="10" />
+                  <circle className="dash-circle" cx="50" cy="50" r="42" fill="none" stroke="#60A5FA" strokeWidth="10" strokeDasharray="264" strokeDashoffset="264" strokeLinecap="round" />
                 </svg>
                 <div style={{ position: "absolute", textAlign: "center" }}>
-                  <div style={{ fontSize: "1.1rem", fontWeight: 700 }}>45%</div>
+                  <div style={{ fontSize: "1.1rem", fontWeight: 800 }}>88%</div>
                 </div>
               </div>
+              
+              <div>
+                <div style={{ fontSize: "0.95rem", fontWeight: 700, marginBottom: "0.2rem" }}>Task Velocity</div>
+                <div style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.6)" }}>Top 5% of peak planners</div>
+              </div>
             </div>
-
           </div>
 
-          {/* Overlapping Calendar Card (Humanized with organic rotation) */}
+          {/* Overlapping Calendar Card - Refined as Sleek Widget */}
           <div className="dash-widget" style={{
-            position: "absolute", top: "25%", left: "40%",
-            background: "#fff", borderRadius: "1rem", padding: "1.5rem",
-            boxShadow: "0 20px 40px rgba(0,0,0,0.12)", border: "1px solid rgba(0,0,0,0.05)",
-            zIndex: 10, width: 280,
-            animation: "float-desk 8s ease-in-out infinite 0.3s"
+            position: "absolute", top: "20%", left: "42%",
+            background: "rgba(15, 23, 42, 0.9)", backdropFilter: "blur(20px)",
+            borderRadius: "1.5rem", padding: "1.8rem",
+            boxShadow: "0 30px 60px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.1)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            zIndex: 10, width: 300,
+            animation: "float-desk 10s ease-in-out infinite 0.5s"
           }}>
-            <div style={{ textAlign: "center", fontSize: "0.9rem", fontWeight: 700, marginBottom: "1rem", color: "#111827" }}>Nov 2024</div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "0.5rem", textAlign: "center", marginBottom: "1rem" }}>
-              {["S","M","T","W","T","F","S"].map(d => <div key={d} style={{ fontSize: "0.7rem", color: "#9CA3AF" }}>{d}</div>)}
+            <div style={{ textAlign: "center", fontSize: "1rem", fontWeight: 700, marginBottom: "1.2rem", color: "#F9FAFB" }}>November 2024</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "0.6rem", textAlign: "center", marginBottom: "1.5rem" }}>
+              {["S","M","T","W","T","F","S"].map(d => <div key={d} style={{ fontSize: "0.75rem", color: "#64748B", fontWeight: 600 }}>{d}</div>)}
               {["10","11","12","13","14","15","16"].map((d, i) => (
                 <div key={d} style={{
-                  fontSize: "0.8rem", fontWeight: d === "14" ? 700 : 500,
-                  color: d === "14" ? "#fff" : "#111827",
-                  background: d === "14" ? "#1B3A2E" : "transparent",
-                  width: 24, height: 24, borderRadius: "50%",
-                  display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto"
+                  fontSize: "0.85rem", fontWeight: d === "14" ? 800 : 500,
+                  color: d === "14" ? "#fff" : "#94A3B8",
+                  background: d === "14" ? "#3B82F6" : "transparent",
+                  width: 28, height: 28, borderRadius: "8px",
+                  display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto",
+                  boxShadow: d === "14" ? "0 4px 12px rgba(59, 130, 246, 0.4)" : "none"
                 }}>{d}</div>
               ))}
             </div>
             
-            <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "#111827", marginBottom: "0.8rem" }}>Upcoming Task</div>
-            <div style={{ background: "#F3F4F6", borderRadius: "0.5rem", padding: "0.6rem 0.8rem", marginBottom: "0.5rem" }}>
-              <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "#111827" }}>Finishing X Client</div>
-              <div style={{ fontSize: "0.7rem", color: "#6B7280" }}>⏱ 3 Days Left</div>
+            <div style={{ fontSize: "0.9rem", fontWeight: 700, color: "#F9FAFB", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#FACC15" }}></div>
+              Priority Events
             </div>
-            <div style={{ background: "#F3F4F6", borderRadius: "0.5rem", padding: "0.6rem 0.8rem" }}>
-              <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "#111827" }}>Finishing X Client</div>
-              <div style={{ fontSize: "0.7rem", color: "#6B7280" }}>⏱ 3 Days Left</div>
+            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "12px", padding: "0.8rem 1rem", marginBottom: "0.75rem" }}>
+              <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "#fff" }}>Keynote Rehearsal</div>
+              <div style={{ fontSize: "0.75rem", color: "#94A3B8" }}>14:00 - Main Hall</div>
+            </div>
+            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "12px", padding: "0.8rem 1rem" }}>
+              <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "#fff" }}>Vendor Briefing</div>
+              <div style={{ fontSize: "0.75rem", color: "#94A3B8" }}>16:30 - Zoom</div>
             </div>
           </div>
           

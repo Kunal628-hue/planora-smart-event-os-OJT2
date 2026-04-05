@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from "react";
+import { MessageSquare, Sparkles, X as CloseIcon } from "lucide-react";
+import { PlanoraSpinner } from "./ui/Loader";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -227,43 +229,40 @@ export default function AiAssistant({ eventId }) {
                                 transition: "all 0.2s"
                             }}
                         >
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" transform="rotate(45)" style={{ marginLeft: "-2px", marginTop: "-2px" }}><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg>
+                            {loading ? (
+                                <PlanoraSpinner size={20} color={input.trim() ? "#fff" : "#2563eb"} />
+                            ) : (
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" transform="rotate(45)" style={{ marginLeft: "-2px", marginTop: "-2px" }}><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg>
+                            )}
                         </button>
                     </form>
                 </div>
             )}
 
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                style={{
-                    width: "48px",
-                    height: "48px",
-                    borderRadius: "50%",
-                    background: "#1e293b",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    cursor: "pointer",
-                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                    transform: isOpen ? "rotate(90deg)" : "rotate(0)",
-                    color: "#fff",
-                    padding: 0
-                }}
-                className="ai-trigger-btn"
-            >
-                {isOpen ? (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
-                ) : (
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25">
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                        <circle cx="9" cy="9" r="1" fill="currentColor" />
-                        <circle cx="12" cy="9" r="1" fill="currentColor" />
-                        <circle cx="15" cy="9" r="1" fill="currentColor" />
-                    </svg>
-                )}
-            </button>
+            {!isOpen && (
+                <button
+                    onClick={() => setIsOpen(true)}
+                    style={{
+                        width: "48px",
+                        height: "48px",
+                        borderRadius: "50%",
+                        background: "#1e293b",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        cursor: "pointer",
+                        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                        transform: "rotate(0)",
+                        color: "#fff",
+                        padding: 0
+                    }}
+                    className="ai-trigger-btn"
+                >
+                    <MessageSquare size={22} strokeWidth={2.25} />
+                </button>
+            )}
             <style>{`
                 @keyframes slideUp {
                     from { opacity: 0; transform: translateY(30px) scale(0.95); }

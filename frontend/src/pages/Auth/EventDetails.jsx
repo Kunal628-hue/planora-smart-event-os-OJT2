@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useOutletContext } from "react-router-dom";
-import { animate, stagger } from "animejs";
 import {
     ChevronLeft,
     Settings,
     Trash2,
     AlertTriangle,
     LayoutList,
-    DollarSign,
+    IndianRupee,
     Handshake,
     Zap,
     AlertCircle,
@@ -16,7 +15,8 @@ import {
     Activity,
     MapPin,
     Calendar,
-    ArrowRight
+    ArrowRight,
+    X
 } from "lucide-react";
 import AiAssistant from "../../components/AiAssistant";
 
@@ -83,24 +83,7 @@ export default function EventDetails() {
     }, [eventId, user]);
 
     useEffect(() => {
-        if (!loading && event) {
-            animate('.stagger-detail', {
-                translateY: [20, 0],
-                opacity: [0, 1],
-                delay: stagger(100),
-                easing: 'easeOutExpo',
-                duration: 800
-            });
-
-            if (healthData) {
-                animate('.health-ring-path', {
-                    strokeDashoffset: [282.7, 282.7 * (1 - (healthData?.score || 0) / 100)],
-                    easing: 'easeInOutSine',
-                    duration: 1500,
-                    delay: 500
-                });
-            }
-        }
+        // Data-only effect, animations removed
     }, [loading, !!event]);
 
     const handleUpdate = async (e) => {
@@ -157,7 +140,7 @@ export default function EventDetails() {
     if (loading) {
         return (
             <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", minHeight: "80vh", gap: "1.25rem" }}>
-                <div style={{ width: "50px", height: "50px", border: "5px solid var(--accent-primary)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 1s linear infinite" }}></div>
+                <div style={{ width: "50px", height: "50px", border: "5px solid var(--accent-primary)", borderRadius: "50%" }}></div>
                 <p style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Hydrating Event State...</p>
             </div>
         );
@@ -187,11 +170,8 @@ export default function EventDetails() {
                         alignItems: "center",
                         justifyContent: "center",
                         cursor: "pointer",
-                        boxShadow: "0 4px 15px rgba(0,0,0,0.03)",
-                        transition: "all 0.2s ease"
+                        boxShadow: "0 4px 15px rgba(0,0,0,0.03)"
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.transform = "translateX(-3px)"}
-                    onMouseLeave={(e) => e.currentTarget.style.transform = "translateX(0)"}
                 >
                     <ChevronLeft size={24} color="#64748b" strokeWidth={2.5} />
                 </button>
@@ -312,7 +292,6 @@ export default function EventDetails() {
                                         strokeDashoffset={276.46 * (1 - (healthData?.score || 0) / 100)}
                                         strokeLinecap="round"
                                         transform="rotate(-90 50 50)"
-                                        style={{ transition: "stroke-dashoffset 2s cubic-bezier(0.2, 1, 0.3, 1)" }}
                                     />
                                     <text x="50" y="52" textAnchor="middle" style={{ fontSize: "22px", fontWeight: 800, fill: "#0f172a", fontFamily: "Outfit" }}>
                                         {healthData?.score || 0}<tspan style={{ fontSize: "11px", opacity: 0.5 }}>%</tspan>
@@ -333,14 +312,14 @@ export default function EventDetails() {
                                     alignItems: "center",
                                     gap: "6px"
                                 }}>
-                                    <div style={{ width: "6px", height: "6px", background: getHealthColor(healthData?.score || 0), borderRadius: "50%", animation: "pulse 2s infinite" }}></div>
+                                    <div style={{ width: "6px", height: "6px", background: getHealthColor(healthData?.score || 0), borderRadius: "50%" }}></div>
                                     <span style={{ fontSize: "10px", fontWeight: 800, color: "#1e293b" }}>LIVE AI ENGINE</span>
                                 </div>
                             </div>
                             <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
                                 {healthData && [
                                     { label: "Logistics", value: healthData.metrics.taskCompletion, color: "#2563eb", icon: <LayoutList size={18} /> },
-                                    { label: "Stability", value: Math.max(0, 100 - (healthData.metrics.budgetUsage > 100 ? (healthData.metrics.budgetUsage - 100) : 0)), color: "#10b981", icon: <DollarSign size={18} /> },
+                                    { label: "Stability", value: Math.max(0, 100 - (healthData.metrics.budgetUsage > 100 ? (healthData.metrics.budgetUsage - 100) : 0)), color: "#10b981", icon: <IndianRupee size={18} /> },
                                     { label: "Synergy", value: healthData.metrics.vendorConfirmation, color: "#7e22ce", icon: <Handshake size={18} /> },
                                     { label: "Velocity", value: healthData.metrics.rsvpRate, color: "#f59e0b", icon: <Zap size={18} /> },
                                 ].map(item => (
@@ -353,7 +332,7 @@ export default function EventDetails() {
                                             <span style={{ color: "#0f172a" }}>{item.value}%</span>
                                         </div>
                                         <div style={{ height: "6px", background: "#f1f5f9", borderRadius: "100px" }}>
-                                            <div style={{ width: `${item.value}%`, background: item.color, height: "100%", borderRadius: "100px", transition: "width 1.5s ease-out" }}></div>
+                                            <div style={{ width: `${item.value}%`, background: item.color, height: "100%", borderRadius: "100px" }}></div>
                                         </div>
                                     </div>
                                 ))}
@@ -435,7 +414,7 @@ export default function EventDetails() {
                         <div style={{ position: "absolute", top: "-20px", right: "-20px", width: "120px", height: "120px", background: "rgba(255,255,255,0.03)", borderRadius: "50%" }}></div>
                         <h3 style={{ fontSize: "14px", color: "rgba(255,255,255,0.5)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "2rem" }}>Budget Allocation</h3>
                         <div style={{ marginBottom: "2.5rem" }}>
-                            <div style={{ fontSize: "42px", fontWeight: 800, letterSpacing: "-0.04em", marginBottom: "0.5rem" }}>₹{parseInt(event.budget).toLocaleString()}</div>
+                            <div style={{ fontSize: "42px", fontWeight: 800, letterSpacing: "-0.04em", marginBottom: "0.5rem" }}>₹{parseInt(event.budget).toLocaleString('en-IN')}</div>
                             <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "rgba(255,255,255,0.4)", fontSize: "12px", fontWeight: 500 }}>
                                 <TrendingUp size={14} /> Recommended allocation for {event.type.toLowerCase()} niche.
                             </div>
@@ -451,12 +430,9 @@ export default function EventDetails() {
                                 color: "#fff",
                                 fontWeight: 800,
                                 cursor: "pointer",
-                                backdropFilter: "blur(10px)",
-                                transition: "all 0.2s ease"
+                                backdropFilter: "blur(10px)"
                             }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.15)"}
-                            onMouseLeave={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.1)"}
-                        >Explore Vendor Matrix ➔</button>
+                        >Explore Vendor Matrix <ArrowRight size={16} /></button>
                     </div>
 
                     {/* Operational Vectors Tracking */}
@@ -491,10 +467,10 @@ export default function EventDetails() {
             {/* Config Adjustment Modal */}
             {showEditModal && (
                 <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2000, backdropFilter: "blur(8px)" }}>
-                    <div style={{ background: "#fff", width: "100%", maxWidth: "550px", padding: "3rem", borderRadius: "32px", boxShadow: "0 25px 60px rgba(0,0,0,0.2)", animation: "modalIn 0.3s ease-out" }}>
+                    <div style={{ background: "#fff", width: "100%", maxWidth: "550px", padding: "3rem", borderRadius: "32px", boxShadow: "0 25px 60px rgba(0,0,0,0.2)" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2.5rem" }}>
                             <h2 style={{ fontSize: "1.75rem", fontWeight: 800, margin: 0, letterSpacing: "-0.03em" }}>Adjust Context</h2>
-                            <button onClick={() => setShowEditModal(false)} style={{ border: "none", background: "#f1f5f9", width: "32px", height: "32px", borderRadius: "50%", cursor: "pointer" }}>×</button>
+                            <button onClick={() => setShowEditModal(false)} style={{ border: "none", background: "#f1f5f9", width: "32px", height: "32px", borderRadius: "50%", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={16} /></button>
                         </div>
                         <form onSubmit={handleUpdate} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
                             <div>
@@ -539,17 +515,6 @@ export default function EventDetails() {
 
             <AiAssistant eventId={eventId} />
 
-            <style>{`
-                @keyframes pulse {
-                    0% { transform: scale(0.95); opacity: 0.8; }
-                    50% { transform: scale(1.1); opacity: 1; }
-                    100% { transform: scale(0.95); opacity: 0.8; }
-                }
-                @keyframes modalIn {
-                    from { transform: translateY(40px); opacity: 0; }
-                    to { transform: translateY(0); opacity: 1; }
-                }
-            `}</style>
         </div>
     );
 }

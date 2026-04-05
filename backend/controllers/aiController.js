@@ -20,41 +20,44 @@ export const getEventHealth = async (req, res) => {
         const vendors = await Vendor.find({ event: new mongoose.Types.ObjectId(eventId) });
         const guests = await Guest.find({ event: new mongoose.Types.ObjectId(eventId) });
 
-        console.log(`[AI Health] Event: ${eventId}`);
-        console.log(` - Tasks found: ${tasks.length}`);
-        console.log(` - Vendors found: ${vendors.length}`);
-        console.log(` - Guests found: ${guests.length}`);
+        const now = new Date();
+        const eventDate = new Date(event.date);
+        const daysRemaining = Math.max(0, Math.ceil((eventDate - now) / (1000 * 60 * 60 * 24)));
 
-        // 1. Task Completion Rate
+        // 1. Task Completion Rate (Weighted by due dates)
         const completedTasks = tasks.filter(t => t.status === "Completed").length;
-        const taskRate = tasks.length > 0 ? (completedTasks / tasks.length) * 100 : 0;
+        const taskRate = tasks.length > 0 ? (completedTasks / tasks.length) * 100 : 100;
 
-        // 2. Budget Usage
+        // 2. Budget Precision
         const totalCost = vendors.reduce((sum, v) => sum + (v.cost || 0), 0);
         const budgetUsage = event.budget > 0 ? (totalCost / event.budget) * 100 : 0;
         let budgetScore = 100;
-        if (budgetUsage > 100) budgetScore = Math.max(0, 100 - (budgetUsage - 100) * 2);
-        else if (budgetUsage > 90) budgetScore = 90;
+        if (budgetUsage > 110) budgetScore = 0;
+        else if (budgetUsage > 100) budgetScore = Math.max(0, 100 - (budgetUsage - 100) * 10);
+        else if (budgetUsage < 50 && daysRemaining < 30) budgetScore = 80; // Underspending warning
 
-        // 3. Vendor Confirmations
-        const confirmedVendors = vendors.filter(v => v.status === "Booked" || v.status === "Paid").length;
-        const vendorRate = vendors.length > 0 ? (confirmedVendors / vendors.length) * 100 : 0;
+        // 3. Strategic Vendor Readiness
+        const criticalCategories = ["Venue", "Catering", "Decor"];
+        const criticalVendors = vendors.filter(v => criticalCategories.includes(v.service));
+        const confirmedCritical = criticalVendors.filter(v => v.status === "Booked" || v.status === "Paid").length;
+        const vendorRate = criticalVendors.length > 0 ? (confirmedCritical / criticalVendors.length) * 100 : 100;
 
-        // 4. Guest RSVPs
-        const rsvpedGuests = guests.filter(g => g.status === "Confirmed").length;
-        const rsvpRate = guests.length > 0 ? (rsvpedGuests / guests.length) * 100 : 0;
+        // 4. Audience Engagement (RSVP)
+        const confirmedRSVPs = guests.filter(g => g.status === "Confirmed").length;
+        const rsvpRate = guests.length > 0 ? (confirmedRSVPs / guests.length) * 100 : 100;
 
-        // 5. Timeline Delays (Simplified: Overdue tasks)
-        const now = new Date();
+        // Time-based Penalty: Risks become 2x more severe if event is within 14 days
+        const timeUrgencyFactor = daysRemaining < 14 ? 1.5 : (daysRemaining < 3 ? 2.5 : 1.0);
+        
         const overdueTasks = tasks.filter(t => t.status !== "Completed" && t.dueDate && new Date(t.dueDate) < now).length;
-        const delayPenalty = overdueTasks * 5;
+        const delayPenalty = overdueTasks * 4 * timeUrgencyFactor;
 
-        // Calculate Final Health Score
+        // Final Aggregate Calculation
         const healthScore = Math.max(0, Math.min(100, (
-            (taskRate * 0.3) +
-            (budgetScore * 0.3) +
-            (vendorRate * 0.2) +
-            (rsvpRate * 0.2)
+            (taskRate * 0.25) +
+            (budgetScore * 0.35) +
+            (vendorRate * 0.20) +
+            (rsvpRate * 0.20)
         ) - delayPenalty));
 
         res.status(200).json({
@@ -65,7 +68,8 @@ export const getEventHealth = async (req, res) => {
                 totalSpent: totalCost,
                 vendorConfirmation: Math.round(vendorRate),
                 rsvpRate: Math.round(rsvpRate),
-                overdueTasks
+                overdueTasks,
+                daysRemaining
             }
         });
     } catch (error) {
@@ -77,10 +81,6 @@ export const getEventHealth = async (req, res) => {
 export const getRiskAssessment = async (req, res) => {
     try {
         const { eventId } = req.params;
-        if (!mongoose.Types.ObjectId.isValid(eventId)) {
-            return res.status(400).json({ message: "Invalid Event Context ID" });
-        }
-
         const event = await Event.findById(eventId);
         if (!event) return res.status(404).json({ message: "Strategic Context not found" });
 
@@ -88,65 +88,56 @@ export const getRiskAssessment = async (req, res) => {
         const vendors = await Vendor.find({ event: new mongoose.Types.ObjectId(eventId) });
         const guests = await Guest.find({ event: new mongoose.Types.ObjectId(eventId) });
 
+        const now = new Date();
+        const eventDate = new Date(event.date);
+        const daysToEvent = Math.ceil((eventDate - now) / (1000 * 60 * 60 * 24));
         const risks = [];
 
-        // Budget Risk
-        const totalCost = vendors.reduce((sum, v) => sum + (v.cost || 0), 0);
-        const eventBudget = event.budget || 0;
-
-        if (totalCost > eventBudget && eventBudget > 0) {
+        // 1. Critical Vendor Risk
+        const criticalVenues = vendors.filter(v => (v.service === "Venue" || v.service === "Catering") && v.status !== "Booked" && v.status !== "Paid");
+        if (criticalVenues.length > 0 && daysToEvent < 30) {
             risks.push({
                 type: "CRITICAL",
-                category: "Budget",
-                message: `Capital overflow: ₹${(totalCost - eventBudget).toLocaleString()} over allocation`,
-                suggestion: "Initiate cost-reduction protocols or expand budget bandwidth."
-            });
-        } else if (totalCost > eventBudget * 0.9 && eventBudget > 0) {
-            risks.push({
-                type: "WARNING",
-                category: "Budget",
-                message: "Capital utilization exceeded 90%",
-                suggestion: "Review upcoming transactional flows immediately."
-            });
-        }
-
-        // Vendor Payment Risk
-        const unpaidVendors = vendors.filter(v => v.status === "Booked" && v.cost > 0);
-        if (unpaidVendors.length > 0) {
-            risks.push({
-                type: "WARNING",
                 category: "Partners",
-                message: `${unpaidVendors.length} partnership agreements have pending settlements`,
-                suggestion: "Verify payment schedules to ensure service continuity."
+                message: "Primary anchor (Venue/Catering) not secured.",
+                suggestion: `Secure booking immediately. High probability of date loss within 30-day window.`
             });
         }
 
-        // Timeline Risk
-        const now = new Date();
-        const overdueTasks = tasks.filter(t => t.status !== "Completed" && t.dueDate && new Date(t.dueDate) < now);
-        if (overdueTasks.length > 0) {
+        // 2. Budget Burn Risk
+        const totalCost = vendors.reduce((sum, v) => sum + (v.cost || 0), 0);
+        if (totalCost > event.budget) {
             risks.push({
                 type: "CRITICAL",
-                category: "Timeline",
-                message: `${overdueTasks.length} milestones identified as overdue`,
-                suggestion: "Prioritize immediate deployment to these delinquent tasks."
+                category: "Budget",
+                message: `Capital overflow: ₹${(totalCost - event.budget).toLocaleString('en-IN')} over allocation`,
+                suggestion: "De-prioritize non-essential add-ons or reallocate contingency funds."
             });
         }
 
-        // Guest RSVP Risk
-        if (event.date) {
-            const eventDate = new Date(event.date);
-            const daysToEvent = Math.ceil((eventDate - now) / (1000 * 60 * 60 * 24));
-            const rsvpRate = guests.length > 0 ? (guests.filter(g => g.status === "Confirmed").length / guests.length) * 100 : 0;
+        // 3. Operational Bottleneck (Task Backlog)
+        const overdueTasks = tasks.filter(t => t.status !== "Completed" && t.dueDate && new Date(t.dueDate) < now);
+        if (overdueTasks.length > 3) {
+            risks.push({
+                type: daysToEvent < 7 ? "CRITICAL" : "WARNING",
+                category: "Timeline",
+                message: `${overdueTasks.length} milestones missed in current sprint.`,
+                suggestion: "Initiate emergency task redirection or increase team velocity."
+            });
+        }
 
-            if (daysToEvent > 0 && daysToEvent < 14 && rsvpRate < 50) {
-                risks.push({
-                    type: "WARNING",
-                    category: "Audience",
-                    message: `RSVP velocity low (${Math.round(rsvpRate)}%) with T-minus ${daysToEvent} days`,
-                    suggestion: "Initiate re-engagement sequence with pending attendees."
-                });
-            }
+        // 4. RSVP Inertia
+        const rsvpTotal = guests.length;
+        const confirmed = guests.filter(g => g.status === "Confirmed").length;
+        const rsvpPercent = rsvpTotal > 0 ? (confirmed / rsvpTotal) * 100 : 100;
+        
+        if (daysToEvent < 15 && rsvpPercent < 40 && rsvpTotal > 0) {
+            risks.push({
+                type: "WARNING",
+                category: "Audience",
+                message: `Low turnout probability: Only ${Math.round(rsvpPercent)}% confirmed.`,
+                suggestion: "Broadcast automated follow-up sequence to pending contacts."
+            });
         }
 
         res.status(200).json(risks);
@@ -198,16 +189,10 @@ export const getSmartTimeline = async (req, res) => {
 export const getBudgetOptimization = async (req, res) => {
     try {
         const { eventId } = req.params;
-        if (!mongoose.Types.ObjectId.isValid(eventId)) {
-            return res.status(400).json({ message: "Invalid Context ID" });
-        }
-
         const event = await Event.findById(eventId);
         if (!event) return res.status(404).json({ message: "Event context lost" });
 
         const vendors = await Vendor.find({ event: new mongoose.Types.ObjectId(eventId) });
-
-        console.log(`[AI Budget] Event: ${eventId} | Records found: ${vendors.length}`);
 
         const categories = {};
         vendors.forEach(v => {
@@ -215,27 +200,33 @@ export const getBudgetOptimization = async (req, res) => {
         });
 
         const suggestions = [];
-        const totalCost = Object.values(categories).reduce((a, b) => a + b, 0);
         const eventBudget = event.budget || 0;
+
+        // Industry Standard benchmarks (as decimals)
+        const benchmarks = {
+            "Wedding": { Catering: 0.40, Venue: 0.20, Decor: 0.15, AV: 0.10, Other: 0.15 },
+            "Conference": { Catering: 0.25, Venue: 0.35, AV: 0.20, Decor: 0.10, Other: 0.10 },
+            "College Fest": { Catering: 0.15, Venue: 0.10, AV: 0.40, Decor: 0.20, Other: 0.15 },
+            "Party": { Catering: 0.50, Venue: 0.15, Decor: 0.20, AV: 0.10, Other: 0.05 }
+        };
+
+        const currentEventMetrics = benchmarks[event.type] || benchmarks["Wedding"];
 
         Object.keys(categories).forEach(cat => {
             if (eventBudget > 0) {
-                const percentage = (categories[cat] / eventBudget) * 100;
-                if (cat === "Catering" && percentage > 40) {
-                    suggestions.push(`Catering allocation is aggressive (${Math.round(percentage)}%). Industrial benchmark for ${event.type} is 35%.`);
-                }
-                if (cat === "Decor" && percentage > 25) {
-                    suggestions.push(`Aesthetic investment (${Math.round(percentage)}%) in Decor is diverging from strategic norms (15-20%).`);
+                const percentage = (categories[cat] / eventBudget);
+                const benchmark = currentEventMetrics[cat] || 0.15;
+
+                if (percentage > benchmark + 0.1) {
+                    suggestions.push(`${cat} allocation (${Math.round(percentage * 100)}%) exceeds strategic benchmark (${Math.round(benchmark * 100)}%). Consider negotiating fixed-fee contracts.`);
+                } else if (percentage < benchmark - 0.1) {
+                    suggestions.push(`${cat} is currently under-resourced (${Math.round(percentage * 100)}%). This may lead to quality compromises in the delivery phase.`);
                 }
             }
         });
 
-        if (totalCost > eventBudget && eventBudget > 0) {
-            suggestions.push(`Current operational flow is ₹${(totalCost - eventBudget).toLocaleString()} over designated capital.`);
-        }
-
         if (suggestions.length === 0 && eventBudget > 0) {
-            suggestions.push("Capital allocation is currently showing high strategic alignment with industrial benchmarks.");
+            suggestions.push("Your budget distribution mirrors high-performance industry models perfectly.");
         }
 
         res.status(200).json(suggestions);
@@ -253,7 +244,7 @@ export const getVendorRecommendations = async (req, res) => {
             name: "Royal Caterers",
             service: "Catering",
             rating: 4.8,
-            priceRange: "High",
+            priceRange: "₹₹₹",
             suitableFor: ["Wedding", "Conference"],
             description: "Premium multi-cuisine catering service specializing in large-scale luxury events and corporate galas.",
             contact: "+91 98765 43210",
@@ -264,7 +255,7 @@ export const getVendorRecommendations = async (req, res) => {
             name: "Street Foodies",
             service: "Catering",
             rating: 4.5,
-            priceRange: "Medium",
+            priceRange: "₹₹",
             suitableFor: ["College Fest", "Party", "Other"],
             description: "Casual and trendy live food counters perfect for energetic social gatherings and festivals.",
             contact: "+91 88888 77777",
@@ -275,7 +266,7 @@ export const getVendorRecommendations = async (req, res) => {
             name: "Elite Decor",
             service: "Decor",
             rating: 4.9,
-            priceRange: "High",
+            priceRange: "₹₹₹",
             suitableFor: ["Wedding", "Birthday"],
             description: "Bespoke floral and lighting design for high-end celebrations and intimate gatherings.",
             contact: "+91 77777 66666",
@@ -286,7 +277,7 @@ export const getVendorRecommendations = async (req, res) => {
             name: "Tech AV Solutions",
             service: "AV",
             rating: 4.7,
-            priceRange: "Medium",
+            priceRange: "₹₹",
             suitableFor: ["Conference", "Workshop", "Other"],
             description: "State-of-the-art audio-visual equipment rental and technical support for seamless presentations.",
             contact: "+91 99999 55555",
@@ -297,7 +288,7 @@ export const getVendorRecommendations = async (req, res) => {
             name: "Budget Blasters",
             service: "Decor",
             rating: 4.2,
-            priceRange: "Low",
+            priceRange: "₹",
             suitableFor: ["College Fest", "Party"],
             description: "Creative and affordable decor solutions that maximize visual impact without breaking the bank.",
             contact: "+91 66666 44444",

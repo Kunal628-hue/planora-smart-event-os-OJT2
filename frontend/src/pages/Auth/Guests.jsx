@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import { animate, stagger } from "animejs";
 import { UserPlus, Users, Trash2, Mail, Briefcase, Loader2, X, Calendar } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -44,17 +43,6 @@ export default function Guests() {
         }
     }, [selectedEventId]);
 
-    useEffect(() => {
-        if (!loading && guests.length > 0) {
-            animate('.guest-card', {
-                translateY: [20, 0],
-                opacity: [0, 1],
-                delay: stagger(80),
-                easing: 'easeOutExpo',
-                duration: 800
-            });
-        }
-    }, [loading, guests.length]);
 
     const handleCreateGuest = async (e) => {
         e.preventDefault();
@@ -162,7 +150,7 @@ export default function Guests() {
 
             {loading ? (
                 <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "10rem 0", gap: "1.5rem" }}>
-                    <div style={{ width: "48px", height: "48px", border: "5px solid #2563eb", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 1s linear infinite" }}></div>
+                    <div style={{ width: "48px", height: "48px", border: "5px solid #2563eb", borderRadius: "50%" }}></div>
                     <p style={{ fontSize: "0.9rem", fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.1em" }}>Analyzing RSVPs...</p>
                 </div>
             ) : filteredGuests.length === 0 ? (
@@ -202,7 +190,9 @@ export default function Guests() {
                                 borderRadius: "14px",
                                 fontWeight: 800,
                                 cursor: "pointer",
-                                transition: "all 0.2s"
+                                borderRadius: "14px",
+                                fontWeight: 800,
+                                cursor: "pointer"
                             }}
                         >Invite Your First Guest</button>
                     )}
@@ -222,8 +212,7 @@ export default function Guests() {
                             position: "relative",
                             boxShadow: "0 4px 20px rgba(0,0,0,0.01)",
                             display: "flex",
-                            flexDirection: "column",
-                            transition: "all 0.3s ease"
+                            flexDirection: "column"
                         }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.5rem" }}>
                                 <div style={{
@@ -270,11 +259,8 @@ export default function Guests() {
                                             border: "none",
                                             color: "#94a3b8",
                                             cursor: "pointer",
-                                            padding: "0",
-                                            transition: "color 0.2s"
+                                            padding: "0"
                                         }}
-                                        onMouseEnter={(e) => e.target.style.color = "#ef4444"}
-                                        onMouseLeave={(e) => e.target.style.color = "#94a3b8"}
                                     >
                                         <Trash2 size={16} />
                                     </button>
@@ -322,7 +308,7 @@ export default function Guests() {
 
             {showModal && (
                 <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2000, backdropFilter: "blur(8px)" }}>
-                    <div style={{ background: "#fff", width: "100%", maxWidth: "520px", padding: "3rem", borderRadius: "32px", boxShadow: "0 25px 60px rgba(0,0,0,0.2)", animation: "modalIn 0.3s ease-out" }}>
+                    <div style={{ background: "#fff", width: "100%", maxWidth: "520px", padding: "3rem", borderRadius: "32px", boxShadow: "0 25px 60px rgba(0,0,0,0.2)" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2.5rem" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
                                 <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -388,20 +374,6 @@ export default function Guests() {
                 </div>
             )}
 
-            <style>{`
-                @keyframes spin {
-                    from { transform: rotate(0deg); }
-                    to { transform: rotate(360deg); }
-                }
-                @keyframes modalIn {
-                    from { transform: translateY(40px); opacity: 0; }
-                    to { transform: translateY(0); opacity: 1; }
-                }
-                .guest-card:hover {
-                    transform: translateY(-8px);
-                    box-shadow: 0 20px 40px rgba(0,0,0,0.06);
-                }
-            `}</style>
         </div>
     );
 }

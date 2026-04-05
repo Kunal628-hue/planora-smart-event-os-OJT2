@@ -70,20 +70,20 @@ export default function Navbar() {
           position: "fixed",
           inset: "0 0 auto 0",
           zIndex: 999,
-          height: 66,
+          height: 70,
           display: "flex",
           alignItems: "center",
           opacity: 0, // GSAP takes over
-          backdropFilter: scrolled ? "blur(20px) saturate(180%)" : "none",
-          WebkitBackdropFilter: scrolled ? "blur(20px) saturate(180%)" : "none",
+          backdropFilter: scrolled ? "blur(24px) saturate(160%)" : "none",
+          WebkitBackdropFilter: scrolled ? "blur(24px) saturate(160%)" : "none",
           background: scrolled
-            ? "rgba(255,255,255,0.88)"
-            : "rgba(255,255,255,0.45)",
+            ? "rgba(3, 7, 18, 0.75)"
+            : "transparent",
           borderBottom: scrolled
-            ? "1px solid rgba(0,0,0,0.07)"
-            : "1px solid rgba(0,0,0,0.03)",
-          boxShadow: scrolled ? "0 2px 24px rgba(0,0,0,0.06)" : "none",
-          transition: "background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, backdrop-filter 0.35s ease",
+            ? "1px solid rgba(255,255,255,0.08)"
+            : "1px solid transparent",
+          boxShadow: scrolled ? "0 8px 32px rgba(0,0,0,0.3)" : "none",
+          transition: "background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease",
         }}
       >
         <div
@@ -91,7 +91,7 @@ export default function Navbar() {
             width: "100%",
             maxWidth: 1200,
             margin: "0 auto",
-            padding: "0 2.5rem",
+            padding: "0 2rem",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -103,7 +103,12 @@ export default function Navbar() {
             <img
               src="/logo-new.svg"
               alt="Planora Logo"
-              style={{ height: "2.4rem", width: "auto", display: "block" }}
+              style={{
+                height: "2.2rem",
+                width: "auto",
+                display: "block",
+                filter: "invert(72%) sepia(99%) saturate(400%) hue-rotate(5deg) brightness(105%) contrast(105%)"
+              }}
             />
           </Link>
 
@@ -112,10 +117,23 @@ export default function Navbar() {
             <GooeyNav items={NAV_LINKS} scrolled={scrolled} />
           </nav>
 
-          {/* Right CTAs */}
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
-            <Link to="/login" className="lp-login-link">
-              Log in
+          {/* Right CTA */}
+          <div style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
+            <Link to="/login" style={{
+              background: "linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)",
+              color: "#fff",
+              padding: "0.6rem 1.4rem",
+              borderRadius: "999px",
+              fontSize: "0.875rem",
+              fontWeight: 700,
+              textDecoration: "none",
+              boxShadow: "0 4px 12px rgba(37, 99, 235, 0.3)",
+              transition: "transform 0.2s, box-shadow 0.2s"
+            }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 6px 20px rgba(37, 99, 235, 0.4)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 12px rgba(37, 99, 235, 0.3)"; }}
+            >
+              Login
             </Link>
           </div>
         </div>

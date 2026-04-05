@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { animate } from "animejs";
 import AuthBackground from "../../components/auth/AuthBackground";
 import SocialAuth from "../../components/auth/SocialAuth";
 
@@ -11,18 +10,6 @@ export default function Signup() {
     const [form, setForm] = useState({ name: "", email: "", password: "" });
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
-
-    const cardRef = useRef(null);
-
-    useEffect(() => {
-        if (!cardRef.current) return;
-        animate(cardRef.current, {
-            opacity: [0, 1],
-            translateY: [30, 0],
-            duration: 1000,
-            easing: "outExpo",
-        });
-    }, []);
 
     const handleChange = (e) => {
         setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -88,7 +75,7 @@ export default function Signup() {
         <div className="auth-page-new">
             <AuthBackground />
             
-            <div className="auth-card-new" ref={cardRef} style={{ opacity: 0 }}>
+            <div className="auth-card-new">
                 {/* Switcher */}
                 <div className="auth-switcher">
                     <Link to="/login" className="switcher-btn">
@@ -174,7 +161,12 @@ export default function Signup() {
                 <SocialAuth onLogin={handleSocialLogin} loading={loading} />
 
                 <div className="auth-footer-new">
-                    Already have an account? <Link to="/login" style={{ color: '#111827', fontWeight: 700, textDecoration: 'underline' }}>Sign in</Link>
+                    <Link to="/" style={{ color: '#6b7280', fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                        Back to Planora
+                    </Link>
                 </div>
             </div>
 

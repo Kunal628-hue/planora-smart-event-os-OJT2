@@ -1,3 +1,12 @@
+import { 
+  Zap, 
+  Layers, 
+  Shield, 
+  Check, 
+  X, 
+  ArrowUpRight 
+} from "lucide-react";
+
 const plans = [
   {
     name: "Free Plan",
@@ -5,24 +14,24 @@ const plans = [
     desc: "Perfect for individuals & hobbyists",
     features: ["Up to 3 events", "Basic task management", "5 team members", "Email support", "Standard templates"],
     notIncluded: ["AI features", "Advanced analytics", "Priority support"],
-    icon: "⚡" // Lightning bolt
+    icon: <Zap size={24} />
   },
   {
     name: "Pro",
-    price: "$9.99",
+    price: "₹799",
     period: "/month",
     desc: "For growing event teams",
     features: ["Unlimited events", "AI-powered planning", "25 team members", "Advanced analytics & insights", "Unlimited individual data", "Priority support", "Custom integrations"],
     popular: true,
-    icon: "🎴" // Layers (using an emoji for now, or SVG)
+    icon: <Layers size={24} />
   },
   {
     name: "Enterprise",
-    price: "$29.99",
+    price: "₹2,499",
     period: "/month",
     desc: "For large organizations",
     features: ["Everything in Pro", "Optimized for teams", "Unlimited team users", "Enhanced data sharing", "Premium support", "Custom branding", "SLA guarantee"],
-    icon: "📚" // Stack
+    icon: <Shield size={24} />
   }
 ];
 
@@ -86,13 +95,13 @@ export default function Pricing() {
                 <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "1rem" }}>
                   {p.features.map((f, idx) => (
                     <li key={idx} style={{ display: "flex", alignItems: "center", gap: "0.75rem", fontSize: "0.95rem", fontWeight: 500 }}>
-                      <span style={{ color: p.popular ? "#fff" : "#111827" }}>✓</span>
+                      <Check size={16} />
                       {f}
                     </li>
                   ))}
                   {p.notIncluded?.map((f, idx) => (
                     <li key={idx} style={{ display: "flex", alignItems: "center", gap: "0.75rem", fontSize: "0.95rem", fontWeight: 500, opacity: 0.3 }}>
-                      <span style={{ color: p.popular ? "#fff" : "#111827" }}>✕</span>
+                      <X size={16} />
                       {f}
                     </li>
                   ))}
@@ -112,7 +121,7 @@ export default function Pricing() {
                 cursor: "pointer",
                 transition: "opacity 0.2s"
               }} onMouseEnter={e => e.currentTarget.style.opacity = "0.9"} onMouseLeave={e => e.currentTarget.style.opacity = "1"}>
-                Get Started ↗
+                Get Started <ArrowUpRight size={18} />
               </button>
             </div>
           ))}

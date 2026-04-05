@@ -6,7 +6,7 @@ import {
     RefreshCw,
     Search as ChartIcon,
     Moon,
-    Flame,
+    AlertTriangle,
     ChevronRight,
     Edit3,
     Zap,
@@ -23,21 +23,11 @@ export default function Settings() {
     const [darkModeMatrix, setDarkModeMatrix] = useState(false);
     // Mock handlers
     const handleSynchronize = () => {
-        // Simulate a save action
+        // Simple save feedback without animation
         const btn = document.querySelector('.premium-btn');
         if (btn) {
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '↻ Synchronizing...';
-            btn.style.opacity = '0.7';
-            setTimeout(() => {
-                btn.innerHTML = '✓ Synchronized';
-                btn.style.background = '#10b981';
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.style.background = 'linear-gradient(135deg, #6C5CE7 0%, #E84393 100%)';
-                    btn.style.opacity = '1';
-                }, 2000);
-            }, 1000);
+            btn.innerHTML = '✓ Synchronized';
+            btn.style.background = '#10b981';
         }
     };
 
@@ -50,8 +40,7 @@ export default function Settings() {
     return (
         <div style={{
             fontFamily: "'Inter', system-ui, sans-serif",
-            color: "#0f172a",
-            animation: "fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1)"
+            color: "#0f172a"
         }}>
             {/* Page Header */}
             <div style={{ marginBottom: "2.5rem" }}>
@@ -141,11 +130,8 @@ export default function Settings() {
                                     style={{
                                         width: "100%", padding: "10px 12px 10px 38px",
                                         background: "#fff", border: "1px solid #e2e8f0", borderRadius: "8px",
-                                        fontSize: "14px", fontWeight: 500, color: "#1e293b", outline: "none",
-                                        transition: "border-color 0.2s"
+                                        fontSize: "14px", fontWeight: 500, color: "#1e293b", outline: "none"
                                     }}
-                                    onFocus={(e) => e.target.style.borderColor = "#2563eb"}
-                                    onBlur={(e) => e.target.style.borderColor = "#e2e8f0"}
                                 />
                             </div>
                         </div>
@@ -174,7 +160,7 @@ export default function Settings() {
                                 border: "none", borderRadius: "8px", color: "#fff",
                                 fontSize: "14px", fontWeight: 700,
                                 display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
-                                cursor: "pointer", transition: "all 0.2s"
+                                cursor: "pointer"
                             }} className="save-btn"
                         >
                             <RefreshCw size={16} />
@@ -234,7 +220,7 @@ export default function Settings() {
                                     style={{
                                         width: "36px", height: "20px", borderRadius: "100px",
                                         background: item.state ? "#1e293b" : "#e2e8f0",
-                                        position: "relative", cursor: "pointer", transition: "all 0.2s"
+                                        position: "relative", cursor: "pointer"
                                     }}
                                 >
                                     <div style={{
@@ -242,8 +228,7 @@ export default function Settings() {
                                         top: "2px",
                                         left: item.state ? "18px" : "2px",
                                         width: "16px", height: "16px", borderRadius: "50%",
-                                        background: "#fff", boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
-                                        transition: "all 0.2s"
+                                        background: "#fff", boxShadow: "0 1px 2px rgba(0,0,0,0.1)"
                                     }} />
                                 </div>
                             </div>
@@ -257,7 +242,7 @@ export default function Settings() {
                             marginTop: "3rem", padding: "1.25rem", borderRadius: "12px",
                             background: "#fff", border: "1px solid #fee2e2",
                             display: "flex", alignItems: "center", justifyContent: "space-between",
-                            cursor: "pointer", transition: "all 0.2s"
+                            cursor: "pointer"
                         }} className="danger-row">
                         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                             <div style={{
@@ -265,7 +250,7 @@ export default function Settings() {
                                 background: "#fef2f2", display: "flex", alignItems: "center", justifyContent: "center",
                                 color: "#ef4444"
                             }}>
-                                <Flame size={18} />
+                                <AlertTriangle size={18} />
                             </div>
                             <div>
                                 <div style={{ fontSize: "13px", fontWeight: 700, color: "#991b1b" }}>Delete Workspace</div>
@@ -277,13 +262,6 @@ export default function Settings() {
                 </div>
             </div>
 
-            <style>{`
-                .settings-card { border-color: #e2e8f0; transition: all 0.2s; }
-                .settings-card:hover { border-color: #cbd5e1; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-                .save-btn:hover { background: #334155 !important; transform: translateY(-1px); }
-                .save-btn:active { transform: translateY(0); }
-                .danger-row:hover { border-color: #fecaca; background: #fffafb; }
-            `}</style>
         </div>
     );
 }

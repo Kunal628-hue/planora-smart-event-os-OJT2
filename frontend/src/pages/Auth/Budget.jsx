@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import { animate, stagger } from "animejs";
 import {
     Plus,
     Wallet,
@@ -107,17 +106,6 @@ export default function Budget() {
         }
     };
 
-    useEffect(() => {
-        if (!loading) {
-            animate('.stat-card', {
-                translateY: [20, 0],
-                opacity: [0, 1],
-                delay: stagger(100),
-                easing: 'easeOutQuart',
-                duration: 600
-            });
-        }
-    }, [loading]);
 
     return (
         <div style={{
@@ -139,18 +127,18 @@ export default function Budget() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "2rem", marginBottom: "3.5rem" }}>
                 <div className="stat-card" style={{ background: "#fff", padding: "2.25rem", borderRadius: "32px", border: "1px solid #f1f5f9", boxShadow: "0 4px 20px rgba(0,0,0,0.02)" }}>
                     <div style={{ fontSize: "12px", fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "1rem" }}>Total Budget</div>
-                    <div style={{ fontSize: "2.5rem", fontWeight: 800, color: "#2563eb", letterSpacing: "-0.02em" }}>₹{totalAllocated.toLocaleString()}</div>
+                    <div style={{ fontSize: "2.5rem", fontWeight: 800, color: "#2563eb", letterSpacing: "-0.02em" }}>₹{totalAllocated.toLocaleString('en-IN')}</div>
                 </div>
                 <div className="stat-card" style={{ background: "#fff", padding: "2.25rem", borderRadius: "32px", border: "1px solid #f1f5f9", boxShadow: "0 4px 20px rgba(0,0,0,0.02)" }}>
                     <div style={{ fontSize: "12px", fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "8px" }}>
                         <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#ec4899" }}></div>
                         Total Spent
                     </div>
-                    <div style={{ fontSize: "1.75rem", fontWeight: 800, color: "#0f172a" }}>₹{totalSpent.toLocaleString()}</div>
+                    <div style={{ fontSize: "1.75rem", fontWeight: 800, color: "#0f172a" }}>₹{totalSpent.toLocaleString('en-IN')}</div>
                 </div>
                 <div className="stat-card" style={{ background: "#fff", padding: "2.25rem", borderRadius: "32px", border: "1px solid #f1f5f9", boxShadow: "0 4px 20px rgba(0,0,0,0.02)" }}>
                     <div style={{ fontSize: "12px", fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "1rem" }}>Remaining Liquidity</div>
-                    <div style={{ fontSize: "1.75rem", fontWeight: 800, color: remainingColor }}>₹{remaining.toLocaleString()}</div>
+                    <div style={{ fontSize: "1.75rem", fontWeight: 800, color: remainingColor }}>₹{remaining.toLocaleString('en-IN')}</div>
                 </div>
             </div>
 
@@ -275,8 +263,7 @@ export default function Budget() {
                                     eventVendors.map((v, idx) => (
                                         <tr key={v._id} style={{
                                             background: idx % 2 !== 0 ? "#fafafc" : "transparent",
-                                            height: "36px",
-                                            transition: "background 0.2s ease"
+                                            height: "36px"
                                         }}>
                                             <td style={{ padding: "0 1rem", fontSize: "12px", fontWeight: 700, color: "#1e293b" }}>{v.name}</td>
                                             <td style={{ padding: "0 1rem", fontSize: "12px", fontWeight: 700, color: "#64748b" }}>{v.service}</td>
@@ -293,7 +280,7 @@ export default function Budget() {
 
             {showModal && (
                 <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2000, backdropFilter: "blur(8px)" }}>
-                    <div style={{ background: "#fff", width: "100%", maxWidth: "480px", padding: "3rem", borderRadius: "32px", boxShadow: "0 25px 60px rgba(0,0,0,0.18)", animation: "modalIn 0.3s ease-out" }}>
+                    <div style={{ background: "#fff", width: "100%", maxWidth: "480px", padding: "3rem", borderRadius: "32px", boxShadow: "0 25px 60px rgba(0,0,0,0.18)" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2.5rem" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
                                 <div style={{ width: "42px", height: "42px", borderRadius: "12px", background: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -334,10 +321,6 @@ export default function Budget() {
                 </div>
             )}
 
-            <style>{`
-                @keyframes modalIn { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-                tbody tr:hover { background: #fdfdfd !important; cursor: default; }
-            `}</style>
-        </div>
+</div>
     );
 }

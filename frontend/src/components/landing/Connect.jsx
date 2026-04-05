@@ -150,38 +150,42 @@ function StepCard({ step }) {
         style={{ height: "100%" }}
       >
         <div style={{
-          background: "#fff",
+          background: "rgba(255,255,255,0.015)",
+          backdropFilter: "blur(20px)",
           borderRadius: "1.5rem",
-          padding: "2rem",
-          border: isHovered ? `1px solid ${step.color}40` : "1px solid rgba(0,0,0,0.06)",
-          boxShadow: isHovered ? `0 20px 40px rgba(${step.colorRgb}, 0.1)` : "0 10px 30px rgba(0,0,0,0.04)",
+          padding: "2.5rem",
+          border: isHovered ? `1px solid ${step.color}40` : "1px solid rgba(255,255,255,0.05)",
+          boxShadow: isHovered ? `0 20px 40px rgba(${step.colorRgb}, 0.15)` : "0 10px 30px rgba(0,0,0,0.2)",
           position: "relative",
           height: "100%",
           transition: "all 0.3s ease",
-          transform: isHovered ? "translateY(-4px)" : "translateY(0)"
+          transform: isHovered ? "translateY(-6px)" : "translateY(0)"
         }}>
           <div style={{
-            fontSize: "2.5rem",
+            fontSize: "3rem",
             fontWeight: 900,
-            color: `rgba(${step.colorRgb}, ${isHovered ? 0.2 : 0.1})`,
+            color: `rgba(${step.colorRgb}, ${isHovered ? 0.25 : 0.1})`,
             position: "absolute",
             top: "1.5rem",
             right: "1.5rem",
             lineHeight: 1,
-            transition: "color 0.3s ease"
+            transition: "all 0.3s ease",
+            fontFamily: "'Outfit', sans-serif"
           }}>
             {step.number}
           </div>
           <div style={{
-            width: 48, height: 48, borderRadius: "1rem",
-            background: `rgba(${step.colorRgb}, 0.1)`, color: step.color,
+            width: 52, height: 52, borderRadius: "1.25rem",
+            background: `rgba(${step.colorRgb}, 0.1)`, 
+            color: step.color,
             display: "flex", alignItems: "center", justifyContent: "center",
-            marginBottom: "1.5rem"
+            marginBottom: "2rem",
+            border: `1px solid rgba(${step.colorRgb}, 0.2)`
           }}>
             {step.icon}
           </div>
-          <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#111827", marginBottom: "0.5rem" }}>{step.title}</h3>
-          <p style={{ fontSize: "0.85rem", color: "#6B7280", lineHeight: 1.6 }}>{step.desc}</p>
+          <h3 style={{ fontSize: "1.25rem", fontWeight: 800, color: "#fff", marginBottom: "0.75rem", fontFamily: "'Outfit', sans-serif" }}>{step.title}</h3>
+          <p style={{ fontSize: "0.95rem", color: "#94A3B8", lineHeight: 1.6 }}>{step.desc}</p>
         </div>
       </ElectricBorder>
     </div>
@@ -201,7 +205,7 @@ export default function Connect() {
           scale: 1, opacity: 1, y: 0, 
           duration: 0.8, 
           stagger: 0.15, 
-          ease: "back.out(1.5)",
+          ease: "power3.out",
           scrollTrigger: {
             trigger: cards[0],
             start: "top 85%",
@@ -214,7 +218,7 @@ export default function Connect() {
   }, []);
 
   return (
-    <section ref={containerRef} id="testimonials" style={{ background: "#FAFAFA", padding: "8rem 0 0", fontFamily: "'Inter', sans-serif" }}>
+    <section ref={containerRef} id="testimonials" style={{ background: "#030712", padding: "10rem 0 0", fontFamily: "'Inter', sans-serif" }}>
       
       {/* Upper Grid Section */}
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 2.5rem", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", alignItems: "center", marginBottom: "8rem" }}>
@@ -223,24 +227,26 @@ export default function Connect() {
         <div>
           <div style={{
             display: "inline-block",
-            background: "#E5E7EB", color: "#374151",
-            padding: "0.4rem 1rem", borderRadius: "999px",
-            fontSize: "0.75rem", fontWeight: 700,
-            textTransform: "uppercase", letterSpacing: "0.05em",
-            marginBottom: "1.5rem"
+            background: "rgba(255,255,255,0.03)", color: "#94A3B8",
+            padding: "0.5rem 1.2rem", borderRadius: "999px",
+            fontSize: "0.8rem", fontWeight: 700,
+            textTransform: "uppercase", letterSpacing: "0.1em",
+            marginBottom: "2rem",
+            border: "1px solid rgba(255,255,255,0.05)"
           }}>
-            ✦ How It Works
+            ✦ Workflow Design
           </div>
           <h2 style={{
-            fontSize: "clamp(2.2rem, 3.5vw, 3.2rem)",
-            fontWeight: 800, color: "#111827",
-            lineHeight: 1.1, letterSpacing: "-0.03em",
-            marginBottom: "1.5rem"
+            fontSize: "clamp(2.5rem, 4vw, 3.8rem)",
+            fontWeight: 800, color: "#F9FAFB",
+            lineHeight: 1.05, letterSpacing: "-0.04em",
+            marginBottom: "2rem",
+            fontFamily: "'Outfit', sans-serif"
           }}>
-            From idea to execution in four steps.
+            From idea to impact in <span style={{ color: "#3B82F6" }}>four</span> smooth steps.
           </h2>
-          <p style={{ fontSize: "1.05rem", color: "#6B7280", lineHeight: 1.6, maxWidth: 400 }}>
-            Planora guides you through every phase — so nothing slips through the cracks. Built to integrate seamlessly.
+          <p style={{ fontSize: "1.15rem", color: "#94A3B8", lineHeight: 1.6, maxWidth: 450 }}>
+            Planora architecture scales with your ambition. Built to ensure every detail is accounted for, from inception to analysis.
           </p>
         </div>
 
@@ -253,7 +259,7 @@ export default function Connect() {
       </div>
 
       {/* Marquee Section mapped from Trust */}
-      <div style={{ padding: "5rem 0", background: "#fff", position: "relative", overflow: "hidden", borderTop: "1px solid rgba(0,0,0,0.03)" }}>
+      <div style={{ padding: "8rem 0", background: "rgba(255,255,255,0.01)", position: "relative", overflow: "hidden", borderTop: "1px solid rgba(255,255,255,0.03)" }}>
         
         <style dangerouslySetInnerHTML={{__html: `
           @keyframes scroll-left {
@@ -284,30 +290,33 @@ export default function Connect() {
             display: flex;
             align-items: center;
             gap: 1.2rem;
-            padding: 0.8rem 1.6rem 0.8rem 0.8rem;
+            padding: 1rem 1.8rem 1rem 1rem;
             border-radius: 100px;
-            background: #ffffff;
-            border: 1px solid rgba(0,0,0,0.06);
-            color: #374151;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            color: #E2E8F0;
             flex-shrink: 0;
             cursor: default;
-            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
           }
           .trust-badge:hover {
-            transform: translateY(-4px) scale(1.03);
-            box-shadow: 0 15px 35px -8px rgba(0,0,0,0.12);
-            border-color: rgba(0,0,0,0.1);
+            transform: translateY(-5px) scale(1.05);
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            color: #fff;
           }
         `}} />
 
         {/* Fade Edges */}
-        <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "20%", background: "linear-gradient(90deg, #fff 10%, transparent)", zIndex: 10, pointerEvents: "none" }} />
-        <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: "20%", background: "linear-gradient(-90deg, #fff 10%, transparent)", zIndex: 10, pointerEvents: "none" }} />
+        <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "20%", background: "linear-gradient(90deg, #030712 10%, transparent)", zIndex: 10, pointerEvents: "none" }} />
+        <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: "20%", background: "linear-gradient(-90deg, #030712 10%, transparent)", zIndex: 10, pointerEvents: "none" }} />
 
-        <div style={{ textAlign: "center", marginBottom: "3rem", zIndex: 1, position: "relative" }}>
-          <p style={{ fontSize: "0.85rem", fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase", color: "#9CA3AF" }}>
-            Trusted by premium organizations for events of all scales
+        <div style={{ textAlign: "center", marginBottom: "4rem", zIndex: 1, position: "relative" }}>
+          <p style={{ fontSize: "0.9rem", fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase", color: "#4B5563" }}>
+            The standard for elite event management
           </p>
         </div>
 

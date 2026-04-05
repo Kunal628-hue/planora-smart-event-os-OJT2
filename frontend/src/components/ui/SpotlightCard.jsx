@@ -40,7 +40,7 @@ const SpotlightCard = forwardRef(({ children, className = '', spotlightColor = '
       onBlur={handleBlur}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className={`relative rounded-3xl border border-neutral-200 bg-white overflow-hidden ${className}`}
+      className={`relative overflow-hidden ${className}`}
       style={style}
     >
       <div

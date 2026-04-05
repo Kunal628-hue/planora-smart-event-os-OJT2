@@ -110,31 +110,32 @@ export default function Testimonials() {
 
   return (
     <section ref={containerRef} id="problem" style={{
-      background: "#0A0A0A",
-      color: "#fff",
-      padding: "8rem 0",
+      background: "#030712",
+      color: "#F9FAFB",
+      padding: "10rem 0",
       position: "relative",
       fontFamily: "'Inter', sans-serif"
     }}>
       <style dangerouslySetInnerHTML={{__html: `
         .problem-card {
-          transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .problem-card:hover {
-          transform: translateY(-5px) scale(1.02);
-          box-shadow: inset 0 1px 1px rgba(255,255,255,0.2), 0 20px 50px rgba(0,0,0,0.6), 0 0 40px rgba(96,165,250,0.1);
-          border-color: rgba(255,255,255,0.15);
+          transform: translateY(-8px) scale(1.02);
+          background: rgba(255,255,255,0.035) !important;
+          border-color: rgba(59, 130, 246, 0.3) !important;
+          box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 40px rgba(59, 130, 246, 0.05);
         }
       `}} />
 
-      {/* Background radial gradient to mimic video's subtle lighting */}
+      {/* Background radial gradient */}
       <div style={{
         position: "absolute",
         top: "-10%",
         right: "10%",
-        width: "600px",
-        height: "600px",
-        background: "radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%)",
+        width: "800px",
+        height: "800px",
+        background: "radial-gradient(circle, rgba(59, 130, 246, 0.05) 0%, transparent 70%)",
         pointerEvents: "none",
         zIndex: 0
       }} />
@@ -145,7 +146,7 @@ export default function Testimonials() {
         padding: "0 2.5rem",
         display: "grid",
         gridTemplateColumns: "1fr 1.2fr",
-        gap: "4rem",
+        gap: "6rem",
         position: "relative",
         zIndex: 1,
         alignItems: "start"
@@ -155,37 +156,39 @@ export default function Testimonials() {
         <div ref={leftColRef} style={{ paddingTop: "2rem" }}>
           <div style={{
             display: "inline-block",
-            background: "rgba(255,255,255,0.1)",
-            padding: "0.4rem 1rem",
+            background: "rgba(255,255,255,0.03)",
+            padding: "0.5rem 1.2rem",
             borderRadius: "999px",
-            fontSize: "0.75rem",
+            fontSize: "0.8rem",
             fontWeight: 700,
-            color: "#E5E7EB",
+            color: "#94A3B8",
             textTransform: "uppercase",
-            letterSpacing: "0.05em",
-            marginBottom: "1.5rem"
+            letterSpacing: "0.1em",
+            marginBottom: "2rem",
+            border: "1px solid rgba(255,255,255,0.05)"
           }}>
-            ✦ The Problem
+            ✦ Modern Challenges
           </div>
           
           <h2 style={{
-            color: "#fff",
-            fontSize: "clamp(2.2rem, 3.5vw, 3.2rem)",
+            color: "#F9FAFB",
+            fontSize: "clamp(2.5rem, 4vw, 3.8rem)",
             fontWeight: 800,
-            lineHeight: 1.1,
-            letterSpacing: "-0.03em",
-            marginBottom: "1.5rem"
+            lineHeight: 1.05,
+            letterSpacing: "-0.04em",
+            marginBottom: "2rem",
+            fontFamily: "'Outfit', sans-serif"
           }}>
-            Event planning is still running on spreadsheets and group chats.
+            Legacy workflows are <span style={{ color: "#EF4444" }}>killing</span> your events.
           </h2>
           
           <p style={{
-            fontSize: "1.05rem",
-            color: "#9CA3AF",
+            fontSize: "1.15rem",
+            color: "#94A3B8",
             lineHeight: 1.6,
-            maxWidth: 400
+            maxWidth: 450
           }}>
-            Organizers deserve better tools. Here's what they deal with every single time before switching to Planora.
+            Spreadsheets and group chats aren't tools — they're liabilities. Planora replaces chaos with enterprise-grade synchronization.
           </p>
         </div>
 
@@ -193,64 +196,62 @@ export default function Testimonials() {
         <div ref={rightColRef} style={{
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
-          gap: "1.5rem",
+          gap: "2rem",
           paddingBottom: "4rem",
           position: "relative"
         }}>
           {/* Column 1 */}
-          <div className="masonry-col-1" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+          <div className="masonry-col-1" style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
             {[PROBLEMS[0], PROBLEMS[2]].map((p, i) => (
               <div key={p.title} className="problem-card" style={{
-                background: "linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 100%)",
+                background: "rgba(255,255,255,0.015)",
                 border: "1px solid rgba(255,255,255,0.05)",
-                borderRadius: "1.5rem",
-                padding: "2.5rem",
-                boxShadow: "inset 0 1px 1px rgba(255,255,255,0.1), 0 20px 40px rgba(0,0,0,0.4)",
-                backdropFilter: "blur(10px)",
-                WebkitBackdropFilter: "blur(10px)"
+                borderRadius: "2rem",
+                padding: "3rem",
+                boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
+                backdropFilter: "blur(20px)",
+                WebkitBackdropFilter: "blur(20px)"
               }}>
                 <div style={{
-                  marginBottom: "1.8rem",
+                  marginBottom: "2rem",
                   background: "rgba(255,255,255,0.03)",
                   border: "1px solid rgba(255,255,255,0.08)",
-                  width: 52, height: 52,
-                  borderRadius: "1rem",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  boxShadow: "inset 0 1px 1px rgba(255,255,255,0.05), 0 4px 10px rgba(0,0,0,0.2)"
+                  width: 56, height: 56,
+                  borderRadius: "1.25rem",
+                  display: "flex", alignItems: "center", justifyContent: "center"
                 }}>
                   {p.icon}
                 </div>
-                <h3 style={{ color: "#fff", fontSize: "1.25rem", fontWeight: 700, marginBottom: "0.8rem", letterSpacing: "-0.01em" }}>{p.title}</h3>
-                <p style={{ fontSize: "0.95rem", color: "#A1A1AA", lineHeight: 1.6 }}>{p.desc}</p>
+                <h3 style={{ color: "#F9FAFB", fontSize: "1.4rem", fontWeight: 800, marginBottom: "1rem", letterSpacing: "-0.02em", fontFamily: "'Outfit', sans-serif" }}>{p.title}</h3>
+                <p style={{ fontSize: "1.05rem", color: "#94A3B8", lineHeight: 1.6 }}>{p.desc}</p>
               </div>
             ))}
           </div>
           
           {/* Column 2 (Offset/Staggered) */}
-          <div className="masonry-col-2" style={{ display: "flex", flexDirection: "column", gap: "1.5rem", marginTop: "4rem" }}>
+          <div className="masonry-col-2" style={{ display: "flex", flexDirection: "column", gap: "2rem", marginTop: "5rem" }}>
             {[PROBLEMS[1], PROBLEMS[3]].map((p, i) => (
               <div key={p.title} className="problem-card" style={{
-                background: "linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 100%)",
+                background: "rgba(255,255,255,0.015)",
                 border: "1px solid rgba(255,255,255,0.05)",
-                borderRadius: "1.5rem",
-                padding: "2.5rem",
-                boxShadow: "inset 0 1px 1px rgba(255,255,255,0.1), 0 20px 40px rgba(0,0,0,0.4)",
-                backdropFilter: "blur(10px)",
-                WebkitBackdropFilter: "blur(10px)"
+                borderRadius: "2rem",
+                padding: "3rem",
+                boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
+                backdropFilter: "blur(20px)",
+                WebkitBackdropFilter: "blur(20px)"
               }}>
                 <div style={{
-                  marginBottom: "1.8rem",
+                  marginBottom: "2rem",
                   background: "rgba(255,255,255,0.03)",
                   border: "1px solid rgba(255,255,255,0.08)",
-                  width: 52, height: 52,
-                  borderRadius: "1rem",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  boxShadow: "inset 0 1px 1px rgba(255,255,255,0.05), 0 4px 10px rgba(0,0,0,0.2)"
+                  width: 56, height: 56,
+                  borderRadius: "1.25rem",
+                  display: "flex", alignItems: "center", justifyContent: "center"
                 }}>
                   {p.icon}
                 </div>
-                <h3 style={{ color: "#fff", fontSize: "1.25rem", fontWeight: 700, marginBottom: "0.8rem", letterSpacing: "-0.01em" }}>{p.title}</h3>
-                <p style={{ fontSize: "0.95rem", color: "#A1A1AA", lineHeight: 1.6 }}>{p.desc}</p>
+                <h3 style={{ color: "#F9FAFB", fontSize: "1.4rem", fontWeight: 800, marginBottom: "1rem", letterSpacing: "-0.02em", fontFamily: "'Outfit', sans-serif" }}>{p.title}</h3>
+                <p style={{ fontSize: "1.05rem", color: "#94A3B8", lineHeight: 1.6 }}>{p.desc}</p>
               </div>
             ))}
           </div>
