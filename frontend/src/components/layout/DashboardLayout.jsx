@@ -189,7 +189,7 @@ export default function DashboardLayout() {
                     </div>
                 </div>
 
-                <nav style={{ flex: 1, padding: "0 0.75rem", overflowY: "auto" }}>
+                <nav className="sidebar-nav" style={{ flex: 1, padding: "0 0.75rem", overflowY: "auto", overflowX: "hidden" }}>
                     {NAV_ITEMS.map((item) => (
                         <Link
                             key={item.id}
@@ -213,7 +213,9 @@ export default function DashboardLayout() {
                                 opacity: location.pathname === item.path ? 1 : 0.6,
                                 color: "inherit",
                                 transform: location.pathname === item.path ? "scale(1)" : "scale(0.9)",
-                                transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
+                                overflow: "hidden",
+                                overflowX: "hidden",
+                                transition: "width 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important"
                             }}>
                                 {item.icon}
                             </span>

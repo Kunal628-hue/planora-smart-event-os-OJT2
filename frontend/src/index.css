@@ -80,7 +80,17 @@ body::before {
   box-shadow: 15px 0 50px rgba(0, 0, 0, 0.15) !important;
   position: relative;
   overflow: hidden;
+  overflow-x: hidden;
   transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.sidebar-nav {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.sidebar-nav::-webkit-scrollbar {
+  display: none;
 }
 
 .dashboard-sidebar::before {
