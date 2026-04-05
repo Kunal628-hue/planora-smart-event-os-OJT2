@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import DarkVeil from "../ui/DarkVeil";
+import NeuralFlow from "../ui/NeuralFlow";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -134,6 +135,11 @@ export default function Hero() {
           0% { transform: translateY(0px) rotate(3deg); }
           50% { transform: translateY(-8px) rotate(5deg); }
           100% { transform: translateY(0px) rotate(3deg); }
+        }
+        @keyframes ring-glow {
+          0% { filter: drop-shadow(0 0 5px rgba(96,165,250,0.4)); }
+          50% { filter: drop-shadow(0 0 15px rgba(96,165,250,0.8)); }
+          100% { filter: drop-shadow(0 0 5px rgba(96,165,250,0.4)); }
         }
       `}} />
 
@@ -341,25 +347,13 @@ export default function Hero() {
             </div>
 
             {/* Statistics Graph */}
-            <div className="dash-widget" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "1.5rem", padding: "1.5rem", backdropFilter: "blur(10px)" }}>
+            <div className="dash-widget" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "1.5rem", padding: "1.5rem", backdropFilter: "blur(10px)", overflow: "hidden" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-                <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#F3F4F6" }}>Engagement</h3>
-                <span style={{ fontSize: "0.8rem", color: "#64748B", background: "rgba(255,255,255,0.05)", padding: "0.2rem 0.6rem", borderRadius: "6px" }}>Real-time</span>
+                <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#F3F4F6" }}>Neural Engagement</h3>
+                <span style={{ fontSize: "0.8rem", color: "#60A5FA", background: "rgba(96,165,250,0.1)", padding: "0.2rem 0.6rem", borderRadius: "6px", fontWeight: 700 }}>Live Analysis</span>
               </div>
-              <div style={{ position: "relative", height: 100 }}>
-                {/* Mock Graph using SVG path */}
-                <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 100 40">
-                  <defs>
-                    <linearGradient id="graph-grad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.4" />
-                      <stop offset="100%" stopColor="#3B82F6" stopOpacity="0" />
-                    </linearGradient>
-                  </defs>
-                  <path d="M0,35 Q10,5 25,25 T50,15 T75,30 T100,10" fill="none" stroke="#60A5FA" strokeWidth="2.5" strokeLinecap="round" />
-                  <path d="M0,35 Q10,5 25,25 T50,15 T75,30 T100,10 L100,40 L0,40 Z" fill="url(#graph-grad)" />
-                  <circle cx="100" cy="10" r="3.5" fill="#60A5FA" />
-                  <circle cx="100" cy="10" r="6" fill="#60A5FA" fillOpacity="0.2" />
-                </svg>
+              <div style={{ position: "relative", height: 120 }}>
+                <NeuralFlow />
               </div>
             </div>
           </div>
@@ -394,7 +388,7 @@ export default function Hero() {
             {/* Weekly Progress Dark Card */}
             <div className="dash-widget" style={{ background: "linear-gradient(135deg, #1E1B4B 0%, #312E81 100%)", borderRadius: "1.5rem", padding: "1.8rem", color: "#fff", display: "flex", alignItems: "center", gap: "1.5rem", border: "1px solid rgba(255,255,255,0.05)" }}>
               <div style={{ position: "relative", width: 70, height: 70, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <svg width="70" height="70" viewBox="0 0 100 100" style={{ transform: "rotate(-90deg)" }}>
+                <svg width="70" height="70" viewBox="0 0 100 100" style={{ transform: "rotate(-90deg)", animation: "ring-glow 3s infinite ease-in-out" }}>
                   <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="10" />
                   <circle className="dash-circle" cx="50" cy="50" r="42" fill="none" stroke="#60A5FA" strokeWidth="10" strokeDasharray="264" strokeDashoffset="264" strokeLinecap="round" />
                 </svg>
@@ -410,15 +404,15 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Overlapping Calendar Card - Refined as Sleek Widget */}
+          {/* Overlapping Calendar Card - Refined as sleek floating widget at bottom-right */}
           <div className="dash-widget" style={{
-            position: "absolute", top: "20%", left: "42%",
-            background: "rgba(15, 23, 42, 0.9)", backdropFilter: "blur(20px)",
+            position: "absolute", bottom: "-2.5rem", right: "-3rem",
+            background: "rgba(15, 23, 42, 0.95)", backdropFilter: "blur(30px)",
             borderRadius: "1.5rem", padding: "1.8rem",
-            boxShadow: "0 30px 60px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.1)",
-            border: "1px solid rgba(255,255,255,0.1)",
-            zIndex: 10, width: 300,
-            animation: "float-desk 10s ease-in-out infinite 0.5s"
+            boxShadow: "0 40px 80px -10px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.1)",
+            border: "1px solid rgba(255,255,255,0.12)",
+            zIndex: 10, width: 280,
+            animation: "float-desk 12s ease-in-out infinite 0.5s"
           }}>
             <div style={{ textAlign: "center", fontSize: "1rem", fontWeight: 700, marginBottom: "1.2rem", color: "#F9FAFB" }}>November 2024</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "0.6rem", textAlign: "center", marginBottom: "1.5rem" }}>
