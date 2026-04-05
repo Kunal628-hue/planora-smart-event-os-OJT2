@@ -20,7 +20,9 @@ import {
     Star,
     X,
     Check,
-    AlertCircle
+    AlertCircle,
+    Phone,
+    Mail
 } from "lucide-react";
 import { NeuralLoader } from "../../components/ui/Loader";
 
@@ -511,37 +513,72 @@ export default function Dashboard() {
                             <X size={16} />
                         </button>
 
-                        <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "2rem" }}>
-                            <div style={{ width: "64px", height: "64px", background: getCategoryStyles(selectedVendorModal.service).bg, borderRadius: "20px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "32px" }}>
-                                {getCategoryStyles(selectedVendorModal.service).icon}
-                            </div>
-                            <div>
-                                <h3 style={{ fontSize: "1.5rem", fontWeight: 800, color: "#0f172a", marginBottom: "0.25rem" }}>{selectedVendorModal.name}</h3>
-                                <p style={{ color: "#64748b", fontSize: "14px", fontWeight: 500 }}>{selectedVendorModal.service} Experts</p>
-                            </div>
+                        <div style={{ marginBottom: "2rem" }}>
+                            <h3 style={{ fontSize: "1.75rem", fontWeight: 850, color: "#0f172a", marginBottom: "0.25rem", letterSpacing: "-0.02em" }}>{selectedVendorModal.name}</h3>
+                            <p style={{ color: "#2563eb", fontSize: "14px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>{selectedVendorModal.service} Experts</p>
                         </div>
-
                         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", marginBottom: "2rem" }}>
-                            <div style={{ padding: "1rem", background: "#f8fafc", borderRadius: "16px" }}>
+                            <div style={{ padding: "1rem", background: "#f8fafc", borderRadius: "16px", border: "1px solid #f1f5f9" }}>
                                 <div style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 800, textTransform: "uppercase", marginBottom: "0.5rem" }}>Rating</div>
                                 <div style={{ fontSize: "18px", fontWeight: 800, color: "#0f172a", display: "flex", alignItems: "center", gap: "6px" }}>
                                     <Star size={18} fill="#f59e0b" color="#f59e0b" /> {selectedVendorModal.rating}/5.0
                                 </div>
                             </div>
-                            <div style={{ padding: "1rem", background: "#f8fafc", borderRadius: "16px" }}>
+                            <div style={{ padding: "1rem", background: "#f8fafc", borderRadius: "16px", border: "1px solid #f1f5f9" }}>
                                 <div style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 800, textTransform: "uppercase", marginBottom: "0.5rem" }}>Pricing</div>
-                                <div style={{ fontSize: "18px", fontWeight: 800, color: "#0f172a" }}>{selectedVendorModal.priceRange}</div>
+                                <div style={{ fontSize: "18px", fontWeight: 800, color: "#0f172a" }}>
+                                    {selectedVendorModal.startingPrice ? (
+                                        <span style={{ fontSize: "16px" }}>
+                                            Starts at <span style={{ color: "#2563eb" }}>₹{new Intl.NumberFormat("en-IN").format(selectedVendorModal.startingPrice)}</span>
+                                        </span>
+                                    ) : (
+                                        <span style={{ letterSpacing: "4px" }}>{selectedVendorModal.priceRange}</span>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Location and Contact Details */}
+                        <div style={{ background: "#f8fafc", borderRadius: "20px", padding: "1.5rem", marginBottom: "2rem", border: "1px solid #f1f5f9" }}>
+                            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                                <div style={{ display: "flex", gap: "1rem", alignItems: "flex-start" }}>
+                                    <div style={{ padding: "8px", background: "#fff", borderRadius: "10px", color: "#2563eb", boxShadow: "0 2px 4px rgba(0,0,0,0.05)" }}><MapPin size={16} /></div>
+                                    <div>
+                                        <div style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 800, textTransform: "uppercase" }}>Location</div>
+                                        <div style={{ fontSize: "13px", color: "#1e293b", fontWeight: 600, lineHeight: "1.4" }}>{selectedVendorModal.location || "Location details upon request"}</div>
+                                    </div>
+                                </div>
+                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                                    <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+                                        <div style={{ padding: "8px", background: "#fff", borderRadius: "10px", color: "#2563eb", boxShadow: "0 2px 4px rgba(0,0,0,0.05)" }}><Phone size={16} /></div>
+                                        <div>
+                                            <div style={{ fontSize: "10px", color: "#94a3b8", fontWeight: 800, textTransform: "uppercase" }}>Phone</div>
+                                            <div style={{ fontSize: "12px", color: "#1e293b", fontWeight: 600 }}>{selectedVendorModal.contact}</div>
+                                        </div>
+                                    </div>
+                                    <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+                                        <div style={{ padding: "8px", background: "#fff", borderRadius: "10px", color: "#2563eb", boxShadow: "0 2px 4px rgba(0,0,0,0.05)" }}><Mail size={16} /></div>
+                                        <div>
+                                            <div style={{ fontSize: "10px", color: "#94a3b8", fontWeight: 800, textTransform: "uppercase" }}>Email</div>
+                                            <div style={{ fontSize: "12px", color: "#1e293b", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", maxWidth: "120px" }}>{selectedVendorModal.email || "Corporate mail only"}</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <div style={{ marginBottom: "2rem" }}>
-                            <div style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 800, textTransform: "uppercase", marginBottom: "0.75rem" }}>Core Specialty</div>
-                            <p style={{ color: "#475569", fontSize: "14px", lineHeight: "1.6" }}>Superior quality and reliability in {selectedVendorModal.service} services for small to medium scale events.</p>
-                        </div>
-
-                        <div style={{ display: "flex", gap: "1rem" }}>
-                            <button className="btn btn-primary" style={{ flex: 1, padding: "1rem", borderRadius: "12px", fontWeight: 800 }} onClick={() => setSelectedVendorModal(null)}>Book Consultation</button>
-                            <button style={{ flex: 1, padding: "1rem", borderRadius: "12px", background: "#f1f5f9", border: "none", color: "#1e293b", fontWeight: 800, cursor: "pointer" }}>Save for later</button>
+                            <div style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 800, textTransform: "uppercase", marginBottom: "0.75rem" }}>
+                                {selectedVendorModal.specialty ? "Core Specialty" : "Overview"}
+                            </div>
+                            <p style={{ color: "#475569", fontSize: "14px", lineHeight: "1.6", fontWeight: 500 }}>
+                                {selectedVendorModal.description || `Superior quality and reliability in ${selectedVendorModal.service} services for all categories of events.`}
+                                {selectedVendorModal.specialty && (
+                                    <span style={{ display: "block", marginTop: "0.5rem", color: "#2563eb", fontWeight: 700 }}>
+                                        Featured Specialty: {selectedVendorModal.specialty}
+                                    </span>
+                                )}
+                            </p>
                         </div>
                     </div>
                 </div>
