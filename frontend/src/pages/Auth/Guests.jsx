@@ -35,6 +35,9 @@ export default function Guests() {
 
     useEffect(() => {
         fetchData();
+        // Background polling to capture email RSVP updates
+        const pollInterval = setInterval(fetchData, 10000); 
+        return () => clearInterval(pollInterval);
     }, [user, selectedEventId, syncTimestamp]);
 
     useEffect(() => {
@@ -342,6 +345,17 @@ export default function Guests() {
                                         <option key={event.id || event._id} value={event.id || event._id}>{event.name}</option>
                                     ))}
                                 </select>
+                            </div>
+
+                            <div>
+                                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#64748b", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Digital Contact (Email)</label>
+                                <input 
+                                    type="email" 
+                                    style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "15px", fontWeight: 600 }} 
+                                    placeholder="e.g. guest@example.com" 
+                                    value={newGuest.email} 
+                                    onChange={e => setNewGuest({ ...newGuest, email: e.target.value })} 
+                                />
                             </div>
 
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
