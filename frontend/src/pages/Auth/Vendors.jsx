@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import { animate, stagger } from "animejs";
+import { useDialog } from "../../context/DialogContext";
 import {
     Plus,
     Trash2,
@@ -22,6 +23,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Vendors() {
     const { user, events, selectedEventId, addNotification } = useOutletContext();
+    const { showConfirm } = useDialog();
     const [vendors, setVendors] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -44,8 +46,7 @@ export default function Vendors() {
         if (!user) return;
         setLoading(true);
         try {
-            // "change event wise" -> If selectedEventId exists, filter by it.
-            let url = `${API_URL}/vendors?user=${user.uid}`;
+            let url = `${API_URL}/vendors?user=${user.uid}&email=${user.email}`;
             if (selectedEventId) {
                 url += `&eventId=${selectedEventId}`;
             }
@@ -116,7 +117,8 @@ export default function Vendors() {
     };
 
     const handleDeleteVendor = async (vendorId) => {
-        if (!window.confirm("Permanently remove this strategic partner from your ecosystem?")) return;
+        const confirmed = await showConfirm("Terminate Partnership", "Are you sure you want to permanently remove this strategic partner from your ecosystem?");
+        if (!confirmed) return;
         try {
             const response = await fetch(`${API_URL}/vendors/${vendorId}`, {
                 method: "DELETE"

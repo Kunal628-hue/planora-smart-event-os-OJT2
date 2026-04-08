@@ -81,8 +81,8 @@ export default function Analytics() {
         setLoading(true);
         try {
             const [vendorsRes, guestsRes] = await Promise.all([
-                fetch(`${import.meta.env.VITE_API_URL}/vendors?user=${user.uid}`),
-                fetch(`${import.meta.env.VITE_API_URL}/guests?user=${user.uid}`)
+                fetch(`${import.meta.env.VITE_API_URL}/vendors?user=${user.uid}&email=${user.email}`),
+                fetch(`${import.meta.env.VITE_API_URL}/guests?user=${user.uid}&email=${user.email}`)
             ]);
 
             const vendorsData = await vendorsRes.json();

@@ -39,7 +39,7 @@ const NAV_ITEMS = [
 export default function DashboardLayout() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { user, logout } = useAuth();
+    const { user, logout, updateUserProfile } = useAuth();
     const [events, setEvents] = useState([]);
     const [selectedEventId, setSelectedEventId] = useState(() => localStorage.getItem("planora_active_event_id") || "");
 
@@ -68,6 +68,10 @@ export default function DashboardLayout() {
     };
 
     const addNotification = (title, message) => {
+        // Respect Smart Notifications preference
+        const isEnabled = localStorage.getItem("planora_pref_smart_notif") !== "false";
+        if (!isEnabled) return;
+
         const newNotif = {
             id: Date.now(),
             title,
@@ -105,7 +109,7 @@ export default function DashboardLayout() {
 
     const fetchAllVendors = async (uid) => {
         try {
-            const res = await fetch(`${API_URL}/vendors?user=${uid}`);
+            const res = await fetch(`${API_URL}/vendors?user=${uid}&email=${user.email}`);
             if (res.ok) {
                 const data = await res.json();
                 setAllVendors(Array.isArray(data) ? data : []);
@@ -118,7 +122,7 @@ export default function DashboardLayout() {
 
     const fetchEvents = async (uid) => {
         try {
-            const res = await fetch(`${API_URL}/events?user=${uid}`);
+            const res = await fetch(`${API_URL}/events?user=${uid}&email=${user.email}`);
             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
             
             const data = await res.json();
@@ -516,7 +520,6 @@ export default function DashboardLayout() {
                             <button 
                                 onClick={() => setShowNotifications(!showNotifications)}
                                 style={{
-                                    background: "none",
                                     border: "none",
                                     color: "#64748b",
                                     cursor: "pointer",
@@ -614,39 +617,68 @@ export default function DashboardLayout() {
                                 style={{
                                     display: "flex",
                                     alignItems: "center",
-                                    gap: "0.75rem",
+                                    gap: "0.85rem",
                                     cursor: "pointer",
-                                    padding: "0.25rem 0.75rem",
-                                    borderRadius: "12px",
-                                    transition: "all 0.2s",
-                                    border: `1px solid ${showUserMenu ? 'var(--accent-primary)' : '#e8e8f5'}`,
-                                    background: "#fff",
-                                    boxShadow: showUserMenu ? "0 4px 12px rgba(0,0,0,0.05)" : "none",
+                                    padding: "0.35rem 1rem 0.35rem 0.35rem",
+                                    borderRadius: "100px",
+                                    transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+                                    border: `1px solid ${showUserMenu ? '#2563eb' : 'transparent'}`,
+                                    background: showUserMenu ? "#fff" : "rgba(248, 250, 252, 0.6)",
+                                    boxShadow: showUserMenu ? "0 10px 25px -5px rgba(37, 99, 235, 0.12)" : "none",
                                     outline: "none"
-                                }}>
+                                }}
+                                onMouseEnter={(e) => {
+                                    if (!showUserMenu) {
+                                        e.currentTarget.style.background = "#fff";
+                                        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.03)";
+                                        e.currentTarget.style.borderColor = "#e2e8f0";
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (!showUserMenu) {
+                                        e.currentTarget.style.background = "rgba(248, 250, 252, 0.6)";
+                                        e.currentTarget.style.boxShadow = "none";
+                                        e.currentTarget.style.borderColor = "transparent";
+                                    }
+                                }}
+                            >
                                 <div style={{
-                                    width: 36,
-                                    height: 36,
+                                    width: 38,
+                                    height: 38,
                                     borderRadius: "50%",
-                                    background: "#f1f5f9",
-                                    color: "#64748b",
+                                    background: "#fff",
+                                    color: "#2563eb",
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
                                     overflow: "hidden",
-                                    border: "1px solid #e2e8f0"
+                                    border: "2px solid #fff",
+                                    boxShadow: "0 0 0 1px #e2e8f0, 0 2px 4px rgba(0,0,0,0.05)",
+                                    transition: "transform 0.3s ease"
                                 }}>
                                     {user?.photoURL ? (
                                         <img src={user.photoURL} alt="Avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                                     ) : (
-                                        <User size={18} />
+                                        <User size={18} strokeWidth={2.5} />
                                     )}
                                 </div>
                                 <div style={{ textAlign: "left" }}>
-                                    <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "#1e293b", lineHeight: 1.2 }}>{user?.displayName?.split(' ')[0] || "Planner"}</div>
-                                    <div style={{ fontSize: "0.65rem", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.025em" }}>User Account</div>
+                                    <div style={{ 
+                                        fontSize: "0.9rem", 
+                                        fontWeight: 800, 
+                                        color: "#0f172a", 
+                                        lineHeight: 1,
+                                        letterSpacing: "-0.01em"
+                                    }}>
+                                        {user?.displayName || user?.email?.split('@')[0] || "Planner"}
+                                    </div>
                                 </div>
-                                <ChevronDown size={14} style={{ marginLeft: "4px", opacity: 0.5, transform: showUserMenu ? "rotate(180deg)" : "none", transition: "transform 0.2s" }} />
+                                <ChevronDown size={14} style={{ 
+                                    opacity: 0.4, 
+                                    transform: showUserMenu ? "rotate(180deg)" : "none", 
+                                    transition: "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+                                    color: "#0f172a"
+                                }} />
                             </div>
 
                             {showUserMenu && (
@@ -700,6 +732,7 @@ export default function DashboardLayout() {
                         setSelectedEventId,
                         syncTimestamp,
                         addNotification,
+                        updateUserProfile,
                         refreshEvents: () => fetchEvents(user.uid)
                     }} />
                 </div>

@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
+import { useDialog } from "../../context/DialogContext";
 import { Plus, Calendar, MapPin, ChevronRight, Loader2, X, Sparkles, LayoutGrid, Package, Wallet } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Events() {
     const { user, addNotification } = useOutletContext();
+    const { showAlert } = useDialog();
     const navigate = useNavigate();
     const [events, setEvents] = useState([]);
     const [fetchLoading, setFetchLoading] = useState(true);
@@ -21,7 +23,7 @@ export default function Events() {
     const fetchEvents = async () => {
         if (!user) return;
         try {
-            const response = await fetch(`${API_URL}/events?user=${user.uid}`);
+            const response = await fetch(`${API_URL}/events?user=${user.uid}&email=${user.email}`);
             const data = await response.json();
             if (Array.isArray(data)) {
                 setEvents(data);
@@ -90,11 +92,11 @@ export default function Events() {
                 addNotification("Event Created", `'${eventData.name}' has been successfully onboarded.`);
             } else {
                 const errorData = await response.json();
-                alert(`Error: ${errorData.message || "Failed to create event"}`);
+                await showAlert("Initialization Error", errorData.message || "Failed to create event stream. Please verify your parameters.");
             }
         } catch (err) {
             console.error("Fetch error:", err);
-            alert("Connection error. Is the backend running?");
+            await showAlert("Nexus Connection Error", "External synchronization failed. Is the backend strategic module active?");
         } finally {
             setLoading(false);
         }

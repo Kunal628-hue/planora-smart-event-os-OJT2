@@ -1,18 +1,33 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import { Plus, User, Mail, Shield, Check, ChevronRight, LayoutGrid, Users2, MoreHorizontal, Trash2, Edit2, X } from "lucide-react";
+import { useDialog } from "../../context/DialogContext";
+import { Plus, User, Mail, Shield, Check, ChevronRight, LayoutGrid, Users2, MoreHorizontal, Trash2, Edit2, X, Calendar, Phone } from "lucide-react";
 import { NeuralLoader } from "../../components/ui/Loader";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Team() {
-    const { user } = useOutletContext();
+    const { user, events = [] } = useOutletContext();
+    const { showAlert, showConfirm } = useDialog();
     const [members, setMembers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isInviting, setIsInviting] = useState(false);
     const [editingId, setEditingId] = useState(null);
-    const [inviteData, setInviteData] = useState({ name: "", email: "", role: "Editor" });
+    const [inviteData, setInviteData] = useState({ name: "", email: "", role: "Editor", event: events[0]?.id || "", whatsapp: "" });
     const [editData, setEditData] = useState({ name: "", role: "" });
+    const [leadWhatsApp, setLeadWhatsApp] = useState(localStorage.getItem(`lead_wa_${user?.uid}`) || "");
+
+    useEffect(() => {
+        if (user?.uid) {
+            localStorage.setItem(`lead_wa_${user?.uid}`, leadWhatsApp);
+        }
+    }, [leadWhatsApp, user?.uid]);
+
+    useEffect(() => {
+        if (!inviteData.event && events.length > 0) {
+            setInviteData(prev => ({ ...prev, event: events[0].id || events[0]._id }));
+        }
+    }, [events]);
 
     const fetchMembers = async () => {
         if (!user) return;
@@ -54,14 +69,27 @@ export default function Team() {
                 body: JSON.stringify({
                     ...inviteData,
                     user: user.uid,
+                    inviterName: user.displayName || "Workspace Owner",
                     status: "Active",
                     permissions: inviteData.role === "Editor" ? "Can modify core modules" : inviteData.role === "Event Lead" ? "Full administrative control" : "Read-only access"
                 })
             });
             if (response.ok) {
+                const collaborator = await response.json();
                 setIsInviting(false);
-                setInviteData({ name: "", email: "", role: "Editor" });
+                
+                // Construct and trigger WhatsApp message if number exists
+                if (inviteData.whatsapp) {
+                    const event = events.find(e => (e.id || e._id) === inviteData.event);
+                    const leaderName = user.displayName || "The Team Leader";
+                    const waMessage = encodeURIComponent(`Hi ${inviteData.name}, this is ${leaderName}. I've added you to our team for the event "${event?.name || 'Project'}" on Planora. Please check your email for the workspace activation link!`);
+                    const waUrl = `https://wa.me/${inviteData.whatsapp.replace(/[^0-9]/g, "")}?text=${waMessage}`;
+                    window.open(waUrl, "_blank");
+                }
+
+                setInviteData({ name: "", email: "", role: "Editor", event: events[0]?.id || "", whatsapp: "" });
                 fetchMembers();
+                showAlert("Invitation Transmitted", `${inviteData.name} has been synchronized with the collective.`);
             }
         } catch (err) {
             console.error("Failed to add collaborator:", err);
@@ -70,10 +98,11 @@ export default function Team() {
 
     const handleDelete = async (memberId, isOwner) => {
         if (isOwner) {
-            alert("Cannot terminate the primary owner's session.");
+            await showAlert("Security Policy", "Cannot terminate the primary owner's session. The workspace requires at least one administrative lead.");
             return;
         }
-        if (window.confirm("Permanently revoke workspace access for this collaborator?")) {
+        const confirmed = await showConfirm("Revoke Access", "Permanently revoke workspace access for this collaborator? They will lose all permissions immediately.");
+        if (confirmed) {
             try {
                 const response = await fetch(`${API_URL}/collaborators/${memberId}`, {
                     method: "DELETE"
@@ -136,9 +165,50 @@ export default function Team() {
                 <h1 style={{ fontSize: "2rem", fontWeight: 850, letterSpacing: "-0.04em", margin: "0 0 0.25rem" }}>
                     Neural <span style={{ color: "#2563eb" }}>Hive</span>
                 </h1>
-                <p style={{ color: "#64748b", fontSize: "0.95rem", fontWeight: 500, margin: 0 }}>
+                <p style={{ color: "#64748b", fontSize: "1rem", fontWeight: 550, margin: 0 }}>
                     Manage and synchronize your planning collective.
                 </p>
+
+                <div style={{ 
+                    marginTop: "1.5rem", 
+                    padding: "1.25rem 1.5rem", 
+                    background: "#fff", 
+                    borderRadius: "20px", 
+                    border: "1px solid #e2e8f0", 
+                    display: "flex", 
+                    alignItems: "center", 
+                    justifyContent: "space-between",
+                    maxWidth: "500px",
+                    boxShadow: "0 4px 15px rgba(0,0,0,0.02)"
+                }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                        <div style={{ width: "40px", height: "40px", borderRadius: "12px", background: "#f0fdf4", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <Shield size={20} strokeWidth={2.5} />
+                        </div>
+                        <div>
+                            <h3 style={{ fontSize: "14px", fontWeight: 800, margin: 0, color: "#1e293b" }}>Lead Identity</h3>
+                            <p style={{ fontSize: "11px", color: "#64748b", fontWeight: 600, margin: "2px 0 0" }}>Set your business WhatsApp for alerts.</p>
+                        </div>
+                    </div>
+                    <div style={{ position: "relative" }}>
+                        <Phone size={14} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+                        <input 
+                            placeholder="Your WA Number" 
+                            value={leadWhatsApp}
+                            onChange={(e) => setLeadWhatsApp(e.target.value)}
+                            style={{ 
+                                padding: "0.5rem 0.75rem 0.5rem 2.25rem", 
+                                borderRadius: "10px", 
+                                border: "1.5px solid #f1f5f9",
+                                fontSize: "13px",
+                                fontWeight: 650,
+                                background: "#f8fafc",
+                                width: "160px",
+                                outline: "none"
+                            }} 
+                        />
+                    </div>
+                </div>
             </div>
 
             <div style={{
@@ -201,6 +271,7 @@ export default function Team() {
                                                         <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#10b981" }} title="Active"></div>
                                                     </div>
                                                     <div style={{ fontSize: "12px", color: "#94a3b8", fontWeight: 500 }}>{member.email}</div>
+                                                    {member.whatsapp && <div style={{ fontSize: "11px", color: "#10b981", fontWeight: 700, marginTop: "2px" }}>WA: {member.whatsapp}</div>}
                                                 </div>
                                             )}
                                         </div>
@@ -300,6 +371,15 @@ export default function Team() {
                                                 style={{ width: "100%", padding: "0.6rem 1rem 0.6rem 2.5rem", borderRadius: "10px", border: "1.5px solid #e2e8f0", fontSize: "13px", fontWeight: 600, outline: "none" }}
                                             />
                                         </div>
+                                        <div style={{ position: "relative", minWidth: "160px" }}>
+                                            <Phone size={14} style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+                                            <input
+                                                placeholder="WhatsApp Number"
+                                                value={inviteData.whatsapp}
+                                                onChange={e => setInviteData({ ...inviteData, whatsapp: e.target.value })}
+                                                style={{ width: "100%", padding: "0.6rem 1rem 0.6rem 2.5rem", borderRadius: "10px", border: "1.5px solid #e2e8f0", fontSize: "13px", fontWeight: 600, outline: "none" }}
+                                            />
+                                        </div>
                                         <select
                                             value={inviteData.role}
                                             onChange={e => setInviteData({ ...inviteData, role: e.target.value })}
@@ -309,6 +389,20 @@ export default function Team() {
                                             <option>Viewer</option>
                                             <option>Event Lead</option>
                                         </select>
+                                        <div style={{ position: "relative", minWidth: "160px" }}>
+                                            <Calendar size={14} style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+                                            <select
+                                                required
+                                                value={inviteData.event}
+                                                onChange={e => setInviteData({ ...inviteData, event: e.target.value })}
+                                                style={{ width: "100%", padding: "0.6rem 1rem 0.6rem 2.5rem", borderRadius: "10px", border: "1.5px solid #e2e8f0", fontSize: "13px", fontWeight: 700, background: "#fff", cursor: "pointer", outline: "none", appearance: "none" }}
+                                            >
+                                                <option value="" disabled>Select Event Context</option>
+                                                {events.map((ev) => (
+                                                    <option key={ev.id || ev._id} value={ev.id || ev._id}>{ev.name || ev.title}</option>
+                                                ))}
+                                            </select>
+                                        </div>
                                         <div style={{ display: "flex", gap: "0.5rem" }}>
                                             <button type="button" onClick={() => setIsInviting(false)} style={{ padding: "0.6rem 1.25rem", borderRadius: "10px", border: '1px solid #e2e8f0', background: "#fff", fontSize: "13px", fontWeight: 750, cursor: "pointer" }}>Cancel</button>
                                             <button type="submit" style={{ padding: "0.6rem 1.25rem", borderRadius: "10px", border: "none", background: "#2563eb", color: "#fff", fontSize: "13px", fontWeight: 850, cursor: "pointer", boxShadow: "0 4px 10px rgba(37, 99, 235, 0.2)" }}>Invite Member</button>

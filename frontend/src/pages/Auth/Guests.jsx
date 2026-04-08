@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import { UserPlus, Users, Trash2, Mail, Briefcase, Loader2, X, Calendar } from "lucide-react";
+import { useDialog } from "../../context/DialogContext";
+import { UserPlus, Users, Trash2, Mail, Briefcase, Loader2, X, Calendar, Phone } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Guests() {
     const { user, events, selectedEventId, syncTimestamp, addNotification } = useOutletContext();
+    const { showConfirm } = useDialog();
     const [guests, setGuests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -14,14 +16,15 @@ export default function Guests() {
         email: "",
         category: "Friend",
         status: "Pending",
-        eventId: ""
+        eventId: "",
+        whatsapp: ""
     });
 
     const fetchData = async () => {
         if (!user) return;
         setLoading(true);
         try {
-            let url = `${API_URL}/guests?user=${user.uid}`;
+            let url = `${API_URL}/guests?user=${user.uid}&email=${user.email}`;
             if (selectedEventId) url += `&eventId=${selectedEventId}`;
             const res = await fetch(url);
             const data = await res.json();
@@ -60,13 +63,25 @@ export default function Guests() {
                 })
             });
             if (response.ok) {
+                const guest = await response.json();
                 setShowModal(false);
+                
+                // Construct and trigger WhatsApp message if number exists
+                if (newGuest.whatsapp) {
+                    const event = events.find(e => (e.id || e._id) === newGuest.eventId);
+                    const senderName = user.displayName || "Management Team Member";
+                    const waMessage = encodeURIComponent(`Hi ${newGuest.name}, this is ${senderName} from the management team. You've been invited to "${event?.name || 'our event'}" on Planora! We've sent a detailed invite to your email. Please accept if you're interested!`);
+                    const waUrl = `https://wa.me/${newGuest.whatsapp.replace(/[^0-9]/g, "")}?text=${waMessage}`;
+                    window.open(waUrl, "_blank");
+                }
+
                 setNewGuest({
                     name: "",
                     email: "",
                     category: "Friend",
                     status: "Pending",
-                    eventId: selectedEventId
+                    eventId: selectedEventId,
+                    whatsapp: ""
                 });
                 fetchData();
                 addNotification("Attendee Onboarded", `${newGuest.name} has been added to the guest registry.`);
@@ -95,7 +110,8 @@ export default function Guests() {
     };
 
     const handleDeleteGuest = async (guestId) => {
-        if (!window.confirm("Are you sure you want to remove this attendee?")) return;
+        const confirmed = await showConfirm("Purge Attendee", "Are you sure you want to permanently remove this attendee from the directory?");
+        if (!confirmed) return;
         try {
             const response = await fetch(`${API_URL}/guests/${guestId}`, {
                 method: "DELETE"
@@ -276,6 +292,12 @@ export default function Guests() {
                                     <Mail size={14} style={{ opacity: 0.8 }} />
                                     {guest.email || "No digital contact"}
                                 </div>
+                                {guest.whatsapp && (
+                                    <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", color: "#10b981", fontSize: "14px", fontWeight: 700, marginTop: "0.4rem" }}>
+                                        <Phone size={14} style={{ opacity: 0.8 }} />
+                                        {guest.whatsapp}
+                                    </div>
+                                )}
                             </div>
 
                             <div style={{ marginTop: "auto", display: "flex", gap: "0.6rem", flexWrap: "wrap", paddingTop: "1.25rem", borderTop: "1px solid #f1f5f9" }}>
@@ -311,57 +333,70 @@ export default function Guests() {
 
             {showModal && (
                 <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2000, backdropFilter: "blur(8px)" }}>
-                    <div style={{ background: "#fff", width: "100%", maxWidth: "520px", padding: "3rem", borderRadius: "32px", boxShadow: "0 25px 60px rgba(0,0,0,0.2)" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2.5rem" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
-                                <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                    <Users size={24} strokeWidth={2.5} />
+                    <div style={{ background: "#fff", width: "100%", maxWidth: "560px", maxHeight: "90vh", overflowY: "auto", padding: "2.5rem", borderRadius: "32px", boxShadow: "0 25px 60px rgba(0,0,0,0.2)", position: "relative" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                                <div style={{ width: "44px", height: "44px", borderRadius: "12px", background: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                    <Users size={22} strokeWidth={2.5} />
                                 </div>
                                 <div>
-                                    <h2 style={{ fontSize: "1.75rem", fontWeight: 800, margin: 0, letterSpacing: "-0.03em" }}>Onboard Guest</h2>
-                                    <p style={{ color: "#64748b", fontSize: "0.9rem", fontWeight: 500, margin: "0.25rem 0 0" }}>Register a new attendee for analysis.</p>
+                                    <h2 style={{ fontSize: "1.5rem", fontWeight: 800, margin: 0, letterSpacing: "-0.03em" }}>Onboard Guest</h2>
+                                    <p style={{ color: "#64748b", fontSize: "0.85rem", fontWeight: 500, margin: "2px 0 0" }}>Register a new attendee for analysis.</p>
                                 </div>
                             </div>
                             <button
                                 onClick={() => setShowModal(false)}
-                                style={{ background: "#f1f5f9", border: "none", color: "#64748b", width: "36px", height: "36px", borderRadius: "50%", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
-                            ><X size={20} strokeWidth={3} /></button>
+                                style={{ background: "#f1f5f9", border: "none", color: "#64748b", width: "32px", height: "32px", borderRadius: "50%", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                            ><X size={18} strokeWidth={3} /></button>
                         </div>
-                        <form onSubmit={handleCreateGuest} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-                            <div>
-                                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#64748b", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Full Identity</label>
-                                <input style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "15px", fontWeight: 600 }} placeholder="e.g. Johnathan Doe" value={newGuest.name} onChange={e => setNewGuest({ ...newGuest, name: e.target.value })} required />
-                            </div>
-
-                            <div>
-                                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#64748b", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Operational Event</label>
-                                <select
-                                    style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "15px", fontWeight: 700 }}
-                                    value={newGuest.eventId}
-                                    onChange={e => setNewGuest({ ...newGuest, eventId: e.target.value })}
-                                    required
-                                >
-                                    {events.map(event => (
-                                        <option key={event.id || event._id} value={event.id || event._id}>{event.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div>
-                                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#64748b", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Digital Contact (Email)</label>
-                                <input 
-                                    type="email" 
-                                    style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "15px", fontWeight: 600 }} 
-                                    placeholder="e.g. guest@example.com" 
-                                    value={newGuest.email} 
-                                    onChange={e => setNewGuest({ ...newGuest, email: e.target.value })} 
-                                />
-                            </div>
-
-                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+                        <form onSubmit={handleCreateGuest} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem" }}>
                                 <div>
-                                    <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#64748b", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Classification</label>
-                                    <select style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "15px", fontWeight: 700 }} value={newGuest.category} onChange={e => setNewGuest({ ...newGuest, category: e.target.value })}>
+                                    <label style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "#64748b", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Full Identity</label>
+                                    <input style={{ width: "100%", padding: "0.85rem", borderRadius: "10px", border: "1px solid #e2e8f0", fontSize: "14px", fontWeight: 600 }} placeholder="e.g. Johnathan Doe" value={newGuest.name} onChange={e => setNewGuest({ ...newGuest, name: e.target.value })} required />
+                                </div>
+                                <div>
+                                    <label style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "#64748b", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Operational Event</label>
+                                    <select
+                                        style={{ width: "100%", padding: "0.85rem", borderRadius: "10px", border: "1px solid #e2e8f0", fontSize: "14px", fontWeight: 700 }}
+                                        value={newGuest.eventId}
+                                        onChange={e => setNewGuest({ ...newGuest, eventId: e.target.value })}
+                                        required
+                                    >
+                                        {events.map(event => (
+                                            <option key={event.id || event._id} value={event.id || event._id}>{event.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem" }}>
+                                <div>
+                                    <label style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "#64748b", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Digital Contact (Email)</label>
+                                    <input 
+                                        type="email" 
+                                        style={{ width: "100%", padding: "0.85rem", borderRadius: "10px", border: "1px solid #e2e8f0", fontSize: "14px", fontWeight: 600 }} 
+                                        placeholder="e.g. guest@example.com" 
+                                        value={newGuest.email} 
+                                        onChange={e => setNewGuest({ ...newGuest, email: e.target.value })} 
+                                    />
+                                </div>
+                                <div>
+                                    <label style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "#64748b", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Mobile Contact (WA)</label>
+                                    <input 
+                                        type="text" 
+                                        style={{ width: "100%", padding: "0.85rem", borderRadius: "10px", border: "1px solid #e2e8f0", fontSize: "14px", fontWeight: 600 }} 
+                                        placeholder="e.g. +1234567890" 
+                                        value={newGuest.whatsapp} 
+                                        onChange={e => setNewGuest({ ...newGuest, whatsapp: e.target.value })} 
+                                    />
+                                </div>
+                            </div>
+
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem" }}>
+                                <div>
+                                    <label style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "#64748b", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Classification</label>
+                                    <select style={{ width: "100%", padding: "0.85rem", borderRadius: "10px", border: "1px solid #e2e8f0", fontSize: "14px", fontWeight: 700 }} value={newGuest.category} onChange={e => setNewGuest({ ...newGuest, category: e.target.value })}>
                                         <option>Friend</option>
                                         <option>Family</option>
                                         <option>VIP</option>
@@ -370,8 +405,8 @@ export default function Guests() {
                                     </select>
                                 </div>
                                 <div>
-                                    <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#64748b", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Initial RSVP</label>
-                                    <select style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "15px", fontWeight: 700 }} value={newGuest.status} onChange={e => setNewGuest({ ...newGuest, status: e.target.value })}>
+                                    <label style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "#64748b", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Initial RSVP</label>
+                                    <select style={{ width: "100%", padding: "0.85rem", borderRadius: "10px", border: "1px solid #e2e8f0", fontSize: "14px", fontWeight: 700 }} value={newGuest.status} onChange={e => setNewGuest({ ...newGuest, status: e.target.value })}>
                                         <option>Pending</option>
                                         <option>Confirmed</option>
                                         <option>Declined</option>
@@ -379,9 +414,9 @@ export default function Guests() {
                                 </div>
                             </div>
 
-                            <div style={{ display: "flex", gap: "1.25rem", marginTop: "1rem" }}>
-                                <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, padding: "1.1rem", borderRadius: "14px", border: "none", background: "#f1f5f9", fontWeight: 800, cursor: "pointer" }}>Cancel</button>
-                                <button type="submit" style={{ flex: 1.5, padding: "1.1rem", borderRadius: "14px", border: "none", background: "#2563eb", color: "#fff", fontWeight: 900, cursor: "pointer", boxShadow: "0 8px 20px rgba(37, 99, 235, 0.2)" }}>Confirm Onboarding</button>
+                            <div style={{ display: "flex", gap: "1rem", marginTop: "0.5rem" }}>
+                                <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, padding: "0.85rem", borderRadius: "12px", border: "none", background: "#f1f5f9", fontWeight: 800, cursor: "pointer", fontSize: "14px" }}>Cancel</button>
+                                <button type="submit" style={{ flex: 1.5, padding: "0.85rem", borderRadius: "12px", border: "none", background: "#2563eb", color: "#fff", fontWeight: 900, cursor: "pointer", boxShadow: "0 8px 20px rgba(37, 99, 235, 0.2)", fontSize: "14px" }}>Confirm Onboarding</button>
                             </div>
                         </form>
                     </div>

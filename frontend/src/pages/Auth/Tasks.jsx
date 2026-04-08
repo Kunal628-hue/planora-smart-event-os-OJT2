@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import { animate, stagger } from "animejs";
+import { useDialog } from "../../context/DialogContext";
 import { Plus, ListTodo, Calendar, Clock, AlertCircle, Loader2, X, Edit2, Trash2 } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Tasks() {
     const { user, events, selectedEventId, addNotification } = useOutletContext();
+    const { showConfirm } = useDialog();
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -22,7 +24,7 @@ export default function Tasks() {
         if (!user) return;
         setLoading(true);
         try {
-            let url = `${API_URL}/tasks?user=${user.uid}`;
+            let url = `${API_URL}/tasks?user=${user.uid}&email=${user.email}`;
             if (selectedEventId) url += `&eventId=${selectedEventId}`;
             const res = await fetch(url);
             const data = await res.json();
@@ -101,7 +103,8 @@ export default function Tasks() {
     };
 
     const handleDeleteTask = async (taskId) => {
-        if (!window.confirm("Are you sure you want to remove this task?")) return;
+        const confirmed = await showConfirm("Delete Milestone", "Are you sure you want to remove this task from your active workflow?");
+        if (!confirmed) return;
         try {
             const response = await fetch(`${API_URL}/tasks/${taskId}`, {
                 method: "DELETE"

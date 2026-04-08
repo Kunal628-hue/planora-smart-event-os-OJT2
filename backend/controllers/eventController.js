@@ -1,5 +1,6 @@
 import Event from "../models/Event.js";
 import Vendor from "../models/Vendor.js";
+import { getAllowedEventIds } from "../utils/authHelper.js";
 
 // @desc    Create a new event
 // @route   POST /api/events
@@ -25,19 +26,20 @@ export const createEvent = async (req, res) => {
     }
 };
 
-// @desc    Get all events for a specific user
-// @route   GET /api/events?user=userId
+// @desc    Get all events for a specific user (+ shared events)
+// @route   GET /api/events?user=userId&email=email
 // @access  Public
 export const getEvents = async (req, res) => {
     try {
-        const userId = req.query.user;
+        const { user: userId, email: userEmail } = req.query;
         if (!userId) {
             return res.status(400).json({ message: "User ID is required" });
         }
-        const filter = { user: userId };
 
-        console.log(`[Backend] Fetching events for user: ${userId}`);
-        const events = await Event.find(filter).sort({ createdAt: -1 });
+        const allowedEventIds = await getAllowedEventIds(userId, userEmail);
+
+        console.log(`[Backend] Fetching events for IDs: ${allowedEventIds.join(', ')}`);
+        const events = await Event.find({ _id: { $in: allowedEventIds } }).sort({ createdAt: -1 });
 
         // Calculate actual spent for each event
         const eventIds = events.map(e => e._id);

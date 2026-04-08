@@ -1,17 +1,31 @@
 import Guest from "../models/Guest.js";
 import Event from "../models/Event.js";
 import { sendInvitation } from "../utils/emailService.js";
+import { getAllowedEventIds } from "../utils/authHelper.js";
+import { sendWhatsAppMessage } from "../utils/whatsappService.js";
 
 export const createGuest = async (req, res) => {
     try {
-        const guest = await Guest.create(req.body);
+        const { event: eventId } = req.body;
+        const event = await Event.findById(eventId);
+        
+        // Ensure the item is created under the event owner's namespace
+        const guestData = { ...req.body };
+        if (event) {
+            guestData.user = event.user; 
+        }
+
+        const guest = await Guest.create(guestData);
         
         // If guest has an email, send the invitation
-        if (guest.email) {
-            const event = await Event.findById(guest.event);
-            if (event) {
-                await sendInvitation(guest, event.title);
-            }
+        if (guest.email && event) {
+            await sendInvitation(guest, event.title);
+        }
+
+        // Send WhatsApp notification
+        if (guest.whatsapp && event) {
+            const waMessage = `Hello ${guest.name}, you have been invited to "${event.title}" on Planora. We have sent a detailed invitation to your email. Please check it and accept if you're interested!`;
+            await sendWhatsAppMessage(guest.whatsapp, waMessage);
         }
         
         res.status(201).json(guest);
@@ -22,10 +36,14 @@ export const createGuest = async (req, res) => {
 
 export const getGuests = async (req, res) => {
     try {
-        const { eventId, user } = req.query;
+        const { eventId, user, email } = req.query;
         const filter = {};
-        if (eventId) filter.event = eventId;
-        if (user) filter.user = user;
+        if (eventId) {
+            filter.event = eventId;
+        } else if (user) {
+            const allowedIds = await getAllowedEventIds(user, email);
+            filter.event = { $in: allowedIds };
+        }
 
         const guests = await Guest.find(filter).sort({ name: 1 });
         res.json(guests);

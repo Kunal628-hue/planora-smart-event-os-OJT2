@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
+import { useDialog } from "../../context/DialogContext";
 import {
     Plus,
     Wallet,
@@ -19,6 +20,7 @@ import {
 
 export default function Budget() {
     const { user, events, selectedEventId, addNotification } = useOutletContext();
+    const { showConfirm } = useDialog();
     const [vendors, setVendors] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -33,7 +35,7 @@ export default function Budget() {
         if (!user) return;
         setLoading(true);
         try {
-            let url = `${import.meta.env.VITE_API_URL}/vendors?user=${user.uid}`;
+            let url = `${import.meta.env.VITE_API_URL}/vendors?user=${user.uid}&email=${user.email}`;
             if (selectedEventId) {
                 url += `&eventId=${selectedEventId}`;
             }
@@ -117,7 +119,8 @@ export default function Budget() {
     };
 
     const handleDeleteExpense = async (id) => {
-        if (!window.confirm("Are you sure you want to purge this financial entry?")) return;
+        const confirmed = await showConfirm("Purge Transaction", "Are you sure you want to permanently remove this financial entry from the ledger?");
+        if (!confirmed) return;
         try {
             const response = await fetch(`${import.meta.env.VITE_API_URL}/vendors/${id}`, {
                 method: "DELETE"

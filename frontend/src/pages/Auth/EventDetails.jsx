@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useOutletContext } from "react-router-dom";
+import { useDialog } from "../../context/DialogContext";
 import {
     ChevronLeft,
     Settings,
@@ -26,6 +27,7 @@ export default function EventDetails() {
     const { eventId } = useParams();
     const navigate = useNavigate();
     const { user, syncTimestamp } = useOutletContext();
+    const { showConfirm } = useDialog();
     const [event, setEvent] = useState(null);
     const [loading, setLoading] = useState(true);
     const [healthData, setHealthData] = useState(null);
@@ -117,7 +119,8 @@ export default function EventDetails() {
     };
 
     const handleDelete = async () => {
-        if (window.confirm("Are you sure you want to delete this event? This action cannot be undone.")) {
+        const confirmed = await showConfirm("Terminate Operation", "Are you sure you want to permanently delete this event? All associated operational data, vendor contracts, and analytics will be purged immediately.");
+        if (confirmed) {
             try {
                 const response = await fetch(`${API_URL}/events/${eventId}`, {
                     method: "DELETE"

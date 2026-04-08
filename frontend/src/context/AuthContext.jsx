@@ -51,13 +51,21 @@ export const AuthProvider = ({ children }) => {
         return signOut(auth);
     };
 
+    const updateUserProfile = async (profileData) => {
+        if (!auth.currentUser) throw new Error("No user logged in");
+        await updateProfile(auth.currentUser, profileData);
+        // Update local state to reflect changes immediately
+        setUser({ ...auth.currentUser, ...profileData });
+    };
+
     const value = {
         user,
         loading,
         loginWithGoogle,
         loginWithEmail,
         signupWithEmail,
-        logout
+        logout,
+        updateUserProfile
     };
 
     return (

@@ -6,7 +6,9 @@ const collaboratorSchema = mongoose.Schema(
         email: { type: String, required: true },
         role: { type: String, required: true }, // Event Lead, Editor, Viewer
         permissions: { type: String },
+        whatsapp: { type: String }, // WhatsApp contact number
         user: { type: String, required: true }, // Firebase UID of owner
+        event: { type: mongoose.Schema.Types.ObjectId, ref: "Event" }, // Optional: link to a specific event
         status: { type: String, default: "Active" }
     },
     { timestamps: true }
