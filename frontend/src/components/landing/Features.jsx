@@ -198,14 +198,14 @@ export default function Features() {
           }}>
             ✦ Platform Power
           </div>
-          <h2 style={{
+        <h2 style={{
             fontSize: "clamp(2.5rem, 5vw, 4rem)",
             fontWeight: 800, color: "#F9FAFB",
             lineHeight: 1.05, letterSpacing: "-0.04em",
             maxWidth: 800, margin: "0 auto 2rem",
             fontFamily: "'Outfit', sans-serif"
           }}>
-            Engineered for <span style={{ color: "#3B82F6" }}>Precision</span>.<br />Built for Results.
+            Engineered for <span style={{ color: "#ff5a1f" }}>Precision</span>.<br />Built for Results.
           </h2>
           <p style={{ fontSize: "1.15rem", color: "#94A3B8", lineHeight: 1.6, maxWidth: 650, margin: "0 auto" }}>
             The definitive toolkit for high-stakes event coordination. Scale your operations without losing the personal touch.
@@ -223,7 +223,7 @@ export default function Features() {
               key={f.title}
               ref={el => cardsRef.current[i] = el}
               className="feature-card"
-              spotlightColor="rgba(59, 130, 246, 0.2)"
+              spotlightColor={i % 2 === 0 ? "rgba(251, 113, 133, 0.15)" : "rgba(45, 212, 191, 0.15)"}
               style={{
                 padding: "3.5rem",
                 display: "flex",
@@ -237,9 +237,11 @@ export default function Features() {
             >
               <div>
                 <div style={{
-                  width: 60, height: 60, background: "rgba(59, 130, 246, 0.1)", color: "#60A5FA",
+                  width: 60, height: 60, 
+                  background: i % 2 === 0 ? "rgba(251, 113, 133, 0.1)" : "rgba(45, 212, 191, 0.1)", 
+                  color: i % 2 === 0 ? "#fb7185" : "#2dd4bf",
                   display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1.5rem",
-                  border: "1px solid rgba(59, 130, 246, 0.2)",
+                  border: `1px solid ${i % 2 === 0 ? "rgba(251, 113, 133, 0.2)" : "rgba(45, 212, 191, 0.2)"}`,
                   animation: "float-icon 4s ease-in-out infinite, blob-morph 8s ease-in-out infinite alternate"
                 }}>
                   {f.icon}

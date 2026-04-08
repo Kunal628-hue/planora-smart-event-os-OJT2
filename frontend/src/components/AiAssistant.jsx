@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import ReactMarkdown from 'react-markdown';
 import { MessageSquare, Sparkles, X as CloseIcon } from "lucide-react";
 import { PlanoraSpinner } from "./ui/Loader";
 
@@ -6,9 +7,24 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 export default function AiAssistant({ eventId }) {
     const [isOpen, setIsOpen] = useState(false);
-    const [messages, setMessages] = useState([
-        { role: "assistant", text: "Hello! I'm your Planora AI. How can I assist with your event strategy today?" }
-    ]);
+    const [messages, setMessages] = useState(() => {
+        const saved = localStorage.getItem(`planora_chat_${eventId || 'global'}`);
+        return saved ? JSON.parse(saved) : [
+            { role: "assistant", text: "**Planora OS Intelligence Unit online.** Tactical event data analysis is ready. How may I assist with your strategy?" }
+        ];
+    });
+
+    useEffect(() => {
+        const saved = localStorage.getItem(`planora_chat_${eventId || 'global'}`);
+        setMessages(saved ? JSON.parse(saved) : [
+            { role: "assistant", text: "**Planora OS Intelligence Unit online.** Tactical event data analysis is ready. How may I assist with your strategy?" }
+        ]);
+    }, [eventId]);
+
+    useEffect(() => {
+        localStorage.setItem(`planora_chat_${eventId || 'global'}`, JSON.stringify(messages));
+    }, [messages, eventId]);
+
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
     const scrollRef = useRef(null);
@@ -17,7 +33,7 @@ export default function AiAssistant({ eventId }) {
         if (scrollRef.current) {
             scrollRef.current.scrollTo({
                 top: scrollRef.current.scrollHeight,
-                behavior: "smooth"        // Scrolls to bottom when messages update.
+                behavior: "smooth"
             });
         }
     }, [messages, loading]);
@@ -40,7 +56,7 @@ export default function AiAssistant({ eventId }) {
             const data = await response.json();
             setMessages(prev => [...prev, { role: "assistant", text: data.response }]);
         } catch (error) {
-            setMessages(prev => [...prev, { role: "assistant", text: "I'm having a bit of trouble connecting to the neural network. Please try again." }]);
+            setMessages(prev => [...prev, { role: "assistant", text: "Connection error with core intelligence. Please re-initiate query." }]);
         } finally {
             setLoading(false);
         }
@@ -147,16 +163,24 @@ export default function AiAssistant({ eventId }) {
                                 maxWidth: "85%",
                                 padding: "0.75rem 1rem",
                                 borderRadius: msg.role === "user" ? "16px 16px 2px 16px" : "16px 16px 16px 2px",
-                                fontSize: "0.9rem",
+                                fontSize: "0.85rem",
                                 fontWeight: 500,
-                                lineHeight: "1.5",
+                                lineHeight: "1.6",
                                 background: msg.role === "user" ? "#1e293b" : "#fff",
                                 color: msg.role === "user" ? "#fff" : "#334155",
                                 border: msg.role === "assistant" ? "1px solid #e2e8f0" : "none",
+                                boxShadow: msg.role === "assistant" ? "0 2px 8px rgba(0,0,0,0.02)" : "none",
                                 position: "relative",
                                 animation: "bubbleIn 0.4s cubic-bezier(0.2, 1, 0.3, 1)"
                             }}>
-                                {msg.text}
+                                <ReactMarkdown components={{
+                                    p: ({node, ...props}) => <div style={{ marginBottom: "0.5rem" }} {...props} />,
+                                    ul: ({node, ...props}) => <ul style={{ margin: "0.5rem 0", paddingLeft: "1.25rem", color: "inherit" }} {...props} />,
+                                    li: ({node, ...props}) => <li style={{ marginBottom: "0.25rem" }} {...props} />,
+                                    strong: ({node, ...props}) => <strong style={{ fontWeight: 800, color: msg.role === "user" ? "#fff" : "#1e293b" }} {...props} />
+                                }}>
+                                    {msg.text}
+                                </ReactMarkdown>
                             </div>
                         ))}
                         {loading && (

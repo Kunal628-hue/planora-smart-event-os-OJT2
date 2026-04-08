@@ -36,7 +36,13 @@ export default function DashboardLayout() {
     const location = useLocation();
     const { user, logout } = useAuth();
     const [events, setEvents] = useState([]);
-    const [selectedEventId, setSelectedEventId] = useState("");
+    const [selectedEventId, setSelectedEventId] = useState(() => localStorage.getItem("planora_active_event_id") || "");
+
+    useEffect(() => {
+        if (selectedEventId) {
+            localStorage.setItem("planora_active_event_id", selectedEventId);
+        }
+    }, [selectedEventId]);
     const [localLoading, setLocalLoading] = useState(true);
     const [showUserMenu, setShowUserMenu] = useState(false);
 

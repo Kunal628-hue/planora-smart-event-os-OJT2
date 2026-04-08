@@ -207,7 +207,6 @@ export default function Events() {
                                             textTransform: "uppercase",
                                             letterSpacing: "0.05em",
                                             border: `1px solid ${statusColor}20`,
-                                            cursor: "pointer",
                                             cursor: "pointer"
                                         }}
                                         title={`Click to mark as ${event.status === "Completed" ? "Planned" : "Completed"}`}
@@ -226,7 +225,6 @@ export default function Events() {
                                             width: `${utilization}%`,
                                             height: "100%",
                                             background: utilization > 90 ? "#ef4444" : statusColor,
-                                            borderRadius: "10px",
                                             borderRadius: "10px"
                                         }}></div>
                                     </div>

@@ -428,6 +428,30 @@ export default function Dashboard() {
                             <div style={{ fontSize: "32px", fontWeight: 800, color: "#fff" }}>₹{(healthData?.metrics?.totalSpent || 0).toLocaleString('en-IN')}</div>
                             <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", fontWeight: 500 }}>Current Spend / ₹{selectedEvent?.budget?.toLocaleString('en-IN')} Cap</div>
                         </div>
+
+                        {/* AI Budget Insights */}
+                        {budgetOpts.length > 0 && (
+                            <div style={{ 
+                                background: "rgba(255, 255, 255, 0.05)", 
+                                borderRadius: "16px", 
+                                padding: "1.25rem", 
+                                marginBottom: "2rem",
+                                border: "1px solid rgba(255, 255, 255, 0.1)"
+                            }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "0.75rem" }}>
+                                    <Sparkles size={14} color="#3b82f6" />
+                                    <span style={{ fontSize: "10px", fontWeight: 800, color: "rgba(255,255,255,0.7)", textTransform: "uppercase" }}>AI Financial Insights</span>
+                                </div>
+                                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                                    {budgetOpts.map((opt, i) => (
+                                        <div key={i} style={{ fontSize: "11px", color: "rgba(255,255,255,0.8)", lineHeight: "1.4", display: "flex", gap: "8px" }}>
+                                            <div style={{ minWidth: "4px", height: "4px", borderRadius: "50%", background: "#3b82f6", marginTop: "5px" }}></div>
+                                            {opt}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                     <div>
                         <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", fontWeight: 700, marginBottom: "0.5rem" }}>

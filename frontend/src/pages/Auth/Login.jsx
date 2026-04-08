@@ -71,174 +71,289 @@ export default function Login() {
         <div className="auth-page-new">
             <AuthBackground />
             
-            <div className="auth-card-new">
-                {/* Switcher */}
-                <div className="auth-switcher">
-                    <button className="switcher-btn active">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
-                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3" />
-                        </svg>
-                        Login
-                    </button>
-                    <Link to="/signup" className="switcher-btn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
-                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                            <circle cx="8.5" cy="7" r="4" />
-                            <line x1="20" y1="8" x2="20" y2="14" />
-                            <line x1="23" y1="11" x2="17" y2="11" />
-                        </svg>
-                        Sign Up
-                    </Link>
-                </div>
+            <Link to="/" className="auth-page-logo">
+                <img 
+                    src="/logo-new.svg" 
+                    alt="Planora" 
+                />
+            </Link>
 
-                <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-                    <div>
-                        <label className="auth-label-new">Email address</label>
-                        <input
-                            className="auth-input-new"
-                            type="email"
-                            name="email"
-                            value={form.email}
-                            onChange={handleChange}
-                            placeholder="Enter your email address"
-                        />
-                    </div>
+            <div className="auth-container">
+                
+                <div className="auth-card-split">
+                    {/* Left Side: Info */}
+                    <div className="auth-info-side">
+                        <h1 className="auth-title">Welcome back</h1>
+                        
+                        <div className="feature-list">
+                            <div className="feature-item">
+                                <div className="feature-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+                                    </svg>
+                                </div>
+                                <div className="feature-text">
+                                    <h3>Smart Coordination</h3>
+                                    <p>AI-driven event planning across platforms.</p>
+                                </div>
+                            </div>
 
-                    <div>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
-                            <label className="auth-label-new" style={{ marginBottom: 0 }}>Password</label>
-                            <Link to="/forgot-password" style={{ fontSize: "0.8rem", color: "#111827", fontWeight: 600, textDecoration: 'none' }}>
-                                Forgot password?
-                            </Link>
-                        </div>
-                        <div style={{ position: 'relative' }}>
-                            <input
-                                className="auth-input-new"
-                                type="password"
-                                name="password"
-                                value={form.password}
-                                onChange={handleChange}
-                                placeholder="Enter your password"
-                            />
-                            <svg 
-                                style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', cursor: 'pointer' }}
-                                width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                            >
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                                <circle cx="12" cy="12" r="3" />
-                            </svg>
+                            <div className="feature-item">
+                                <div className="feature-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                    </svg>
+                                </div>
+                                <div className="feature-text">
+                                    <h3>Vendor Access</h3>
+                                    <p>Top-tier services at your fingertips.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    {error && (
-                        <div className="auth-error-new">{error}</div>
-                    )}
+                    {/* Right Side: Form */}
+                    <div className="auth-form-side">
+                        <div className="auth-form-container">
+                            <SocialAuth onLogin={handleSocialLogin} loading={loading} />
 
-                    <button type="submit" className="auth-submit-btn" disabled={loading}>
-                        {loading ? "Logging in..." : "Log In"}
-                    </button>
-                </form>
+                            <div className="auth-divider-new">
+                                <span>OR</span>
+                            </div>
 
-                <div className="auth-divider-new">
-                    <span>OR</span>
-                </div>
+                            <form onSubmit={handleSubmit} className="auth-form">
+                                <div className="form-group" style={{ marginBottom: '0.75rem' }}>
+                                    <label className="auth-label-new">Email address</label>
+                                    <input
+                                        className="auth-input-new"
+                                        type="email"
+                                        name="email"
+                                        value={form.email}
+                                        onChange={handleChange}
+                                        placeholder="name@company.com"
+                                        style={{ padding: '0.65rem 1rem' }}
+                                    />
+                                </div>
 
-                <SocialAuth onLogin={handleSocialLogin} loading={loading} />
+                                <div className="form-group" style={{ marginBottom: '0.75rem' }}>
+                                    <label className="auth-label-new">Password</label>
+                                    <input
+                                        className="auth-input-new"
+                                        type="password"
+                                        name="password"
+                                        value={form.password}
+                                        onChange={handleChange}
+                                        placeholder="••••••••"
+                                        style={{ padding: '0.65rem 1rem' }}
+                                    />
+                                </div>
 
-                <div className="auth-footer-new">
-                    <Link to="/" style={{ color: '#6b7280', fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M19 12H5M12 19l-7-7 7-7"/>
-                        </svg>
-                        Back to Planora
-                    </Link>
+                                {error && (
+                                    <div className="auth-error-new" style={{ padding: '0.5rem', marginBottom: '0.65rem' }}>{error}</div>
+                                )}
+
+                                <button type="submit" className="auth-submit-btn" disabled={loading} style={{ padding: '0.75rem' }}>
+                                    {loading ? "Logging in..." : "Continue"}
+                                </button>
+                            </form>
+
+                            <div className="auth-footer-links" style={{ marginTop: '1.25rem' }}>
+                                <p style={{ margin: 0 }}>Need an account? <Link to="/signup">Join Planora</Link></p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <style>{`
                 .auth-page-new {
                     min-height: 100vh;
+                    background: #070707;
                     display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    position: relative;
-                    padding: 1.5rem;
-                    overflow: hidden;
-                }
-                .auth-card-new {
-                    background: #ffffff;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 2rem;
+                    flex-direction: column;
                     padding: 2.5rem;
+                    color: white;
+                    font-family: 'Inter', -apple-system, sans-serif;
+                    overflow-x: hidden;
+                    overflow-y: auto;
+                    position: relative;
+                    box-sizing: border-box;
+                }
+                /* Hide white edges on scroll */
+                :global(html), :global(body) {
+                    background: #070707 !important;
+                    margin: 0;
+                    padding: 0;
+                }
+                .auth-page-logo {
+                    position: fixed;
+                    top: 2.5rem;
+                    left: 2.5rem;
+                    z-index: 50;
+                    transition: transform 0.2s;
+                }
+                .auth-page-logo img {
+                    height: 2.2rem;
+                    width: auto;
+                    filter: invert(72%) sepia(99%) saturate(400%) hue-rotate(5deg) brightness(110%) contrast(110%) drop-shadow(0 0 12px rgba(255, 215, 0, 0.4));
+                }
+                .auth-page-logo:hover {
+                    transform: scale(1.05);
+                }
+                .auth-container {
                     width: 100%;
-                    max-width: 440px;
-                    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-                    z-index: 1;
-                }
-                .auth-switcher {
+                    max-width: 860px;
+                    z-index: 10;
+                    margin: auto;
                     display: flex;
-                    background: #f9fafb;
-                    padding: 4px;
-                    border-radius: 0.75rem;
-                    margin-bottom: 2rem;
+                    flex-direction: column;
+                    position: relative;
                 }
-                .switcher-btn {
-                    flex: 1;
+                .auth-card-split {
+                    background: #0d0d0d;
+                    border: 1px solid rgba(255, 255, 255, 0.04);
+                    border-radius: 28px;
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    overflow: hidden;
+                    box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.9);
+                    position: relative;
+                }
+                /* Vibrant Colorful Rainbow Border */
+                .auth-card-split::before {
+                    content: "";
+                    position: absolute;
+                    inset: -2px;
+                    border-radius: 30px;
+                    padding: 2px;
+                    background: linear-gradient(
+                        90deg, 
+                        #00f2fe 0%, 
+                        #4facfe 20%, 
+                        #7000ff 40%, 
+                        #ff006a 60%, 
+                        #ff9900 80%,
+                        #00f2fe 100%
+                    );
+                    background-size: 200% auto;
+                    animation: aurora-border 4s linear infinite;
+                    -webkit-mask: 
+                        linear-gradient(#fff 0 0) content-box, 
+                        linear-gradient(#fff 0 0);
+                    -webkit-mask-composite: xor;
+                    mask-composite: exclude;
+                    pointer-events: none;
+                }
+                @keyframes aurora-border {
+                    0% { background-position: 0% 50%; }
+                    100% { background-position: 200% 50%; }
+                }
+                @media (max-width: 900px) {
+                    .auth-card-split {
+                        grid-template-columns: 1fr;
+                        max-height: 85vh;
+                    }
+                    .auth-info-side { display: none; }
+                }
+                .auth-info-side {
+                    padding: 3rem;
+                    background: rgba(255, 255, 255, 0.012);
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    border-right: 1px solid rgba(255, 255, 255, 0.04);
+                }
+                .auth-title {
+                    font-size: 2rem;
+                    font-weight: 800;
+                    margin-bottom: 2rem;
+                    letter-spacing: -0.04em;
+                    color: #ffffff;
+                }
+                .feature-list {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1.5rem;
+                }
+                .feature-item {
+                    display: flex;
+                    gap: 1.25rem;
+                    align-items: flex-start;
+                }
+                .feature-icon {
+                    width: 38px;
+                    height: 38px;
+                    background: rgba(255, 255, 255, 0.04);
+                    border: 1px solid rgba(255, 255, 255, 0.06);
+                    border-radius: 12px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    padding: 8px;
-                    border-radius: 0.6rem;
-                    font-size: 0.9rem;
-                    font-weight: 600;
-                    color: #6b7280;
-                    transition: all 0.2s;
-                    text-decoration: none;
+                    color: rgba(255, 255, 255, 0.8);
                 }
-                .switcher-btn.active {
-                    background: #ffffff;
-                    color: #111827;
-                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                .feature-text h3 {
+                    font-size: 1rem;
+                    font-weight: 600;
+                    margin-bottom: 0.25rem;
+                    color: #ffffff;
+                }
+                .feature-text p {
+                    font-size: 0.875rem;
+                    color: rgba(255, 255, 255, 0.4);
+                    margin: 0;
+                    line-height: 1.4;
+                }
+                .auth-form-side {
+                    padding: 3rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: #0a0a0a;
+                }
+                .auth-form-container {
+                    width: 100%;
+                    max-width: 300px;
                 }
                 .auth-label-new {
                     display: block;
-                    font-size: 0.9rem;
-                    font-weight: 600;
-                    color: #374151;
+                    font-size: 0.8125rem;
+                    font-weight: 500;
+                    color: rgba(255, 255, 255, 0.5);
                     margin-bottom: 0.5rem;
                 }
                 .auth-input-new {
                     width: 100%;
-                    padding: 0.75rem 1rem;
-                    background: #fff;
-                    border: 1px solid #d1d5db;
-                    border-radius: 0.75rem;
-                    font-size: 1rem;
-                    color: #111827;
-                    transition: border-color 0.2s;
+                    padding: 0.7rem 1rem;
+                    background: rgba(255, 255, 255, 0.02);
+                    border: 1px solid rgba(255, 255, 255, 0.08);
+                    border-radius: 12px;
+                    font-size: 0.9375rem;
+                    color: white;
+                    transition: all 0.2s;
                 }
                 .auth-input-new:focus {
-                    border-color: #111827;
+                    border-color: #00d1ff;
                     outline: none;
+                    background: rgba(255, 255, 255, 0.04);
                 }
                 .auth-submit-btn {
                     width: 100%;
                     padding: 0.85rem;
-                    background: #1f2937;
-                    color: #ffffff;
-                    border-radius: 0.75rem;
-                    font-size: 1rem;
+                    background: #ff5a1f;
+                    color: white;
+                    border: none;
+                    border-radius: 12px;
+                    font-size: 0.9375rem;
                     font-weight: 700;
-                    transition: background 0.2s;
+                    cursor: pointer;
+                    transition: all 0.2s;
                     margin-top: 0.5rem;
                 }
-                .auth-submit-btn:hover {
-                    background: #111827;
-                }
+                .auth-submit-btn:hover { background: #ff7844; transform: translateY(-1px); }
                 .auth-divider-new {
                     position: relative;
                     text-align: center;
-                    margin: 1.75rem 0;
+                    margin: 1.5rem 0;
                 }
                 .auth-divider-new::before {
                     content: "";
@@ -247,29 +362,25 @@ export default function Login() {
                     left: 0;
                     right: 0;
                     height: 1px;
-                    background: #e5e7eb;
+                    background: rgba(255, 255, 255, 0.05);
                 }
                 .auth-divider-new span {
                     position: relative;
-                    background: #fff;
-                    padding: 0 1rem;
-                    color: #9ca3af;
+                    background: #0a0a0a;
+                    padding: 0 0.75rem;
+                    color: rgba(255, 255, 255, 0.2);
                     font-size: 0.75rem;
-                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
                 }
-                .auth-error-new {
-                    background: #fff1f2;
-                    border: 1px solid #fecaca;
-                    color: #b91c1c;
-                    padding: 0.75rem;
-                    border-radius: 0.75rem;
-                    font-size: 0.85rem;
-                }
-                .auth-footer-new {
-                    margin-top: 2rem;
+                .auth-footer-links {
                     text-align: center;
-                    font-size: 0.9rem;
-                    color: #4b5563;
+                    font-size: 0.875rem;
+                }
+                .auth-footer-links a {
+                    color: #ff5a1f;
+                    text-decoration: none;
+                    font-weight: 500;
                 }
             `}</style>
         </div>

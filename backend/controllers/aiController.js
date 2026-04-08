@@ -462,11 +462,15 @@ export const askAiAssistant = async (req, res) => {
 
             User Question: "${message}"
 
-            Guidelines:
-            1. Be helpful, professional, and concise.
-            2. Use the provided data to give specific answers.
-            3. If the user asks for suggestions, provide them based on the event type.
-            4. Keep responses friendly and encouraging.
+            Core Directives:
+            1. Provide highly structured, clear, and detailed information.
+            2. STRICTLY NO EMOJIS are permitted in your response.
+            3. Use technical and professional language; avoid conversational fluff or excessive enthusiasm.
+            4. Format all responses using appropriate markdown:
+               - Use bold text for key metrics and important data points (e.g., **₹4,000,000**).
+               - Use bullet points for summarizing multiple data points.
+            5. When responding to general updates, lead with the most critical metrics first.
+            6. Ensure all numerical data used exactly matches the context provided above.
         `;
 
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });

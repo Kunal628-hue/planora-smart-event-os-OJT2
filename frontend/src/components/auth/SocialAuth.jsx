@@ -24,19 +24,19 @@ const SocialAuth = ({ onLogin, loading }) => {
                     justify-content: center;
                     gap: 0.75rem;
                     width: 100%;
-                    padding: 0.75rem;
-                    background: #fff;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 0.75rem;
+                    padding: 0.9rem;
+                    background: transparent;
+                    border: 1px solid rgba(255, 255, 255, 0.15);
+                    border-radius: 12px;
                     font-size: 0.95rem;
                     font-weight: 500;
-                    color: #111827;
+                    color: white;
                     transition: all 0.2s;
                     cursor: pointer;
                 }
                 .social-btn-new:hover {
-                    background: #f9fafb;
-                    border-color: #d1d5db;
+                    background: rgba(255, 255, 255, 0.05);
+                    border-color: rgba(255, 255, 255, 0.3);
                 }
                 .social-btn-new:disabled {
                     opacity: 0.5;

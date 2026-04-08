@@ -120,26 +120,26 @@ export default function Navbar() {
           {/* Right CTA */}
           <div style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
             <Link to="/login" style={{
-              background: "#3B82F6",
+              background: "#ff5a1f",
               color: "#fff",
               padding: "0.65rem 1.65rem",
               borderRadius: "999px",
               fontSize: "0.85rem",
               fontWeight: 800,
               textDecoration: "none",
-              boxShadow: "0 4px 20px rgba(59, 130, 246, 0.3)",
+              boxShadow: "0 4px 20px rgba(255, 90, 31, 0.3)",
               transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
               border: "1px solid rgba(255,255,255,0.1)"
             }}
               onMouseEnter={e => { 
                 e.currentTarget.style.transform = "translateY(-2px)"; 
-                e.currentTarget.style.boxShadow = "0 8px 25px rgba(59, 130, 246, 0.5)";
-                e.currentTarget.style.background = "#2563EB";
+                e.currentTarget.style.boxShadow = "0 8px 25px rgba(255, 90, 31, 0.5)";
+                e.currentTarget.style.background = "#ff7844";
               }}
               onMouseLeave={e => { 
                 e.currentTarget.style.transform = "translateY(0)"; 
-                e.currentTarget.style.boxShadow = "0 4px 20px rgba(59, 130, 246, 0.3)";
-                e.currentTarget.style.background = "#3B82F6";
+                e.currentTarget.style.boxShadow = "0 4px 20px rgba(255, 90, 31, 0.3)";
+                e.currentTarget.style.background = "#ff5a1f";
               }}
             >
               Get Started

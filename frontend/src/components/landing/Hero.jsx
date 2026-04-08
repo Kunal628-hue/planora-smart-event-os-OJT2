@@ -143,54 +143,57 @@ export default function Hero() {
         }
       `}} />
 
-      {/* DarkVeil Background Animation */}
+      {/* New Gradient Background similar to AuthBackground */}
       <div style={{
         position: "absolute",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        zIndex: 0,
-        opacity: 0.15, // Subtle matching effect
-        pointerEvents: "none"
+        top: "-10%",
+        left: "-10%",
+        width: "120%",
+        height: "120%",
+        background: "#0a0a0a",
+        zIndex: -2,
+        overflow: "hidden"
       }}>
-        <DarkVeil 
-          speed={0.15} 
-          hueShift={-80} 
-          noiseIntensity={0.02} 
-          scanlineIntensity={0.05} 
-          scanlineFrequency={150}
-          warpAmount={0.2}
-          resolutionScale={0.5}
-        />
+        <div style={{
+          position: "absolute",
+          width: "60vw",
+          height: "60vw",
+          top: "-20%",
+          left: "-10%",
+          background: "radial-gradient(circle, rgba(251, 113, 133, 0.12) 0%, transparent 70%)",
+          filter: "blur(100px)",
+        }} />
+        <div style={{
+          position: "absolute",
+          width: "70vw",
+          height: "70vw",
+          bottom: "-20%",
+          right: "-10%",
+          background: "radial-gradient(circle, rgba(45, 212, 191, 0.12) 0%, transparent 70%)",
+          filter: "blur(100px)",
+        }} />
       </div>
 
-      {/* Glowing Rotating Orb */}
-      <div className="scroll-color-shift" style={{
-        position: "absolute",
-        top: "-10%",
-        left: "20%",
-        width: "60vw",
-        height: "60vw",
-        background: "radial-gradient(circle, rgba(99,102,241,0.06) 0%, rgba(236,72,153,0.03) 40%, transparent 70%)",
-        animation: "orb-spin 20s linear infinite",
-        pointerEvents: "none",
-        zIndex: 0
+      {/* Grain Texture */}
+      <div style={{
+          position: "absolute",
+          inset: 0,
+          opacity: 0.1,
+          pointerEvents: "none",
+          mixBlendMode: "overlay",
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+          zIndex: -1
       }} />
 
-      {/* Architectural Grid Background */}
+      {/* Subtle Mesh Grid */}
       <div style={{
         position: "absolute",
         inset: 0,
-        backgroundImage: `
-          linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px),
-          linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px)
-        `,
-        backgroundSize: "60px 60px, 60px 60px, 12px 12px, 12px 12px",
-        opacity: 0.8,
-        pointerEvents: "none",
+        backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px)`,
+        backgroundSize: "60px 60px",
+        opacity: 0.3,
+        maskImage: "radial-gradient(circle at center, black, transparent 90%)",
+        WebkitMaskImage: "radial-gradient(circle at center, black, transparent 90%)",
         zIndex: -1
       }} />
 

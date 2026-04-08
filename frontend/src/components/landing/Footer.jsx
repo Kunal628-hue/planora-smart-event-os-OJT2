@@ -33,20 +33,20 @@ export default function Footer() {
   };
 
   return (
-    <footer style={{ background: "#F9FAFB", fontFamily: "'Inter', sans-serif", color: "#030712" }}>
+    <footer style={{ background: "#0a0a0a", fontFamily: "'Inter', sans-serif", color: "white" }}>
       <style dangerouslySetInnerHTML={{__html: `
-        .footer-input::placeholder { color: #94A3B8; opacity: 1; }
+        .footer-input::placeholder { color: rgba(255, 255, 255, 0.4); opacity: 1; }
         @keyframes fade-in { 
           from { opacity: 0; transform: translateY(10px); }
           to { opacity: 1; transform: translateY(0); }
         }
       `}} />
-      {/* 1. Newsletter Section (White Background) */}
-      <div style={{ padding: "8rem 2.5rem 6rem", textAlign: "center", position: "relative" }}>
+      {/* 1. Newsletter Section (Dark Background) */}
+      <div style={{ padding: "8rem 2.5rem 6rem", textAlign: "center", position: "relative", background: "#0a0a0a" }}>
         <h2 style={{ 
           fontSize: "clamp(2.5rem, 5vw, 3.5rem)", 
           fontWeight: 800, 
-          color: "#030712", 
+          color: "white", 
           marginBottom: "1rem",
           letterSpacing: "-0.03em",
           fontFamily: "'Outfit', sans-serif"
@@ -55,7 +55,7 @@ export default function Footer() {
         </h2>
         <p style={{ 
           fontSize: "1.1rem", 
-          color: "#64748B", 
+          color: "rgba(255, 255, 255, 0.6)", 
           marginBottom: "2.5rem",
           maxWidth: "600px",
           margin: "0 auto 2.5rem"
@@ -66,8 +66,8 @@ export default function Footer() {
         {status === "success" ? (
           <div style={{ 
             maxWidth: "480px", margin: "0 auto 2.5rem", padding: "1.5rem", 
-            background: "#ECFDF5", borderRadius: "1rem", border: "1px solid #10B981",
-            color: "#065F46", fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", gap: "0.75rem",
+            background: "rgba(16, 185, 129, 0.1)", borderRadius: "1rem", border: "1px solid rgba(16, 185, 129, 0.2)",
+            color: "#10B981", fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", gap: "0.75rem",
             animation: "fade-in 0.5s ease"
           }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -80,13 +80,13 @@ export default function Footer() {
             maxWidth: "480px", 
             margin: "0 auto 2.5rem",
             padding: "0.5rem",
-            background: "#fff",
+            background: "#171717",
             borderRadius: "1rem",
-            border: "1px solid #E2E8F0",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.03)"
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.3)"
           }} onSubmit={handleSubmit}>
             <div style={{ position: "relative", flex: 1, display: "flex", alignItems: "center" }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: "1rem" }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255, 255, 255, 0.4)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: "1rem" }}>
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
               </svg>
               <input 
@@ -103,14 +103,14 @@ export default function Footer() {
                   fontSize: "0.95rem",
                   width: "100%",
                   background: "transparent",
-                  color: "#030712"
+                  color: "white"
                 }}
               />
             </div>
             <button 
               disabled={status === "loading"}
               style={{
-                background: "#030712",
+                background: "#ff5a1f",
                 color: "#fff",
                 border: "none",
                 padding: "0.8rem 1.5rem",
@@ -118,7 +118,6 @@ export default function Footer() {
                 fontWeight: 700,
                 cursor: status === "loading" ? "not-allowed" : "pointer",
                 transition: "all 0.2s ease",
-                opacity: status === "loading" ? 0.7 : 1,
                 minWidth: "120px"
               }}
             >
@@ -166,7 +165,7 @@ export default function Footer() {
               lineHeight: 1.1,
               fontFamily: "'Outfit', sans-serif"
             }}>
-              Ready to <span style={{ color: "#3B82F6" }}>Elevate</span> Your Events?
+              Ready to <span style={{ color: "#ff5a1f" }}>Elevate</span> Your Events?
             </h3>
             <p style={{ fontSize: "1.1rem", color: "#94A3B8", marginBottom: "2.5rem", lineHeight: 1.6 }}>
               Join the next generation of event architects. Scalable, intelligent, and designed for high-performance teams.
