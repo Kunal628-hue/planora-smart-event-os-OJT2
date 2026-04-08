@@ -5,7 +5,7 @@ import { UserPlus, Users, Trash2, Mail, Briefcase, Loader2, X, Calendar } from "
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Guests() {
-    const { user, events, selectedEventId } = useOutletContext();
+    const { user, events, selectedEventId, syncTimestamp, addNotification } = useOutletContext();
     const [guests, setGuests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -35,7 +35,7 @@ export default function Guests() {
 
     useEffect(() => {
         fetchData();
-    }, [user, selectedEventId]);
+    }, [user, selectedEventId, syncTimestamp]);
 
     useEffect(() => {
         if (selectedEventId) {
@@ -66,6 +66,7 @@ export default function Guests() {
                     eventId: selectedEventId
                 });
                 fetchData();
+                addNotification("Attendee Onboarded", `${newGuest.name} has been added to the guest registry.`);
             }
         } catch (err) {
             console.error("Failed to add guest:", err);
@@ -83,6 +84,7 @@ export default function Guests() {
             });
             if (response.ok) {
                 setGuests(guests.map(g => g._id === guestId ? { ...g, status: newStatus } : g));
+                addNotification("Status Synchronized", `Attendee RSVP updated to ${newStatus}.`);
             }
         } catch (err) {
             console.error("Failed to update status:", err);
@@ -97,6 +99,7 @@ export default function Guests() {
             });
             if (response.ok) {
                 setGuests(guests.filter(g => g._id !== guestId));
+                addNotification("Entry Purged", "Attendee has been removed from the directory.");
             }
         } catch (err) {
             console.error("Failed to delete guest:", err);
@@ -187,9 +190,6 @@ export default function Guests() {
                                 background: "#fff",
                                 border: "1.5px solid #e2e8f0",
                                 padding: "1rem 2rem",
-                                borderRadius: "14px",
-                                fontWeight: 800,
-                                cursor: "pointer",
                                 borderRadius: "14px",
                                 fontWeight: 800,
                                 cursor: "pointer"

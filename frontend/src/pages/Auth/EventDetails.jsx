@@ -25,7 +25,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 export default function EventDetails() {
     const { eventId } = useParams();
     const navigate = useNavigate();
-    const { user } = useOutletContext();
+    const { user, syncTimestamp } = useOutletContext();
     const [event, setEvent] = useState(null);
     const [loading, setLoading] = useState(true);
     const [healthData, setHealthData] = useState(null);
@@ -80,7 +80,7 @@ export default function EventDetails() {
 
     useEffect(() => {
         fetchEventData();
-    }, [eventId, user]);
+    }, [eventId, user, syncTimestamp]);
 
     useEffect(() => {
         // Data-only effect, animations removed

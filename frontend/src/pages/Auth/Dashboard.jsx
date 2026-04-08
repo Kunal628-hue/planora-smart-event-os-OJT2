@@ -30,7 +30,7 @@ const AiAssistant = lazy(() => import("../../components/AiAssistant"));
 
 export default function Dashboard() {
     const navigate = useNavigate();
-    const { user, events, selectedEventId } = useOutletContext();
+    const { user, events, selectedEventId, syncTimestamp, addNotification } = useOutletContext();
     const [healthData, setHealthData] = useState(null);
     const [risks, setRisks] = useState([]);
     const [budgetOpts, setBudgetOpts] = useState([]);
@@ -61,6 +61,20 @@ export default function Dashboard() {
             setHealthData(health);
             setRisks(riskData);
             setBudgetOpts(budgetData);
+            
+            // Comprehensive Alert Logic
+            if (health) {
+                if (health.metrics.overdueTasks > 0) {
+                    addNotification("Operational Lag", `You have ${health.metrics.overdueTasks} overdue tasks in this event context.`);
+                }
+                if (health.summary === "Critical" || health.summary === "At Risk") {
+                    addNotification("Health Warning", `Event health state is currently '${health.summary}'. Intervention required.`);
+                }
+            }
+
+            if (riskData.some(r => r.impact === "High")) {
+                addNotification("Risk Alert", "High-impact risk factors identified. Review the Intelligence Board.");
+            }
 
             const event = events.find(e => (e.id || e._id) === eventId);
             if (event) {
@@ -72,6 +86,19 @@ export default function Dashboard() {
                 const vendorData = vendorRes.ok ? await vendorRes.json() : [];
                 setTimeline(timelineData);
                 setVendors(vendorData);
+
+                // Budget & Deadline Checks
+                const daysLeft = getDaysToEvent(event.date);
+                if (daysLeft > 0 && daysLeft <= 7) {
+                    addNotification("Approaching Deadline", `${event.name} is only ${daysLeft} days away. Finalize all vendor logistics.`);
+                }
+
+                if (budgetData.length > 0) {
+                    const totalSpent = budgetData.reduce((sum, b) => sum + (parseInt(b.optimized) || 0), 0);
+                    if (totalSpent > (parseInt(event.budget) || 0)) {
+                        addNotification("Budget Exceeded", `Total allocation (₹${totalSpent}) exceeds defined budget for this event.`);
+                    }
+                }
             }
 
         } catch (err) {
@@ -88,7 +115,7 @@ export default function Dashboard() {
         } else if (events.length === 0) {
             setLoading(false);
         }
-    }, [selectedEventId, events]);
+    }, [selectedEventId, events, syncTimestamp]);
 
     const [selectedVendorModal, setSelectedVendorModal] = useState(null);
 

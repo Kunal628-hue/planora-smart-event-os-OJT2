@@ -6,7 +6,7 @@ import { Plus, ListTodo, Calendar, Clock, AlertCircle, Loader2, X, Edit2, Trash2
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Tasks() {
-    const { user, events, selectedEventId } = useOutletContext();
+    const { user, events, selectedEventId, addNotification } = useOutletContext();
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -82,6 +82,7 @@ export default function Tasks() {
                     eventId: selectedEventId
                 });
                 fetchData();
+                addNotification(editingTask ? "Milestone Updated" : "Milestone Created", `The directive '${newTask.title}' is now active.`);
             }
         } catch (err) {
             console.error("Failed to save task:", err);
@@ -107,6 +108,7 @@ export default function Tasks() {
             });
             if (response.ok) {
                 setTasks(tasks.filter(t => t._id !== taskId));
+                addNotification("Milestone Terminated", "Task has been removed from your active workflow.");
             }
         } catch (err) {
             console.error("Failed to delete task:", err);
@@ -123,6 +125,9 @@ export default function Tasks() {
             });
             if (response.ok) {
                 setTasks(tasks.map(t => t._id === taskId ? { ...t, status: newStatus } : t));
+                if (newStatus === "Completed") {
+                    addNotification("Objective Secured", "Target milestone has been marked as completed.");
+                }
             }
         } catch (err) {
             console.error("Failed to update status:", err);
@@ -404,7 +409,7 @@ export default function Tasks() {
                             </div>
                             <div style={{ display: "flex", gap: "1.25rem", marginTop: "1rem" }}>
                                 <button type="button" onClick={() => { setShowModal(false); setEditingTask(null); setNewTask({ title: "", dueDate: "", priority: "Medium", eventId: selectedEventId }); }} style={{ flex: 1, padding: "1.1rem", borderRadius: "14px", border: "none", background: "#f1f5f9", fontWeight: 800, cursor: "pointer" }}>Cancel</button>
-                                <button type="submit" style={{ flex: 2, padding: "1.1rem", borderRadius: "14px", border: "none", background: "#2563eb", color: "#fff", fontWeight: 900, cursor: "pointer", boxShadow: "0 8px 20px rgba(37, 99, 235, 0.2)" }}>{editingTask ? "Save Changes" : "Create Milestone"}</button>
+                                <button type="submit" style={{ flex: 2, padding: "1.1rem", borderRadius: "14px", border: "none", background: "#2563eb", color: "#fff", fontWeight: 900, cursor: "pointer", boxShadow: "0 8px 20px rgba(37, 99, 235, 0.2)" }}>{editingTask ? "Update Milestone" : "Create Milestone"}</button>
                             </div>
                         </form>
                     </div>

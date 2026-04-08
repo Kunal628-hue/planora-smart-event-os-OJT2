@@ -152,20 +152,6 @@ export default function Settings() {
                             </div>
                         </div>
 
-                        <button
-                            onClick={handleSynchronize}
-                            style={{
-                                marginTop: "1rem", width: "100%", padding: "12px",
-                                background: "#1e293b",
-                                border: "none", borderRadius: "8px", color: "#fff",
-                                fontSize: "14px", fontWeight: 700,
-                                display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
-                                cursor: "pointer"
-                            }} className="save-btn"
-                        >
-                            <RefreshCw size={16} />
-                            Save Changes
-                        </button>
                     </div>
                 </div>
 

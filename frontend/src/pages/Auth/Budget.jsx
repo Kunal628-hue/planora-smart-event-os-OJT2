@@ -12,14 +12,17 @@ import {
     ArrowRight,
     PieChart,
     Calendar,
-    ArrowUpRight
+    ArrowUpRight,
+    Edit2,
+    Trash2
 } from "lucide-react";
 
 export default function Budget() {
-    const { user, events, selectedEventId } = useOutletContext();
+    const { user, events, selectedEventId, addNotification } = useOutletContext();
     const [vendors, setVendors] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
+    const [editingExpense, setEditingExpense] = useState(null);
     const [newExpense, setNewExpense] = useState({
         name: "",
         service: "Catering",
@@ -86,8 +89,13 @@ export default function Budget() {
     const handleAddExpense = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/vendors`, {
-                method: "POST",
+            const method = editingExpense ? "PATCH" : "POST";
+            const url = editingExpense 
+                ? `${import.meta.env.VITE_API_URL}/vendors/${editingExpense._id}`
+                : `${import.meta.env.VITE_API_URL}/vendors`;
+
+            const response = await fetch(url, {
+                method,
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     ...newExpense,
@@ -98,12 +106,39 @@ export default function Budget() {
             });
             if (response.ok) {
                 setShowModal(false);
+                setEditingExpense(null);
                 setNewExpense({ name: "", service: "Catering", cost: "" });
                 fetchData();
+                addNotification(editingExpense ? "Ledger Updated" : "Expense Logged", `Financial entry for '${newExpense.name}' has been processed.`);
             }
         } catch (err) {
             console.error("Add expense failed:", err);
         }
+    };
+
+    const handleDeleteExpense = async (id) => {
+        if (!window.confirm("Are you sure you want to purge this financial entry?")) return;
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/vendors/${id}`, {
+                method: "DELETE"
+            });
+            if (response.ok) {
+                fetchData();
+                addNotification("Entry Purged", "The selected transaction has been removed from the ledger.");
+            }
+        } catch (err) {
+            console.error("Delete failed:", err);
+        }
+    };
+
+    const openEditModal = (expense) => {
+        setEditingExpense(expense);
+        setNewExpense({
+            name: expense.name,
+            service: expense.service,
+            cost: expense.cost
+        });
+        setShowModal(true);
     };
 
 
@@ -252,12 +287,13 @@ export default function Budget() {
                                     <th style={{ padding: "0.85rem 1rem", fontSize: "10px", fontWeight: 850, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em" }}>Category</th>
                                     <th style={{ padding: "0.85rem 1rem", fontSize: "10px", fontWeight: 850, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em" }}>Timestamp</th>
                                     <th style={{ padding: "0.85rem 1rem", fontSize: "10px", fontWeight: 850, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em", textAlign: "right" }}>Valuation</th>
+                                    <th style={{ padding: "0.85rem 1rem", fontSize: "10px", fontWeight: 850, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em", textAlign: "right" }}>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {eventVendors.length === 0 ? (
                                     <tr>
-                                        <td colSpan="4" style={{ padding: "6rem", textAlign: "center", color: "#94a3b8", fontWeight: 700, fontStyle: "italic" }}>No transactional logs found in current context.</td>
+                                        <td colSpan="5" style={{ padding: "6rem", textAlign: "center", color: "#94a3b8", fontWeight: 700, fontStyle: "italic" }}>No transactional logs found in current context.</td>
                                     </tr>
                                 ) : (
                                     eventVendors.map((v, idx) => (
@@ -269,6 +305,12 @@ export default function Budget() {
                                             <td style={{ padding: "0 1rem", fontSize: "12px", fontWeight: 700, color: "#64748b" }}>{v.service}</td>
                                             <td style={{ padding: "0 1rem", fontSize: "12px", fontWeight: 600, color: "#94a3b8" }}>{new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</td>
                                             <td style={{ padding: "0 1rem", fontSize: "12px", fontWeight: 850, color: "#0f172a", textAlign: "right" }}>₹{v.cost.toLocaleString()}</td>
+                                            <td style={{ padding: "0 1rem", textAlign: "right" }}>
+                                                <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+                                                    <button onClick={() => openEditModal(v)} style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer", padding: "4px" }}><Edit2 size={14} /></button>
+                                                    <button onClick={() => handleDeleteExpense(v._id)} style={{ background: "none", border: "none", color: "#ef444490", cursor: "pointer", padding: "4px" }}><Trash2 size={14} /></button>
+                                                </div>
+                                            </td>
                                         </tr>
                                     ))
                                 )}
@@ -314,7 +356,7 @@ export default function Budget() {
                             </div>
                             <div style={{ display: "flex", gap: "1.25rem", marginTop: "1rem" }}>
                                 <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, padding: "1rem", borderRadius: "14px", border: "none", background: "#f1f5f9", fontWeight: 800, cursor: "pointer" }}>Cancel</button>
-                                <button type="submit" style={{ flex: 1.5, padding: "1rem", borderRadius: "14px", border: "none", background: "#2563eb", color: "#fff", fontWeight: 900, cursor: "pointer", boxShadow: "0 10px 20px rgba(37, 99, 235, 0.2)" }}>Execute Entry</button>
+                                <button type="submit" style={{ flex: 1.5, padding: "1rem", borderRadius: "14px", border: "none", background: "#2563eb", color: "#fff", fontWeight: 900, cursor: "pointer", boxShadow: "0 10px 20px rgba(37, 99, 235, 0.2)" }}>{editingExpense ? "Update Entry" : "Execute Entry"}</button>
                             </div>
                         </form>
                     </div>

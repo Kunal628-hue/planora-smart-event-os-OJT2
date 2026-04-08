@@ -65,7 +65,7 @@ const CyberChartIllustration = ({ prompt, icon: Icon }) => (
 
 export default function Analytics() {
     const navigate = useNavigate();
-    const { user, events, selectedEventId } = useOutletContext();
+    const { user, events, selectedEventId, syncTimestamp } = useOutletContext();
     const [stats, setStats] = useState({
         visits: 0,
         confirmed: 0,
@@ -151,7 +151,7 @@ export default function Analytics() {
 
     useEffect(() => {
         fetchData();
-    }, [user, selectedEventId, events]);
+    }, [user, selectedEventId, events, syncTimestamp]);
 
     const maxVal = stats.rsvpTrend.length > 0 ? Math.max(...stats.rsvpTrend.map(t => Math.max(t.actual, t.projected))) * 1.2 : 100;
     const sparklinePoints = stats.rsvpTrend.map((v, i) => `${(i / (stats.rsvpTrend.length - 1)) * 400},${180 - (v.actual / maxVal) * 180}`).join(' ');
@@ -189,10 +189,6 @@ export default function Analytics() {
                 </div>
 
                 <div style={{ display: "flex", gap: "0.75rem" }}>
-                    <button onClick={fetchData} className="premium-btn-secondary">
-                        <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
-                        <span>Resync</span>
-                    </button>
                     <button className="premium-btn-primary">
                         <Share2 size={14} />
                         <span>Export</span>

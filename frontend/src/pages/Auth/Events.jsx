@@ -5,7 +5,7 @@ import { Plus, Calendar, MapPin, ChevronRight, Loader2, X, Sparkles, LayoutGrid,
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Events() {
-    const { user } = useOutletContext();
+    const { user, addNotification } = useOutletContext();
     const navigate = useNavigate();
     const [events, setEvents] = useState([]);
     const [fetchLoading, setFetchLoading] = useState(true);
@@ -53,6 +53,7 @@ export default function Events() {
             });
             if (response.ok) {
                 fetchEvents();
+                addNotification("Status Updated", `Event context transitioned to '${newStatus}'.`);
             }
         } catch (err) {
             console.error("Status update failed:", err);
@@ -86,6 +87,7 @@ export default function Events() {
                 setShowModal(false);
                 setNewEvent({ name: "", date: "", location: "", type: "Wedding", budget: "" });
                 fetchEvents();
+                addNotification("Event Created", `'${eventData.name}' has been successfully onboarded.`);
             } else {
                 const errorData = await response.json();
                 alert(`Error: ${errorData.message || "Failed to create event"}`);

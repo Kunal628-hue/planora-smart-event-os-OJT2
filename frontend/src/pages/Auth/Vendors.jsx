@@ -21,7 +21,7 @@ import {
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Vendors() {
-    const { user, events, selectedEventId } = useOutletContext();
+    const { user, events, selectedEventId, addNotification } = useOutletContext();
     const [vendors, setVendors] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -108,6 +108,7 @@ export default function Vendors() {
                     status: "Unpaid"
                 });
                 fetchData();
+                addNotification(editingVendor ? "Vendor Updated" : "Vendor Onboarded", `${formVendor.name} has been ${editingVendor ? "updated" : "added"} to your event logistics.`);
             }
         } catch (err) {
             console.error("Failed to save vendor:", err);
@@ -122,6 +123,7 @@ export default function Vendors() {
             });
             if (response.ok) {
                 setVendors(vendors.filter(v => v._id !== vendorId));
+                addNotification("Vendor Removed", "Service provider has been detached from your session.");
                 setActiveMenu(null);
             }
         } catch (err) {
