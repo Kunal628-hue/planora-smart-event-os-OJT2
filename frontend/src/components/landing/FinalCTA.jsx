@@ -32,7 +32,7 @@ export default function FinalCTA() {
   }, []);
 
   return (
-    <section ref={containerRef} style={{ background: "#FAFAFA", padding: "6rem 2.5rem 8rem", fontFamily: "'Inter', sans-serif" }}>
+    <section ref={containerRef} style={{ background: "#050505", padding: "6rem 2.5rem 8rem", fontFamily: "'Inter', sans-serif" }}>
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes mesh-drift {
           0% { transform: translate(-50%, -50%) scale(1); }
@@ -60,19 +60,21 @@ export default function FinalCTA() {
           animation: button-shine 5s infinite;
         }
       `}} />
-      <div 
+        <div 
         ref={cardRef}
         style={{
           maxWidth: 1200,
           margin: "0 auto",
-          background: "#111827",
+          background: "rgba(255,255,255,0.02)",
           borderRadius: "2rem",
           padding: "6rem 2rem",
           color: "#fff",
           textAlign: "center",
-          boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)",
+          boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)",
+          border: "1px solid rgba(255,255,255,0.05)",
           position: "relative",
-          overflow: "hidden"
+          overflow: "hidden",
+          backdropFilter: "blur(20px)"
         }}
       >
         {/* Subtle background glow mimicking video's deep layout */}

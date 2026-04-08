@@ -156,7 +156,7 @@ export default function Connect() {
   }, []);
 
   return (
-    <section ref={containerRef} id="testimonials" style={{ background: "#FAFAFA", padding: "8rem 0 0", fontFamily: "'Inter', sans-serif" }}>
+    <section ref={containerRef} id="testimonials" style={{ background: "#050505", padding: "8rem 0 0", fontFamily: "'Inter', sans-serif" }}>
       
       {/* Upper Grid Section */}
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 2.5rem", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", alignItems: "center", marginBottom: "8rem" }}>
@@ -165,7 +165,9 @@ export default function Connect() {
         <div>
           <div style={{
             display: "inline-block",
-            background: "#E5E7EB", color: "#374151",
+            background: "rgba(255,255,255,0.05)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            color: "#E5E7EB",
             padding: "0.4rem 1rem", borderRadius: "999px",
             fontSize: "0.75rem", fontWeight: 700,
             textTransform: "uppercase", letterSpacing: "0.05em",
@@ -175,13 +177,13 @@ export default function Connect() {
           </div>
           <h2 style={{
             fontSize: "clamp(2.2rem, 3.5vw, 3.2rem)",
-            fontWeight: 800, color: "#111827",
+            fontWeight: 800, color: "#fff",
             lineHeight: 1.1, letterSpacing: "-0.03em",
             marginBottom: "1.5rem"
           }}>
             From idea to execution in four steps.
           </h2>
-          <p style={{ fontSize: "1.05rem", color: "#6B7280", lineHeight: 1.6, maxWidth: 400 }}>
+          <p style={{ fontSize: "1.05rem", color: "#9CA3AF", lineHeight: 1.6, maxWidth: 400 }}>
             Planora guides you through every phase — so nothing slips through the cracks. Built to integrate seamlessly.
           </p>
         </div>
@@ -190,12 +192,13 @@ export default function Connect() {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
           {STEPS.map((step, i) => (
             <div key={i} className="step-card" style={{
-              background: "#fff",
+              background: "rgba(255,255,255,0.02)",
               borderRadius: "1.5rem",
               padding: "2rem",
-              border: "1px solid rgba(0,0,0,0.06)",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.04)",
-              position: "relative"
+              border: "1px solid rgba(255,255,255,0.05)",
+              boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+              position: "relative",
+              backdropFilter: "blur(10px)"
             }}>
               <div style={{ fontSize: "2.5rem", fontWeight: 900, color: `rgba(${step.colorRgb}, 0.1)`, position: "absolute", top: "1.5rem", right: "1.5rem", lineHeight: 1 }}>
                 {step.number}
@@ -208,15 +211,15 @@ export default function Connect() {
               }}>
                 {step.icon}
               </div>
-              <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#111827", marginBottom: "0.5rem" }}>{step.title}</h3>
-              <p style={{ fontSize: "0.85rem", color: "#6B7280", lineHeight: 1.6 }}>{step.desc}</p>
+              <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#fff", marginBottom: "0.5rem" }}>{step.title}</h3>
+              <p style={{ fontSize: "0.85rem", color: "#9CA3AF", lineHeight: 1.6 }}>{step.desc}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* Marquee Section mapped from Trust */}
-      <div style={{ padding: "5rem 0", background: "#fff", position: "relative", overflow: "hidden", borderTop: "1px solid rgba(0,0,0,0.03)" }}>
+      <div style={{ padding: "5rem 0", background: "#0D0D0D", position: "relative", overflow: "hidden", borderTop: "1px solid rgba(255,255,255,0.03)" }}>
         
         <style dangerouslySetInnerHTML={{__html: `
           @keyframes scroll-left {
@@ -249,13 +252,13 @@ export default function Connect() {
             gap: 1.2rem;
             padding: 0.8rem 1.6rem 0.8rem 0.8rem;
             border-radius: 100px;
-            background: #ffffff;
-            border: 1px solid rgba(0,0,0,0.06);
-            color: #374151;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #D1D5DB;
             flex-shrink: 0;
             cursor: default;
             transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
           }
           .trust-badge:hover {
             transform: translateY(-4px) scale(1.03);
@@ -265,8 +268,8 @@ export default function Connect() {
         `}} />
 
         {/* Fade Edges */}
-        <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "20%", background: "linear-gradient(90deg, #fff 10%, transparent)", zIndex: 10, pointerEvents: "none" }} />
-        <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: "20%", background: "linear-gradient(-90deg, #fff 10%, transparent)", zIndex: 10, pointerEvents: "none" }} />
+        <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "20%", background: "linear-gradient(90deg, #0D0D0D 10%, transparent)", zIndex: 10, pointerEvents: "none" }} />
+        <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: "20%", background: "linear-gradient(-90deg, #0D0D0D 10%, transparent)", zIndex: 10, pointerEvents: "none" }} />
 
         <div style={{ textAlign: "center", marginBottom: "3rem", zIndex: 1, position: "relative" }}>
           <p style={{ fontSize: "0.85rem", fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase", color: "#9CA3AF" }}>

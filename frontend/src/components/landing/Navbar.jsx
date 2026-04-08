@@ -32,28 +32,28 @@ export default function Navbar() {
           padding: 0.45rem 1rem;
           font-size: 0.9rem;
           font-weight: 500;
-          color: #374151;
+          color: #D1D5DB;
           border-radius: 0.5rem;
           transition: color 0.2s, background 0.2s;
           text-decoration: none;
           letter-spacing: -0.01em;
         }
         .lp-nav-link:hover {
-          color: #111827;
-          background: rgba(17,24,39,0.06);
+          color: #FFFFFF;
+          background: rgba(255,255,255,0.06);
         }
         .lp-login-link {
           padding: 0.45rem 1.1rem;
           font-size: 0.875rem;
           font-weight: 600;
-          color: #374151;
+          color: #D1D5DB;
           border-radius: 0.6rem;
           transition: color 0.2s, background 0.2s;
           text-decoration: none;
         }
         .lp-login-link:hover {
-          color: #111827;
-          background: rgba(17,24,39,0.06);
+          color: #FFFFFF;
+          background: rgba(255,255,255,0.06);
         }
         .lp-cta-btn {
           display: inline-flex;
@@ -62,8 +62,8 @@ export default function Navbar() {
           padding: 0.55rem 1.3rem;
           font-size: 0.875rem;
           font-weight: 700;
-          color: #fff;
-          background: #111827;
+          color: #000;
+          background: #fff;
           border-radius: 999px;
           text-decoration: none;
           border: none;
@@ -90,12 +90,12 @@ export default function Navbar() {
           backdropFilter: scrolled ? "blur(20px) saturate(180%)" : "none",
           WebkitBackdropFilter: scrolled ? "blur(20px) saturate(180%)" : "none",
           background: scrolled
-            ? "rgba(255,255,255,0.88)"
+            ? "rgba(10,10,10,0.85)"
             : "transparent",
           borderBottom: scrolled
-            ? "1px solid rgba(0,0,0,0.07)"
+            ? "1px solid rgba(255,255,255,0.07)"
             : "1px solid transparent",
-          boxShadow: scrolled ? "0 2px 24px rgba(0,0,0,0.06)" : "none",
+          boxShadow: scrolled ? "0 2px 24px rgba(0,0,0,0.4)" : "none",
           transition: "background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, backdrop-filter 0.35s ease",
         }}
       >
@@ -116,7 +116,7 @@ export default function Navbar() {
             <img
               src="/logo-new.svg"
               alt="Planora Logo"
-              style={{ height: "2.4rem", width: "auto", display: "block" }}
+              style={{ height: "2.4rem", width: "auto", display: "block", filter: "invert(1) brightness(2)" }}
             />
           </Link>
 

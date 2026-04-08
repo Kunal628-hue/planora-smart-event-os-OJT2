@@ -14,20 +14,20 @@ const FEATURES = [
     title: "Smart Event Planning",
     desc: "Build event timelines, assign milestones, and track progress with an intelligent planning engine.",
     mockup: (
-      <div style={{ background: "#F9FAFB", borderRadius: "1rem", padding: "1.25rem", border: "1px solid #E5E7EB", marginTop: "2rem" }}>
-        <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "0.75rem", padding: "1rem", display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.75rem" }}>
+      <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: "1rem", padding: "1.25rem", border: "1px solid rgba(255,255,255,0.05)", marginTop: "2rem" }}>
+        <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "0.75rem", padding: "1rem", display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.75rem" }}>
           <div>
-            <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "#111827" }}>Venue Booking</div>
-            <div style={{ fontSize: "0.7rem", color: "#6B7280" }}>Due in 2 days</div>
+            <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "#fff" }}>Venue Booking</div>
+            <div style={{ fontSize: "0.7rem", color: "#9CA3AF" }}>Due in 2 days</div>
           </div>
-          <button style={{ background: "#111827", color: "#fff", border: "none", padding: "0.3rem 0.6rem", borderRadius: "4px", fontSize: "0.65rem", fontWeight: 600 }}>See More</button>
+          <button style={{ background: "#fff", color: "#000", border: "none", padding: "0.3rem 0.6rem", borderRadius: "4px", fontSize: "0.65rem", fontWeight: 600 }}>See More</button>
         </div>
-        <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: "0.75rem", padding: "1rem", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "0.75rem", padding: "1rem", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
-            <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "#111827" }}>Speaker Outreach</div>
-            <div style={{ fontSize: "0.7rem", color: "#6B7280" }}>On track</div>
+            <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "#fff" }}>Speaker Outreach</div>
+            <div style={{ fontSize: "0.7rem", color: "#9CA3AF" }}>On track</div>
           </div>
-          <div style={{ width: 24, height: 24, borderRadius: "50%", background: "#E5E7EB", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem" }}>✓</div>
+          <div style={{ width: 24, height: 24, borderRadius: "50%", background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem", color: "#fff" }}>✓</div>
         </div>
       </div>
     )
@@ -65,23 +65,23 @@ const FEATURES = [
     title: "Volunteer Coordination",
     desc: "Organize your team with role assignments and live visibility. No more chasing on WhatsApp.",
     mockup: (
-      <div style={{ background: "#F9FAFB", borderRadius: "1rem", padding: "1.5rem", border: "1px solid #E5E7EB", marginTop: "2rem", position: "relative" }}>
+      <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: "1rem", padding: "1.5rem", border: "1px solid rgba(255,255,255,0.05)", marginTop: "2rem", position: "relative" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-          <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "#111827" }}>Assign task to</div>
-          <span style={{ fontSize: "0.8rem", color: "#6B7280" }}>v</span>
+          <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "#fff" }}>Assign task to</div>
+          <span style={{ fontSize: "0.8rem", color: "#9CA3AF" }}>v</span>
         </div>
-        <div style={{ background: "#fff", borderRadius: "0.5rem", border: "1px solid #E5E7EB", padding: "0.5rem", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)" }}>
-          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", padding: "0.5rem", borderBottom: "1px solid #f3f4f6" }}>
+        <div style={{ background: "rgba(255,255,255,0.02)", borderRadius: "0.5rem", border: "1px solid rgba(255,255,255,0.05)", padding: "0.5rem", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.5)" }}>
+          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", padding: "0.5rem", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
             <div style={{ width: 24, height: 24, borderRadius: "50%", background: "#f87171" }} />
-            <span style={{ fontSize: "0.8rem", fontWeight: 500 }}>Mark Manson</span>
+            <span style={{ fontSize: "0.8rem", fontWeight: 500, color: "#D1D5DB" }}>Mark Manson</span>
           </div>
-          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", padding: "0.5rem", background: "#f3f4f6", borderRadius: "0.25rem" }}>
+          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", padding: "0.5rem", background: "rgba(255,255,255,0.05)", borderRadius: "0.25rem" }}>
             <div style={{ width: 24, height: 24, borderRadius: "50%", background: "#60a5fa" }} />
-            <span style={{ fontSize: "0.8rem", fontWeight: 600 }}>Karen William</span>
+            <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "#fff" }}>Karen William</span>
           </div>
           <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", padding: "0.5rem" }}>
             <div style={{ width: 24, height: 24, borderRadius: "50%", background: "#34d399" }} />
-            <span style={{ fontSize: "0.8rem", fontWeight: 500 }}>Niki M.</span>
+            <span style={{ fontSize: "0.8rem", fontWeight: 500, color: "#D1D5DB" }}>Niki M.</span>
           </div>
         </div>
       </div>
@@ -96,9 +96,9 @@ const FEATURES = [
     title: "Real-time Execution Dashboard",
     desc: "A mission control for your event — monitor RSVP trends, vendor status, and health scores as they happen.",
     mockup: (
-      <div style={{ background: "#F9FAFB", borderRadius: "1rem", padding: "1.25rem", border: "1px solid #E5E7EB", marginTop: "2rem" }}>
+      <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: "1rem", padding: "1.25rem", border: "1px solid rgba(255,255,255,0.05)", marginTop: "2rem" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-          <h3 style={{ fontSize: "0.9rem", fontWeight: 700, color: "#111827" }}>Live Health Score</h3>
+          <h3 style={{ fontSize: "0.9rem", fontWeight: 700, color: "#fff" }}>Live Health Score</h3>
         </div>
         <div style={{ position: "relative", height: 80 }}>
           <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 100 40">
@@ -108,7 +108,7 @@ const FEATURES = [
           </svg>
           <div style={{ position: "absolute", right: "2%", top: "-10%", background: "#10B981", color: "#fff", fontSize: "0.6rem", padding: "0.2rem 0.5rem", borderRadius: "4px", fontWeight: 600, boxShadow: "0 2px 4px rgba(16,185,129,0.3)" }}>Excellent</div>
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1rem", fontSize: "0.75rem", color: "#6B7280" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1rem", fontSize: "0.75rem", color: "#9CA3AF" }}>
           <span>10:00 AM</span>
           <span>12:00 PM</span>
           <span>Now</span>
@@ -159,7 +159,7 @@ export default function Features() {
   return (
     <section ref={containerRef} id="features" style={{
       padding: "8rem 0",
-      background: "#FAFAFA",
+      background: "#050505",
       fontFamily: "'Inter', sans-serif"
     }}>
       <style dangerouslySetInnerHTML={{__html: `
@@ -189,7 +189,9 @@ export default function Features() {
         <div ref={headerRef} style={{ marginBottom: "5rem" }}>
           <div style={{
             display: "inline-block",
-            background: "#E5E7EB", color: "#374151",
+            background: "rgba(255,255,255,0.05)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            color: "#E5E7EB",
             padding: "0.4rem 1rem", borderRadius: "999px",
             fontSize: "0.75rem", fontWeight: 700,
             textTransform: "uppercase", letterSpacing: "0.05em",
@@ -199,13 +201,13 @@ export default function Features() {
           </div>
           <h2 style={{
             fontSize: "clamp(2.2rem, 4vw, 3.5rem)",
-            fontWeight: 800, color: "#111827",
+            fontWeight: 800, color: "#fff",
             lineHeight: 1.1, letterSpacing: "-0.03em",
             maxWidth: 800, marginBottom: "1.5rem"
           }}>
             Everything you need to run a flawless event.
           </h2>
-          <p style={{ fontSize: "1.05rem", color: "#6B7280", lineHeight: 1.6, maxWidth: 600 }}>
+          <p style={{ fontSize: "1.05rem", color: "#9CA3AF", lineHeight: 1.6, maxWidth: 600 }}>
             Planora is purpose-built for event organizers — combining the depth of enterprise tools with the speed you need on the ground.
           </p>
         </div>
@@ -222,16 +224,17 @@ export default function Features() {
               ref={el => cardsRef.current[i] = el}
               className="feature-card"
               style={{
-                background: "#fff",
+                background: "rgba(255,255,255,0.02)",
                 borderRadius: "1.5rem",
                 padding: "3rem",
-                border: "1px solid rgba(0,0,0,0.05)",
-                boxShadow: "0 10px 30px -10px rgba(0,0,0,0.05)",
+                border: "1px solid rgba(255,255,255,0.05)",
+                boxShadow: "0 10px 30px -10px rgba(0,0,0,0.5)",
                 display: "flex",
                 flexDirection: "column",
                 gap: "2rem",
                 position: "relative",
-                overflow: "hidden"
+                overflow: "hidden",
+                backdropFilter: "blur(10px)"
               }}
             >
               <div>
@@ -244,11 +247,11 @@ export default function Features() {
                 </div>
               </div>
               
-              <h3 style={{ fontSize: "1.5rem", fontWeight: 700, color: "#111827", marginBottom: "1rem", letterSpacing: "-0.02em" }}>
+              <h3 style={{ fontSize: "1.5rem", fontWeight: 700, color: "#fff", marginBottom: "1rem", letterSpacing: "-0.02em" }}>
                 {f.title}
               </h3>
               
-              <p style={{ fontSize: "0.95rem", color: "#6B7280", lineHeight: 1.6, marginBottom: "1.5rem", flex: 1 }}>
+              <p style={{ fontSize: "0.95rem", color: "#9CA3AF", lineHeight: 1.6, marginBottom: "1.5rem", flex: 1 }}>
                 {f.desc}
               </p>
 
