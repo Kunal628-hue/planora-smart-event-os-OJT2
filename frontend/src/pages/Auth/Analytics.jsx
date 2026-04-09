@@ -22,9 +22,10 @@ import {
     Shield,
     Download,
     FileText,
-    ChevronDown
+    ChevronDown,
+    AlertTriangle
 } from "lucide-react";
-import jsPDF from 'jspdf';
+import { jsPDF } from "jspdf";
 import autoTable from 'jspdf-autotable';
 
 /**
@@ -70,7 +71,9 @@ const CyberChartIllustration = ({ prompt, icon: Icon }) => (
 
 export default function Analytics() {
     const navigate = useNavigate();
-    const { user, events, selectedEventId, syncTimestamp } = useOutletContext();
+    const { user, events, selectedEventId, syncTimestamp, addNotification } = useOutletContext();
+    const [filteredGuests, setFilteredGuests] = useState([]);
+    const [filteredVendors, setFilteredVendors] = useState([]);
     const [stats, setStats] = useState({
         visits: 0,
         confirmed: 0,
@@ -94,21 +97,25 @@ export default function Analytics() {
             const guestsData = await guestsRes.json();
 
             const filteredEvents = selectedEventId ? events.filter(e => (e.id || e._id) === selectedEventId) : events;
-            const filteredGuests = selectedEventId ? guestsData.filter(g => g.event === selectedEventId) : guestsData;
+            const currentGuests = selectedEventId ? guestsData.filter(g => (g.event?._id || g.event) === selectedEventId) : guestsData;
+            const currentVendors = selectedEventId ? vendorsData.filter(v => (v.event?._id || v.event) === selectedEventId) : vendorsData;
+            
+            setFilteredGuests(currentGuests);
+            setFilteredVendors(currentVendors);
 
             const totalRevenue = filteredEvents.reduce((sum, e) => sum + (parseFloat(e.budget) || 0), 0);
-            const totalConfirmed = filteredGuests.filter(g => g.status === "Confirmed").length;
-            const checkInRate = filteredGuests.length > 0 ? Math.round((totalConfirmed / filteredGuests.length) * 100) : 0;
+            const totalConfirmed = currentGuests.filter(g => g.status === "Confirmed").length;
+            const checkInRate = currentGuests.length > 0 ? Math.round((totalConfirmed / currentGuests.length) * 100) : 0;
 
-            const trend = filteredGuests.length > 0 ? [24, 52, 38, 71, 55, 88, 82] : [0, 0, 0, 0, 0, 0, 0];
+            const trend = currentGuests.length > 0 ? [24, 52, 38, 71, 55, 88, 82] : [0, 0, 0, 0, 0, 0, 0];
 
-            const channels = filteredGuests.length > 0 ? Object.entries(filteredGuests.reduce((acc, g) => {
+            const channels = currentGuests.length > 0 ? Object.entries(currentGuests.reduce((acc, g) => {
                 const cat = g.category || "General";
                 acc[cat] = (acc[cat] || 0) + 1;
                 return acc;
             }, {})).map(([name, count]) => ({
                 name,
-                value: Math.round((count / (filteredGuests.length || 1)) * 100),
+                value: Math.round((count / (currentGuests.length || 1)) * 100),
                 color: name === "VIP" ? "#f59e0b" : name === "Business" ? "#3b82f6" : "#10b981"
             })) : [];
 
@@ -117,7 +124,7 @@ export default function Analytics() {
             const dailyCounts = { "Mon": 0, "Tue": 0, "Wed": 0, "Thu": 0, "Fri": 0, "Sat": 0, "Sun": 0 };
             const daysMap = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-            filteredGuests.forEach(g => {
+            currentGuests.forEach(g => {
                 if (g.status === "Confirmed" && g.createdAt) {
                     const date = new Date(g.createdAt);
                     const dayName = daysMap[date.getDay()];
@@ -140,7 +147,7 @@ export default function Analytics() {
             });
 
             setStats({
-                visits: filteredGuests.length,
+                visits: currentGuests.length,
                 confirmed: totalConfirmed,
                 checkInRate,
                 revenue: totalRevenue,
@@ -183,52 +190,203 @@ export default function Analytics() {
     const [showExportMenu, setShowExportMenu] = useState(false);
 
     const handleExportCSV = () => {
-        if (!filteredGuests.length) return;
-        const headers = ["Name", "Email", "Status", "Category", "Event"];
-        const rows = filteredGuests.map(g => [
-            g.name,
-            g.email,
-            g.status,
-            g.category || "General",
-            events.find(e => (e.id || e._id) === (g.event?._id || g.event))?.name || "N/A"
-        ]);
-        
-        const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.setAttribute("href", url);
-        link.setAttribute("download", `planora_attendees_${new Date().toISOString().split('T')[0]}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        setShowExportMenu(false);
+        try {
+            console.log("CSV Export triggered", { count: filteredGuests?.length });
+            if (!filteredGuests || filteredGuests.length === 0) {
+                if (addNotification) addNotification("Export Denied", "No attendee records found.");
+                setShowExportMenu(false);
+                return;
+            }
+
+            const headers = ["Name", "Email", "WhatsApp", "Status", "Category", "Event"];
+            const safeEvents = events || [];
+            
+            const rows = filteredGuests.map(g => [
+                `"${(g.name || "").replace(/"/g, '""')}"`,
+                `"${(g.email || "").replace(/"/g, '""')}"`,
+                `"${(g.whatsapp || "N/A").replace(/"/g, '""')}"`,
+                `"${(g.status || "").replace(/"/g, '""')}"`,
+                `"${(g.category || "General").replace(/"/g, '""')}"`,
+                `"${(safeEvents.find(e => (e.id || e._id) === (g.event?._id || g.event))?.name || "N/A").replace(/"/g, '""')}"`
+            ]);
+            
+            const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `planora_attendees_${new Date().getTime()}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            setShowExportMenu(false);
+            
+            if (addNotification) addNotification("Sync Complete", "Attendee data exported successfully.");
+        } catch (err) {
+            console.error("CSV Export failed:", err);
+            if (addNotification) addNotification("Export Error", "A critical error occurred during CSV generation.");
+        }
     };
 
     const handleExportPDF = () => {
-        if (!filteredGuests.length) return;
-        const doc = new jsPDF();
-        doc.text("Planora Attendee Intelligence Report", 14, 15);
-        doc.setFontSize(10);
-        doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 22);
-        
-        autoTable(doc, {
-            startY: 30,
-            head: [["Name", "Email", "Status", "Category", "Event"]],
-            body: filteredGuests.map(g => [
-                g.name,
-                g.email,
-                g.status,
-                g.category || "General",
-                events.find(e => (e.id || e._id) === (g.event?._id || g.event))?.name || "N/A"
-            ]),
-            theme: 'striped',
-            headStyles: { fillColor: [37, 99, 235] }
-        });
-        
-        doc.save(`planora_report_${new Date().toISOString().split('T')[0]}.pdf`);
-        setShowExportMenu(false);
+        try {
+            console.log("PDF Export triggered", { count: filteredGuests?.length });
+            if (!filteredGuests || filteredGuests.length === 0) {
+                if (addNotification) addNotification("Export Denied", "No data available for PDF.");
+                setShowExportMenu(false);
+                return;
+            }
+
+            const DocConstructor = jsPDF.jsPDF || jsPDF;
+            const doc = new DocConstructor();
+            const safeEvents = events || [];
+            const activeEventName = selectedEventId ? safeEvents.find(e => (e.id || e._id) === selectedEventId)?.name : "Full Portfolio";
+
+            // Header & Branding
+            doc.setFillColor(15, 23, 42); // Navy Blue
+            doc.rect(0, 0, 210, 40, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(22);
+            doc.setFont("helvetica", "bold");
+            doc.text("PLANORA STRATEGIC REPORT", 14, 25);
+            
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.text(`Project Intelligence: ${activeEventName}`, 14, 32);
+            doc.text(`Generated: ${new Date().toLocaleString()}`, 196, 32, { align: "right" });
+
+            // 1. Executive Summary Section
+            doc.setTextColor(15, 23, 42);
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            doc.text("EXECUTIVE PERFORMANCE SUMMARY", 14, 55);
+            
+            doc.setDrawColor(37, 99, 235);
+            doc.line(14, 58, 196, 58);
+
+            const kpis = [
+                ["Performance Metric", "Observed Value", "Strategic Status"],
+                ["Total Audience Outreach", stats.visits.toLocaleString('en-IN'), "Active Operation"],
+                ["Gross Conversion (RSVPs)", stats.confirmed.toLocaleString('en-IN'), `${stats.checkInRate}% Conversion Rate`],
+                ["Strategic Budget Allocation", `Rs. ${stats.revenue.toLocaleString('en-IN')}`, "Allocated"],
+                ["Operational Grip Index", `${stats.checkInRate}%`, "Stable Dynamics"]
+            ];
+
+            autoTable(doc, {
+                startY: 62,
+                head: [kpis[0]],
+                body: kpis.slice(1),
+                theme: 'grid',
+                styles: { fontSize: 10, cellPadding: 5 },
+                headStyles: { fillColor: [248, 250, 252], textColor: [15, 23, 42], fontStyle: 'bold' },
+                columnStyles: { 0: { cellWidth: 80 }, 1: { cellWidth: 50 }, 2: { cellWidth: 50 } }
+            });
+
+            // 2. RSVP Dynamics (Trajectory)
+            let lastY = doc.lastAutoTable.finalY + 15;
+            doc.setFontSize(14);
+            doc.text("OPERATIONAL TRAJECTORY (7-DAY TREND)", 14, lastY);
+            doc.line(14, lastY + 3, 196, lastY + 3);
+
+            autoTable(doc, {
+                startY: lastY + 7,
+                head: [["Timeline Day", "Actual RSVPs", "Projected Target", "Delta Variance"]],
+                body: stats.rsvpTrend.map(t => [
+                    t.day,
+                    t.actual,
+                    t.projected,
+                    `${t.actual >= t.projected ? '+' : ''}${t.actual - t.projected}`
+                ]),
+                theme: 'striped',
+                headStyles: { fillColor: [15, 23, 42] },
+                styles: { fontSize: 9 }
+            });
+
+            // 3. Audience Segmentation
+            lastY = doc.lastAutoTable.finalY + 15;
+            if (lastY > 230) { doc.addPage(); lastY = 20; }
+            doc.setFontSize(14);
+            doc.text("AUDIENCE SEGMENTATION ANALYSIS", 14, lastY);
+            doc.line(14, lastY + 3, 196, lastY + 3);
+
+            autoTable(doc, {
+                startY: lastY + 7,
+                head: [["Segment Category", "Share Percentage", "Strategic Impact"]],
+                body: stats.channels.map(ch => [
+                    ch.name,
+                    `${ch.value}%`,
+                    ch.value > 30 ? "Primary Driver" : ch.value > 10 ? "Secondary Segment" : "Niche Audience"
+                ]),
+                theme: 'grid',
+                headStyles: { fillColor: [51, 65, 85] },
+                styles: { fontSize: 9 }
+            });
+
+            // 4. Attendee Intelligence (Detailed Directory)
+            lastY = doc.lastAutoTable.finalY + 15;
+            if (lastY > 230) { doc.addPage(); lastY = 20; }
+            doc.setFontSize(14);
+            doc.text("DETAILED ATTENDEE DIRECTORY", 14, lastY);
+            doc.line(14, lastY + 3, 196, lastY + 3);
+
+            autoTable(doc, {
+                startY: lastY + 7,
+                head: [["Identity Name", "Digital Contact (Email)", "Direct WhatsApp", "RSVP Status", "Classification"]],
+                body: filteredGuests.map(g => [
+                    g.name || "N/A",
+                    g.email || "N/A",
+                    g.whatsapp || "N/A",
+                    g.status || "Unknown",
+                    g.category || "General"
+                ]),
+                theme: 'striped',
+                headStyles: { fillColor: [37, 99, 235] },
+                styles: { fontSize: 8 }
+            });
+
+            // 5. Vendor Ecosystem Section (If data exists)
+            if (filteredVendors && filteredVendors.length > 0) {
+                lastY = doc.lastAutoTable.finalY + 15;
+                if (lastY > 230) { doc.addPage(); lastY = 20; }
+                
+                doc.setFontSize(14);
+                doc.text("STRATEGIC VENDOR ECOSYSTEM", 14, lastY);
+                doc.line(14, lastY + 3, 196, lastY + 3);
+
+                autoTable(doc, {
+                    startY: lastY + 7,
+                    head: [["Service Provider", "Domain Type", "Contract Value", "Ledger Status"]],
+                    body: filteredVendors.map(v => [
+                        v.name || "N/A",
+                        v.service || "General",
+                        `Rs. ${parseInt(v.cost || 0).toLocaleString('en-IN')}`,
+                        v.status || "Pending"
+                    ]),
+                    theme: 'grid',
+                    headStyles: { fillColor: [15, 23, 42] },
+                    styles: { fontSize: 9 }
+                });
+            }
+
+            // Footer
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.setTextColor(148, 163, 184);
+                doc.text(`Planora Strategic Intelligence OS | ${activeEventName} | Internal Confidence | Page ${i} of ${pageCount}`, 105, 290, { align: "center" });
+            }
+
+            doc.save(`planora_intelligence_${new Date().getTime()}.pdf`);
+            setShowExportMenu(false);
+            
+            if (addNotification) addNotification("Report Ready", "Strategic PDF has been generated and saved.");
+        } catch (err) {
+            console.error("PDF Export failed:", err);
+            if (addNotification) addNotification("Export Error", "PDF engine encountered a synchronization fault.");
+        }
     };
 
     return (
