@@ -46,21 +46,21 @@ export default function EventDetails() {
         if (!eventId || !user) return;
         try {
             const [eventRes, healthRes, riskRes] = await Promise.all([
-                fetch(`${API_URL}/events/${eventId}`),
+                fetch(`${API_URL}/events/${eventId}?user=${user.uid}&email=${user.email}`),
                 fetch(`${API_URL}/ai/health/${eventId}`),
                 fetch(`${API_URL}/ai/risk/${eventId}`)
             ]);
 
-            if (!eventRes.ok) throw new Error("Event not found");
+            if (!eventRes.ok) {
+                if (eventRes.status === 403) {
+                    addNotification("Access Restricted", "You do not have the clearance levels required for this tactical grid.");
+                }
+                throw new Error("Unauthorized or Event not found");
+            }
 
             const eventData = await eventRes.json();
             const health = await healthRes.json();
             const riskData = await riskRes.json();
-
-            if (eventData.userId !== user.uid && eventData.user !== user.uid) {
-                navigate("/events");
-                return;
-            }
 
             setEvent(eventData);
             setHealthData(health);

@@ -91,13 +91,26 @@ export const getEvents = async (req, res) => {
 };
 
 // @desc    Get a single event by ID
-// @route   GET /api/events/:id
+// @route   GET /api/events/:id?user=userId&email=email
 // @access  Public
 export const getEventById = async (req, res) => {
     try {
-        const event = await Event.findById(req.params.id);
+        const { user: userId, email: userEmail } = req.query;
+        const eventId = req.params.id;
+
+        const event = await Event.findById(eventId);
         if (!event) {
             return res.status(404).json({ message: "Event not found" });
+        }
+
+        // --- Strategic Access Verification ---
+        // We verify that the requesting entity has been granted operational visibility into this context.
+        if (userId) {
+            const allowedIds = await getAllowedEventIds(userId, userEmail);
+            if (!allowedIds.includes(eventId)) {
+                console.warn(`[Security Alert] Unauthorized access attempt by ${userEmail || userId} on event ${eventId}`);
+                return res.status(403).json({ message: "Unauthorized: Access to this operational context is restricted." });
+            }
         }
 
         // Format for frontend
