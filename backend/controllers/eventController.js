@@ -1,5 +1,7 @@
 import Event from "../models/Event.js";
 import Vendor from "../models/Vendor.js";
+import Profile from "../models/Profile.js";
+import Collaborator from "../models/Collaborator.js";
 import { getAllowedEventIds } from "../utils/authHelper.js";
 
 // @desc    Create a new event
@@ -38,8 +40,22 @@ export const getEvents = async (req, res) => {
 
         const allowedEventIds = await getAllowedEventIds(userId, userEmail);
 
-        console.log(`[Backend] Fetching events for IDs: ${allowedEventIds.join(', ')}`);
+        // --- Strategic Component: Profile & Team Leader Presence Synchronization ---
+        // When a Team Leader logs in, we ensure their contact intelligence is propagated to their team.
+        if (userId) {
+            const leaderProfile = await Profile.findOne({ user: userId });
+            if (leaderProfile && leaderProfile.whatsapp) {
+                console.log(`[Presence Intelligence] Synchronizing Team Leader contact (${leaderProfile.whatsapp}) across operational pool.`);
+                await Collaborator.updateMany(
+                    { user: userId },
+                    { $set: { inviterWhatsApp: leaderProfile.whatsapp } }
+                );
+            }
+        }
+
+        console.log(`[Backend Access Analytics] User: ${userEmail || userId} | Allowed Scope: [${allowedEventIds.join(', ')}]`);
         const events = await Event.find({ _id: { $in: allowedEventIds } }).sort({ createdAt: -1 });
+        console.log(`[Backend Access Analytics] Retrieved ${events.length} events from database.`);
 
         // Calculate actual spent for each event
         const eventIds = events.map(e => e._id);
@@ -62,11 +78,12 @@ export const getEvents = async (req, res) => {
             type: event.type || "Other",
             budget: event.budget,
             status: event.status,
-            userId: event.user,
+            user: event.user,
             spent: spendMap[event._id.toString()] || 0
         }));
 
         res.json(formattedEvents);
+        console.log(`[Backend Data Transmission] Sent ${formattedEvents.length} formatted events to client.`);
     } catch (error) {
         console.error("[Backend] Error in getEvents:", error);
         res.status(500).json({ message: "Failed to retrieve events. Check database connectivity.", error: error.message });
@@ -92,7 +109,7 @@ export const getEventById = async (req, res) => {
             type: event.type || "Other",
             budget: event.budget,
             status: event.status,
-            userId: event.user
+            user: event.user
         };
 
         res.json(formattedEvent);

@@ -15,7 +15,10 @@ import {
     Calendar,
     ArrowUpRight,
     Edit2,
-    Trash2
+    Trash2,
+    Upload,
+    FileText,
+    ExternalLink
 } from "lucide-react";
 
 export default function Budget() {
@@ -23,12 +26,14 @@ export default function Budget() {
     const { showConfirm } = useDialog();
     const [vendors, setVendors] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isUploading, setIsUploading] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [editingExpense, setEditingExpense] = useState(null);
     const [newExpense, setNewExpense] = useState({
         name: "",
         service: "Catering",
         cost: "",
+        receiptUrl: ""
     });
 
     const fetchData = async () => {
@@ -88,6 +93,32 @@ export default function Budget() {
             return acc;
         }, { total: 0, styles: [] }).styles.join(', ');
 
+    const handleFileUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setIsUploading(true);
+        const formData = new FormData();
+        formData.append("receipt", file);
+
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/upload/receipt`, {
+                method: "POST",
+                body: formData
+            });
+            const data = await res.json();
+            if (data.success) {
+                setNewExpense(prev => ({ ...prev, receiptUrl: data.url }));
+                addNotification("Document Sanitized", "Your financial proof has been securely uploaded to the registry.");
+            }
+        } catch (err) {
+            console.error("Upload failed:", err);
+            addNotification("Upload Protocol Failed", "We couldn't synchronize the evidence folder.");
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
     const handleAddExpense = async (e) => {
         e.preventDefault();
         try {
@@ -139,7 +170,8 @@ export default function Budget() {
         setNewExpense({
             name: expense.name,
             service: expense.service,
-            cost: expense.cost
+            cost: expense.cost,
+            receiptUrl: expense.receiptUrl || ""
         });
         setShowModal(true);
     };
@@ -307,7 +339,18 @@ export default function Budget() {
                                             <td style={{ padding: "0 1rem", fontSize: "12px", fontWeight: 600, color: "#94a3b8" }}>{new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</td>
                                             <td style={{ padding: "0 1rem", fontSize: "12px", fontWeight: 850, color: "#0f172a", textAlign: "right" }}>₹{v.cost.toLocaleString()}</td>
                                             <td style={{ padding: "0 1rem", textAlign: "right" }}>
-                                                <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+                                                <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end", alignItems: "center" }}>
+                                                    {v.receiptUrl && (
+                                                        <a 
+                                                            href={`${import.meta.env.VITE_API_URL}${v.receiptUrl}`} 
+                                                            target="_blank" 
+                                                            rel="noopener noreferrer"
+                                                            style={{ color: "#2563eb", padding: "4px", display: "flex" }}
+                                                            title="View Receipt"
+                                                        >
+                                                            <FileText size={14} />
+                                                        </a>
+                                                    )}
                                                     <button onClick={() => openEditModal(v)} style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer", padding: "4px" }}><Edit2 size={14} /></button>
                                                     <button onClick={() => handleDeleteExpense(v._id)} style={{ background: "none", border: "none", color: "#ef444490", cursor: "pointer", padding: "4px" }}><Trash2 size={14} /></button>
                                                 </div>
@@ -354,6 +397,51 @@ export default function Budget() {
                                     <label style={{ display: "block", fontSize: "10px", fontWeight: 850, color: "#64748b", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Valuation (₹)</label>
                                     <input type="number" style={{ width: "100%", padding: "0.9rem", borderRadius: "14px", border: "1.5px solid #e2e8f0", fontSize: "14px", fontWeight: 850 }} placeholder="0" value={newExpense.cost} onChange={e => setNewExpense({ ...newExpense, cost: e.target.value })} required />
                                 </div>
+                            </div>
+
+                            <div style={{ 
+                                border: "2px dashed #e2e8f0", 
+                                borderRadius: "20px", 
+                                padding: "1.5rem",
+                                textAlign: "center",
+                                position: "relative",
+                                background: newExpense.receiptUrl ? "#f0f9ff" : "transparent",
+                                transition: "all 0.2s"
+                            }}>
+                                {isUploading ? (
+                                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+                                        <div className="animate-spin"><Upload size={20} color="#2563eb" /></div>
+                                        <span style={{ fontSize: "12px", fontWeight: 700, color: "#2563eb" }}>Uploading Digital Proof...</span>
+                                    </div>
+                                ) : newExpense.receiptUrl ? (
+                                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px" }}>
+                                        <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#2563eb" }}>
+                                            <FileText size={16} />
+                                        </div>
+                                        <div style={{ textAlign: "left" }}>
+                                            <div style={{ fontSize: "12px", fontWeight: 800, color: "#0369a1" }}>Proof Attached</div>
+                                            <div style={{ fontSize: "10px", color: "#0ea5e9", fontWeight: 600 }}>Click to replace file</div>
+                                        </div>
+                                        <input 
+                                            type="file" 
+                                            onChange={handleFileUpload}
+                                            style={{ position: "absolute", inset: 0, opacity: 0, cursor: "pointer" }}
+                                            accept="image/*,.pdf"
+                                        />
+                                    </div>
+                                ) : (
+                                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
+                                        <Upload size={20} color="#94a3b8" />
+                                        <div style={{ fontSize: "13px", fontWeight: 800, color: "#64748b" }}>Attach Receipt / Bill</div>
+                                        <div style={{ fontSize: "10px", color: "#94a3b8", fontWeight: 500 }}>PNG, JPG or PDF up to 5MB</div>
+                                        <input 
+                                            type="file" 
+                                            onChange={handleFileUpload}
+                                            style={{ position: "absolute", inset: 0, opacity: 0, cursor: "pointer" }}
+                                            accept="image/*,.pdf"
+                                        />
+                                    </div>
+                                )}
                             </div>
                             <div style={{ display: "flex", gap: "1.25rem", marginTop: "1rem" }}>
                                 <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, padding: "1rem", borderRadius: "14px", border: "none", background: "#f1f5f9", fontWeight: 800, cursor: "pointer" }}>Cancel</button>

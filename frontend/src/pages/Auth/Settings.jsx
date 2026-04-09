@@ -274,7 +274,7 @@ export default function Settings() {
                             </div>
                             <div>
                                 <h4 style={{ margin: 0, fontSize: "18px", fontWeight: 900, color: "#fff" }}>Security Protocol</h4>
-                                <p style={{ margin: "4px 0 0", fontSize: "13px", color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>Last login sync: 2 hours ago from Tokyo, JP</p>
+                                <p style={{ margin: "4px 0 0", fontSize: "13px", color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>Global identity sync active.</p>
                             </div>
                         </div>
                         <button 

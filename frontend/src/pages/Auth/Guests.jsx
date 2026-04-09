@@ -6,7 +6,7 @@ import { UserPlus, Users, Trash2, Mail, Briefcase, Loader2, X, Calendar, Phone }
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Guests() {
-    const { user, events, selectedEventId, syncTimestamp, addNotification } = useOutletContext();
+    const { user, events, selectedEventId, syncTimestamp, addNotification, hasFullAccess, hasEditorAccess } = useOutletContext();
     const { showConfirm } = useDialog();
     const [guests, setGuests] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -16,7 +16,7 @@ export default function Guests() {
         email: "",
         category: "Friend",
         status: "Pending",
-        eventId: "",
+        eventId: selectedEventId || "",
         whatsapp: ""
     });
 
@@ -66,12 +66,14 @@ export default function Guests() {
                 const guest = await response.json();
                 setShowModal(false);
                 
-                // Construct and trigger WhatsApp message if number exists
+                // --- App-Priority Redirection (Priority for Desktop App) ---
                 if (newGuest.whatsapp) {
                     const event = events.find(e => (e.id || e._id) === newGuest.eventId);
                     const senderName = user.displayName || "Management Team Member";
-                    const waMessage = encodeURIComponent(`Hi ${newGuest.name}, this is ${senderName} from the management team. You've been invited to "${event?.name || 'our event'}" on Planora! We've sent a detailed invite to your email. Please accept if you're interested!`);
-                    const waUrl = `https://wa.me/${newGuest.whatsapp.replace(/[^0-9]/g, "")}?text=${waMessage}`;
+                    const waMessage = encodeURIComponent(`Hi ${newGuest.name}, this is ${senderName}. You've been prioritized for the "${event?.name || 'Upcoming Project'}" on Planora OS. We've sent your official digital record to your email. Let's synchronize on the details!`);
+                    
+                    // Using api.whatsapp.com gateway which triggers the Desktop App if installed
+                    const waUrl = `https://api.whatsapp.com/send?phone=${newGuest.whatsapp.replace(/[^0-9]/g, "")}&text=${waMessage}`;
                     window.open(waUrl, "_blank");
                 }
 
@@ -92,6 +94,7 @@ export default function Guests() {
     };
 
     const toggleStatus = async (guestId, currentStatus) => {
+        if (!hasEditorAccess) return;
         const statusCycle = { "Pending": "Confirmed", "Confirmed": "Declined", "Declined": "Pending" };
         const newStatus = statusCycle[currentStatus] || "Pending";
         try {
@@ -110,6 +113,7 @@ export default function Guests() {
     };
 
     const handleDeleteGuest = async (guestId) => {
+        if (!hasEditorAccess) return;
         const confirmed = await showConfirm("Purge Attendee", "Are you sure you want to permanently remove this attendee from the directory?");
         if (!confirmed) return;
         try {
@@ -145,28 +149,30 @@ export default function Guests() {
                         Monitor attendance velocity and catering preferences in real-time.
                     </p>
                 </div>
-                <button
-                    onClick={() => setShowModal(true)}
-                    disabled={events.length === 0}
-                    style={{
-                        borderRadius: "16px",
-                        padding: "1rem 2rem",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.75rem",
-                        background: "#2563eb",
-                        color: "#fff",
-                        border: "none",
-                        fontWeight: 800,
-                        fontSize: "15px",
-                        cursor: "pointer",
-                        boxShadow: "0 8px 20px rgba(37, 99, 235, 0.2)",
-                        transition: "all 0.2s ease"
-                    }}
-                >
-                    <UserPlus size={20} strokeWidth={3} />
-                    <span>Add Attendee</span>
-                </button>
+                {hasEditorAccess && (
+                    <button
+                        onClick={() => setShowModal(true)}
+                        disabled={events.length === 0}
+                        style={{
+                            borderRadius: "16px",
+                            padding: "1rem 2rem",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.75rem",
+                            background: "#2563eb",
+                            color: "#fff",
+                            border: "none",
+                            fontWeight: 800,
+                            fontSize: "15px",
+                            cursor: "pointer",
+                            boxShadow: "0 8px 20px rgba(37, 99, 235, 0.2)",
+                            transition: "all 0.2s ease"
+                        }}
+                    >
+                        <UserPlus size={20} strokeWidth={3} />
+                        <span>Add Attendee</span>
+                    </button>
+                )}
             </div>
 
             {loading ? (
@@ -201,7 +207,7 @@ export default function Guests() {
                     <p style={{ color: "#64748b", margin: "0 auto 2.5rem", maxWidth: "450px", fontSize: "1.1rem", fontWeight: 500, lineHeight: "1.6" }}>
                         {events.length === 0 ? "Identify an event context before adding guests. Create an event first to begin tracking." : "Start populating your attendee list to see analytical growth and rsvp velocity."}
                     </p>
-                    {events.length > 0 && (
+                    {events.length > 0 && hasEditorAccess && (
                         <button
                             onClick={() => setShowModal(true)}
                             style={{
@@ -254,7 +260,7 @@ export default function Guests() {
                                         style={{
                                             background: guest.status === "Confirmed" ? "#f0fdf4" : guest.status === "Declined" ? "#fff1f2" : "#f8fafc",
                                             color: guest.status === "Confirmed" ? "#10b981" : guest.status === "Declined" ? "#ef4444" : "#64748b",
-                                            cursor: "pointer",
+                                            cursor: hasEditorAccess ? "pointer" : "default",
                                             border: `1px solid ${guest.status === "Confirmed" ? "#10b98120" : guest.status === "Declined" ? "#ef444420" : "#64748b20"}`,
                                             fontWeight: 800,
                                             padding: "6px 14px",
@@ -270,18 +276,20 @@ export default function Guests() {
                                         <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "currentColor" }}></div>
                                         {guest.status}
                                     </div>
-                                    <button
-                                        onClick={() => handleDeleteGuest(guest._id)}
-                                        style={{
-                                            background: "none",
-                                            border: "none",
-                                            color: "#94a3b8",
-                                            cursor: "pointer",
-                                            padding: "0"
-                                        }}
-                                    >
-                                        <Trash2 size={16} />
-                                    </button>
+                                    {hasEditorAccess && (
+                                        <button
+                                            onClick={() => handleDeleteGuest(guest._id)}
+                                            style={{
+                                                background: "none",
+                                                border: "none",
+                                                color: "#94a3b8",
+                                                cursor: "pointer",
+                                                padding: "0"
+                                            }}
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    )}
                                 </div>
                             </div>
 
@@ -330,7 +338,7 @@ export default function Guests() {
                 </div>
             )}
 
-            {showModal && (
+            {showModal && hasEditorAccess && (
                 <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2000, backdropFilter: "blur(8px)", padding: "1rem" }}>
                     <div className="modal-reveal mobile-full-width" style={{ background: "#fff", width: "100%", maxWidth: "560px", maxHeight: "90vh", overflowY: "auto", padding: "2rem", borderRadius: "32px", boxShadow: "0 25px 60px rgba(0,0,0,0.2)", position: "relative" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
@@ -338,7 +346,7 @@ export default function Guests() {
                                 <div style={{ width: "44px", height: "44px", borderRadius: "12px", background: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
                                     <Users size={22} strokeWidth={2.5} />
                                 </div>
-                                <div>
+                                <div style={{ overflow: "hidden" }}>
                                     <h2 style={{ fontSize: "1.5rem", fontWeight: 800, margin: 0, letterSpacing: "-0.03em" }}>Onboard Guest</h2>
                                     <p style={{ color: "#64748b", fontSize: "0.85rem", fontWeight: 500, margin: "2px 0 0" }}>Register a new attendee for analysis.</p>
                                 </div>

@@ -7,13 +7,16 @@ import { NeuralLoader } from "../../components/ui/Loader";
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Team() {
-    const { user, events = [] } = useOutletContext();
+    const { user, events = [], selectedEventId, hasFullAccess, hasEditorAccess } = useOutletContext();
+    
+    console.log(`[Team Access Context] User: ${user?.email} | Full Access: ${hasFullAccess} | Editor Access: ${hasEditorAccess}`);
+
     const { showAlert, showConfirm } = useDialog();
     const [members, setMembers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isInviting, setIsInviting] = useState(false);
     const [editingId, setEditingId] = useState(null);
-    const [inviteData, setInviteData] = useState({ name: "", email: "", role: "Editor", event: events[0]?.id || "", whatsapp: "" });
+    const [inviteData, setInviteData] = useState({ name: "", email: "", role: "Editor", event: selectedEventId || events[0]?.id || "", whatsapp: "" });
     const [editData, setEditData] = useState({ name: "", role: "" });
     const [leadWhatsApp, setLeadWhatsApp] = useState(localStorage.getItem(`lead_wa_${user?.uid}`) || "");
 
@@ -24,31 +27,34 @@ export default function Team() {
     }, [leadWhatsApp, user?.uid]);
 
     useEffect(() => {
-        if (!inviteData.event && events.length > 0) {
-            setInviteData(prev => ({ ...prev, event: events[0].id || events[0]._id }));
-        }
-    }, [events]);
+        setInviteData(prev => ({ ...prev, event: selectedEventId }));
+        fetchMembers();
+    }, [selectedEventId]);
 
     const fetchMembers = async () => {
-        if (!user) return;
+        if (!selectedEventId) return;
         setLoading(true);
         try {
-            const res = await fetch(`${API_URL}/collaborators?user=${user.uid}`);
+            const res = await fetch(`${API_URL}/collaborators?eventId=${selectedEventId}`);
             const data = await res.json();
 
-            // The owner is always implicitly part of the team, but we might want to store them too?
-            // For now, let's keep the owner as a virtual first record if they aren't in the DB.
-            const owner = {
-                _id: 'owner',
-                name: user?.displayName || "Workspace Owner",
-                email: user?.email || "owner@planora.os",
-                role: "Event Lead",
-                status: "Active",
-                permissions: "Full administrative control over workspace",
-                isOwner: true
-            };
-
-            setMembers([owner, ...data]);
+            if (data.owner) {
+                const team = [data.owner, ...(data.collaborators || [])];
+                setMembers(team);
+            } else {
+                // Fallback for owned events
+                const owner = {
+                    _id: 'owner',
+                    name: user?.displayName || "Workspace Owner",
+                    email: user?.email || "owner@planora.os",
+                    role: "Event Lead",
+                    status: "Active",
+                    permissions: "Full administrative control over workspace",
+                    isOwner: true,
+                    userId: user?.uid
+                };
+                setMembers([owner, ...data]);
+            }
         } catch (err) {
             console.error("Fetch error:", err);
         } finally {
@@ -56,38 +62,38 @@ export default function Team() {
         }
     };
 
-    useEffect(() => {
-        fetchMembers();
-    }, [user]);
-
     const handleInvite = async (e) => {
         e.preventDefault();
         try {
+            // Find who is inviting (could be owner or an Event Lead collaborator)
+            const inviter = members.find(m => m.email === user?.email) || { name: user.displayName || "Workspace Owner" };
+
             const response = await fetch(`${API_URL}/collaborators`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     ...inviteData,
-                    user: user.uid,
-                    inviterName: user.displayName || "Workspace Owner",
+                    user: user.uid, // This logic assumes the UID is passed for the one who CREATES the record
+                    inviterName: inviter.name,
                     status: "Active",
-                    permissions: inviteData.role === "Editor" ? "Can modify core modules" : inviteData.role === "Event Lead" ? "Full administrative control" : "Read-only access"
+                    permissions: inviteData.role === "Editor" ? "Limited Access: Guests Only" : inviteData.role === "Event Lead" ? "Full administrative control" : "Read-only access"
                 })
             });
             if (response.ok) {
-                const collaborator = await response.json();
-                setIsInviting(false);
+                const event = events.find(e => (e.id || e._id) === inviteData.event);
+                const senderName = user.displayName || "Workspace Owner";
                 
-                // Construct and trigger WhatsApp message if number exists
+                // --- App-Priority Redirection (Priority for Desktop App) ---
                 if (inviteData.whatsapp) {
-                    const event = events.find(e => (e.id || e._id) === inviteData.event);
-                    const leaderName = user.displayName || "The Team Leader";
-                    const waMessage = encodeURIComponent(`Hi ${inviteData.name}, this is ${leaderName}. I've added you to our team for the event "${event?.name || 'Project'}" on Planora. Please check your email for the workspace activation link!`);
-                    const waUrl = `https://wa.me/${inviteData.whatsapp.replace(/[^0-9]/g, "")}?text=${waMessage}`;
+                    const waMessage = encodeURIComponent(`Hi ${inviteData.name}, this is ${senderName}. I've synchronized your access as '${inviteData.role}' for the "${event?.name || 'Project Registry'}" on Planora OS. Your dashboard is now active. let's execute!`);
+                    
+                    // Using api.whatsapp.com gateway which triggers the Desktop App if installed
+                    const waUrl = `https://api.whatsapp.com/send?phone=${inviteData.whatsapp.replace(/[^0-9]/g, "")}&text=${waMessage}`;
                     window.open(waUrl, "_blank");
                 }
 
-                setInviteData({ name: "", email: "", role: "Editor", event: events[0]?.id || "", whatsapp: "" });
+                setIsInviting(false);
+                setInviteData({ name: "", email: "", role: "Editor", event: selectedEventId, whatsapp: "" });
                 fetchMembers();
                 showAlert("Invitation Transmitted", `${inviteData.name} has been synchronized with the collective.`);
             }
@@ -310,7 +316,7 @@ export default function Team() {
                                         </span>
                                     </td>
                                     <td style={{ padding: "0.85rem 1.5rem", textAlign: "right" }}>
-                                        {!member.isOwner && (
+                                        {(!member.isOwner && hasFullAccess) && (
                                             <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem" }}>
                                                 {isEditing ? (
                                                     <>
@@ -331,7 +337,7 @@ export default function Team() {
                         })}
 
                         {/* Integrated Invite Section */}
-                        {!isInviting ? (
+                        {hasFullAccess && (!isInviting ? (
                             <tr
                                 onClick={() => setIsInviting(true)}
                                 style={{ cursor: "pointer", borderTop: "1px dashed #e2e8f0" }}
@@ -411,7 +417,7 @@ export default function Team() {
                                     </form>
                                 </td>
                             </tr>
-                        )}
+                        ))}
                     </tbody>
                 </table>
             </div>

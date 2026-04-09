@@ -8,6 +8,7 @@ const vendorSchema = mongoose.Schema(
         email: { type: String },
         cost: { type: Number, default: 0 },
         status: { type: String, default: "Inquiry" }, // Inquiry, Booked, Paid
+        receiptUrl: { type: String }, // URL or path to uploaded bill/receipt
         event: { type: mongoose.Schema.Types.ObjectId, ref: "Event", required: true },
         user: { type: String, required: true }, // Firebase UID
     },

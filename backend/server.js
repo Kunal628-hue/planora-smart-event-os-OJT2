@@ -8,6 +8,12 @@ import vendorRoutes from "./routes/vendorRoutes.js";
 import taskRoutes from "./routes/taskRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 import collaboratorRoutes from "./routes/collaboratorRoutes.js";
+import uploadRoutes from "./routes/uploadRoutes.js";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
@@ -41,6 +47,10 @@ app.use("/api/vendors", vendorRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/collaborators", collaboratorRoutes);
+app.use("/api/upload", uploadRoutes);
+
+// Static files for uploads (prefixed with /api to match VITE_API_URL expectations)
+app.use("/api/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Test route
 app.get("/", (req, res) => {

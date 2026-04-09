@@ -170,6 +170,65 @@ export default function DashboardLayout() {
         }
     };
 
+    const safeEvents = Array.isArray(events) ? events : [];
+    const selectedEvent = safeEvents.find(e => (e.id || e._id) === selectedEventId);
+
+    // --- Core Permission Intelligence ---
+    // Calculate permissions for the current user in the active event context
+    const [currentRole, setCurrentRole] = useState("Viewer");
+    const [isOwner, setIsOwner] = useState(false);
+
+    useEffect(() => {
+        if (!selectedEventId || !user) return;
+        
+        const resolvePermissions = async () => {
+            try {
+                // Fetch the event specifically to get its latest metadata including owner
+                const eventRes = await fetch(`${API_URL}/events/${selectedEventId}`);
+                const event = eventRes.ok ? await eventRes.json() : safeEvents.find(e => String(e.id || e._id) === String(selectedEventId));
+                
+                // 1. Ownership Check (UID + Email fallback)
+                const isSystemAdmin = user?.email && import.meta.env.VITE_ADMIN_EMAIL === user.email;
+                const isUIDOwner = event?.user && String(event.user) === String(user.uid);
+                
+                // Secondary check: If the owner's identity is stored as an email in a special field (if it exists)
+                // or if we can match any 'Event Lead' record with this email.
+                setIsOwner(isUIDOwner || isSystemAdmin);
+
+                if (isUIDOwner || isSystemAdmin) {
+                    setCurrentRole("Event Lead");
+                    console.log(`[Permission Intelligence] Admin/Owner Access Granted to ${user.email}`);
+                    return;
+                }
+
+                // 2. Collaborator Check
+                const res = await fetch(`${API_URL}/collaborators?user=${user.uid}&email=${user.email}&eventId=${selectedEventId}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    
+                    // Look for ANY record matching this user that has elevated permissions
+                    const collabList = Array.isArray(data) ? data : (data.collaborators || []);
+                    const myCollab = collabList.find(c => 
+                        String(c.userId) === String(user.uid) || 
+                        c.email.toLowerCase() === user.email.toLowerCase()
+                    );
+                    
+                    const role = myCollab?.role || "Viewer";
+                    console.log(`[Permission Intelligence] Collaborator Role Resolved: ${role} for ${user.email}`);
+                    setCurrentRole(role);
+                }
+            } catch (err) {
+                console.error("Permission resolution error:", err);
+                setCurrentRole("Viewer");
+            }
+        };
+
+        resolvePermissions();
+    }, [selectedEventId, user, safeEvents]);
+
+    const hasFullAccess = isOwner || currentRole === "Event Lead";
+    const hasEditorAccess = hasFullAccess || currentRole === "Editor";
+
     if (localLoading) {
         return (
             <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", minHeight: "100vh", background: "var(--bg-base)", gap: "1.5rem" }}>
@@ -211,9 +270,6 @@ export default function DashboardLayout() {
         // Simulate "Researching" state
         setTimeout(() => setIsResearching(false), 1500);
     };
-
-    const safeEvents = Array.isArray(events) ? events : [];
-    const selectedEvent = safeEvents.find(e => (e.id || e._id) === selectedEventId);
 
     const getSearchResults = () => {
         if (!searchQuery.trim()) return [];
@@ -735,6 +791,8 @@ export default function DashboardLayout() {
                         syncTimestamp,
                         addNotification,
                         updateUserProfile,
+                        hasFullAccess,
+                        hasEditorAccess,
                         refreshEvents: () => fetchEvents(user.uid)
                     }} />
                 </div>
