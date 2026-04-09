@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
-import GooeyNav from "../ui/GooeyNav";
 
 const NAV_LINKS = [
   { label: "Home", href: "#hero" },
@@ -29,18 +28,32 @@ export default function Navbar() {
   return (
     <>
       <style>{`
+        .lp-nav-link {
+          padding: 0.45rem 1rem;
+          font-size: 0.9rem;
+          font-weight: 500;
+          color: #D1D5DB;
+          border-radius: 0.5rem;
+          transition: color 0.2s, background 0.2s;
+          text-decoration: none;
+          letter-spacing: -0.01em;
+        }
+        .lp-nav-link:hover {
+          color: #FFFFFF;
+          background: rgba(255,255,255,0.06);
+        }
         .lp-login-link {
           padding: 0.45rem 1.1rem;
           font-size: 0.875rem;
           font-weight: 600;
-          color: #374151;
+          color: #D1D5DB;
           border-radius: 0.6rem;
           transition: color 0.2s, background 0.2s;
           text-decoration: none;
         }
         .lp-login-link:hover {
-          color: #111827;
-          background: rgba(17,24,39,0.06);
+          color: #FFFFFF;
+          background: rgba(255,255,255,0.06);
         }
         .lp-cta-btn {
           display: inline-flex;
@@ -49,8 +62,8 @@ export default function Navbar() {
           padding: 0.55rem 1.3rem;
           font-size: 0.875rem;
           font-weight: 700;
-          color: #fff;
-          background: #111827;
+          color: #000;
+          background: #fff;
           border-radius: 999px;
           text-decoration: none;
           border: none;
@@ -70,20 +83,20 @@ export default function Navbar() {
           position: "fixed",
           inset: "0 0 auto 0",
           zIndex: 999,
-          height: 70,
+          height: 66,
           display: "flex",
           alignItems: "center",
           opacity: 0, // GSAP takes over
           backdropFilter: scrolled ? "blur(20px) saturate(180%)" : "none",
           WebkitBackdropFilter: scrolled ? "blur(20px) saturate(180%)" : "none",
           background: scrolled
-            ? "rgba(3, 7, 18, 0.7)"
+            ? "rgba(10,10,10,0.85)"
             : "transparent",
           borderBottom: scrolled
-            ? "1px solid rgba(255,255,255,0.1)"
+            ? "1px solid rgba(255,255,255,0.07)"
             : "1px solid transparent",
-          boxShadow: scrolled ? "0 15px 40px -10px rgba(0,0,0,0.5)" : "none",
-          transition: "all 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+          boxShadow: scrolled ? "0 2px 24px rgba(0,0,0,0.4)" : "none",
+          transition: "background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, backdrop-filter 0.35s ease",
         }}
       >
         <div
@@ -91,7 +104,7 @@ export default function Navbar() {
             width: "100%",
             maxWidth: 1200,
             margin: "0 auto",
-            padding: "0 2rem",
+            padding: "0 2.5rem",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -103,46 +116,23 @@ export default function Navbar() {
             <img
               src="/logo-new.svg"
               alt="Planora Logo"
-              style={{
-                height: "2.2rem",
-                width: "auto",
-                display: "block",
-                filter: "invert(72%) sepia(99%) saturate(400%) hue-rotate(5deg) brightness(105%) contrast(105%)"
-              }}
+              style={{ height: "2.4rem", width: "auto", display: "block", filter: "invert(1) brightness(2)" }}
             />
           </Link>
 
           {/* Center nav */}
-          <nav style={{ display: "flex", alignItems: "center" }}>
-            <GooeyNav items={NAV_LINKS} scrolled={scrolled} />
+          <nav style={{ display: "flex", gap: "0.1rem", alignItems: "center" }}>
+            {NAV_LINKS.map(({ label, href }) => (
+              <a key={label} href={href} className="lp-nav-link">
+                {label}
+              </a>
+            ))}
           </nav>
 
-          {/* Right CTA */}
-          <div style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
-            <Link to="/login" style={{
-              background: "#ff5a1f",
-              color: "#fff",
-              padding: "0.65rem 1.65rem",
-              borderRadius: "999px",
-              fontSize: "0.85rem",
-              fontWeight: 800,
-              textDecoration: "none",
-              boxShadow: "0 4px 20px rgba(255, 90, 31, 0.3)",
-              transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
-              border: "1px solid rgba(255,255,255,0.1)"
-            }}
-              onMouseEnter={e => { 
-                e.currentTarget.style.transform = "translateY(-2px)"; 
-                e.currentTarget.style.boxShadow = "0 8px 25px rgba(255, 90, 31, 0.5)";
-                e.currentTarget.style.background = "#ff7844";
-              }}
-              onMouseLeave={e => { 
-                e.currentTarget.style.transform = "translateY(0)"; 
-                e.currentTarget.style.boxShadow = "0 4px 20px rgba(255, 90, 31, 0.3)";
-                e.currentTarget.style.background = "#ff5a1f";
-              }}
-            >
-              Get Started
+          {/* Right CTAs */}
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
+            <Link to="/login" className="lp-login-link">
+              Log in
             </Link>
           </div>
         </div>

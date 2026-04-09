@@ -1,8 +1,6 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { TrendingUp } from "lucide-react";
-import SpotlightCard from "../ui/SpotlightCard";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -16,22 +14,20 @@ const FEATURES = [
     title: "Smart Event Planning",
     desc: "Build event timelines, assign milestones, and track progress with an intelligent planning engine.",
     mockup: (
-      <div style={{ background: "rgba(255,255,255,0.02)", borderRadius: "1.25rem", padding: "1.5rem", border: "1px solid rgba(255,255,255,0.05)", marginTop: "2rem" }}>
-        <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "0.85rem", padding: "1.2rem", display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
+      <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: "1rem", padding: "1.25rem", border: "1px solid rgba(255,255,255,0.05)", marginTop: "2rem" }}>
+        <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "0.75rem", padding: "1rem", display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.75rem" }}>
           <div>
-            <div style={{ fontSize: "0.9rem", fontWeight: 600, color: "#F9FAFB" }}>Venue Booking</div>
-            <div style={{ fontSize: "0.75rem", color: "#64748B" }}>Due in 2 days</div>
+            <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "#fff" }}>Venue Booking</div>
+            <div style={{ fontSize: "0.7rem", color: "#9CA3AF" }}>Due in 2 days</div>
           </div>
-          <button style={{ background: "#3B82F6", color: "#fff", border: "none", padding: "0.4rem 0.8rem", borderRadius: "8px", fontSize: "0.7rem", fontWeight: 700 }}>Open</button>
+          <button style={{ background: "#fff", color: "#000", border: "none", padding: "0.3rem 0.6rem", borderRadius: "4px", fontSize: "0.65rem", fontWeight: 600 }}>See More</button>
         </div>
-        <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "0.85rem", padding: "1.2rem", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "0.75rem", padding: "1rem", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
-            <div style={{ fontSize: "0.9rem", fontWeight: 600, color: "#F9FAFB" }}>Speaker Outreach</div>
-            <div style={{ fontSize: "0.75rem", color: "#64748B" }}>On track</div>
+            <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "#fff" }}>Speaker Outreach</div>
+            <div style={{ fontSize: "0.7rem", color: "#9CA3AF" }}>On track</div>
           </div>
-          <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(16, 185, 129, 0.1)", border: "1px solid rgba(16, 185, 129, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#10B981" }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          </div>
+          <div style={{ width: 24, height: 24, borderRadius: "50%", background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem", color: "#fff" }}>✓</div>
         </div>
       </div>
     )
@@ -45,18 +41,16 @@ const FEATURES = [
     title: "Budget & Sponsorship Tracking",
     desc: "Real-time financial visibility with automated categorization and overspend early warnings.",
     mockup: (
-      <div style={{ background: "linear-gradient(135deg, #1E1B4B 0%, #312E81 100%)", borderRadius: "1.25rem", padding: "2rem", color: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", marginTop: "2rem", position: "relative", overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)" }}>
-        <div style={{ fontSize: "1rem", fontWeight: 700, marginBottom: "0.4rem" }}>Financial Overview</div>
-        <div style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.7)", marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "6px" }}>
-          Growth Trend: 12% <TrendingUp size={14} color="#60A5FA" />
-        </div>
-        <div style={{ position: "relative", width: 100, height: 100, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <svg width="100" height="100" viewBox="0 0 100 100" style={{ transform: "rotate(-90deg)" }}>
-            <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="10" />
-            <circle cx="50" cy="50" r="42" fill="none" stroke="#60A5FA" strokeWidth="10" strokeDasharray="264" strokeDashoffset="145" strokeLinecap="round" />
+      <div style={{ background: "#1B3A2E", borderRadius: "1rem", padding: "2rem", color: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", marginTop: "2rem", position: "relative", overflow: "hidden" }}>
+        <div style={{ fontSize: "0.9rem", fontWeight: 600, marginBottom: "0.2rem" }}>Total Budget</div>
+        <div style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.7)", marginBottom: "1rem" }}>45% spent</div>
+        <div style={{ position: "relative", width: 90, height: 90, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <svg width="90" height="90" viewBox="0 0 100 100" style={{ transform: "rotate(-90deg)" }}>
+            <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="8" />
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#fff" strokeWidth="8" strokeDasharray="251" strokeDashoffset="138" strokeLinecap="round" />
           </svg>
           <div style={{ position: "absolute", textAlign: "center" }}>
-            <div style={{ fontSize: "1.4rem", fontWeight: 800 }}>₹4.2L</div>
+            <div style={{ fontSize: "1.2rem", fontWeight: 700 }}>45%</div>
           </div>
         </div>
       </div>
@@ -71,23 +65,23 @@ const FEATURES = [
     title: "Volunteer Coordination",
     desc: "Organize your team with role assignments and live visibility. No more chasing on WhatsApp.",
     mockup: (
-      <div style={{ background: "rgba(255,255,255,0.02)", borderRadius: "1.25rem", padding: "1.5rem", border: "1px solid rgba(255,255,255,0.05)", marginTop: "2rem", position: "relative" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.2rem" }}>
-          <div style={{ fontSize: "0.95rem", fontWeight: 600, color: "#F9FAFB" }}>Team Assignment</div>
-          <span style={{ fontSize: "0.85rem", color: "#64748B" }}>Expand</span>
+      <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: "1rem", padding: "1.5rem", border: "1px solid rgba(255,255,255,0.05)", marginTop: "2rem", position: "relative" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+          <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "#fff" }}>Assign task to</div>
+          <span style={{ fontSize: "0.8rem", color: "#9CA3AF" }}>v</span>
         </div>
-        <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: "1rem", border: "1px solid rgba(255,255,255,0.08)", padding: "0.6rem", boxShadow: "0 20px 40px rgba(0,0,0,0.3)" }}>
-          <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", padding: "0.8rem", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-            <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#F87171" }} />
-            <span style={{ fontSize: "0.85rem", fontWeight: 500, color: "#E2E8F0" }}>Mark Manson</span>
+        <div style={{ background: "rgba(255,255,255,0.02)", borderRadius: "0.5rem", border: "1px solid rgba(255,255,255,0.05)", padding: "0.5rem", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.5)" }}>
+          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", padding: "0.5rem", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+            <div style={{ width: 24, height: 24, borderRadius: "50%", background: "#f87171" }} />
+            <span style={{ fontSize: "0.8rem", fontWeight: 500, color: "#D1D5DB" }}>Mark Manson</span>
           </div>
-          <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", padding: "0.8rem", background: "rgba(255,255,255,0.04)", borderRadius: "0.5rem" }}>
-            <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#60A5FA" }} />
-            <span style={{ fontSize: "0.85rem", fontWeight: 700, color: "#fff" }}>Karen William</span>
+          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", padding: "0.5rem", background: "rgba(255,255,255,0.05)", borderRadius: "0.25rem" }}>
+            <div style={{ width: 24, height: 24, borderRadius: "50%", background: "#60a5fa" }} />
+            <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "#fff" }}>Karen William</span>
           </div>
-          <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", padding: "0.8rem" }}>
-            <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#34D399" }} />
-            <span style={{ fontSize: "0.85rem", fontWeight: 500, color: "#E2E8F0" }}>Niki M.</span>
+          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", padding: "0.5rem" }}>
+            <div style={{ width: 24, height: 24, borderRadius: "50%", background: "#34d399" }} />
+            <span style={{ fontSize: "0.8rem", fontWeight: 500, color: "#D1D5DB" }}>Niki M.</span>
           </div>
         </div>
       </div>
@@ -102,17 +96,22 @@ const FEATURES = [
     title: "Real-time Execution Dashboard",
     desc: "A mission control for your event — monitor RSVP trends, vendor status, and health scores as they happen.",
     mockup: (
-      <div style={{ background: "rgba(255,255,255,0.02)", borderRadius: "1.25rem", padding: "1.5rem", border: "1px solid rgba(255,255,255,0.05)", marginTop: "2rem" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.2rem" }}>
-          <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#F9FAFB" }}>Execution Health</h3>
+      <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: "1rem", padding: "1.25rem", border: "1px solid rgba(255,255,255,0.05)", marginTop: "2rem" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+          <h3 style={{ fontSize: "0.9rem", fontWeight: 700, color: "#fff" }}>Live Health Score</h3>
         </div>
-        <div style={{ position: "relative", height: 100 }}>
+        <div style={{ position: "relative", height: 80 }}>
           <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 100 40">
-            <path d="M0,35 Q15,10 35,30 T65,15 T90,5" fill="none" stroke="#10B981" strokeWidth="3" strokeLinecap="round" />
-            <path d="M0,35 Q15,10 35,30 T65,15 T90,5 L100,40 L0,40 Z" fill="rgba(16,185,129,0.1)" />
-            <circle cx="90" cy="5" r="4" fill="#10B981" />
+            <path d="M0,40 Q15,30 30,35 T60,20 T90,5 T100,5" fill="none" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" />
+            <path d="M0,40 Q15,30 30,35 T60,20 T90,5 T100,5 L100,40 L0,40 Z" fill="rgba(16,185,129,0.1)" />
+            <circle cx="90" cy="5" r="3" fill="#fff" stroke="#10B981" strokeWidth="2" />
           </svg>
-          <div style={{ position: "absolute", right: "5%", top: "-15%", background: "#10B981", color: "#fff", fontSize: "0.75rem", padding: "0.3rem 0.6rem", borderRadius: "6px", fontWeight: 700, boxShadow: "0 4px 12px rgba(16,185,129,0.4)" }}>Optimal</div>
+          <div style={{ position: "absolute", right: "2%", top: "-10%", background: "#10B981", color: "#fff", fontSize: "0.6rem", padding: "0.2rem 0.5rem", borderRadius: "4px", fontWeight: 600, boxShadow: "0 2px 4px rgba(16,185,129,0.3)" }}>Excellent</div>
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1rem", fontSize: "0.75rem", color: "#9CA3AF" }}>
+          <span>10:00 AM</span>
+          <span>12:00 PM</span>
+          <span>Now</span>
         </div>
       </div>
     )
@@ -159,8 +158,8 @@ export default function Features() {
 
   return (
     <section ref={containerRef} id="features" style={{
-      padding: "10rem 0",
-      background: "#030712",
+      padding: "8rem 0",
+      background: "#050505",
       fontFamily: "'Inter', sans-serif"
     }}>
       <style dangerouslySetInnerHTML={{__html: `
@@ -176,39 +175,40 @@ export default function Features() {
           100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
         }
         .feature-card {
-          transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .feature-card:hover {
           transform: translateY(-8px) scale(1.01) rotate(1deg);
+          box-shadow: 0 30px 60px -12px rgba(0,0,0,0.12), 0 18px 36px -18px rgba(0,0,0,0.05);
         }
       `}} />
 
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 2rem" }}>
         
         {/* Header matched from original text, layout from video */}
-        <div ref={headerRef} style={{ marginBottom: "6rem", textAlign: "center" }}>
+        <div ref={headerRef} style={{ marginBottom: "5rem" }}>
           <div style={{
             display: "inline-block",
-            background: "rgba(255,255,255,0.03)", color: "#94A3B8",
-            padding: "0.5rem 1.2rem", borderRadius: "999px",
-            fontSize: "0.8rem", fontWeight: 700,
-            textTransform: "uppercase", letterSpacing: "0.1em",
-            marginBottom: "2rem",
-            border: "1px solid rgba(255,255,255,0.05)"
+            background: "rgba(255,255,255,0.05)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            color: "#E5E7EB",
+            padding: "0.4rem 1rem", borderRadius: "999px",
+            fontSize: "0.75rem", fontWeight: 700,
+            textTransform: "uppercase", letterSpacing: "0.05em",
+            marginBottom: "1.5rem"
           }}>
-            ✦ Platform Power
+            ✦ Features
           </div>
-        <h2 style={{
-            fontSize: "clamp(2.5rem, 5vw, 4rem)",
-            fontWeight: 800, color: "#F9FAFB",
-            lineHeight: 1.05, letterSpacing: "-0.04em",
-            maxWidth: 800, margin: "0 auto 2rem",
-            fontFamily: "'Outfit', sans-serif"
+          <h2 style={{
+            fontSize: "clamp(2.2rem, 4vw, 3.5rem)",
+            fontWeight: 800, color: "#fff",
+            lineHeight: 1.1, letterSpacing: "-0.03em",
+            maxWidth: 800, marginBottom: "1.5rem"
           }}>
-            Engineered for <span style={{ color: "#ff5a1f" }}>Precision</span>.<br />Built for Results.
+            Everything you need to run a flawless event.
           </h2>
-          <p style={{ fontSize: "1.15rem", color: "#94A3B8", lineHeight: 1.6, maxWidth: 650, margin: "0 auto" }}>
-            The definitive toolkit for high-stakes event coordination. Scale your operations without losing the personal touch.
+          <p style={{ fontSize: "1.05rem", color: "#9CA3AF", lineHeight: 1.6, maxWidth: 600 }}>
+            Planora is purpose-built for event organizers — combining the depth of enterprise tools with the speed you need on the ground.
           </p>
         </div>
 
@@ -219,40 +219,39 @@ export default function Features() {
           gap: "2rem"
         }}>
           {FEATURES.map((f, i) => (
-            <SpotlightCard
+            <div
               key={f.title}
               ref={el => cardsRef.current[i] = el}
               className="feature-card"
-              spotlightColor={i % 2 === 0 ? "rgba(251, 113, 133, 0.15)" : "rgba(45, 212, 191, 0.15)"}
               style={{
-                padding: "3.5rem",
+                background: "rgba(255,255,255,0.02)",
+                borderRadius: "1.5rem",
+                padding: "3rem",
+                border: "1px solid rgba(255,255,255,0.05)",
+                boxShadow: "0 10px 30px -10px rgba(0,0,0,0.5)",
                 display: "flex",
                 flexDirection: "column",
-                gap: "2.5rem",
-                background: "rgba(255,255,255,0.01)",
-                borderRadius: "2rem",
-                border: "1px solid rgba(255,255,255,0.05)",
-                backdropFilter: "blur(12px)"
+                gap: "2rem",
+                position: "relative",
+                overflow: "hidden",
+                backdropFilter: "blur(10px)"
               }}
             >
               <div>
                 <div style={{
-                  width: 60, height: 60, 
-                  background: i % 2 === 0 ? "rgba(251, 113, 133, 0.1)" : "rgba(45, 212, 191, 0.1)", 
-                  color: i % 2 === 0 ? "#fb7185" : "#2dd4bf",
+                  width: 56, height: 56, background: "rgba(37, 99, 235, 0.08)", color: "#2563EB",
                   display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1.5rem",
-                  border: `1px solid ${i % 2 === 0 ? "rgba(251, 113, 133, 0.2)" : "rgba(45, 212, 191, 0.2)"}`,
                   animation: "float-icon 4s ease-in-out infinite, blob-morph 8s ease-in-out infinite alternate"
                 }}>
                   {f.icon}
                 </div>
               </div>
               
-              <h3 style={{ fontSize: "1.75rem", fontWeight: 800, color: "#F9FAFB", marginBottom: "1rem", letterSpacing: "-0.02em", fontFamily: "'Outfit', sans-serif" }}>
+              <h3 style={{ fontSize: "1.5rem", fontWeight: 700, color: "#fff", marginBottom: "1rem", letterSpacing: "-0.02em" }}>
                 {f.title}
               </h3>
               
-              <p style={{ fontSize: "1.05rem", color: "#94A3B8", lineHeight: 1.6, marginBottom: "1.5rem", flex: 1 }}>
+              <p style={{ fontSize: "0.95rem", color: "#9CA3AF", lineHeight: 1.6, marginBottom: "1.5rem", flex: 1 }}>
                 {f.desc}
               </p>
 
@@ -260,7 +259,7 @@ export default function Features() {
               <div style={{ flexShrink: 0 }}>
                 {f.mockup}
               </div>
-            </SpotlightCard>
+            </div>
           ))}
         </div>
       </div>

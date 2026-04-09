@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import ElectricBorder from "../ui/ElectricBorder";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -131,67 +130,6 @@ const TRUST_ITEMS = [
   },
 ];
 
-function StepCard({ step }) {
-  const [isHovered, setIsHovered] = useState(false);
-
-  return (
-    <div
-      className="step-card"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      style={{ position: "relative", height: "100%" }}
-    >
-      <ElectricBorder
-        color={step.color}
-        speed={1.5}
-        chaos={0.15}
-        borderRadius={24}
-        isActive={isHovered}
-        style={{ height: "100%" }}
-      >
-        <div style={{
-          background: "rgba(255,255,255,0.015)",
-          backdropFilter: "blur(10px)",
-          borderRadius: "1.5rem",
-          padding: "2.5rem",
-          border: isHovered ? `1px solid ${step.color}40` : "1px solid rgba(255,255,255,0.05)",
-          boxShadow: isHovered ? `0 20px 40px rgba(${step.colorRgb}, 0.15)` : "0 10px 30px rgba(0,0,0,0.2)",
-          position: "relative",
-          height: "100%",
-          transition: "all 0.3s ease",
-          transform: isHovered ? "translateY(-6px)" : "translateY(0)"
-        }}>
-          <div style={{
-            fontSize: "3rem",
-            fontWeight: 900,
-            color: `rgba(${step.colorRgb}, ${isHovered ? 0.25 : 0.1})`,
-            position: "absolute",
-            top: "1.5rem",
-            right: "1.5rem",
-            lineHeight: 1,
-            transition: "all 0.3s ease",
-            fontFamily: "'Outfit', sans-serif"
-          }}>
-            {step.number}
-          </div>
-          <div style={{
-            width: 52, height: 52, borderRadius: "1.25rem",
-            background: `rgba(${step.colorRgb}, 0.1)`, 
-            color: step.color,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            marginBottom: "2rem",
-            border: `1px solid rgba(${step.colorRgb}, 0.2)`
-          }}>
-            {step.icon}
-          </div>
-          <h3 style={{ fontSize: "1.25rem", fontWeight: 800, color: "#fff", marginBottom: "0.75rem", fontFamily: "'Outfit', sans-serif" }}>{step.title}</h3>
-          <p style={{ fontSize: "0.95rem", color: "#94A3B8", lineHeight: 1.6 }}>{step.desc}</p>
-        </div>
-      </ElectricBorder>
-    </div>
-  );
-}
-
 export default function Connect() {
   const containerRef = useRef(null);
 
@@ -205,7 +143,7 @@ export default function Connect() {
           scale: 1, opacity: 1, y: 0, 
           duration: 0.8, 
           stagger: 0.15, 
-          ease: "power3.out",
+          ease: "back.out(1.5)",
           scrollTrigger: {
             trigger: cards[0],
             start: "top 85%",
@@ -218,7 +156,7 @@ export default function Connect() {
   }, []);
 
   return (
-    <section ref={containerRef} id="testimonials" style={{ background: "#030712", padding: "10rem 0 0", fontFamily: "'Inter', sans-serif" }}>
+    <section ref={containerRef} id="testimonials" style={{ background: "#050505", padding: "8rem 0 0", fontFamily: "'Inter', sans-serif" }}>
       
       {/* Upper Grid Section */}
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 2.5rem", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", alignItems: "center", marginBottom: "8rem" }}>
@@ -227,39 +165,61 @@ export default function Connect() {
         <div>
           <div style={{
             display: "inline-block",
-            background: "rgba(255,255,255,0.03)", color: "#94A3B8",
-            padding: "0.5rem 1.2rem", borderRadius: "999px",
-            fontSize: "0.8rem", fontWeight: 700,
-            textTransform: "uppercase", letterSpacing: "0.1em",
-            marginBottom: "2rem",
-            border: "1px solid rgba(255,255,255,0.05)"
+            background: "rgba(255,255,255,0.05)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            color: "#E5E7EB",
+            padding: "0.4rem 1rem", borderRadius: "999px",
+            fontSize: "0.75rem", fontWeight: 700,
+            textTransform: "uppercase", letterSpacing: "0.05em",
+            marginBottom: "1.5rem"
           }}>
-            ✦ Workflow Design
+            ✦ How It Works
           </div>
           <h2 style={{
-            fontSize: "clamp(2.5rem, 4vw, 3.8rem)",
-            fontWeight: 800, color: "#F9FAFB",
-            lineHeight: 1.05, letterSpacing: "-0.04em",
-            marginBottom: "2rem",
-            fontFamily: "'Outfit', sans-serif"
+            fontSize: "clamp(2.2rem, 3.5vw, 3.2rem)",
+            fontWeight: 800, color: "#fff",
+            lineHeight: 1.1, letterSpacing: "-0.03em",
+            marginBottom: "1.5rem"
           }}>
-            From idea to impact in <span style={{ color: "#3B82F6" }}>four</span> smooth steps.
+            From idea to execution in four steps.
           </h2>
-          <p style={{ fontSize: "1.15rem", color: "#94A3B8", lineHeight: 1.6, maxWidth: 450 }}>
-            Planora architecture scales with your ambition. Built to ensure every detail is accounted for, from inception to analysis.
+          <p style={{ fontSize: "1.05rem", color: "#9CA3AF", lineHeight: 1.6, maxWidth: 400 }}>
+            Planora guides you through every phase — so nothing slips through the cracks. Built to integrate seamlessly.
           </p>
         </div>
 
         {/* Right Side: 2x2 Grid of Step Cards mirroring video's app integration icons */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
           {STEPS.map((step, i) => (
-            <StepCard key={i} step={step} />
+            <div key={i} className="step-card" style={{
+              background: "rgba(255,255,255,0.02)",
+              borderRadius: "1.5rem",
+              padding: "2rem",
+              border: "1px solid rgba(255,255,255,0.05)",
+              boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+              position: "relative",
+              backdropFilter: "blur(10px)"
+            }}>
+              <div style={{ fontSize: "2.5rem", fontWeight: 900, color: `rgba(${step.colorRgb}, 0.1)`, position: "absolute", top: "1.5rem", right: "1.5rem", lineHeight: 1 }}>
+                {step.number}
+              </div>
+              <div style={{
+                width: 48, height: 48, borderRadius: "1rem",
+                background: `rgba(${step.colorRgb}, 0.1)`, color: step.color,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                marginBottom: "1.5rem"
+              }}>
+                {step.icon}
+              </div>
+              <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#fff", marginBottom: "0.5rem" }}>{step.title}</h3>
+              <p style={{ fontSize: "0.85rem", color: "#9CA3AF", lineHeight: 1.6 }}>{step.desc}</p>
+            </div>
           ))}
         </div>
       </div>
 
       {/* Marquee Section mapped from Trust */}
-      <div style={{ padding: "8rem 0", background: "rgba(255,255,255,0.01)", position: "relative", overflow: "hidden", borderTop: "1px solid rgba(255,255,255,0.03)" }}>
+      <div style={{ padding: "5rem 0", background: "#0D0D0D", position: "relative", overflow: "hidden", borderTop: "1px solid rgba(255,255,255,0.03)" }}>
         
         <style dangerouslySetInnerHTML={{__html: `
           @keyframes scroll-left {
@@ -290,33 +250,30 @@ export default function Connect() {
             display: flex;
             align-items: center;
             gap: 1.2rem;
-            padding: 1rem 1.8rem 1rem 1rem;
+            padding: 0.8rem 1.6rem 0.8rem 0.8rem;
             border-radius: 100px;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.05);
-            color: #E2E8F0;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #D1D5DB;
             flex-shrink: 0;
             cursor: default;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            backdrop-filter: blur(10px);
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
           }
           .trust-badge:hover {
-            transform: translateY(-5px) scale(1.05);
-            background: rgba(255,255,255,0.05);
-            border-color: rgba(59, 130, 246, 0.3);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            color: #fff;
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 15px 35px -8px rgba(0,0,0,0.12);
+            border-color: rgba(0,0,0,0.1);
           }
         `}} />
 
         {/* Fade Edges */}
-        <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "20%", background: "linear-gradient(90deg, #030712 10%, transparent)", zIndex: 10, pointerEvents: "none" }} />
-        <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: "20%", background: "linear-gradient(-90deg, #030712 10%, transparent)", zIndex: 10, pointerEvents: "none" }} />
+        <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "20%", background: "linear-gradient(90deg, #0D0D0D 10%, transparent)", zIndex: 10, pointerEvents: "none" }} />
+        <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: "20%", background: "linear-gradient(-90deg, #0D0D0D 10%, transparent)", zIndex: 10, pointerEvents: "none" }} />
 
-        <div style={{ textAlign: "center", marginBottom: "4rem", zIndex: 1, position: "relative" }}>
-          <p style={{ fontSize: "0.9rem", fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase", color: "#4B5563" }}>
-            The standard for elite event management
+        <div style={{ textAlign: "center", marginBottom: "3rem", zIndex: 1, position: "relative" }}>
+          <p style={{ fontSize: "0.85rem", fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase", color: "#9CA3AF" }}>
+            Trusted by premium organizations for events of all scales
           </p>
         </div>
 

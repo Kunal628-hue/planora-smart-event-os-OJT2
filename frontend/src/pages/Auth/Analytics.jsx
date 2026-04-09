@@ -19,8 +19,13 @@ import {
     TrendingDown,
     Layers,
     Wand2,
-    Shield
+    Shield,
+    Download,
+    FileText,
+    ChevronDown
 } from "lucide-react";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 /**
  * Premium Neon Chart Placeholder
@@ -175,6 +180,57 @@ export default function Analytics() {
         navigate("/dashboard");
     };
 
+    const [showExportMenu, setShowExportMenu] = useState(false);
+
+    const handleExportCSV = () => {
+        if (!filteredGuests.length) return;
+        const headers = ["Name", "Email", "Status", "Category", "Event"];
+        const rows = filteredGuests.map(g => [
+            g.name,
+            g.email,
+            g.status,
+            g.category || "General",
+            events.find(e => (e.id || e._id) === (g.event?._id || g.event))?.name || "N/A"
+        ]);
+        
+        const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `planora_attendees_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setShowExportMenu(false);
+    };
+
+    const handleExportPDF = () => {
+        if (!filteredGuests.length) return;
+        const doc = new jsPDF();
+        doc.text("Planora Attendee Intelligence Report", 14, 15);
+        doc.setFontSize(10);
+        doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 22);
+        
+        autoTable(doc, {
+            startY: 30,
+            head: [["Name", "Email", "Status", "Category", "Event"]],
+            body: filteredGuests.map(g => [
+                g.name,
+                g.email,
+                g.status,
+                g.category || "General",
+                events.find(e => (e.id || e._id) === (g.event?._id || g.event))?.name || "N/A"
+            ]),
+            theme: 'striped',
+            headStyles: { fillColor: [37, 99, 235] }
+        });
+        
+        doc.save(`planora_report_${new Date().toISOString().split('T')[0]}.pdf`);
+        setShowExportMenu(false);
+    };
+
     return (
         <div className="responsive-container" style={{
             fontFamily: "'Outfit', 'Inter', system-ui, sans-serif",
@@ -195,11 +251,59 @@ export default function Analytics() {
                     </h1>
                 </div>
 
-                <div style={{ display: "flex", gap: "0.75rem" }}>
-                    <button className="premium-btn-primary">
+                <div style={{ display: "flex", gap: "0.75rem", position: "relative" }}>
+                    <button 
+                        className="premium-btn-primary"
+                        onClick={() => setShowExportMenu(!showExportMenu)}
+                        style={{ position: "relative" }}
+                    >
                         <Share2 size={14} />
-                        <span>Export</span>
+                        <span>Export Intelligence</span>
+                        <ChevronDown size={14} style={{ transform: showExportMenu ? "rotate(180deg)" : "rotate(0)", transition: "0.3s" }} />
                     </button>
+
+                    {showExportMenu && (
+                        <div style={{
+                            position: "absolute",
+                            top: "110%",
+                            right: 0,
+                            background: "#fff",
+                            borderRadius: "14px",
+                            boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
+                            padding: "8px",
+                            zIndex: 100,
+                            minWidth: "180px",
+                            border: "1px solid #f1f5f9",
+                            animation: "fade-in 0.2s ease-out"
+                        }}>
+                            <button 
+                                onClick={handleExportPDF}
+                                style={{
+                                    width: "100%", padding: "10px 14px", borderRadius: "8px", border: "none",
+                                    background: "transparent", display: "flex", alignItems: "center", gap: "10px",
+                                    fontSize: "13px", fontWeight: 700, color: "#1e293b", cursor: "pointer", textAlign: "left"
+                                }}
+                                onMouseEnter={e => e.currentTarget.style.background = "#eff6ff"}
+                                onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                            >
+                                <FileText size={16} color="#ef4444" />
+                                <span>Export as PDF</span>
+                            </button>
+                            <button 
+                                onClick={handleExportCSV}
+                                style={{
+                                    width: "100%", padding: "10px 14px", borderRadius: "8px", border: "none",
+                                    background: "transparent", display: "flex", alignItems: "center", gap: "10px",
+                                    fontSize: "13px", fontWeight: 700, color: "#1e293b", cursor: "pointer", textAlign: "left"
+                                }}
+                                onMouseEnter={e => e.currentTarget.style.background = "#eff6ff"}
+                                onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                            >
+                                <Download size={16} color="#10b981" />
+                                <span>Export Spreadsheet</span>
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
 
