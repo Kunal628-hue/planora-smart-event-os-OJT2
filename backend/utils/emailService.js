@@ -3,11 +3,18 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+// --- Dynamic Environment Resolution ---
+// We dynamically resolve application URLs to ensure the mailer points to the correct tactical environment.
+const EMAIL_USER = process.env.EMAIL_USER;
+const EMAIL_PASS = process.env.EMAIL_PASS;
+const BACKEND_URL = process.env.BACKEND_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:5001");
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+
 const transporter = nodemailer.createTransport({
     service: process.env.EMAIL_SERVICE || "gmail",
     auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: EMAIL_USER,
+        pass: EMAIL_PASS,
     },
 });
 
@@ -19,11 +26,11 @@ const transporter = nodemailer.createTransport({
 export const sendInvitation = async (guest, eventName) => {
     if (!guest.email) return;
 
-    const rsvpConfirmUrl = `${process.env.BACKEND_URL}/api/guests/rsvp/${guest._id}/Confirmed`;
-    const rsvpDeclineUrl = `${process.env.BACKEND_URL}/api/guests/rsvp/${guest._id}/Declined`;
+    const rsvpConfirmUrl = `${BACKEND_URL}/api/guests/rsvp/${guest._id}/Confirmed`;
+    const rsvpDeclineUrl = `${BACKEND_URL}/api/guests/rsvp/${guest._id}/Declined`;
 
     const mailOptions = {
-        from: `"Planora" <${process.env.EMAIL_USER}>`,
+        from: `"Planora" <${EMAIL_USER}>`,
         to: guest.email,
         subject: `Invitation: ${eventName}`,
         html: `
@@ -62,7 +69,7 @@ export const sendCollaboratorInvite = async (collaborator, inviterName, eventNam
     if (!collaborator.email) return;
 
     const mailOptions = {
-        from: `"Planora Hive" <${process.env.EMAIL_USER}>`,
+        from: `"Planora Hive" <${EMAIL_USER}>`,
         to: collaborator.email,
         subject: `Team Invitation: Join ${inviterName} for ${eventName || 'Event Planning'} on Planora`,
         html: `
@@ -83,7 +90,7 @@ export const sendCollaboratorInvite = async (collaborator, inviterName, eventNam
                 <p style="color: #64748b; font-size: 16px; line-height: 1.6;">You can now log in to the dashboard to view shared events, manage guests, and synchronize with the lead team.</p>
                 
                 <div style="text-align: center; margin-top: 40px;">
-                    <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/login" style="background-color: #2563eb; color: white; padding: 14px 30px; text-decoration: none; border-radius: 12px; font-weight: 700; display: inline-block; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);">Access Dashboard</a>
+                    <a href="${FRONTEND_URL}/login" style="background-color: #2563eb; color: white; padding: 14px 30px; text-decoration: none; border-radius: 12px; font-weight: 700; display: inline-block; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);">Access Dashboard</a>
                 </div>
                 
                 <hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 40px 0;" />
