@@ -66,7 +66,10 @@ app.use("/api/collaborators", collaboratorRoutes);
 app.use("/api/upload", uploadRoutes);
 
 // Static files for uploads (prefixed with /api to match VITE_API_URL expectations)
-app.use("/api/uploads", express.static(path.join(__dirname, "uploads")));
+// Note: Local static serving is disabled in production to prevent Vercel boot-time conflicts.
+if (process.env.NODE_ENV !== "production") {
+  app.use("/api/uploads", express.static(path.join(__dirname, "uploads")));
+}
 
 // Test route
 app.get("/", (req, res) => {
