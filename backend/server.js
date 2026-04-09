@@ -20,8 +20,24 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// Middleware
-app.use(cors());
+// --- Multi-Tenant CORS Strategy ---
+// We allow the local development studio and the designated production frontend origin.
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://planora-smart-event-os-web.vercel.app"
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
+      callback(null, true);
+    } else {
+      callback(new Error('Cross-Origin Access Restricted by Planora Security Protocol'));
+    }
+  },
+  credentials: true
+}));
+
 app.use(express.json());
 
 // Ensure DB connection for every request (singleton handles efficiency)
@@ -68,5 +84,19 @@ if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
     console.log(`✅ Planora backend running at http://localhost:${PORT}`);
   });
 }
+
+// Global Error Handler - Operational Integrity
+app.use((err, req, res, next) => {
+  console.error(`[Operational Failure] ${err.stack}`);
+  
+  // Ensure CORS headers are present even in failure states
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.header("Access-Control-Allow-Credentials", "true");
+  
+  res.status(500).json({ 
+    message: "Internal Operational Failure. Transaction aborted.",
+    systemDetail: process.env.NODE_ENV === 'production' ? 'Access backend logs for diagnostic traces.' : err.message
+  });
+});
 
 export default app;
