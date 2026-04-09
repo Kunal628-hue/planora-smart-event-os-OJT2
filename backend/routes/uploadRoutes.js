@@ -5,11 +5,19 @@ import fs from 'fs';
 
 const router = express.Router();
 
-// Ensure uploads directory exists
+// Ensure uploads directory exists - wrapped for Vercel compatibility
 const uploadDir = 'uploads/receipts';
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
+const ensureUploadDir = () => {
+    try {
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        }
+    } catch (err) {
+        console.warn("[Storage Warning] Local file system is read-only. Tactical receipt storage may be restricted in this environment.");
+    }
+};
+
+// We don't call it at the top level to avoid Vercel boot-time crashes
 
 // Multer Config
 const storage = multer.diskStorage({
@@ -38,7 +46,10 @@ const upload = multer({
 });
 
 // Upload Endpoint
-router.post('/receipt', upload.single('receipt'), (req, res) => {
+router.post('/receipt', (req, res, next) => {
+    ensureUploadDir();
+    next();
+}, upload.single('receipt'), (req, res) => {
     if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
     }
