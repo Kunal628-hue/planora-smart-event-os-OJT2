@@ -2,7 +2,6 @@ import Guest from "../models/Guest.js";
 import Event from "../models/Event.js";
 import { sendInvitation } from "../utils/emailService.js";
 import { getAllowedEventIds } from "../utils/authHelper.js";
-import { sendWhatsAppMessage } from "../utils/whatsappService.js";
 
 export const createGuest = async (req, res) => {
     try {
@@ -22,12 +21,6 @@ export const createGuest = async (req, res) => {
             await sendInvitation(guest, event.title);
         }
 
-        // Send WhatsApp notification
-        if (guest.whatsapp && event) {
-            const waMessage = `Hello ${guest.name}, you have been invited to "${event.title}" on Planora. We have sent a detailed invitation to your email. Please check it and accept if you're interested!`;
-            await sendWhatsAppMessage(guest.whatsapp, waMessage);
-        }
-        
         res.status(201).json(guest);
     } catch (error) {
         res.status(500).json({ message: error.message });
