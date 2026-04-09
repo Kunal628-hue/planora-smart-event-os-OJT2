@@ -134,19 +134,19 @@ export default function Events() {
     };
 
     return (
-        <div style={{ fontFamily: "'Inter', system-ui, sans-serif", padding: "1.5rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "3rem" }}>
-                <div>
+        <div className="responsive-container" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "3rem", gap: "1.5rem", flexWrap: "wrap" }}>
+                <div style={{ flex: 1, minWidth: "280px" }}>
                     <h1 style={{ fontSize: "2rem", fontWeight: 850, color: "#0f172a", marginBottom: "0.25rem", letterSpacing: "-0.03em" }}>Event Portfolio</h1>
                     <p style={{ color: "#64748b", fontSize: "1rem", fontWeight: 500 }}>Manage and coordinate your high-impact operational streams.</p>
                 </div>
                 <button
                     onClick={() => setShowModal(true)}
                     className="btn btn-primary"
-                    style={{ borderRadius: "14px", padding: "0.85rem 1.75rem", fontWeight: 800, fontSize: "14px" }}
+                    style={{ borderRadius: "14px", padding: "0.85rem 1.75rem", fontWeight: 800, fontSize: "14px", whiteSpace: "nowrap" }}
                 >
                     <Plus size={18} strokeWidth={3} />
-                    Initialize Event
+                    <span>Initialize Event</span>
                 </button>
             </div>
 
@@ -242,14 +242,16 @@ export default function Events() {
             {/* Redesigned Modal - Compressed Scale */}
             {showModal && (
                 <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(4px)" }}>
-                    <div className="modal-reveal" style={{
-                        width: "100%",
+                    <div className="modal-reveal mobile-full-width" style={{
+                        width: "95%",
                         maxWidth: "400px",
                         background: "#ffffff",
                         padding: "1.75rem",
                         borderRadius: "24px",
                         boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.2)",
-                        position: "relative"
+                        position: "relative",
+                        maxHeight: "90vh",
+                        overflowY: "auto"
                     }}>
                         <button
                             onClick={() => setShowModal(false)}

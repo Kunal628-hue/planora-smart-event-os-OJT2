@@ -76,14 +76,13 @@ export default function Settings() {
         : "PL";
 
     return (
-        <div style={{
+        <div className="responsive-container" style={{
             fontFamily: "'Inter', system-ui, sans-serif",
             color: "#0f172a",
-            animation: "fade-in 0.5s ease-out"
         }}>
             {/* Page Header */}
-            <div style={{ marginBottom: "2.5rem", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
-                <div>
+            <div style={{ marginBottom: "2.5rem", display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: "1.5rem", flexWrap: "wrap" }}>
+                <div style={{ flex: 1, minWidth: "280px" }}>
                     <h1 style={{
                         fontSize: "32px",
                         fontWeight: 700,
@@ -124,11 +123,9 @@ export default function Settings() {
             </div>
 
             {/* 2-Column Grid */}
-            <div style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(2, 1fr)",
-                gap: "2.5rem",
-                alignItems: "start"
+            <div className="responsive-split" style={{
+                alignItems: "start",
+                gap: "2rem"
             }}>
 
                 {/* Identity Profile Card (Left Panel) */}

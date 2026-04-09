@@ -61,6 +61,7 @@ export default function DashboardLayout() {
         { id: 2, title: "Budget Warning", message: "Catering costs exceed projection by 12%.", time: "2h ago", read: true }
     ]);
     const [showNotifications, setShowNotifications] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const playNotificationSound = () => {
         const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3");
@@ -274,7 +275,11 @@ export default function DashboardLayout() {
 
     return (
         <div className="dashboard-layout">
-            <aside className="dashboard-sidebar">
+            <div 
+                className={`sidebar-overlay ${isSidebarOpen ? 'visible' : ''}`} 
+                onClick={() => setIsSidebarOpen(false)}
+            />
+            <aside className={`dashboard-sidebar ${isSidebarOpen ? 'mobile-open' : ''}`}>
                 <div style={{ padding: "0.75rem 1rem" }}>
                     <Link to="/dashboard" style={{ display: "block" }}>
                         <img
@@ -344,6 +349,7 @@ export default function DashboardLayout() {
                         <Link
                             key={item.id}
                             to={item.path}
+                            onClick={() => setIsSidebarOpen(false)}
                             className={`sidebar-item${location.pathname === item.path ? " active" : ""}`}
                             style={{
                                 marginBottom: "2px",
@@ -397,8 +403,14 @@ export default function DashboardLayout() {
                     backdropFilter: "blur(20px)",
                     borderBottom: "1px solid rgba(232, 232, 245, 0.5)"
                 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", flex: 1 }}>
-                        <div style={{ position: "relative", width: "100%", maxWidth: "400px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "1rem", flex: 1 }}>
+                        <button 
+                            className="sidebar-toggle-btn"
+                            onClick={() => setIsSidebarOpen(true)}
+                        >
+                            <LayoutDashboard size={20} />
+                        </button>
+                        <div className="search-input-wrapper">
                             <Search size={16} color="#94a3b8" style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)" }} />
                             <input 
                                 id="global-search-input"
@@ -409,17 +421,7 @@ export default function DashboardLayout() {
                                     setSearchQuery(e.target.value);
                                     setShowSearchResults(true);
                                 }}
-                                style={{
-                                    width: "100%",
-                                    padding: "0.6rem 1rem 0.6rem 2.5rem",
-                                    background: "#f8fafc",
-                                    border: "1px solid #e2e8f0",
-                                    borderRadius: "10px",
-                                    fontSize: "0.85rem",
-                                    color: "#1e293b",
-                                    outline: "none",
-                                    transition: "all 0.2s"
-                                }}
+                                className="search-input"
                                 onFocus={e => {
                                     e.target.style.background = "#fff";
                                     e.target.style.borderColor = "var(--accent-primary)";
@@ -662,7 +664,7 @@ export default function DashboardLayout() {
                                         <User size={18} strokeWidth={2.5} />
                                     )}
                                 </div>
-                                <div style={{ textAlign: "left" }}>
+                                <div className="user-info-text" style={{ textAlign: "left" }}>
                                     <div style={{ 
                                         fontSize: "0.9rem", 
                                         fontWeight: 800, 
@@ -673,7 +675,7 @@ export default function DashboardLayout() {
                                         {user?.displayName || user?.email?.split('@')[0] || "Planner"}
                                     </div>
                                 </div>
-                                <ChevronDown size={14} style={{ 
+                                <ChevronDown size={14} className="user-info-chevron" style={{ 
                                     opacity: 0.4, 
                                     transform: showUserMenu ? "rotate(180deg)" : "none", 
                                     transition: "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
@@ -724,7 +726,7 @@ export default function DashboardLayout() {
                         </div>
                     </div>
                 </header>
-                <div className="dashboard-content" style={{ padding: "40px" }}>
+                <div className="dashboard-content">
                     <Outlet context={{
                         user,
                         events,

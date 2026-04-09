@@ -146,9 +146,8 @@ export default function Budget() {
 
 
     return (
-        <div style={{
+        <div className="responsive-container" style={{
             fontFamily: "'Outfit', 'Inter', system-ui, sans-serif",
-            padding: "2.5rem",
             background: "#fcfdff",
             minHeight: "100vh",
             color: "#0f172a"
@@ -162,7 +161,7 @@ export default function Budget() {
                 </p>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "2rem", marginBottom: "3.5rem" }}>
+            <div className="responsive-grid-3" style={{ marginBottom: "3.5rem" }}>
                 <div className="stat-card" style={{ background: "#fff", padding: "2.25rem", borderRadius: "32px", border: "1px solid #f1f5f9", boxShadow: "0 4px 20px rgba(0,0,0,0.02)" }}>
                     <div style={{ fontSize: "12px", fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "1rem" }}>Total Budget</div>
                     <div style={{ fontSize: "2.5rem", fontWeight: 800, color: "#2563eb", letterSpacing: "-0.02em" }}>₹{totalAllocated.toLocaleString('en-IN')}</div>
@@ -180,10 +179,9 @@ export default function Budget() {
                 </div>
             </div>
 
-            <div style={{ display: "flex", gap: "2.5rem", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: "2rem", flexWrap: "wrap" }}>
                 <div style={{
-                    flex: "0 0 38%",
-                    minWidth: "350px",
+                    flex: "1 1 350px",
                     background: "#fff",
                     padding: "2.75rem",
                     borderRadius: "40px",
@@ -245,15 +243,15 @@ export default function Budget() {
                 </div>
 
                 <div style={{
-                    flex: 1,
-                    minWidth: "500px",
+                    flex: "1 1 450px",
                     background: "#fff",
                     padding: "2.75rem",
                     borderRadius: "40px",
                     border: "1px solid #f1f5f9",
                     display: "flex",
                     flexDirection: "column",
-                    boxShadow: "0 4px 25px rgba(0,0,0,0.02)"
+                    boxShadow: "0 4px 25px rgba(0,0,0,0.02)",
+                    overflow: "hidden"
                 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2.5rem" }}>
                         <h3 style={{ fontSize: "1.35rem", fontWeight: 800, display: "flex", alignItems: "center", gap: "0.75rem" }}>
@@ -282,15 +280,15 @@ export default function Budget() {
                         </button>
                     </div>
 
-                    <div style={{ overflowX: "auto" }}>
+                    <div style={{ overflowX: "auto", width: "100%" }}>
                         <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 0 }}>
                             <thead>
                                 <tr style={{ textAlign: "left" }}>
-                                    <th style={{ padding: "0.85rem 1rem", fontSize: "10px", fontWeight: 850, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em" }}>Operational Entity</th>
-                                    <th style={{ padding: "0.85rem 1rem", fontSize: "10px", fontWeight: 850, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em" }}>Category</th>
-                                    <th style={{ padding: "0.85rem 1rem", fontSize: "10px", fontWeight: 850, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em" }}>Timestamp</th>
-                                    <th style={{ padding: "0.85rem 1rem", fontSize: "10px", fontWeight: 850, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em", textAlign: "right" }}>Valuation</th>
-                                    <th style={{ padding: "0.85rem 1rem", fontSize: "10px", fontWeight: 850, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em", textAlign: "right" }}>Actions</th>
+                                    <th style={{ padding: "0.85rem 1rem", minWidth: "140px", fontSize: "10px", fontWeight: 850, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em" }}>Operational Entity</th>
+                                    <th style={{ padding: "0.85rem 1rem", minWidth: "100px", fontSize: "10px", fontWeight: 850, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em" }}>Category</th>
+                                    <th style={{ padding: "0.85rem 1rem", minWidth: "100px", fontSize: "10px", fontWeight: 850, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em" }}>Timestamp</th>
+                                    <th style={{ padding: "0.85rem 1rem", minWidth: "120px", fontSize: "10px", fontWeight: 850, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em", textAlign: "right" }}>Valuation</th>
+                                    <th style={{ padding: "0.85rem 1rem", minWidth: "100px", fontSize: "10px", fontWeight: 850, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em", textAlign: "right" }}>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -324,8 +322,8 @@ export default function Budget() {
             </div>
 
             {showModal && (
-                <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2000, backdropFilter: "blur(8px)" }}>
-                    <div style={{ background: "#fff", width: "100%", maxWidth: "480px", padding: "3rem", borderRadius: "32px", boxShadow: "0 25px 60px rgba(0,0,0,0.18)" }}>
+                <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2000, backdropFilter: "blur(8px)", padding: "1rem" }}>
+                    <div className="modal-reveal mobile-full-width" style={{ background: "#fff", width: "100%", maxWidth: "480px", padding: "2rem", borderRadius: "32px", boxShadow: "0 25px 60px rgba(0,0,0,0.18)", maxHeight: "90vh", overflowY: "auto" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2.5rem" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
                                 <div style={{ width: "42px", height: "42px", borderRadius: "12px", background: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>

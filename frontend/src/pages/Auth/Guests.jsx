@@ -130,15 +130,14 @@ export default function Guests() {
         : guests;
 
     return (
-        <div style={{
+        <div className="responsive-container" style={{
             fontFamily: "'Outfit', 'Inter', system-ui, sans-serif",
-            padding: "2.5rem",
             background: "#fcfdff",
             minHeight: "100vh",
             color: "#0f172a"
         }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "3.5rem" }}>
-                <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "3.5rem", gap: "1.5rem", flexWrap: "wrap" }}>
+                <div style={{ flex: 1, minWidth: "280px" }}>
                     <h1 style={{ fontSize: "2.75rem", fontWeight: 800, letterSpacing: "-0.04em", margin: "0 0 0.5rem" }}>
                         Attendee <span style={{ color: "#2563eb" }}>Directory</span>
                     </h1>
@@ -219,8 +218,8 @@ export default function Guests() {
             ) : (
                 <div style={{
                     display: "grid",
-                    gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-                    gap: "2rem"
+                    gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+                    gap: "1.5rem"
                 }}>
                     {filteredGuests.map(guest => (
                         <div key={guest._id} className="guest-card" style={{
@@ -332,8 +331,8 @@ export default function Guests() {
             )}
 
             {showModal && (
-                <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2000, backdropFilter: "blur(8px)" }}>
-                    <div style={{ background: "#fff", width: "100%", maxWidth: "560px", maxHeight: "90vh", overflowY: "auto", padding: "2.5rem", borderRadius: "32px", boxShadow: "0 25px 60px rgba(0,0,0,0.2)", position: "relative" }}>
+                <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2000, backdropFilter: "blur(8px)", padding: "1rem" }}>
+                    <div className="modal-reveal mobile-full-width" style={{ background: "#fff", width: "100%", maxWidth: "560px", maxHeight: "90vh", overflowY: "auto", padding: "2rem", borderRadius: "32px", boxShadow: "0 25px 60px rgba(0,0,0,0.2)", position: "relative" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
                                 <div style={{ width: "44px", height: "44px", borderRadius: "12px", background: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>

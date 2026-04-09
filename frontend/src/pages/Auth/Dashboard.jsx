@@ -281,12 +281,11 @@ export default function Dashboard() {
     const daysRemaining = getDaysToEvent(selectedEvent?.date);
 
     return (
-        <div style={{
+        <div className="responsive-container" style={{
             fontFamily: "'Outfit', 'Inter', system-ui, sans-serif",
             background: "#fcfdff",
             minHeight: "100vh",
             color: "#0f172a",
-            padding: "2.5rem"
         }}>
             {/* Glossy Top Alert Bar */}
             {risks.length > 0 && (
@@ -322,10 +321,7 @@ export default function Dashboard() {
             )}
 
             {/* Premium 3-Column KPI Strip */}
-            <div style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(3, 1fr)",
-                gap: "1.5rem",
+            <div className="responsive-grid-3" style={{
                 marginBottom: "2.5rem"
             }}>
                 {[
@@ -369,10 +365,7 @@ export default function Dashboard() {
             </div>
 
             {/* Split Row */}
-            <div style={{
-                display: "grid",
-                gridTemplateColumns: "2.1fr 0.9fr",
-                gap: "2rem",
+            <div className="responsive-split" style={{
                 marginBottom: "2.5rem"
             }}>
                 {/* Milestone Timeline */}
@@ -399,7 +392,7 @@ export default function Dashboard() {
                             borderRadius: "10px"
                         }}></div>
 
-                        <div style={{ display: "flex", justifyContent: "space-between" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap" }}>
                             {timeline.slice(0, 5).map((step, idx) => {
                                 // Find the CURRENT active step (the first one where we have MORE or equal days left than the milestone)
                                 const currentPhaseIdx = timeline.findIndex(s => daysRemaining >= s.daysBefore);
@@ -407,7 +400,7 @@ export default function Dashboard() {
                                 const isPast = idx < (currentPhaseIdx === -1 ? timeline.length - 1 : currentPhaseIdx);
 
                                 return (
-                                    <div key={idx} style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", maxWidth: "100px" }}>
+                                    <div key={idx} style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", minWidth: "80px", flex: 1 }}>
                                         <div style={{
                                             width: "16px",
                                             height: "16px",

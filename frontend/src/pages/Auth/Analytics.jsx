@@ -153,9 +153,17 @@ export default function Analytics() {
         fetchData();
     }, [user, selectedEventId, events, syncTimestamp]);
 
-    const maxVal = stats.rsvpTrend.length > 0 ? Math.max(...stats.rsvpTrend.map(t => Math.max(t.actual, t.projected))) * 1.2 : 100;
-    const sparklinePoints = stats.rsvpTrend.map((v, i) => `${(i / (stats.rsvpTrend.length - 1)) * 400},${180 - (v.actual / maxVal) * 180}`).join(' ');
-    const projectionPoints = stats.rsvpTrend.map((v, i) => `${(i / (stats.rsvpTrend.length - 1)) * 400},${180 - (v.projected / maxVal) * 180}`).join(' ');
+    const maxVal = (stats.rsvpTrend && stats.rsvpTrend.length > 0) 
+        ? Math.max(10, Math.max(...stats.rsvpTrend.map(t => Math.max(t.actual || 0, t.projected || 0))) * 1.2) 
+        : 100;
+
+    const sparklinePoints = (stats.rsvpTrend && stats.rsvpTrend.length > 1) 
+        ? stats.rsvpTrend.map((v, i) => `${(i / (stats.rsvpTrend.length - 1)) * 400},${180 - ((v.actual || 0) / maxVal) * 180}`).join(' ')
+        : "0,180 400,180";
+
+    const projectionPoints = (stats.rsvpTrend && stats.rsvpTrend.length > 1) 
+        ? stats.rsvpTrend.map((v, i) => `${(i / (stats.rsvpTrend.length - 1)) * 400},${180 - ((v.projected || 0) / maxVal) * 180}`).join(' ')
+        : "0,180 400,180";
 
     const handleExecute = () => {
         // Since it mentions Catering Protocol, navigate to Vendors
@@ -168,9 +176,8 @@ export default function Analytics() {
     };
 
     return (
-        <div style={{
+        <div className="responsive-container" style={{
             fontFamily: "'Outfit', 'Inter', system-ui, sans-serif",
-            padding: "2rem",
             background: "#fff",
             minHeight: "100vh",
             color: "#0f172a",
@@ -197,7 +204,7 @@ export default function Analytics() {
             </div>
 
             {/* KPI Executive Strip - Compact */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem", marginBottom: "2rem" }}>
+            <div className="analytics-kpi-grid" style={{ marginBottom: "2rem" }}>
                 {[
                     { label: "Guest Velocity", val: stats.visits.toLocaleString('en-IN'), icon: Users, color: "#2563eb", trend: "+12%" },
                     { label: "RSVP Conversion", val: stats.confirmed.toLocaleString('en-IN'), icon: Ticket, color: "#10b981", trend: "+5.2%" },
@@ -217,9 +224,9 @@ export default function Analytics() {
                 ))}
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(12, 1fr)", gap: "1.5rem", marginBottom: "2rem" }}>
+            <div className="analytics-main-grid" style={{ marginBottom: "2rem" }}>
                 {/* Real-time Trajectory Chart - Smaller */}
-                <div style={{ gridColumn: "span 8" }} className="analytics-module">
+                <div className="analytics-module trajectory-module">
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
                         <h3 className="module-title">
                             <TrendingUp size={16} />
@@ -231,7 +238,7 @@ export default function Analytics() {
                         </div>
                     </div>
 
-                    {stats.rsvpTrend.length > 0 ? (
+                    {stats.rsvpTrend && stats.rsvpTrend.length > 0 ? (
                         <div style={{ flex: 1, position: "relative", minHeight: "280px" }}>
                             <svg width="100%" height="240" viewBox="0 0 400 200" style={{ overflow: "visible" }}>
                                 <defs>
@@ -241,22 +248,22 @@ export default function Analytics() {
                                     </linearGradient>
                                 </defs>
                                 
-                                {/* Background Grid Lines */}
+                                 {/* Background Grid Lines */}
                                 {[0, 0.25, 0.5, 0.75, 1].map(r => (
                                     <line key={r} x1="0" y1={180 - r * 180} x2="400" y2={180 - r * 180} stroke="#f1f5f9" strokeWidth="1" />
                                 ))}
 
                                 {/* Bars for Projected */}
-                                {stats.rsvpTrend.map((v, i) => {
+                                {stats.rsvpTrend.length > 1 && stats.rsvpTrend.map((v, i) => {
                                     const x = (i / (stats.rsvpTrend.length - 1)) * 400;
-                                    const barHeight = (v.projected / maxVal) * 180;
+                                    const barHeight = ((v.projected || 0) / maxVal) * 180;
                                     return (
                                         <rect 
                                             key={i} 
                                             x={x - 12} 
                                             y={180 - barHeight} 
                                             width="4" 
-                                            height={barHeight} 
+                                            height={barHeight || 0} 
                                             fill="#e2e8f0" 
                                             rx="2"
                                         />
@@ -264,10 +271,12 @@ export default function Analytics() {
                                 })}
 
                                 {/* Path Area */}
-                                <path 
-                                    d={`M 0,180 L 0,${180 - (stats.rsvpTrend[0].actual / maxVal) * 180} ${stats.rsvpTrend.map((v, i) => `L ${(i / (stats.rsvpTrend.length - 1)) * 400},${180 - (v.actual / maxVal) * 180}`).join(' ')} L 400,180 Z`} 
-                                    fill="url(#actualFill)" 
-                                />
+                                {stats.rsvpTrend.length > 1 && (
+                                    <path 
+                                        d={`M 0,180 L 0,${180 - ((stats.rsvpTrend[0].actual || 0) / maxVal) * 180} ${stats.rsvpTrend.map((v, i) => `L ${(i / (stats.rsvpTrend.length - 1)) * 400},${180 - ((v.actual || 0) / maxVal) * 180}`).join(' ')} L 400,180 Z`} 
+                                        fill="url(#actualFill)" 
+                                    />
+                                )}
 
                                 {/* Projection Line */}
                                 <polyline 
@@ -289,9 +298,9 @@ export default function Analytics() {
                                 />
 
                                 {/* Interaction Points */}
-                                {stats.rsvpTrend.map((v, i) => {
+                                {stats.rsvpTrend.length > 1 && stats.rsvpTrend.map((v, i) => {
                                     const x = (i / (stats.rsvpTrend.length - 1)) * 400;
-                                    const y = 180 - (v.actual / maxVal) * 180;
+                                    const y = 180 - ((v.actual || 0) / maxVal) * 180;
                                     return (
                                         <g key={i}>
                                             <circle cx={x} cy={y} r="6" fill="#fff" stroke="#2563eb" strokeWidth="2.5" />
@@ -307,7 +316,7 @@ export default function Analytics() {
                 </div>
 
                 {/* Distribution Matrix - Smaller */}
-                <div style={{ gridColumn: "span 4" }} className="analytics-module">
+                <div className="analytics-module distribution-module">
                     <h3 className="module-title">
                         <PieChart size={16} />
                         Segment Distribution

@@ -1237,3 +1237,193 @@ h6 {
 .anim-number-glow {
   animation: number-glow 2s ease-in-out infinite;
 }
+
+/* ── Utility Responsiveness ────────────────── */
+
+.responsive-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.responsive-split {
+  display: grid;
+  grid-template-columns: 2.1fr 0.9fr;
+  gap: 2rem;
+}
+
+.responsive-container {
+  padding: 2.5rem;
+}
+
+@media (max-width: 1024px) {
+  .responsive-grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .responsive-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .responsive-grid-3 {
+    grid-template-columns: 1fr;
+  }
+  
+  .responsive-container {
+    padding: 1.5rem;
+  }
+  
+  .mobile-hide {
+    display: none !important;
+  }
+  
+  .mobile-full-width {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .sidebar-toggle-btn {
+    display: flex !important;
+  }
+
+  .search-input {
+    max-width: 150px !important;
+  }
+
+  .user-info-text, .user-info-chevron {
+    display: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .responsive-container {
+    padding: 1rem;
+  }
+  
+  .top-bar-title {
+    display: none !important;
+  }
+}
+
+/* ── Task Row Responsiveness ────────────────── */
+
+@media (max-width: 900px) {
+  .task-row-header {
+    display: none !important;
+  }
+  
+  .task-row {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+    padding: 1.5rem !important;
+  }
+  
+  .task-row > div {
+    text-align: left !important;
+    justify-content: flex-start !important;
+  }
+  
+  .task-row .task-actions {
+    justify-content: flex-start !important;
+  }
+}
+/* ── Analytics Responsiveness ────────────────── */
+
+.analytics-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.analytics-main-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.5rem;
+}
+
+.trajectory-module {
+  grid-column: span 8;
+}
+
+.distribution-module {
+  grid-column: span 4;
+}
+
+@media (max-width: 1200px) {
+  .analytics-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .analytics-main-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .trajectory-module, .distribution-module {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .analytics-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .analytics-module {
+    padding: 1.5rem !important;
+  }
+  
+  .tactical-matrix-card {
+    padding: 2rem !important;
+  }
+  
+  .execute-btn, .tactical-secondary-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 900px) {
+  .responsive-container h1 {
+    font-size: 2rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .responsive-container {
+    padding: 1rem !important;
+  }
+  
+  .responsive-container h1 {
+    font-size: 1.75rem !important;
+  }
+}
+
+/* Premium Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e1;
+}
+
+/* Ensure table cells don't wrap and cause height issues */
+td {
+  white-space: nowrap;
+}

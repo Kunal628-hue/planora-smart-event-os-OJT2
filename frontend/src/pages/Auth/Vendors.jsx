@@ -173,16 +173,15 @@ export default function Vendors() {
     const currentEventName = events.find(e => (e.id || e._id) === selectedEventId)?.name || "Entire Portfolio";
 
     return (
-        <div style={{
+        <div className="responsive-container" style={{
             fontFamily: "'Outfit', 'Inter', system-ui, sans-serif",
-            padding: "2.5rem",
             background: "#fcfdff",
             minHeight: "100vh",
             color: "#0f172a"
         }}>
             {/* Header Section */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "3rem" }}>
-                <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "3rem", gap: "1.5rem", flexWrap: "wrap" }}>
+                <div style={{ flex: 1, minWidth: "280px" }}>
                     <h1 style={{ fontSize: "2.75rem", fontWeight: 850, letterSpacing: "-0.05em", margin: "0 0 0.5rem" }}>
                         Vendor <span style={{ color: "#2563eb" }}>Registry</span>
                     </h1>
@@ -338,7 +337,7 @@ export default function Vendors() {
                         <p style={{ color: "#64748b", fontWeight: 600 }}>No partners assigned to this stream yet.</p>
                     </div>
                 ) : (
-                    <div className="table-wrapper">
+                    <div className="table-wrapper" style={{ overflowX: "auto" }}>
                         <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 0 }}>
                             <thead>
                                 <tr style={{ background: "#f8fafc" }}>

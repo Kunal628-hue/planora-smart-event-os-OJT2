@@ -142,15 +142,14 @@ export default function Tasks() {
         : tasks;
 
     return (
-        <div style={{
+        <div className="responsive-container" style={{
             fontFamily: "'Outfit', 'Inter', system-ui, sans-serif",
-            padding: "2.5rem",
             background: "#fcfdff",
             minHeight: "100vh",
             color: "#0f172a"
         }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "3.5rem" }}>
-                <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "3.5rem", gap: "1.5rem", flexWrap: "wrap" }}>
+                <div style={{ flex: 1, minWidth: "280px" }}>
                     <h1 style={{ fontSize: "2.75rem", fontWeight: 800, letterSpacing: "-0.04em", margin: "0 0 0.5rem" }}>
                         Workflow <span style={{ color: "#2563eb" }}>Milestones</span>
                     </h1>
@@ -241,7 +240,7 @@ export default function Tasks() {
                 </div>
             ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                    <div style={{
+                    <div className="task-row-header" style={{
                         display: "grid",
                         gridTemplateColumns: "1fr 180px 180px 140px 100px",
                         padding: "0 2.5rem 1rem",
@@ -334,7 +333,7 @@ export default function Tasks() {
                                 }}>{task.priority}</span>
                             </div>
 
-                            <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem" }}>
+                             <div className="task-actions" style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem" }}>
                                 <button
                                     onClick={() => handleEditTask(task)}
                                     className="task-action-btn"
@@ -362,8 +361,8 @@ export default function Tasks() {
             )}
 
             {showModal && (
-                <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2000, backdropFilter: "blur(8px)" }}>
-                    <div style={{ background: "#fff", width: "100%", maxWidth: "520px", padding: "3rem", borderRadius: "32px", boxShadow: "0 25px 60px rgba(0,0,0,0.2)", animation: "modalIn 0.3s ease-out" }}>
+                <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2000, backdropFilter: "blur(8px)", padding: "1rem" }}>
+                    <div className="modal-reveal mobile-full-width" style={{ background: "#fff", width: "100%", maxWidth: "520px", padding: "2rem", borderRadius: "32px", boxShadow: "0 25px 60px rgba(0,0,0,0.2)", animation: "modalIn 0.3s ease-out", maxHeight: "90vh", overflowY: "auto" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2.5rem" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
                                 <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "#eff6ff", display: "flex", alignItems: "center", justifyContent: "center", color: "#2563eb" }}>

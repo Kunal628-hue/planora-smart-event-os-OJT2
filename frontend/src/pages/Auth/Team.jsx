@@ -154,18 +154,17 @@ export default function Team() {
     };
 
     return (
-        <div style={{
+        <div className="responsive-container" style={{
             fontFamily: "'Outfit', 'Inter', system-ui, sans-serif",
-            padding: "2rem",
             background: "#fcfdff",
             minHeight: "100vh",
             color: "#0f172a"
         }}>
             <div style={{ marginBottom: "2.5rem" }}>
-                <h1 style={{ fontSize: "2rem", fontWeight: 850, letterSpacing: "-0.04em", margin: "0 0 0.25rem" }}>
+                <h1 style={{ fontSize: "2.75rem", fontWeight: 850, letterSpacing: "-0.04em", margin: "0 0 0.25rem" }}>
                     Neural <span style={{ color: "#2563eb" }}>Hive</span>
                 </h1>
-                <p style={{ color: "#64748b", fontSize: "1rem", fontWeight: 550, margin: 0 }}>
+                <p style={{ color: "#64748b", fontSize: "1.05rem", fontWeight: 550, margin: 0 }}>
                     Manage and synchronize your planning collective.
                 </p>
 
@@ -179,7 +178,9 @@ export default function Team() {
                     alignItems: "center", 
                     justifyContent: "space-between",
                     maxWidth: "500px",
-                    boxShadow: "0 4px 15px rgba(0,0,0,0.02)"
+                    boxShadow: "0 4px 15px rgba(0,0,0,0.02)",
+                    flexWrap: "wrap",
+                    gap: "1rem"
                 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
                         <div style={{ width: "40px", height: "40px", borderRadius: "12px", background: "#f0fdf4", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -190,7 +191,7 @@ export default function Team() {
                             <p style={{ fontSize: "11px", color: "#64748b", fontWeight: 600, margin: "2px 0 0" }}>Set your business WhatsApp for alerts.</p>
                         </div>
                     </div>
-                    <div style={{ position: "relative" }}>
+                    <div style={{ position: "relative", minWidth: "160px" }}>
                         <Phone size={14} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
                         <input 
                             placeholder="Your WA Number" 
@@ -203,7 +204,7 @@ export default function Team() {
                                 fontSize: "13px",
                                 fontWeight: 650,
                                 background: "#f8fafc",
-                                width: "160px",
+                                width: "100%",
                                 outline: "none"
                             }} 
                         />
@@ -216,7 +217,7 @@ export default function Team() {
                 borderRadius: "24px",
                 border: "1px solid #f1f5f9",
                 boxShadow: "0 4px 20px rgba(0,0,0,0.015)",
-                overflow: "hidden"
+                overflowX: "auto"
             }}>
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <thead>

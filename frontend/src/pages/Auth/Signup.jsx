@@ -266,9 +266,16 @@ export default function Signup() {
                     100% { background-position: 200% 50%; }
                 }
                 @media (max-width: 900px) {
+                    .auth-page-new {
+                        padding: 1.5rem;
+                    }
+                    .auth-page-logo {
+                        top: 1.5rem;
+                        left: 1.5rem;
+                    }
                     .auth-card-split {
                         grid-template-columns: 1fr;
-                        max-height: 85vh;
+                        max-height: none;
                     }
                     .auth-info-side { display: none; }
                 }
