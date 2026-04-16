@@ -116,7 +116,7 @@ export default function Navbar() {
             <img
               src="/logo-new.svg"
               alt="Planora Logo"
-              style={{ height: "2.4rem", width: "auto", display: "block", filter: "invert(1) brightness(2)" }}
+              style={{ height: "2.4rem", width: "auto", display: "block" }}
             />
           </Link>
 

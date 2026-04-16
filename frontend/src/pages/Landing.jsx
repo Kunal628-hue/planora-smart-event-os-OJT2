@@ -1,7 +1,6 @@
 import { Suspense, lazy } from "react";
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero";
-import CustomCursor from "../components/landing/CustomCursor";
 
 const Features = lazy(() => import("../components/landing/Features"));
 const Testimonials = lazy(() => import("../components/landing/Testimonials"));
@@ -19,7 +18,6 @@ export default function Landing() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#050505", color: "#FFFFFF", overflowX: "hidden" }}>
-      <CustomCursor />
       <Navbar />
       <Hero />
       <Suspense fallback={null}>
@@ -35,7 +33,7 @@ export default function Landing() {
           <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "2rem", marginBottom: "3rem" }}>
             <div>
               <Link to="/" style={{ display: "block", marginBottom: "1.5rem" }}>
-                <img src="/logo-new.svg" alt="Planora" style={{ height: "2.2rem", width: "auto", filter: "invert(1) brightness(1.5)" }} />
+                <img src="/logo-new.svg" alt="Planora" style={{ height: "2.2rem", width: "auto" }} />
               </Link>
               <p style={{ fontSize: "0.85rem", color: "#9CA3AF", lineHeight: 1.7, maxWidth: 260 }}>
                 Effortlessly manage tasks, set reminders, and stay organized – all in one intuitive platform.

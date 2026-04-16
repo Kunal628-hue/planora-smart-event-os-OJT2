@@ -259,6 +259,13 @@ h6 {
   background-clip: text;
 }
 
+.hero-gradient-text {
+  background: linear-gradient(to right, #A78BFA, #F472B6, #38BDF8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* ── Button System ───────────────────────── */
 .btn {
   display: inline-flex;
@@ -1426,4 +1433,25 @@ h6 {
 /* Ensure table cells don't wrap and cause height issues */
 td {
   white-space: nowrap;
+}
+
+/* ── Blur Text Gradient ────────────────────── */
+.blur-text-gradient {
+  background: linear-gradient(
+    90deg, 
+    #3b82f6 0%, 
+    #8b5cf6 33%, 
+    #d946ef 66%, 
+    #ec4899 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: inline-flex;
+  font-weight: 700;
+  filter: drop-shadow(0 0 15px rgba(139, 92, 246, 0.15));
+}
+
+.blur-text-gradient span {
+  color: transparent !important;
 }

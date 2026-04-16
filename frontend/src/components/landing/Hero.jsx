@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import NetworkAuroraBackground from "./NetworkAuroraBackground";
+import BlurText from "../animations/BlurText";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -24,22 +25,10 @@ export default function Hero() {
         { opacity: 1, y: 0, duration: 0.8, delay: 0.2 }
       )
       .fromTo(
-        titleRef.current,
-        { y: 30, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1 },
-        "-=0.4"
-      )
-      .fromTo(
-        subRef.current,
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8 },
-        "-=0.6"
-      )
-      .fromTo(
         ctaRef.current,
         { y: 20, opacity: 0, scale: 0.95 },
         { y: 0, opacity: 1, scale: 1, duration: 0.8 },
-        "-=0.6"
+        "+=0.8"
       )
       .fromTo(
         ".scroll-down",
@@ -118,15 +107,27 @@ export default function Hero() {
             maxWidth: 900,
             margin: "0 auto 1.5rem",
             position: "relative",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center"
           }}>
-            One-source for Event <span style={{
-              background: "linear-gradient(to right, #A78BFA, #F472B6, #38BDF8)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}>Intelligence</span>
+            <BlurText
+              text="One-source for Event"
+              delay={80}
+              animateBy="words"
+              direction="top"
+              className="mb-2"
+            />
+            <BlurText
+              text="Intelligence"
+              delay={50}
+              animateBy="letters"
+              direction="bottom"
+              className="hero-gradient-text inline-block"
+            />
           </h1>
 
-          <p ref={subRef} style={{
+          <div ref={subRef} style={{
             fontSize: "1.1rem",
             color: "#9CA3AF",
             maxWidth: 550,
@@ -134,8 +135,13 @@ export default function Hero() {
             lineHeight: 1.6,
             fontWeight: 400
           }}>
-            Dive into automated event ecosystems, where innovative synchronization meets enterprise-grade execution.
-          </p>
+            <BlurText
+              text="Dive into automated event ecosystems, where innovative synchronization meets enterprise-grade execution."
+              delay={30}
+              animateBy="words"
+              direction="top"
+            />
+          </div>
 
           <div ref={ctaRef} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "1rem" }}>
             <Link to="/signup" style={{
