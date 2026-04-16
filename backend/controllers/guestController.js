@@ -5,7 +5,7 @@ import { getAllowedEventIds } from "../utils/authHelper.js";
 
 export const createGuest = async (req, res) => {
     try {
-        const { event: eventId } = req.body;
+        const { event: eventId, email } = req.body;
         const event = await Event.findById(eventId);
         
         // Ensure the item is created under the event owner's namespace
@@ -14,7 +14,18 @@ export const createGuest = async (req, res) => {
             guestData.user = event.user; 
         }
 
+        // --- De-duplication Strategy ---
+        // If an email is provided, verify if this entity already exists in the current operational scope.
+        if (email && eventId) {
+            const existingGuest = await Guest.findOne({ email, event: eventId });
+            if (existingGuest) {
+                console.log(`[Operation: Guest Creation] Duplicate detected for ${email}. Returning existing entity.`);
+                return res.status(200).json(existingGuest);
+            }
+        }
+
         const guest = await Guest.create(guestData);
+        console.log(`[Operation: Guest Creation] Successfully registered new entity: ${guest.name} (${guest.email || 'No Email'})`);
         
         // If guest has an email, send the invitation
         if (guest.email && event) {
@@ -23,6 +34,7 @@ export const createGuest = async (req, res) => {
 
         res.status(201).json(guest);
     } catch (error) {
+        console.error("[Guest Creation Failed]", error);
         res.status(500).json({ message: error.message });
     }
 };
@@ -109,6 +121,7 @@ export const updateGuestStatusViaEmail = async (req, res) => {
         }
 
         // If status is Confirmed, show a modern form to capture family size
+        // We use relative path for action to ensure it works on any domain
         res.send(`
             <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f9ff; height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0;">
                 <div style="background: white; padding: 40px; border-radius: 24px; box-shadow: 0 20px 50px rgba(37, 99, 235, 0.1); width: 100%; max-width: 450px; border: 1px solid #e0f2fe;">
@@ -117,7 +130,7 @@ export const updateGuestStatusViaEmail = async (req, res) => {
                         <p style="color: #64748b; margin-top: 8px;">Yay! We're excited to have you, <strong>${guest.name}</strong>!</p>
                     </div>
                     
-                    <form action="${process.env.BACKEND_URL}/api/guests/rsvp/finalize/${id}" method="POST">
+                    <form action="/api/guests/rsvp/finalize/${id}" method="POST">
                         <div style="margin-bottom: 25px;">
                             <label style="display: block; font-weight: 600; color: #1e293b; margin-bottom: 10px; font-size: 14px;">Total people attending from your party?</label>
                             <div style="position: relative;">
@@ -136,6 +149,7 @@ export const updateGuestStatusViaEmail = async (req, res) => {
             </div>
         `);
     } catch (error) {
+        console.error("[Email Status Update Error]", error);
         res.status(500).send("Something went wrong. Please try again later.");
     }
 };
@@ -162,12 +176,12 @@ export const finalizeRSVP = async (req, res) => {
                         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     </div>
                     <h1 style="color: #064e3b; margin-bottom: 10px; font-size: 28px;">RSVP Confirmed!</h1>
-                    <p style="color: #059669; font-size: 18px; margin-bottom: 30px;">Thank you, <strong>${guest.name}</strong>. We've registered <strong>${familySize}</strong> people for your party.</p>
-                    <a href="${process.env.APP_URL}" style="background: #f0fdf4; color: #059669; padding: 12px 24px; text-decoration: none; border-radius: 12px; font-weight: 600; border: 1px solid #d1fae5;">Visit Planora</a>
+                    <p style="color: #059669; font-size: 18px; margin: 0;">Thank you, <strong>${guest.name}</strong>. We've registered <strong>${familySize}</strong> people for your party.</p>
                 </div>
             </div>
         `);
     } catch (error) {
+        console.error("[Finalize RSVP Error]", error);
         res.status(500).send("Update failed. Please try again.");
     }
 };

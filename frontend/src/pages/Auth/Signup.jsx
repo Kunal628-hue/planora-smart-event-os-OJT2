@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import AuthBackground from "../../components/auth/AuthBackground";
@@ -6,13 +6,46 @@ import SocialAuth from "../../components/auth/SocialAuth";
 
 export default function Signup() {
     const navigate = useNavigate();
-    const { loginWithGoogle, signupWithEmail } = useAuth();
-    const [form, setForm] = useState({ name: "", email: "", password: "" });
+    const { loginWithGoogle, signupWithEmail, setOtpVerified } = useAuth();
+    const [form, setForm] = useState({ name: "", email: "", password: "", otp: "" });
+    const [step, setStep] = useState("email"); // email, otp
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [status, setStatus] = useState("");
 
     const handleChange = (e) => {
         setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    };
+
+    const handleVerifyOTP = async (e) => {
+        e.preventDefault();
+        if (!form.otp || form.otp.length < 6) {
+            setError("Please enter the 6-digit code.");
+            return;
+        }
+
+        setError("");
+        setLoading(true);
+        setStatus("Verifying...");
+
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/verify-otp`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: form.email, code: form.otp }),
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setOtpVerified(true);
+                navigate("/dashboard");
+            } else {
+                setError(data.message || "Invalid code.");
+            }
+        } catch (err) {
+            setError("Verification failed. Please try again.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleSocialLogin = async (provider = 'google') => {
@@ -23,8 +56,27 @@ export default function Signup() {
         try {
             setError("");
             setLoading(true);
-            await loginWithGoogle();
-            navigate("/dashboard");
+            const userCredential = await loginWithGoogle();
+            const email = userCredential.user.email;
+            
+            setForm(prev => ({ ...prev, email }));
+            
+            // --- Strategic OTP Challenge for New Google Accounts ---
+            setStatus("Google account linked. Sending security code...");
+            
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/send-otp`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email }),
+            });
+            const data = await response.json();
+            
+            if (response.ok) {
+                setStep("otp");
+                setStatus("Security code sent to your Google email!");
+            } else {
+                setError(data.message || "Failed to send security code.");
+            }
         } catch (err) {
             console.error("Social Signup Error:", err);
             if (err.code === "auth/operation-not-allowed") {
@@ -57,7 +109,23 @@ export default function Signup() {
 
         try {
             await signupWithEmail(form.email, form.password, form.name);
-            navigate("/dashboard");
+            
+            // --- Strategic Mandatory OTP Challenge for New Accounts ---
+            setStatus("Account created. Sending verification code...");
+            
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/send-otp`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: form.email }),
+            });
+            
+            if (response.ok) {
+                setStep("otp");
+                setStatus("Verification code sent to your inbox!");
+            } else {
+                const data = await response.json();
+                setError(data.message || "Account created, but failed to send verification code.");
+            }
         } catch (err) {
             if (err.code === "auth/operation-not-allowed") {
                 setError("Email/Password sign-up is not enabled. Please enable it in the Firebase Console.");
@@ -125,54 +193,93 @@ export default function Signup() {
                                 <span>OR</span>
                             </div>
 
-                            <form onSubmit={handleSubmit} className="auth-form">
-                                <div className="form-group" style={{ marginBottom: '0.65rem' }}>
-                                    <label className="auth-label-new">Full Name</label>
-                                    <input
-                                        className="auth-input-new"
-                                        type="text"
-                                        name="name"
-                                        value={form.name}
-                                        onChange={handleChange}
-                                        placeholder="Jane Doe"
-                                        style={{ padding: '0.6rem 1rem' }}
-                                    />
-                                </div>
+                            {step === "email" ? (
+                                <form onSubmit={handleSubmit} className="auth-form">
+                                    <div className="form-group" style={{ marginBottom: '0.65rem' }}>
+                                        <label className="auth-label-new">Full Name</label>
+                                        <input
+                                            className="auth-input-new"
+                                            type="text"
+                                            name="name"
+                                            value={form.name}
+                                            onChange={handleChange}
+                                            placeholder="Jane Doe"
+                                            style={{ padding: '0.6rem 1rem' }}
+                                        />
+                                    </div>
 
-                                <div className="form-group" style={{ marginBottom: '0.65rem' }}>
-                                    <label className="auth-label-new">Email address</label>
-                                    <input
-                                        className="auth-input-new"
-                                        type="email"
-                                        name="email"
-                                        value={form.email}
-                                        onChange={handleChange}
-                                        placeholder="name@company.com"
-                                        style={{ padding: '0.6rem 1rem' }}
-                                    />
-                                </div>
+                                    <div className="form-group" style={{ marginBottom: '0.65rem' }}>
+                                        <label className="auth-label-new">Email address</label>
+                                        <input
+                                            className="auth-input-new"
+                                            type="email"
+                                            name="email"
+                                            value={form.email}
+                                            onChange={handleChange}
+                                            placeholder="name@company.com"
+                                            style={{ padding: '0.6rem 1rem' }}
+                                        />
+                                    </div>
 
-                                <div className="form-group" style={{ marginBottom: '0.65rem' }}>
-                                    <label className="auth-label-new">Password</label>
-                                    <input
-                                        className="auth-input-new"
-                                        type="password"
-                                        name="password"
-                                        value={form.password}
-                                        onChange={handleChange}
-                                        placeholder="Min. 8 characters"
-                                        style={{ padding: '0.6rem 1rem' }}
-                                    />
-                                </div>
+                                    <div className="form-group" style={{ marginBottom: '0.65rem' }}>
+                                        <label className="auth-label-new">Password</label>
+                                        <input
+                                            className="auth-input-new"
+                                            type="password"
+                                            name="password"
+                                            value={form.password}
+                                            onChange={handleChange}
+                                            placeholder="Min. 8 characters"
+                                            style={{ padding: '0.6rem 1rem' }}
+                                        />
+                                    </div>
 
-                                {error && (
-                                    <div className="auth-error-new" style={{ padding: '0.4rem', marginBottom: '0.5rem' }}>{error}</div>
-                                )}
+                                    {error && (
+                                        <div className="auth-error-new" style={{ padding: '0.4rem', marginBottom: '0.5rem' }}>{error}</div>
+                                    )}
 
-                                <button type="submit" className="auth-submit-btn" disabled={loading} style={{ padding: '0.8rem' }}>
-                                    {loading ? "Creating..." : "Create Account"}
-                                </button>
-                            </form>
+                                    <button type="submit" className="auth-submit-btn" disabled={loading} style={{ padding: '0.8rem' }}>
+                                        {loading ? "Creating..." : "Create Account"}
+                                    </button>
+                                </form>
+                            ) : (
+                                <form onSubmit={handleVerifyOTP} className="auth-form">
+                                    <div className="form-group" style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
+                                        <label className="auth-label-new" style={{ marginBottom: '1rem', textAlign: 'center' }}>Verify your account<br/><span style={{ color: 'white' }}>{form.email}</span></label>
+                                        <input
+                                            className="auth-input-new"
+                                            type="text"
+                                            name="otp"
+                                            value={form.otp}
+                                            onChange={handleChange}
+                                            placeholder="000000"
+                                            maxLength={6}
+                                            style={{ fontSize: '1.5rem', textAlign: 'center', letterSpacing: '0.5em', padding: '1rem' }}
+                                            autoFocus
+                                        />
+                                    </div>
+
+                                    {error && (
+                                        <div className="auth-error-new" style={{ padding: '0.65rem', marginBottom: '1rem', fontSize: '0.85rem' }}>{error}</div>
+                                    )}
+                                    
+                                    {status && !error && (
+                                        <div style={{ color: '#10b981', fontSize: '0.75rem', marginBottom: '1rem', textAlign: 'center' }}>{status}</div>
+                                    )}
+
+                                    <button type="submit" className="auth-submit-btn" disabled={loading}>
+                                        {loading ? "Verifying..." : "Complete Signup"}
+                                    </button>
+
+                                    <button 
+                                        type="button" 
+                                        onClick={() => { setStep("email"); setStatus(""); setError(""); }}
+                                        style={{ width: '100%', background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: '0.75rem', marginTop: '1rem', cursor: 'pointer' }}
+                                    >
+                                        Go back
+                                    </button>
+                                </form>
+                            )}
 
                             <div className="auth-footer-links" style={{ marginTop: '1.25rem' }}>
                                 <p style={{ margin: 0 }}>Already have an account? <Link to="/login">Sign in</Link></p>

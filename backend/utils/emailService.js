@@ -30,6 +30,47 @@ transporter.verify((error, success) => {
 });
 
 /**
+ * Sends a 6-digit OTP code to a user for email verification.
+ * @param {string} email - The user's email address.
+ * @param {string} code - The 6-digit verification code.
+ */
+export const sendOTPMail = async (email, code) => {
+    if (!email) return;
+
+    const mailOptions = {
+        from: `"Planora Security" <${EMAIL_USER}>`,
+        to: email,
+        subject: `${code} is your Planora verification code`,
+        html: `
+            <div style="font-family: 'Outfit', 'Segoe UI', sans-serif; max-width: 480px; margin: auto; padding: 40px; border: 1px solid #f1f5f9; border-radius: 24px; background: #ffffff; text-align: center;">
+                <div style="margin-bottom: 30px;">
+                    <h1 style="color: #0f172a; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.04em;">Planora <span style="color: #2563eb;">Security</span></h1>
+                </div>
+                
+                <h2 style="color: #1e293b; font-size: 20px; font-weight: 700; margin-bottom: 8px;">Verification Required</h2>
+                <p style="color: #64748b; font-size: 15px; margin-bottom: 30px;">Use the code below to complete your authentication process. This code is valid for <strong>5 minutes</strong>.</p>
+                
+                <div style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 16px; padding: 24px; margin-bottom: 30px;">
+                    <span style="font-family: 'Courier New', Courier, monospace; font-size: 36px; font-weight: 800; letter-spacing: 0.25em; color: #2563eb;">${code}</span>
+                </div>
+                
+                <p style="color: #94a3b8; font-size: 13px; line-height: 1.5;">If you did not request this verification, please ignore this email or contact support if you have security concerns.</p>
+                
+                <hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 30px 0;" />
+                <p style="color: #cbd5e1; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">Planora Smart Event OS • Confidential</p>
+            </div>
+        `,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log(`✅ Verification OTP sent to ${email}`);
+    } catch (error) {
+        console.error(`❌ OTP delivery failed [${email}]:`, error.message);
+    }
+};
+
+/**
  * Sends an invitation email to a guest with RSVP links.
  * @param {Object} guest - The guest object.
  * @param {string} eventName - The name of the event.

@@ -18,14 +18,30 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isOtpVerified, setOtpVerified] = useState(() => {
+        return sessionStorage.getItem("otpVerified") === "true";
+    });
+
+    const updateOtpVerified = (val) => {
+        setOtpVerified(val);
+        sessionStorage.setItem("otpVerified", val);
+    };
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            console.log(`[Firebase Session] State Changed. User: ${currentUser ? currentUser.email : "NULL"}`);
             setUser(currentUser);
             setLoading(false);
+            
+            // Clean up OTP state if user logs out - ensures security integrity
+            if (!currentUser) {
+                console.log("[Firebase Session] User null detected. Clearing OTP status.");
+                sessionStorage.removeItem("otpVerified");
+                setOtpVerified(false);
+            }
         });
         return () => unsubscribe();
-    }, []);
+    }, [auth]);
 
     const loginWithGoogle = async () => {
         try {
@@ -48,6 +64,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
+        updateOtpVerified(false);
         return signOut(auth);
     };
 
@@ -61,6 +78,8 @@ export const AuthProvider = ({ children }) => {
     const value = {
         user,
         loading,
+        isOtpVerified,
+        setOtpVerified: updateOtpVerified,
         loginWithGoogle,
         loginWithEmail,
         signupWithEmail,

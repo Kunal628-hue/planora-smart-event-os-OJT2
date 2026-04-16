@@ -9,6 +9,7 @@ import taskRoutes from "./routes/taskRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 import collaboratorRoutes from "./routes/collaboratorRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -21,17 +22,22 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 // --- Multi-Tenant CORS Strategy ---
-// We allow the local development studio and the designated production frontend origin.
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://planora-smart-event-os-web.vercel.app"
+  "https://planora-smart-event-os-web.vercel.app",
+  "https://planora-smart-event-os-ojt-2-6zpq.vercel.app"
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
+    // Allow if no origin (like mobile apps/curl), if in allowed list, 
+    // or if it's a Vercel preview deployment (*.vercel.app)
+    const isVercel = origin && origin.endsWith(".vercel.app");
+    
+    if (!origin || allowedOrigins.includes(origin) || isVercel || process.env.NODE_ENV !== 'production') {
       callback(null, true);
     } else {
+      console.warn(`[Security Alert] CORS Blocked for origin: ${origin}`);
       callback(new Error('Cross-Origin Access Restricted by Planora Security Protocol'));
     }
   },
@@ -65,6 +71,7 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/collaborators", collaboratorRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/auth", authRoutes);
 
 // Static files for uploads (prefixed with /api to match VITE_API_URL expectations)
 // Note: Local static serving is disabled in production to prevent Vercel boot-time conflicts.
@@ -91,15 +98,27 @@ if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
 
 // Global Error Handler - Operational Integrity
 app.use((err, req, res, next) => {
-  console.error(`[Operational Failure] ${err.stack}`);
+  console.error(`[Operational Failure] ${err.name}: ${err.message}`);
+  console.error(err.stack);
   
+  // Proactive Environment Audit
+  const missingEnv = [];
+  if (!process.env.MONGODB_URI) missingEnv.push("MONGODB_URI");
+  if (!process.env.EMAIL_USER) missingEnv.push("EMAIL_USER");
+  if (!process.env.EMAIL_PASS) missingEnv.push("EMAIL_PASS");
+  if (!process.env.GEMINI_API_KEY) missingEnv.push("GEMINI_API_KEY");
+
+  const envDiagnostics = missingEnv.length > 0 
+    ? `Critical Configuration Missing: ${missingEnv.join(", ")}. Please check your Vercel Dashboard environment variables.`
+    : null;
+
   // Ensure CORS headers are present even in failure states
   res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
   res.header("Access-Control-Allow-Credentials", "true");
   
   res.status(500).json({ 
     message: "Internal Operational Failure. Transaction aborted.",
-    systemDetail: process.env.NODE_ENV === 'production' ? 'Access backend logs for diagnostic traces.' : err.message
+    systemDetail: envDiagnostics || err.message || 'Access backend logs for diagnostic traces.'
   });
 });
 
