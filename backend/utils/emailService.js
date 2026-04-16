@@ -6,7 +6,7 @@ dotenv.config();
 // --- Dynamic Environment Resolution ---
 // We dynamically resolve application URLs to ensure the mailer points to the correct tactical environment.
 const EMAIL_USER = process.env.EMAIL_USER;
-const EMAIL_PASS = process.env.EMAIL_PASS;
+const EMAIL_PASS = process.env.EMAIL_PASS ? process.env.EMAIL_PASS.replace(/\s+/g, "") : "";
 const BACKEND_URL = process.env.BACKEND_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:5001");
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 
@@ -16,6 +16,17 @@ const transporter = nodemailer.createTransport({
         user: EMAIL_USER,
         pass: EMAIL_PASS,
     },
+});
+
+// --- Connection Verification ---
+// We verify the SMTP connection on service initialization to catch credential errors proactively.
+transporter.verify((error, success) => {
+    if (error) {
+        console.error("❌ Email Service Verification Failed:", error.message);
+        console.log("💡 Suggestion: Check EMAIL_USER and EMAIL_PASS in your .env file.");
+    } else {
+        console.log("✅ Email Service is ready to deliver messages");
+    }
 });
 
 /**
@@ -53,9 +64,12 @@ export const sendInvitation = async (guest, eventName) => {
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log(`Invitation sent to ${guest.email}`);
+        console.log(`✅ Invitation sent to ${guest.email}`);
     } catch (error) {
-        console.error("Email sending failed:", error);
+        console.error(`❌ Guest email delivery failed [${guest.email}]:`, error.message);
+        if (error.code === 'EAUTH') {
+            console.error("Authentication failed. Please verify your Google App Password.");
+        }
     }
 };
 
@@ -78,7 +92,7 @@ export const sendCollaboratorInvite = async (collaborator, inviterName, eventNam
                     <h1 style="color: #0f172a; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.04em;">Planora <span style="color: #2563eb;">Hive</span></h1>
                 </div>
                 
-                <h2 style="color: #1e293b; font-size: 20px; font-weight: 700;">Workspace Activation</h2>
+                <h2 style="color: #1e292b; font-size: 20px; font-weight: 700;">Workspace Activation</h2>
                 <p style="color: #64748b; font-size: 16px; line-height: 1.6;">Hello <strong>${collaborator.name}</strong>,</p>
                 <p style="color: #64748b; font-size: 16px; line-height: 1.6;"><strong>${inviterName}</strong> has invited you to join their operational collective on Planora for the event <strong>${eventName || 'Event Context'}</strong> as a <strong>${collaborator.role}</strong>.</p>
                 
@@ -101,8 +115,57 @@ export const sendCollaboratorInvite = async (collaborator, inviterName, eventNam
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log(`Collaborator invite sent to ${collaborator.email}`);
+        console.log(`✅ Collaborator invite sent to ${collaborator.email}`);
     } catch (error) {
-        console.error("Collaborator email sending failed:", error);
+        console.error(`❌ Collaborator email delivery failed [${collaborator.email}]:`, error.message);
+        if (error.code === 'EAUTH') {
+            console.error("Authentication failed. Please verify your Google App Password.");
+        }
+    }
+};
+
+/**
+ * Sends a polite rejection email for tech/college event applications.
+ * @param {Object} guest - The guest/applicant object.
+ * @param {string} eventName - The name of the event.
+ */
+export const sendRejectionMail = async (guest, eventName) => {
+    if (!guest.email) return;
+
+    const mailOptions = {
+        from: `"Planora Selection Committee" <${EMAIL_USER}>`,
+        to: guest.email,
+        subject: `Update regarding your application for ${eventName}`,
+        html: `
+            <div style="font-family: 'Inter', 'Segoe UI', sans-serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #f1f5f9; border-radius: 24px; background: #ffffff;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #0f172a; margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.04em;">Planora <span style="color: #64748b;">Events</span></h1>
+                </div>
+                
+                <h2 style="color: #1e293b; font-size: 18px; font-weight: 700; margin-bottom: 20px;">Regarding your application</h2>
+                <p style="color: #475569; font-size: 15px; line-height: 1.6;">Dear <strong>${guest.name}</strong>,</p>
+                <p style="color: #475569; font-size: 15px; line-height: 1.6;">Thank you for your interest in joining us for <strong>${eventName}</strong>. We received an overwhelming number of high-quality applications this year, which made our selection process incredibly difficult.</p>
+                
+                <div style="background: #f8fafc; border-radius: 16px; padding: 24px; margin: 30px 0; border: 1px solid #e2e8f0;">
+                    <p style="margin: 0; color: #64748b; font-style: italic; line-height: 1.5;">After a thorough review of your profile and background, we regret to inform you that we are unable to offer you a spot for this specific event.</p>
+                </div>
+                
+                <p style="color: #475569; font-size: 15px; line-height: 1.6;">Please keep in mind that our decision is based solely on the current event capacity and the specific requirements for this session. It is by no means a reflection of your talent or potential.</p>
+                
+                <p style="color: #475569; font-size: 15px; line-height: 1.6;">We will keep your details in our talent registry for future opportunities that align with your profile. Thank you for your understanding and for being part of our community.</p>
+                
+                <div style="margin-top: 40px; border-top: 1px solid #f1f5f9; padding-top: 20px;">
+                    <p style="color: #94a3b8; font-size: 13px; margin: 0;">Warm regards,</p>
+                    <p style="color: #1e293b; font-weight: 700; font-size: 14px; margin: 4px 0 0;">The Selection Team</p>
+                </div>
+            </div>
+        `,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log(`❌ Rejection notice delivered to ${guest.email}`);
+    } catch (error) {
+        console.error(`❌ Failed to deliver rejection mail to ${guest.email}:`, error.message);
     }
 };

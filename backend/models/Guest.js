@@ -6,8 +6,12 @@ const guestSchema = mongoose.Schema(
         email: { type: String },
         phone: { type: String },
         whatsapp: { type: String }, // WhatsApp contact number
-        status: { type: String, default: "Pending" }, // Pending, Confirmed, Declined
-        category: { type: String, default: "General" }, // Family, Friend, VIP, etc.
+        status: { type: String, default: "Pending" }, // Pending, Confirmed, Declined, Rejected
+        familySize: { type: Number, default: 0 }, // Number of extra family members
+        category: { type: String, default: "General" }, // Family, Friend, VIP, Tech, College
+        linkedIn: { type: String }, // For tech/college events
+        portfolio: { type: String }, // For tech/college events
+        rejectionReason: { type: String }, // For selection feedback
         event: { type: mongoose.Schema.Types.ObjectId, ref: "Event", required: true },
         user: { type: String, required: true }, // Firebase UID
     },

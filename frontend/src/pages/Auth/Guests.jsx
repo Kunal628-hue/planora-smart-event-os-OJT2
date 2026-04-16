@@ -14,10 +14,13 @@ export default function Guests() {
     const [newGuest, setNewGuest] = useState({
         name: "",
         email: "",
-        category: "Friend",
+        category: "Tech",
         status: "Pending",
         eventId: selectedEventId || "",
-        whatsapp: ""
+        whatsapp: "",
+        familySize: 1,
+        linkedIn: "",
+        portfolio: ""
     });
 
     const fetchData = async () => {
@@ -80,10 +83,13 @@ export default function Guests() {
                 setNewGuest({
                     name: "",
                     email: "",
-                    category: "Friend",
+                    category: "Tech",
                     status: "Pending",
-                    eventId: selectedEventId,
-                    whatsapp: ""
+                    eventId: selectedEventId || "",
+                    whatsapp: "",
+                    familySize: 1,
+                    linkedIn: "",
+                    portfolio: ""
                 });
                 fetchData();
                 addNotification("Attendee Onboarded", `${newGuest.name} has been added to the guest registry.`);
@@ -93,10 +99,9 @@ export default function Guests() {
         }
     };
 
-    const toggleStatus = async (guestId, currentStatus) => {
+    const updateStatus = async (guestId, newStatus) => {
         if (!hasEditorAccess) return;
-        const statusCycle = { "Pending": "Confirmed", "Confirmed": "Declined", "Declined": "Pending" };
-        const newStatus = statusCycle[currentStatus] || "Pending";
+        
         try {
             const response = await fetch(`${API_URL}/guests/${guestId}`, {
                 method: "PATCH",
@@ -104,8 +109,13 @@ export default function Guests() {
                 body: JSON.stringify({ status: newStatus })
             });
             if (response.ok) {
-                setGuests(guests.map(g => g._id === guestId ? { ...g, status: newStatus } : g));
-                addNotification("Status Synchronized", `Attendee RSVP updated to ${newStatus}.`);
+                if (newStatus === "Rejected") {
+                    setGuests(prev => prev.filter(g => g._id !== guestId));
+                    addNotification("Application Rejected", "The applicant has been notified and removed from the directory.");
+                } else {
+                    setGuests(prev => prev.map(g => g._id === guestId ? { ...g, status: newStatus } : g));
+                    addNotification("Status Synchronized", `Attendee RSVP updated to ${newStatus}.`);
+                }
             }
         } catch (err) {
             console.error("Failed to update status:", err);
@@ -255,26 +265,54 @@ export default function Guests() {
                                     {guest.name.charAt(0)}
                                 </div>
                                 <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.75rem" }}>
-                                    <div
-                                        onClick={() => toggleStatus(guest._id, guest.status)}
-                                        style={{
-                                            background: guest.status === "Confirmed" ? "#f0fdf4" : guest.status === "Declined" ? "#fff1f2" : "#f8fafc",
-                                            color: guest.status === "Confirmed" ? "#10b981" : guest.status === "Declined" ? "#ef4444" : "#64748b",
-                                            cursor: hasEditorAccess ? "pointer" : "default",
-                                            border: `1px solid ${guest.status === "Confirmed" ? "#10b98120" : guest.status === "Declined" ? "#ef444420" : "#64748b20"}`,
-                                            fontWeight: 800,
-                                            padding: "6px 14px",
-                                            borderRadius: "100px",
-                                            fontSize: "11px",
-                                            display: "flex",
-                                            alignItems: "center",
-                                            gap: "6px",
-                                            textTransform: "uppercase",
-                                            letterSpacing: "0.05em"
-                                        }}
-                                    >
-                                        <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "currentColor" }}></div>
-                                        {guest.status}
+                                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                        <div
+                                            onClick={() => {
+                                                const statusCycle = { "Pending": "Confirmed", "Confirmed": "Declined", "Declined": "Pending" };
+                                                const nextStatus = statusCycle[guest.status] || "Pending";
+                                                updateStatus(guest._id, nextStatus);
+                                            }}
+                                            style={{
+                                                background: guest.status === "Confirmed" ? "#f0fdf4" : guest.status === "Declined" ? "#fff1f2" : "#f8fafc",
+                                                color: guest.status === "Confirmed" ? "#10b981" : guest.status === "Declined" ? "#ef4444" : "#64748b",
+                                                cursor: hasEditorAccess ? "pointer" : "default",
+                                                border: `1px solid ${guest.status === "Confirmed" ? "#10b98120" : guest.status === "Declined" ? "#ef444420" : "#64748b20"}`,
+                                                fontWeight: 800,
+                                                padding: "6px 14px",
+                                                borderRadius: "100px",
+                                                fontSize: "11px",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                gap: "6px",
+                                                textTransform: "uppercase",
+                                                letterSpacing: "0.05em"
+                                            }}
+                                        >
+                                            <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "currentColor" }}></div>
+                                            {guest.status}
+                                        </div>
+                                        {hasEditorAccess && (
+                                            <button
+                                                onClick={() => updateStatus(guest._id, "Rejected")}
+                                                title="Reject Application"
+                                                style={{
+                                                    background: "#fff1f2",
+                                                    border: "1px solid #ef444430",
+                                                    color: "#ef4444",
+                                                    width: "28px",
+                                                    height: "28px",
+                                                    borderRadius: "8px",
+                                                    cursor: "pointer",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                    transition: "all 0.2s"
+                                                }}
+                                                onMouseOver={(e) => e.currentTarget.style.background = "#ef444410"}
+                                            >
+                                                <X size={14} strokeWidth={3} />
+                                            </button>
+                                        )}
                                     </div>
                                     {hasEditorAccess && (
                                         <button
@@ -299,6 +337,20 @@ export default function Guests() {
                                     <Mail size={14} style={{ opacity: 0.8 }} />
                                     {guest.email || "No digital contact"}
                                 </div>
+                                <div style={{ display: "flex", gap: "1rem", marginTop: "0.6rem" }}>
+                                    {guest.linkedIn && (
+                                        <a href={guest.linkedIn.startsWith('http') ? guest.linkedIn : `https://${guest.linkedIn}`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "0.4rem", color: "#2563eb", fontSize: "12px", fontWeight: 700, textDecoration: "none" }}>
+                                            <Briefcase size={14} />
+                                            LinkedIn
+                                        </a>
+                                    )}
+                                    {guest.portfolio && (
+                                        <a href={guest.portfolio.startsWith('http') ? guest.portfolio : `https://${guest.portfolio}`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "0.4rem", color: "#64748b", fontSize: "12px", fontWeight: 700, textDecoration: "none" }}>
+                                            <Calendar size={14} />
+                                            Portfolio
+                                        </a>
+                                    )}
+                                </div>
                                 {guest.whatsapp && (
                                     <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", color: "#10b981", fontSize: "14px", fontWeight: 700, marginTop: "0.4rem" }}>
                                         <Phone size={14} style={{ opacity: 0.8 }} />
@@ -320,6 +372,24 @@ export default function Guests() {
                                 }}>
                                     {guest.category}
                                 </span>
+                                {guest.status === "Confirmed" && guest.familySize > 0 && (
+                                    <span style={{
+                                        padding: "4px 10px",
+                                        borderRadius: "8px",
+                                        background: "#f0fdf4",
+                                        fontSize: "11px",
+                                        fontWeight: 800,
+                                        color: "#10b981",
+                                        textTransform: "uppercase",
+                                        letterSpacing: "0.05em",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "4px"
+                                    }}>
+                                        <Users size={12} />
+                                        Party: {guest.familySize}
+                                    </span>
+                                )}
                                 <span style={{
                                     padding: "4px 10px",
                                     borderRadius: "8px",
@@ -400,7 +470,7 @@ export default function Guests() {
                                 </div>
                             </div>
 
-                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem" }}>
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1.25rem" }}>
                                 <div>
                                     <label style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "#64748b", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Classification</label>
                                     <select style={{ width: "100%", padding: "0.85rem", borderRadius: "10px", border: "1px solid #e2e8f0", fontSize: "14px", fontWeight: 700 }} value={newGuest.category} onChange={e => setNewGuest({ ...newGuest, category: e.target.value })}>
@@ -418,6 +488,16 @@ export default function Guests() {
                                         <option>Confirmed</option>
                                         <option>Declined</option>
                                     </select>
+                                </div>
+                                <div>
+                                    <label style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "#64748b", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Party Size</label>
+                                    <input 
+                                        type="number" 
+                                        min="1"
+                                        style={{ width: "100%", padding: "0.85rem", borderRadius: "10px", border: "1px solid #e2e8f0", fontSize: "14px", fontWeight: 700 }} 
+                                        value={newGuest.familySize} 
+                                        onChange={e => setNewGuest({ ...newGuest, familySize: parseInt(e.target.value) || 1 })} 
+                                    />
                                 </div>
                             </div>
 

@@ -39,6 +39,7 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Ensure DB connection for every request (singleton handles efficiency)
 app.use(async (req, res, next) => {
