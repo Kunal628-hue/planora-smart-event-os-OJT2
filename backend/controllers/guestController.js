@@ -4,6 +4,13 @@ import { sendInvitation, sendRejectionMail } from "../utils/emailService.js";
 import { getAllowedEventIds } from "../utils/authHelper.js";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
+
+// Polyfills for Vercel serverless environment to prevent 'pdf-parse' crash
+if (typeof global !== "undefined") {
+    if (!global.DOMMatrix) global.DOMMatrix = class DOMMatrix {};
+    if (!global.ImageData) global.ImageData = class ImageData {};
+    if (!global.Path2D) global.Path2D = class Path2D {};
+}
 const pdf = require("pdf-parse");
 import * as xlsx from "xlsx";
 import csv from "csv-parser";
