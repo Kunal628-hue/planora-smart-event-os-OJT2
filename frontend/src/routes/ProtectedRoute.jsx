@@ -2,7 +2,7 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function ProtectedRoute({ children }) {
-    const { user, loading, isOtpVerified } = useAuth();
+    const { user, loading } = useAuth();
 
     if (loading) {
         return (
@@ -12,9 +12,9 @@ export default function ProtectedRoute({ children }) {
         );
     }
 
-    if (!user || !isOtpVerified) {
+    if (!user) {
         // Detailed Diagnostic Log for Debugging
-        console.warn(`[Security Analysis] Unauthorized Access Blocked. State: { Auth: ${!!user}, Verified: ${isOtpVerified}, Loading: ${loading} }`);
+        console.warn(`[Security Analysis] Unauthorized Access Blocked. State: { Auth: false, Loading: ${loading} }`);
         return <Navigate to="/login" replace />;
     }
 

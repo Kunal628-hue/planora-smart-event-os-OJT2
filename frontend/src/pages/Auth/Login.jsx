@@ -6,102 +6,19 @@ import SocialAuth from "../../components/auth/SocialAuth";
 
 export default function Login() {
     const navigate = useNavigate();
-    const { loginWithGoogle, loginWithEmail, setOtpVerified, user, isOtpVerified } = useAuth();
-    const [form, setForm] = useState({ email: "", password: "", otp: "" });
-    const [step, setStep] = useState("email"); // email, otp
-    const [authMode, setAuthMode] = useState("password"); // password, otp
+    const { loginWithGoogle, loginWithEmail, user } = useAuth();
+    const [form, setForm] = useState({ email: "", password: "" });
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
-    const [status, setStatus] = useState("");
 
-    // --- State Recovery Logic ---
-    // If the user is already authenticated in Firebase but hasn't completed OTP,
-    // we automatically transition them to the OTP step to prevent a login loop.
     useEffect(() => {
-        if (user && !isOtpVerified && step === "email") {
-            setForm(prev => ({ ...prev, email: user.email }));
-            setStep("otp");
-            setStatus("Session detected. Please verify your identity with the code sent to your email.");
-            
-            // Auto-trigger the OTP send if it hasn't been sent yet
-            const triggerResend = async () => {
-                try {
-                    await fetch(`${import.meta.env.VITE_API_URL}/auth/send-otp`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ email: user.email }),
-                    });
-                } catch (e) { console.warn("Failed to auto-resend OTP"); }
-            };
-            triggerResend();
+        if (user) {
+            navigate("/dashboard");
         }
-    }, [user, isOtpVerified, step]);
+    }, [user, navigate]);
 
     const handleChange = (e) => {
         setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-    };
-
-    const handleSendOTP = async () => {
-        if (!form.email) {
-            setError("Please enter your email address first.");
-            return;
-        }
-
-        setError("");
-        setLoading(true);
-        setStatus("Sending verification code...");
-        
-        try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/send-otp`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: form.email }),
-            });
-            const data = await response.json();
-            if (response.ok) {
-                setStep("otp");
-                setStatus("Code sent to your inbox!");
-            } else {
-                setError(data.message || "Failed to send code.");
-            }
-        } catch (err) {
-            setError("Network error. Please try again.");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleVerifyOTP = async (e) => {
-        e.preventDefault();
-        if (!form.otp || form.otp.length < 6) {
-            setError("Please enter the 6-digit code.");
-            return;
-        }
-
-        setError("");
-        setLoading(true);
-        setStatus("Verifying...");
-
-        try {
-            console.log(`[OTP Verification] Starting for ${form.email}. Current Firebase User: ${user ? user.email : "NONE"}`);
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/verify-otp`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: form.email, code: form.otp }),
-            });
-            const data = await response.json();
-            if (response.ok) {
-                console.log(`[OTP Success] Verified. Navigating to dashboard. User available: ${!!user}`);
-                setOtpVerified(true);
-                navigate("/dashboard");
-            } else {
-                setError(data.message || "Invalid code.");
-            }
-        } catch (err) {
-            setError("Verification failed. Please try again.");
-        } finally {
-            setLoading(false);
-        }
     };
 
     const handleSocialLogin = async (provider = 'google') => {
@@ -112,43 +29,15 @@ export default function Login() {
         try {
             setError("");
             setLoading(true);
-            const userCredential = await loginWithGoogle();
-            const email = userCredential.user.email;
-            
-            setForm(prev => ({ ...prev, email }));
-            
-            // --- Tactical Enhancement: Strategic OTP Challenge for Google Accounts ---
-            setStatus("Google identity verified. Sending security code...");
-            
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/send-otp`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email }),
-            });
-            const data = await response.json();
-            
-            if (response.ok) {
-                setStep("otp");
-                setStatus("Security code sent to your Google email!");
-            } else {
-                setError(data.message || "Failed to send security code.");
-            }
+            await loginWithGoogle();
+            navigate("/dashboard");
         } catch (err) {
             console.error("Social Login Error:", err);
-            if (err.code === "auth/operation-not-allowed") {
-                setError("Google sign-in is not enabled. Please enable it in the Firebase Console.");
-            } else if (err.code === "auth/account-exists-with-different-credential") {
-                setError("An account already exists with the same email address but different sign-in credentials. Please try another method.");
-            } else if (err.code === "auth/popup-closed-by-user") {
-                setError("Sign-in window was closed. Please try again.");
-            } else {
-                setError(err.message);
-            }
+            setError(err.message);
         } finally {
             setLoading(false);
         }
     };
-
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -161,28 +50,9 @@ export default function Login() {
 
         try {
             await loginWithEmail(form.email, form.password);
-            
-            // --- Strategic Mandatory OTP Challenge ---
-            // After password verification, we initiate the OTP step to satisfy the isOtpVerified requirement.
-            setStatus("Password verified. Sending secondary security code...");
-            
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/send-otp`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: form.email }),
-            });
-            
-            if (response.ok) {
-                setStep("otp");
-                setStatus("Security code sent!");
-            } else {
-                const data = await response.json();
-                setError(data.message || "Email login successful, but failed to send verification code.");
-            }
+            navigate("/dashboard");
         } catch (err) {
-            if (err.code === "auth/operation-not-allowed") {
-                setError("Email/Password sign-in is not enabled. Please enable it in the Firebase Console.");
-            } else if (err.code === "auth/invalid-credential") {
+            if (err.code === "auth/invalid-credential") {
                 setError("Invalid email or password.");
             } else {
                 setError(err.message);
@@ -246,106 +116,41 @@ export default function Login() {
                                 <span>OR</span>
                             </div>
 
-                            {step === "email" ? (
-                                <form onSubmit={authMode === "password" ? handleSubmit : (e) => { e.preventDefault(); handleSendOTP(); }} className="auth-form">
-                                    <div className="form-group" style={{ marginBottom: '1rem' }}>
-                                        <label className="auth-label-new">Email address</label>
-                                        <input
-                                            className="auth-input-new"
-                                            type="email"
-                                            name="email"
-                                            value={form.email}
-                                            onChange={handleChange}
-                                            placeholder="name@gmail.com"
-                                            required
-                                        />
-                                    </div>
+                            <form onSubmit={handleSubmit} className="auth-form">
+                                <div className="form-group" style={{ marginBottom: '1rem' }}>
+                                    <label className="auth-label-new">Email address</label>
+                                    <input
+                                        className="auth-input-new"
+                                        type="email"
+                                        name="email"
+                                        value={form.email}
+                                        onChange={handleChange}
+                                        placeholder="name@gmail.com"
+                                        required
+                                    />
+                                </div>
 
-                                    {authMode === "password" && (
-                                        <div className="form-group" style={{ marginBottom: '1.25rem' }}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                                                <label className="auth-label-new" style={{ margin: 0 }}>Password</label>
-                                                <button 
-                                                    type="button" 
-                                                    onClick={() => setAuthMode("otp")}
-                                                    style={{ background: 'none', border: 'none', color: '#ff5a1f', fontSize: '0.75rem', cursor: 'pointer', padding: 0 }}
-                                                >
-                                                    Use code instead?
-                                                </button>
-                                            </div>
-                                            <input
-                                                className="auth-input-new"
-                                                type="password"
-                                                name="password"
-                                                value={form.password}
-                                                onChange={handleChange}
-                                                placeholder="••••••••"
-                                            />
-                                        </div>
-                                    )}
+                                <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                                    <label className="auth-label-new" style={{ marginBottom: '0.5rem' }}>Password</label>
+                                    <input
+                                        className="auth-input-new"
+                                        type="password"
+                                        name="password"
+                                        value={form.password}
+                                        onChange={handleChange}
+                                        placeholder="••••••••"
+                                        required
+                                    />
+                                </div>
 
-                                    {error && (
-                                        <div className="auth-error-new" style={{ padding: '0.65rem', marginBottom: '1rem', fontSize: '0.85rem' }}>{error}</div>
-                                    )}
+                                {error && (
+                                    <div className="auth-error-new" style={{ padding: '0.65rem', marginBottom: '1rem', fontSize: '0.85rem' }}>{error}</div>
+                                )}
 
-                                    <button type="submit" className="auth-submit-btn" disabled={loading}>
-                                        {loading ? "Please wait..." : (authMode === "password" ? "Continue" : "Send Login Code")}
-                                    </button>
-
-                                    {authMode === "otp" && (
-                                        <button 
-                                            type="button" 
-                                            onClick={() => setAuthMode("password")}
-                                            style={{ width: '100%', background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: '0.75rem', marginTop: '1rem', cursor: 'pointer' }}
-                                        >
-                                            Back to password login
-                                        </button>
-                                    )}
-                                </form>
-                            ) : (
-                                <form onSubmit={handleVerifyOTP} className="auth-form">
-                                    <div className="form-group" style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
-                                        <label className="auth-label-new" style={{ marginBottom: '1rem', textAlign: 'center' }}>Enter the 6-digit code sent to<br/><span style={{ color: 'white' }}>{form.email}</span></label>
-                                        <input
-                                            className="auth-input-new"
-                                            type="text"
-                                            name="otp"
-                                            value={form.otp}
-                                            onChange={handleChange}
-                                            placeholder="000000"
-                                            maxLength={6}
-                                            style={{ fontSize: '1.5rem', textAlign: 'center', letterSpacing: '0.5em', padding: '1rem' }}
-                                            autoFocus
-                                        />
-                                    </div>
-
-                                    {error && (
-                                        <div className="auth-error-new" style={{ padding: '0.65rem', marginBottom: '1rem', fontSize: '0.85rem' }}>{error}</div>
-                                    )}
-                                    
-                                    {status && !error && (
-                                        <div style={{ color: '#10b981', fontSize: '0.75rem', marginBottom: '1rem', textAlign: 'center' }}>{status}</div>
-                                    )}
-
-                                    <button type="submit" className="auth-submit-btn" disabled={loading}>
-                                        {loading ? "Verifying..." : "Verify & Login"}
-                                    </button>
-
-                                    <button 
-                                        type="button" 
-                                        onClick={() => { 
-                                            logout(); // Clear the trapped session
-                                            setStep("email"); 
-                                            setForm({ email: "", password: "", otp: "" }); // Clear previous email
-                                            setStatus(""); 
-                                            setError(""); 
-                                        }}
-                                        style={{ width: '100%', background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: '0.75rem', marginTop: '1rem', cursor: 'pointer' }}
-                                    >
-                                        Not your email? Try again
-                                    </button>
-                                </form>
-                            )}
+                                <button type="submit" className="auth-submit-btn" disabled={loading}>
+                                    {loading ? "Logging in..." : "Continue"}
+                                </button>
+                            </form>
 
                             <div className="auth-footer-links" style={{ marginTop: '1.5rem' }}>
                                 <p style={{ margin: 0 }}>Need an account? <Link to="/signup">Join Planora</Link></p>

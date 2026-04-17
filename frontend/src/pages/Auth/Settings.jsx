@@ -38,7 +38,7 @@ export default function Settings() {
         { id: 1, event: "System Authentication", status: "success", geo: "Mumbai, IN", time: "2 hours ago", icon: <Fingerprint size={14} /> },
         { id: 2, event: "PDF Intelligence Export", status: "success", geo: "Mumbai, IN", time: "5 hours ago", icon: <Database size={14} /> },
         { id: 3, event: "Security Protocol Update", status: "info", geo: "System", time: "Yesterday", icon: <Shield size={14} /> },
-        { id: 4, event: "Project Parameter Change", status: "warn", geo: "Mumbai, IN", time: "2 days ago", icon: <Zap size={14} /> },
+        { id: 4, event: "Event Parameter Change", status: "warn", geo: "Mumbai, IN", time: "2 days ago", icon: <Zap size={14} /> },
         { id: 5, event: "Workspace Initialized", status: "success", geo: "Cloud", time: "Jan 12, 2024", icon: <Activity size={14} /> }
     ]);
 

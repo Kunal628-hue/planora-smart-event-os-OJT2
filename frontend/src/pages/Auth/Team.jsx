@@ -85,7 +85,9 @@ export default function Team() {
                 
                 // --- App-Priority Redirection (Priority for Desktop App) ---
                 if (inviteData.whatsapp) {
-                    const waMessage = encodeURIComponent(`Hi ${inviteData.name}, this is ${senderName}. I've synchronized your access as '${inviteData.role}' for the "${event?.name || 'Project Registry'}" on Planora OS. Your dashboard is now active. let's execute!`);
+                    const event = events.find(e => (e.id || e._id) === inviteData.event);
+                    const locationText = event?.location ? `\n📍 Venue: ${event.location}\n🗺️ Map: https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}` : "";
+                    const waMessage = encodeURIComponent(`Hi ${inviteData.name}, this is ${senderName}. I've synchronized your access as '${inviteData.role}' for "${event?.name || 'Event Registry'}" on Planora.${locationText}\n\nYour dashboard is now active. Let's execute!`);
                     
                     // Using api.whatsapp.com gateway which triggers the Desktop App if installed
                     const waUrl = `https://api.whatsapp.com/send?phone=${inviteData.whatsapp.replace(/[^0-9]/g, "")}&text=${waMessage}`;

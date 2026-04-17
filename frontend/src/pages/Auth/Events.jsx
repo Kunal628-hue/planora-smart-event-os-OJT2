@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import { useDialog } from "../../context/DialogContext";
-import { Plus, Calendar, MapPin, ChevronRight, Loader2, X, Sparkles, LayoutGrid, Package, Wallet } from "lucide-react";
+import { Plus, Calendar, MapPin, Globe, ChevronRight, Loader2, X, Sparkles, LayoutGrid, Package, Wallet } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -17,7 +17,9 @@ export default function Events() {
         date: "",
         location: "",
         type: "Wedding",
-        budget: ""
+        budget: "",
+        city: "",
+        country: ""
     });
 
     const fetchEvents = async () => {
@@ -73,7 +75,9 @@ export default function Events() {
             type: newEvent.type || "Other",
             budget: parseInt(newEvent.budget) || 0,
             userId: user.uid,
-            status: "Planned"
+            status: "Planned",
+            city: newEvent.city,
+            country: newEvent.country
         };
 
         setLoading(true);
@@ -87,7 +91,7 @@ export default function Events() {
 
             if (response.ok) {
                 setShowModal(false);
-                setNewEvent({ name: "", date: "", location: "", type: "Wedding", budget: "" });
+                setNewEvent({ name: "", date: "", location: "", type: "Wedding", budget: "", city: "", country: "" });
                 fetchEvents();
                 addNotification("Event Created", `'${eventData.name}' has been successfully onboarded.`);
             } else {
@@ -283,7 +287,7 @@ export default function Events() {
 
                         <form onSubmit={handleCreateEvent} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                             <div>
-                                <label style={labelStyle}>Project Title</label>
+                                <label style={labelStyle}>Event Title</label>
                                 <div style={{ position: "relative" }}>
                                     <LayoutGrid size={15} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
                                     <input
@@ -327,13 +331,42 @@ export default function Events() {
                                 </div>
                             </div>
 
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                                <div>
+                                    <label style={labelStyle}>Country</label>
+                                    <div style={{ position: "relative" }}>
+                                        <Globe size={15} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+                                        <input
+                                            required
+                                            placeholder="USA, India, etc."
+                                            value={newEvent.country}
+                                            onChange={e => setNewEvent({ ...newEvent, country: e.target.value })}
+                                            style={inputStyle}
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label style={labelStyle}>City</label>
+                                    <div style={{ position: "relative" }}>
+                                        <MapPin size={15} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+                                        <input
+                                            required
+                                            placeholder="New York, Mumbai, etc."
+                                            value={newEvent.city}
+                                            onChange={e => setNewEvent({ ...newEvent, city: e.target.value })}
+                                            style={inputStyle}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
                             <div>
-                                <label style={labelStyle}>Geographical Location</label>
+                                <label style={labelStyle}>Venue Location</label>
                                 <div style={{ position: "relative" }}>
-                                    <MapPin size={15} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+                                    <LayoutGrid size={15} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
                                     <input
                                         required
-                                        placeholder="Venue or coordinate..."
+                                        placeholder="Specific Hotel, Hall, or Address..."
                                         value={newEvent.location}
                                         onChange={e => setNewEvent({ ...newEvent, location: e.target.value })}
                                         style={inputStyle}
@@ -381,7 +414,7 @@ export default function Events() {
                                     <Loader2 size={18} />
                                 ) : (
                                     <>
-                                        Initialize Project
+                                        Initialize Event
                                         <ChevronRight size={16} strokeWidth={3} />
                                     </>
                                 )}

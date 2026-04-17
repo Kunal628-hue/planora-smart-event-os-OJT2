@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useDialog } from "../../context/DialogContext";
-import { UserPlus, Users, Trash2, Mail, Briefcase, Loader2, X, Calendar, Phone } from "lucide-react";
+import { UserPlus, Users, Trash2, Mail, Briefcase, Loader2, X, Calendar, Phone, Upload, FileText } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -52,6 +52,44 @@ export default function Guests() {
         }
     }, [selectedEventId]);
 
+    const [bulkLoading, setBulkLoading] = useState(false);
+    const [bulkCooldown, setBulkCooldown] = useState(false);
+
+    const handleBulkUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file || !selectedEventId || bulkCooldown) return;
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("eventId", selectedEventId);
+
+        setBulkLoading(true);
+        try {
+            const response = await fetch(`${API_URL}/guests/bulk-upload`, {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                addNotification("Bulk Onboarding Complete", data.message);
+                fetchData();
+            } else if (response.status === 429) {
+                addNotification("AI Rate Limit", "The AI engine is busy. Please wait 2 minutes before trying again.");
+                // Start a 30-second cooldown to prevent hammering
+                setBulkCooldown(true);
+                setTimeout(() => setBulkCooldown(false), 30000);
+            } else {
+                addNotification("Extraction Error", data.message || "Failed to parse file.");
+            }
+        } catch (err) {
+            console.error("Bulk upload failed:", err);
+            addNotification("Connection Error", "Failed to reach the server.");
+        } finally {
+            setBulkLoading(false);
+            e.target.value = "";
+        }
+    };
 
     const handleCreateGuest = async (e) => {
         e.preventDefault();
@@ -73,7 +111,8 @@ export default function Guests() {
                 if (newGuest.whatsapp) {
                     const event = events.find(e => (e.id || e._id) === newGuest.eventId);
                     const senderName = user.displayName || "Management Team Member";
-                    const waMessage = encodeURIComponent(`Hi ${newGuest.name}, this is ${senderName}. You've been prioritized for the "${event?.name || 'Upcoming Project'}" on Planora OS. We've sent your official digital record to your email. Let's synchronize on the details!`);
+                    const locationText = event?.location ? `\n📍 Venue: ${event.location}\n🗺️ View Map: https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}` : "";
+                    const waMessage = encodeURIComponent(`Hi ${newGuest.name}, this is ${senderName}. You're invited to "${event?.name || 'Upcoming Event'}" on Planora!${locationText}\n\nWe've sent more details to your email. See you there!`);
                     
                     // Using api.whatsapp.com gateway which triggers the Desktop App if installed
                     const waUrl = `https://api.whatsapp.com/send?phone=${newGuest.whatsapp.replace(/[^0-9]/g, "")}&text=${waMessage}`;
@@ -160,28 +199,57 @@ export default function Guests() {
                     </p>
                 </div>
                 {hasEditorAccess && (
-                    <button
-                        onClick={() => setShowModal(true)}
-                        disabled={events.length === 0}
-                        style={{
+                    <div style={{ display: "flex", gap: "1rem" }}>
+                        <label style={{
                             borderRadius: "16px",
                             padding: "1rem 2rem",
                             display: "flex",
                             alignItems: "center",
                             gap: "0.75rem",
-                            background: "#2563eb",
-                            color: "#fff",
-                            border: "none",
+                            background: "#fff",
+                            color: bulkCooldown ? "#94a3b8" : "#2563eb",
+                            border: "1px solid #e2e8f0",
                             fontWeight: 800,
                             fontSize: "15px",
-                            cursor: "pointer",
-                            boxShadow: "0 8px 20px rgba(37, 99, 235, 0.2)",
-                            transition: "all 0.2s ease"
-                        }}
-                    >
-                        <UserPlus size={20} strokeWidth={3} />
-                        <span>Add Attendee</span>
-                    </button>
+                            cursor: (bulkLoading || bulkCooldown) ? "default" : "pointer",
+                            boxShadow: "0 4px 10px rgba(0,0,0,0.02)",
+                            transition: "all 0.2s ease",
+                            opacity: (bulkLoading || bulkCooldown) ? 0.6 : 1
+                        }}>
+                            {bulkLoading ? <Loader2 className="animate-spin" size={20} /> : <Upload size={20} />}
+                            <span>{bulkCooldown ? "Cooling down..." : bulkLoading ? "Extracting..." : "Bulk Onboarding"}</span>
+                            <input 
+                                type="file" 
+                                accept=".pdf,.xlsx,.xls,.csv" 
+                                style={{ display: "none" }} 
+                                onChange={handleBulkUpload}
+                                disabled={bulkLoading || bulkCooldown || events.length === 0}
+                            />
+                        </label>
+
+                        <button
+                            onClick={() => setShowModal(true)}
+                            disabled={events.length === 0}
+                            style={{
+                                borderRadius: "16px",
+                                padding: "1rem 2rem",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "0.75rem",
+                                background: "#2563eb",
+                                color: "#fff",
+                                border: "none",
+                                fontWeight: 800,
+                                fontSize: "15px",
+                                cursor: "pointer",
+                                boxShadow: "0 8px 20px rgba(37, 99, 235, 0.2)",
+                                transition: "all 0.2s ease"
+                            }}
+                        >
+                            <UserPlus size={20} strokeWidth={3} />
+                            <span>Add Attendee</span>
+                        </button>
+                    </div>
                 )}
             </div>
 

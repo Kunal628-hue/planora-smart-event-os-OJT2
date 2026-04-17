@@ -2,13 +2,35 @@ import Event from "../models/Event.js";
 import Task from "../models/Task.js";
 import Vendor from "../models/Vendor.js";
 import Guest from "../models/Guest.js";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 
 dotenv.config();
 
-const genAI = process.env.GEMINI_API_KEY ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY) : null;
+const generateGroqCompletion = async (prompt) => {
+    if (!process.env.GROQ_API_KEY) throw new Error("GROQ_API_KEY is missing");
+    
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            model: "llama-3.3-70b-versatile",
+            messages: [{ role: "user", content: prompt }],
+            temperature: 0.2
+        })
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Groq API Error: ${response.status} ${errorText}`);
+    }
+
+    const data = await response.json();
+    return data.choices[0].message.content;
+};
 
 export const getEventHealth = async (req, res) => {
     try {
@@ -236,201 +258,206 @@ export const getBudgetOptimization = async (req, res) => {
 };
 
 export const getVendorRecommendations = async (req, res) => {
-    const { type, budget } = req.query;
+    try {
+        const { type, budget, eventId } = req.query;
+        
+        let remainingBudget = parseFloat(budget) || 1000000;
+        let eventType = type || "Wedding";
+        let bookedCategories = [];
+        let eventTitle = "your event";
+        let eventCity = "Mumbai";
+        let eventCountry = "India";
 
-    // Mock vendor database
-    // Comprehensive Real-world Vendor Registry (India Focus)
-    const allVendors = [
-        // --- LUXURY / PREMIUM (₹₹₹ - ₹₹₹₹) ---
-        {
-            name: "The Taj Mahal Palace",
-            service: "Venue",
-            rating: 4.9,
-            priceRange: "₹₹₹₹",
-            startingPrice: 2500000,
-            location: "Apollo Bunder, Mumbai, Maharashtra 400001",
-            suitableFor: ["Wedding", "Conference", "Event"],
-            description: "Iconic landmark offering legendary hospitality and grand ballrooms for high-profile weddings and corporate summits.",
-            contact: "+91 22 6665 3366",
-            email: "reservations.mumbai@tajhotels.com",
-            specialty: "Heritage Grandeur & Royal Banquets"
-        },
-        {
-            name: "Blue Sea Catering",
-            service: "Catering",
-            rating: 4.8,
-            priceRange: "₹₹₹",
-            startingPrice: 1500000,
-            location: "Worli Sea Face, Mumbai, Maharashtra 400030",
-            suitableFor: ["Wedding", "Conference", "Party"],
-            description: "Award-winning gourmet catering specializing in exotic global cuisines and theatrical live stations for elite gatherings.",
-            contact: "+91 22 2490 2222",
-            email: "info@bluesea.in",
-            specialty: "Signature Continental & Pan-Asian Fusion"
-        },
-        {
-            name: "Sabyasachi Mukherjee Decor",
-            service: "Decor",
-            rating: 5.0,
-            priceRange: "₹₹₹₹",
-            startingPrice: 10000000,
-            location: "Kala Ghoda, Mumbai, Maharashtra 400001",
-            suitableFor: ["Wedding", "Other"],
-            description: "Bespoke, high-couture event styling that blends traditional Indian craftsmanship with maximalist vintage aesthetics.",
-            contact: "+91 33 4031 6000",
-            email: "decor@sabyasachi.com",
-            specialty: "Vintage Indian & Floral Maximalism"
-        },
-        {
-            name: "Elite Pro-Live AV",
-            service: "AV",
-            rating: 4.9,
-            priceRange: "₹₹₹",
-            startingPrice: 800000,
-            location: "Andheri East, Mumbai, Maharashtra 400069",
-            suitableFor: ["Conference", "College Fest", "Event"],
-            description: "Cutting-edge sound and light solutions for large-scale concerts, hybrid conferences, and stadium events.",
-            contact: "+91 91234 56789",
-            email: "solutions@eliteprolive.com",
-            specialty: "3D Projection Mapping & Line-Array Audio"
-        },
-
-        // --- MID-RANGE (₹₹ - ₹₹₹) ---
-        {
-            name: "Novotel City Center",
-            service: "Venue",
-            rating: 4.6,
-            priceRange: "₹₹",
-            startingPrice: 500000,
-            location: "Ahmedabad, Gujarat 380015",
-            suitableFor: ["Conference", "Party", "Workshop"],
-            description: "Modern, high-tech banquet halls and meeting rooms designed for efficiency and seamless business flow.",
-            contact: "+91 80 6670 0600",
-            email: "meetings@novotel.com",
-            specialty: "Smart Tech & Modern Corporate Layouts"
-        },
-        {
-            name: "Copper Chimney Catering",
-            service: "Catering",
-            rating: 4.7,
-            priceRange: "₹₹",
-            startingPrice: 300000,
-            location: "Bandra West, Mumbai, Maharashtra 400050",
-            suitableFor: ["Party", "Conference", "Wedding"],
-            description: "Decades of culinary excellence bringing legendary North Indian flavors and tandoori specialties to your event.",
-            contact: "+91 22 2492 4433",
-            email: "catering@copperchimney.in",
-            specialty: "Signature North Indian & Frontier Cuisine"
-        },
-        {
-            name: "The Wedding Design Company",
-            service: "Decor",
-            rating: 4.7,
-            priceRange: "₹₹₹",
-            startingPrice: 1500000,
-            location: "Greater Kailash, New Delhi 110048",
-            suitableFor: ["Wedding", "Birthday", "Party"],
-            description: "Creative design house focusing on thematic storytelling and modern chic setups for social celebrations.",
-            contact: "+91 11 4678 9000",
-            email: "hello@twdc.in",
-            specialty: "Thematic Storytelling & Modern Chic"
-        },
-        {
-            name: "Pixel Perfect Media",
-            service: "Photography",
-            rating: 4.8,
-            priceRange: "₹₹",
-            startingPrice: 200000,
-            location: "Indiranagar, Bangalore, Karnataka 560038",
-            suitableFor: ["Wedding", "Event", "Conference"],
-            description: "Specializing in cinematic event coverage, traditional portraits, and high-speed delivery of digital assets.",
-            contact: "+91 99887 76655",
-            email: "lens@pixelperfect.in",
-            specialty: "Cinematography & 4K Live Streaming"
-        },
-
-        // --- AFFORDABLE / BUDGET (₹ - ₹₹) ---
-        {
-            name: "Suburban Community Hall",
-            service: "Venue",
-            rating: 4.2,
-            priceRange: "₹",
-            startingPrice: 50000,
-            location: "Borivali West, Mumbai, Maharashtra 400092",
-            suitableFor: ["Party", "Workshop", "Other"],
-            description: "Spacious and functional community environment ideal for local gatherings and budget-friendly social meetups.",
-            contact: "+91 22 1234 5678",
-            email: "bookings@suburban.org",
-            specialty: "Functional Space & Easy Accessibility"
-        },
-        {
-            name: "Street Bites Live",
-            service: "Catering",
-            rating: 4.5,
-            priceRange: "₹",
-            startingPrice: 75000,
-            location: "Kothrud, Pune, Maharashtra 411038",
-            suitableFor: ["College Fest", "Party"],
-            description: "Fun and vibrant live food counters bringing hygienic street food favorites to your event.",
-            contact: "+91 88776 65544",
-            email: "bite@streetbites.in",
-            specialty: "Live Chaat & Global Street Snacks"
-        },
-        {
-            name: "Eco-Friendly Decorators",
-            service: "Decor",
-            rating: 4.4,
-            priceRange: "₹",
-            startingPrice: 150000,
-            location: "Auroville, Pondicherry 605101",
-            suitableFor: ["Wedding", "Party", "College Fest"],
-            description: "Sustainable and beautiful decor using recycled materials, locally sourced flowers, and biodegradable elements.",
-            contact: "+91 77665 54433",
-            email: "earth@ecodecor.com",
-            specialty: "Sustainable Design & Zero-Waste Setups"
-        },
-        {
-            name: "Rent-A-Beam AV",
-            service: "AV",
-            rating: 4.3,
-            priceRange: "₹",
-            startingPrice: 20000,
-            location: "Salt Lake City, Kolkata, West Bengal 700091",
-            suitableFor: ["Workshop", "College Fest", "Other"],
-            description: "Reliable equipment rentals for basic sound, projectors, and basic stage lighting at competitive prices.",
-            contact: "+91 99001 12233",
-            email: "rent@rentabeam.com",
-            specialty: "Plug-and-Play AV & Projector Kits"
-        },
-        {
-            name: "City-Swift Logistics",
-            service: "Logistics",
-            rating: 4.5,
-            priceRange: "₹",
-            startingPrice: 35000,
-            location: "Whitefield, Bangalore, Karnataka 560066",
-            suitableFor: ["Conference", "Event", "College Fest"],
-            description: "Safe and efficient transport solutions for guests and equipment across urban centers.",
-            contact: "+91 80 4433 2211",
-            email: "logistic@cityswift.in",
-            specialty: "Group Transport & Equipment Freight"
+        // If eventId is provided, get real precision data
+        if (eventId && mongoose.Types.ObjectId.isValid(eventId)) {
+            const event = await Event.findById(eventId);
+            if (event) {
+                const bookedVendors = await Vendor.find({ event: event._id });
+                const totalSpent = bookedVendors.reduce((sum, v) => sum + (v.cost || 0), 0);
+                remainingBudget = Math.max(0, event.budget - totalSpent);
+                eventType = event.type;
+                eventTitle = event.title;
+                eventCity = event.city || "Mumbai";
+                eventCountry = event.country || "India";
+                bookedCategories = bookedVendors.map(v => v.service);
+            }
         }
-    ];
 
-    let recommendations = allVendors.filter(v => v.suitableFor.includes(type));
+        const allVendors = [
+            {
+                name: "The Taj Mahal Palace",
+                service: "Venue",
+                rating: 4.9,
+                priceRange: "₹₹₹₹",
+                startingPrice: 2500000,
+                city: "Mumbai",
+                country: "India",
+                location: "Apollo Bunder",
+                suitableFor: ["Wedding", "Conference", "Event"],
+                description: "Iconated heritage luxury for grand events.",
+                contact: "+91 22 6665 3366"
+            },
+            {
+                name: "Blue Sea Catering",
+                service: "Catering",
+                rating: 4.8,
+                priceRange: "₹₹₹",
+                startingPrice: 1500000,
+                city: "Mumbai",
+                country: "India",
+                location: "Worli",
+                suitableFor: ["Wedding", "Conference", "Party"],
+                description: "Premium gourmet catering solutions.",
+                contact: "+91 22 2490 2222"
+            },
+            {
+                name: "Novotel Delhi Aerocity",
+                service: "Venue",
+                rating: 4.6,
+                priceRange: "₹₹",
+                startingPrice: 50000,
+                city: "Delhi",
+                country: "India",
+                location: "Aerocity",
+                suitableFor: ["Conference", "Party", "Workshop"],
+                description: "Modern business-focused venue.",
+                contact: "+91 80 6670 0600"
+            },
+            {
+                name: "Eco-Friendly Decorators",
+                service: "Decor",
+                rating: 4.4,
+                priceRange: "₹",
+                startingPrice: 80000,
+                city: "Delhi",
+                country: "India",
+                location: "Auroville",
+                suitableFor: ["Wedding", "Party", "College Fest"],
+                description: "Zero-waste sustainable event design.",
+                contact: "+91 77665 54433"
+            },
+            {
+                name: "Street Bites Live",
+                service: "Catering",
+                rating: 4.5,
+                priceRange: "₹",
+                startingPrice: 30000,
+                city: "Pune",
+                country: "India",
+                location: "Kothrud",
+                suitableFor: ["College Fest", "Party"],
+                description: "Hygienic and vibrant live food counters.",
+                contact: "+91 88776 65544"
+            },
+            {
+                name: "The Ritz-Carlton, New York",
+                service: "Venue",
+                rating: 4.9,
+                priceRange: "₹₹₹₹",
+                startingPrice: 500000,
+                city: "New York",
+                country: "USA",
+                location: "Central Park South",
+                suitableFor: ["Wedding", "Conference"],
+                description: "Legendary luxury in the heart of Manhattan.",
+                contact: "+1 212 308 9100"
+            },
+            {
+                name: "Empire Steak House",
+                service: "Catering",
+                rating: 4.7,
+                priceRange: "₹₹₹",
+                startingPrice: 150000,
+                city: "New York",
+                country: "USA",
+                location: "Midtown",
+                suitableFor: ["Party", "Corporate"],
+                description: "Classic American steakhouse gourmet catering.",
+                contact: "+1 212 555 0199"
+            }
+        ];
 
-    // Fallback: If no specific recommendations, show top rated vendors
-    if (recommendations.length === 0) {
-        recommendations = allVendors.sort((a, b) => b.rating - a.rating).slice(0, 3);
+        // Systemic Filtering
+        // 1. Filter by budget and suitability
+        let filtered = allVendors.filter(v => {
+            // Broaden suitability check: if event is Birthday, match "Party" vendors, etc.
+            const broaderMapping = {
+                "Birthday": "Party",
+                "Tech Summits": "Conference",
+                "Corporate": "Conference",
+                "Other": "Event"
+            };
+            const targetTag = broaderMapping[eventType] || eventType;
+            
+            return (v.suitableFor.includes(targetTag) || v.suitableFor.includes("Event")) && 
+                   v.startingPrice <= remainingBudget;
+        });
+
+        // 2. Prioritize Country then City Match
+        filtered.sort((a, b) => {
+            const aCountryMatch = a.country?.toLowerCase() === eventCountry?.toLowerCase();
+            const bCountryMatch = b.country?.toLowerCase() === eventCountry?.toLowerCase();
+            
+            if (aCountryMatch && !bCountryMatch) return -1;
+            if (!aCountryMatch && bCountryMatch) return 1;
+
+            const aCityMatch = a.city?.toLowerCase() === eventCity?.toLowerCase();
+            const bCityMatch = b.city?.toLowerCase() === eventCity?.toLowerCase();
+            
+            if (aCityMatch && !bCityMatch) return -1;
+            if (!aCityMatch && bCityMatch) return 1;
+
+            // Then booked categories
+            const aBooked = bookedCategories.includes(a.service);
+            const bBooked = bookedCategories.includes(b.service);
+            if (!aBooked && bBooked) return -1;
+            if (aBooked && !bBooked) return 1;
+
+            return b.rating - a.rating;
+        });
+
+        const topPicks = filtered.slice(0, 3);
+
+        // Enhance with Groq Match Reason
+        if (process.env.GROQ_API_KEY && topPicks.length > 0) {
+            try {
+                const prompt = `
+                    You are an expert event planner. Recommend these ${topPicks.length} vendors for "${eventTitle}" in "${eventCity}, ${eventCountry}" with a remaining budget of ₹${remainingBudget.toLocaleString()}.
+                    Vendors: ${topPicks.map(v => `${v.name} (Located in ${v.city}, ${v.country}, Starts at ₹${v.startingPrice})`).join(", ")}.
+                    For each vendor, write a 1-sentence "Match Reason" explaining why it fits this specific geography (country/city), budget and event type.
+                    Return ONLY a raw JSON array of strings, nothing else. Example: ["reason 1", "reason 2"]
+                `;
+                const resultText = await generateGroqCompletion(prompt);
+                const reasons = JSON.parse(resultText.replace(/```json|```/g, "").trim());
+                
+                topPicks.forEach((v, i) => {
+                    v.matchReason = reasons[i] || `Ideal ${v.service} choice for events in ${v.city}, ${v.country}.`;
+                });
+            } catch (err) {
+                if (err.message && err.message.includes("429")) {
+                    console.warn("[Optimization Engine] Vendor AI feature rate limited. Using fast fallback matches.");
+                } else {
+                    console.error("[Optimization Engine] Gemini Recommendation Error (Non-Quota):", err.message);
+                }
+                topPicks.forEach(v => v.matchReason = `Expert ${v.service} optimized for your budget.`);
+            }
+        } else {
+            topPicks.forEach(v => v.matchReason = `Localized ${v.service} expert optimized for your budget.`);
+        }
+
+        res.status(200).json(topPicks);
+    } catch (error) {
+        console.error("Vendor Recommendation Error:", error);
+        res.status(500).json({ message: "Engine Failure" });
     }
-
-    res.status(200).json(recommendations);
 };
 
 export const askAiAssistant = async (req, res) => {
     const { message, eventId } = req.body;
 
-    if (!genAI) {
+    if (!process.env.GROQ_API_KEY) {
+
+
         return res.status(200).json({
             response: "Gemini API key is not configured. Please use simple queries or add a valid key."
         });
@@ -473,18 +500,19 @@ export const askAiAssistant = async (req, res) => {
             6. Ensure all numerical data used exactly matches the context provided above.
         `;
 
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-        const result = await model.generateContent(context);
-        const response = result.response.text();
+        const response = await generateGroqCompletion(context);
 
         res.status(200).json({ response });
     } catch (error) {
-        console.error("Gemini Error:", error);
-
+        if (error.message?.includes("429") || error.message?.includes("quota")) {
+            console.warn("[Neural Chatbot] AI quota exhausted. Sending fallback message to user.");
+        } else {
+            console.error("[Neural Chatbot] Backend Error:", error.message);
+        }
         let userMessage = "I'm sorry, I'm having trouble thinking right now. Could you try asking again?";
 
-        if (error.message?.includes("429") || error.message?.includes("quota") || error.message?.includes("Quota")) {
-            userMessage = "I've reached my daily free-tier limit for a moment. Please wait a minute and try again; I'll be ready to help soon!";
+        if (error.message?.includes("429") || error.message?.includes("quota")) {
+            userMessage = "I've reached my limit. Please wait a moment.";
         } else if (error.message?.includes("404")) {
             userMessage = "I'm experiencing a configuration issue. Please check your API key.";
         }

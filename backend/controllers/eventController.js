@@ -9,12 +9,14 @@ import { getAllowedEventIds } from "../utils/authHelper.js";
 // @access  Public
 export const createEvent = async (req, res) => {
     try {
-        const { name, budget, location, date, userId, type, status } = req.body;
+        const { name, budget, location, city, country, date, userId, type, status } = req.body;
 
         const event = await Event.create({
             title: name,
             description: "", // Now using a separate field for type
             location,
+            city: city || "Mumbai",
+            country: country || "India",
             date,
             user: userId,
             budget,
@@ -75,6 +77,8 @@ export const getEvents = async (req, res) => {
             name: event.title,
             date: event.date,
             location: event.location,
+            city: event.city || "Mumbai",
+            country: event.country || "India",
             type: event.type || "Other",
             budget: event.budget,
             status: event.status,
@@ -119,6 +123,8 @@ export const getEventById = async (req, res) => {
             name: event.title,
             date: event.date,
             location: event.location,
+            city: event.city || "Mumbai",
+            country: event.country || "India",
             type: event.type || "Other",
             budget: event.budget,
             status: event.status,

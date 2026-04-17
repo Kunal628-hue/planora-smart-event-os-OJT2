@@ -14,6 +14,14 @@ const eventSchema = mongoose.Schema(
             type: String,
             required: true,
         },
+        city: {
+            type: String,
+            default: "Mumbai"
+        },
+        country: {
+            type: String,
+            default: "India"
+        },
         date: {
             type: String, // String to match frontend date-picker format easily
             required: true,

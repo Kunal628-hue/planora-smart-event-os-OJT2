@@ -29,57 +29,18 @@ transporter.verify((error, success) => {
     }
 });
 
-/**
- * Sends a 6-digit OTP code to a user for email verification.
- * @param {string} email - The user's email address.
- * @param {string} code - The 6-digit verification code.
- */
-export const sendOTPMail = async (email, code) => {
-    if (!email) return;
-
-    const mailOptions = {
-        from: `"Planora Security" <${EMAIL_USER}>`,
-        to: email,
-        subject: `${code} is your Planora verification code`,
-        html: `
-            <div style="font-family: 'Outfit', 'Segoe UI', sans-serif; max-width: 480px; margin: auto; padding: 40px; border: 1px solid #f1f5f9; border-radius: 24px; background: #ffffff; text-align: center;">
-                <div style="margin-bottom: 30px;">
-                    <h1 style="color: #0f172a; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.04em;">Planora <span style="color: #2563eb;">Security</span></h1>
-                </div>
-                
-                <h2 style="color: #1e293b; font-size: 20px; font-weight: 700; margin-bottom: 8px;">Verification Required</h2>
-                <p style="color: #64748b; font-size: 15px; margin-bottom: 30px;">Use the code below to complete your authentication process. This code is valid for <strong>5 minutes</strong>.</p>
-                
-                <div style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 16px; padding: 24px; margin-bottom: 30px;">
-                    <span style="font-family: 'Courier New', Courier, monospace; font-size: 36px; font-weight: 800; letter-spacing: 0.25em; color: #2563eb;">${code}</span>
-                </div>
-                
-                <p style="color: #94a3b8; font-size: 13px; line-height: 1.5;">If you did not request this verification, please ignore this email or contact support if you have security concerns.</p>
-                
-                <hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 30px 0;" />
-                <p style="color: #cbd5e1; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">Planora Smart Event OS • Confidential</p>
-            </div>
-        `,
-    };
-
-    try {
-        await transporter.sendMail(mailOptions);
-        console.log(`✅ Verification OTP sent to ${email}`);
-    } catch (error) {
-        console.error(`❌ OTP delivery failed [${email}]:`, error.message);
-    }
-};
 
 /**
  * Sends an invitation email to a guest with RSVP links.
  * @param {Object} guest - The guest object.
  * @param {string} eventName - The name of the event.
  */
-export const sendInvitation = async (guest, eventName) => {
+export const sendInvitation = async (guest, eventName, eventLocation) => {
     if (!guest.email) return;
 
     const rsvpConfirmUrl = `${BACKEND_URL}/api/guests/rsvp/${guest._id}/Confirmed`;
     const rsvpDeclineUrl = `${BACKEND_URL}/api/guests/rsvp/${guest._id}/Declined`;
+    const mapsUrl = eventLocation ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(eventLocation)}` : "";
 
     const mailOptions = {
         from: `"Planora" <${EMAIL_USER}>`,
@@ -90,6 +51,15 @@ export const sendInvitation = async (guest, eventName) => {
                 <h2 style="color: #2563eb;">You're Invited!</h2>
                 <p>Hello <strong>${guest.name}</strong>,</p>
                 <p>You have been invited to the event: <strong>${eventName}</strong>.</p>
+                
+                ${eventLocation ? `
+                <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2563eb;">
+                    <p style="margin: 0; color: #64748b; font-size: 0.9rem;">📍 <strong>Location:</strong></p>
+                    <p style="margin: 5px 0 10px 0; color: #1e293b; font-weight: 600;">${eventLocation}</p>
+                    <a href="${mapsUrl}" target="_blank" style="color: #2563eb; font-size: 0.85rem; font-weight: 700; text-decoration: none;">View on Google Maps →</a>
+                </div>
+                ` : ""}
+
                 <p>Please let us know if you can attend by clicking one of the buttons below:</p>
                 
                 <div style="margin: 30px 0; display: flex; gap: 15px;">
@@ -120,8 +90,10 @@ export const sendInvitation = async (guest, eventName) => {
  * @param {string} inviterName - The name of the person who invited them.
  * @param {string} eventName - The name of the event they are invited to.
  */
-export const sendCollaboratorInvite = async (collaborator, inviterName, eventName) => {
+export const sendCollaboratorInvite = async (collaborator, inviterName, eventName, eventLocation) => {
     if (!collaborator.email) return;
+
+    const mapsUrl = eventLocation ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(eventLocation)}` : "";
 
     const mailOptions = {
         from: `"Planora Hive" <${EMAIL_USER}>`,
@@ -137,6 +109,14 @@ export const sendCollaboratorInvite = async (collaborator, inviterName, eventNam
                 <p style="color: #64748b; font-size: 16px; line-height: 1.6;">Hello <strong>${collaborator.name}</strong>,</p>
                 <p style="color: #64748b; font-size: 16px; line-height: 1.6;"><strong>${inviterName}</strong> has invited you to join their operational collective on Planora for the event <strong>${eventName || 'Event Context'}</strong> as a <strong>${collaborator.role}</strong>.</p>
                 
+                ${eventLocation ? `
+                <div style="background: #eff6ff; border-radius: 16px; padding: 20px; margin: 20px 0; border: 1px solid #dbeafe;">
+                    <p style="margin: 0; color: #2563eb; font-size: 13px; font-weight: 800; text-transform: uppercase;">📍 Operational Venue</p>
+                    <p style="margin: 6px 0 10px 0; color: #1e3a8a; font-weight: 700;">${eventLocation}</p>
+                    <a href="${mapsUrl}" target="_blank" style="color: #2563eb; font-size: 13px; font-weight: 700; text-decoration: underline;">Open Intelligence Map</a>
+                </div>
+                ` : ""}
+
                 <div style="background: #f8fafc; border-radius: 16px; padding: 24px; margin: 30px 0; border: 1px solid #e2e8f0;">
                     <h3 style="margin: 0 0 12px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8;">Your Access Logic</h3>
                     <p style="margin: 0; color: #1e293b; font-weight: 600;">${collaborator.permissions || "Standard project access"}</p>

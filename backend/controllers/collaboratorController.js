@@ -67,15 +67,19 @@ export const createCollaborator = async (req, res) => {
 
         const collaborator = await Collaborator.create(collabData);
         
-        // Find the event title for the invitation email
+        // Find the event title and location for the invitation email
         let eventName = "Event Context";
+        let eventLocation = "";
         if (collaborator.event) {
             const event = await Event.findById(collaborator.event);
-            if (event) eventName = event.title || event.name;
+            if (event) {
+                eventName = event.title || event.name;
+                eventLocation = event.location;
+            }
         }
 
         // Send notification email
-        await sendCollaboratorInvite(collaborator, inviterName || "A Team Lead", eventName);
+        await sendCollaboratorInvite(collaborator, inviterName || "A Team Lead", eventName, eventLocation);
         
         res.status(201).json(collaborator);
     } catch (error) {

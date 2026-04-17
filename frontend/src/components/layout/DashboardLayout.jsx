@@ -350,7 +350,7 @@ export default function DashboardLayout() {
                     </Link>
                 </div>
 
-                {/* Project Selector - Functional Specification */}
+                {/* Event Selector - Functional Specification */}
                 <div style={{ padding: "0 1rem 1.5rem" }}>
                     <div style={{
                         background: "rgba(255, 255, 255, 0.03)",
@@ -363,7 +363,7 @@ export default function DashboardLayout() {
                         position: "relative"
                     }}>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>Active Project</div>
+                            <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>Active Event</div>
                             <select
                                 value={selectedEventId}
                                 onChange={(e) => handleEventChange(e.target.value)}
@@ -623,7 +623,7 @@ export default function DashboardLayout() {
                                     animation: "fade-up 0.2s ease-out"
                                 }}>
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem", paddingBottom: "0.75rem", borderBottom: "1px solid #f1f5f9" }}>
-                                        <h3 style={{ fontSize: "14px", fontWeight: 800, color: "#1e293b", margin: 0 }}>Project Alerts</h3>
+                                        <h3 style={{ fontSize: "14px", fontWeight: 800, color: "#1e293b", margin: 0 }}>Event Alerts</h3>
                                         <button 
                                             onClick={() => setNotifications(notifications.map(n => ({...n, read: true})))}
                                             style={{ fontSize: "11px", fontWeight: 700, color: "#2563eb", border: "none", background: "none", cursor: "pointer" }}

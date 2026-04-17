@@ -254,7 +254,7 @@ export default function Analytics() {
             
             doc.setFontSize(10);
             doc.setFont("helvetica", "normal");
-            doc.text(`Project Intelligence: ${activeEventName}`, 14, 32);
+            doc.text(`Event Intelligence: ${activeEventName}`, 14, 32);
             doc.text(`Generated: ${new Date().toLocaleString()}`, 196, 32, { align: "right" });
 
             // 1. Executive Summary Section
@@ -573,7 +573,7 @@ export default function Analytics() {
                             </svg>
                         </div>
                     ) : (
-                        <CyberChartIllustration prompt="Awaiting project data for trajectory calculation" icon={TrendingUp} />
+                        <CyberChartIllustration prompt="Awaiting event data for trajectory calculation" icon={TrendingUp} />
                     )}
                 </div>
 

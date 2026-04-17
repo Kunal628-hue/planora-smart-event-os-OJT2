@@ -80,7 +80,7 @@ export default function Dashboard() {
             if (event) {
                 const [timelineRes, vendorRes] = await Promise.all([
                     fetch(`${API_URL}/ai/timeline?type=${event.type || "Wedding"}`),
-                    fetch(`${API_URL}/ai/vendors?type=${event.type || "Wedding"}`)
+                    fetch(`${API_URL}/ai/vendors?type=${event.type || "Wedding"}&eventId=${eventId}`)
                 ]);
                 const timelineData = timelineRes.ok ? await timelineRes.json() : [];
                 const vendorData = vendorRes.ok ? await vendorRes.json() : [];
@@ -240,7 +240,7 @@ export default function Dashboard() {
                             lineHeight: 1.6,
                             fontWeight: 500
                         }}>
-                            The next-generation workspace for event managers. Connect your first project to unlock AI-powered insights and real-time automation.
+                            The next-generation workspace for event managers. Connect your first event to unlock AI-powered insights and real-time automation.
                         </p>
 
                         <div style={{ display: "flex", gap: "1rem", justifyContent: "center" }}>
@@ -325,7 +325,7 @@ export default function Dashboard() {
                 marginBottom: "2.5rem"
             }}>
                 {[
-                    { label: "Health Score", value: `${healthData?.score || 0}%`, color: getHealthColor(healthData?.score || 0), desc: "Live Project Health" },
+                    { label: "Health Score", value: `${healthData?.score || 0}%`, color: getHealthColor(healthData?.score || 0), desc: "Live Event Health" },
                     { label: "Budget Utilisation", value: `${healthData?.metrics?.budgetUsage || 0}%`, color: getBudgetColor(healthData?.metrics?.budgetUsage || 0), desc: "Real-time Spending" },
                     { label: "Days to Event", value: daysRemaining, color: "#2563eb", desc: "Countdown Active" }
                 ].map((kpi, i) => (
@@ -597,15 +597,22 @@ export default function Dashboard() {
                                 <div style={{ display: "flex", flexDirection: "column" }}>
                                     <div style={{ fontSize: "14px", fontWeight: 800, color: "#1e293b" }}>{vendor.name}</div>
                                     <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                        <span style={{ fontSize: "10px", color: styles.color, fontWeight: 800, textTransform: "uppercase" }}>{vendor.service}</span>
-                                        <span style={{ width: "2px", height: "2px", background: "#cbd5e1", borderRadius: "50%" }}></span>
-                                        <span style={{ fontSize: "12px", color: "#94a3b8", fontWeight: 600 }}>{vendor.priceRange}</span>
-                                    </div>
+                                         <span style={{ fontSize: "10px", color: styles.color, fontWeight: 800, textTransform: "uppercase" }}>{vendor.service}</span>
+                                         <span style={{ width: "2px", height: "2px", background: "#cbd5e1", borderRadius: "50%" }}></span>
+                                         <span style={{ fontSize: "12px", color: "#94a3b8", fontWeight: 600 }}>{vendor.priceRange}</span>
+                                     </div>
+                                     {vendor.matchReason && (
+                                         <div style={{ fontSize: "10px", color: "#2563eb", fontWeight: 700, fontStyle: "italic", marginTop: "2px", maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                             {vendor.matchReason}
+                                         </div>
+                                     )}
                                 </div>
                             </div>
                         );
                     }) : (
-                        <div style={{ fontSize: "13px", color: "#94a3b8", fontWeight: 500, fontStyle: "italic" }}>Calculating optimal vendor matrix...</div>
+                        <div style={{ fontSize: "13px", color: "#94a3b8", fontWeight: 500, fontStyle: "italic" }}>
+                            {loading ? "Calculating optimal vendor matrix..." : "No vendor recommendations available for this criteria."}
+                        </div>
                     )}
                 </div>
             </div>
