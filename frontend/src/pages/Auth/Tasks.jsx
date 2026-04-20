@@ -3,6 +3,7 @@ import { useOutletContext } from "react-router-dom";
 import { animate, stagger } from "animejs";
 import { useDialog } from "../../context/DialogContext";
 import { Plus, ListTodo, Calendar, Clock, AlertCircle, Loader2, X, Edit2, Trash2 } from "lucide-react";
+import { LogoLoader } from "../../components/ui/Loader";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -190,10 +191,7 @@ export default function Tasks() {
             </div>
 
             {loading ? (
-                <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "10rem 0", gap: "1.5rem" }}>
-                    <div style={{ width: "48px", height: "48px", border: "5px solid #2563eb", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 1s linear infinite" }}></div>
-                    <p style={{ fontSize: "0.9rem", fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.1em" }}>Optimizing Flows...</p>
-                </div>
+                <LogoLoader text="Optimizing Flows..." />
             ) : filteredTasks.length === 0 ? (
                 <div style={{
                     padding: "8rem 2rem",

@@ -24,7 +24,8 @@ import {
     Phone,
     Mail
 } from "lucide-react";
-import { NeuralLoader } from "../../components/ui/Loader";
+// eslint-disable-next-line
+import { LogoLoader } from "../../components/ui/Loader";
 
 const AiAssistant = lazy(() => import("../../components/AiAssistant"));
 
@@ -166,7 +167,7 @@ export default function Dashboard() {
     if (loading) {
         return (
             <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "70vh" }}>
-                <NeuralLoader text="Scanning Neural Pathways..." />
+                <LogoLoader text="Scanning Optimal Pathways..." />
             </div>
         );
     }

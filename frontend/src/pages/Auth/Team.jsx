@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useDialog } from "../../context/DialogContext";
 import { Plus, User, Mail, Shield, Check, ChevronRight, LayoutGrid, Users2, MoreHorizontal, Trash2, Edit2, X, Calendar, Phone } from "lucide-react";
-import { NeuralLoader } from "../../components/ui/Loader";
+import { LogoLoader } from "../../components/ui/Loader";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -240,7 +240,7 @@ export default function Team() {
                         {loading ? (
                             <tr>
                                 <td colSpan="4" style={{ padding: "4rem", textAlign: "center" }}>
-                                    <NeuralLoader text="Synchronizing Hive Mind..." />
+                                    <LogoLoader text="Syncing Team..." />
                                 </td>
                             </tr>
                         ) : members.map((member) => {

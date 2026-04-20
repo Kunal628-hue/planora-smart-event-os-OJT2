@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useDialog } from "../../context/DialogContext";
 import { UserPlus, Users, Trash2, Mail, Briefcase, Loader2, X, Calendar, Phone, Upload, FileText } from "lucide-react";
+import { LogoLoader } from "../../components/ui/Loader";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -254,10 +255,7 @@ export default function Guests() {
             </div>
 
             {loading ? (
-                <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "10rem 0", gap: "1.5rem" }}>
-                    <div style={{ width: "48px", height: "48px", border: "5px solid #2563eb", borderRadius: "50%" }}></div>
-                    <p style={{ fontSize: "0.9rem", fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.1em" }}>Analyzing RSVPs...</p>
-                </div>
+                <LogoLoader text="Analyzing RSVPs..." />
             ) : filteredGuests.length === 0 ? (
                 <div style={{
                     padding: "8rem 2rem",

@@ -1,5 +1,100 @@
 import { useEffect, useState } from "react";
 
+export const LogoLoader = ({ text = "Starting Planora..." }) => {
+    return (
+        <div style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: "100%",
+            background: "transparent",
+            gap: "2rem",
+            padding: "4rem"
+        }}>
+            <div style={{ position: "relative", display: "flex", justifyContent: "center" }}>
+                <img 
+                    src="/logo-new.svg" 
+                    alt="Planora Logo" 
+                    style={{
+                        height: "3.5rem",
+                        width: "auto",
+                        display: "block",
+                        animation: "pulse-logo 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+                        filter: "drop-shadow(0 0 15px rgba(37, 99, 235, 0.2))"
+                    }}
+                />
+                <div style={{
+                    position: "absolute",
+                    inset: "-20px",
+                    borderRadius: "50%",
+                    background: "radial-gradient(circle, rgba(37, 99, 235, 0.08) 0%, transparent 70%)",
+                    animation: "pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+                    zIndex: -1
+                }} />
+            </div>
+            
+            <div style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "0.75rem"
+            }}>
+                <p style={{
+                    fontSize: "0.85rem",
+                    fontWeight: 700,
+                    color: "#64748b",
+                    letterSpacing: "0.15em",
+                    margin: 0,
+                    textAlign: "center",
+                    textTransform: "uppercase"
+                }}>
+                    {text}
+                </p>
+                
+                <div style={{
+                    width: "120px",
+                    height: "3px",
+                    background: "rgba(37, 99, 235, 0.1)",
+                    borderRadius: "3px",
+                    overflow: "hidden"
+                }}>
+                    <div style={{
+                        width: "100%",
+                        height: "100%",
+                        background: "#2563eb",
+                        transformOrigin: "left",
+                        animation: "progress 1.5s ease-in-out infinite"
+                    }} />
+                </div>
+            </div>
+
+            <style>{`
+                @keyframes pulse-logo {
+                    0%, 100% {
+                        transform: scale(1) translateY(0);
+                        opacity: 1;
+                    }
+                    50% {
+                        transform: scale(1.05) translateY(-5px);
+                        opacity: 0.9;
+                    }
+                }
+                @keyframes pulse-glow {
+                    0%, 100% { transform: scale(0.8); opacity: 0.5; }
+                    50% { transform: scale(1.2); opacity: 1; }
+                }
+                @keyframes progress {
+                    0% { transform: scaleX(0); transform-origin: left; }
+                    50% { transform: scaleX(1); transform-origin: left; }
+                    50.1% { transform: scaleX(1); transform-origin: right; }
+                    100% { transform: scaleX(0); transform-origin: right; }
+                }
+            `}</style>
+        </div>
+    );
+};
+
 export const NeuralLoader = ({ text = "Optimizing Flows..." }) => {
     return (
         <div style={{

@@ -19,6 +19,7 @@ import {
     ArrowRight,
     X
 } from "lucide-react";
+import { LogoLoader } from "../../components/ui/Loader";
 import AiAssistant from "../../components/AiAssistant";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -141,12 +142,7 @@ export default function EventDetails() {
     };
 
     if (loading) {
-        return (
-            <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", minHeight: "80vh", gap: "1.25rem" }}>
-                <div style={{ width: "50px", height: "50px", border: "5px solid var(--accent-primary)", borderRadius: "50%" }}></div>
-                <p style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Hydrating Event State...</p>
-            </div>
-        );
+        return <LogoLoader text="Hydrating Event State..." />;
     }
 
     if (!event) return null;
@@ -401,6 +397,65 @@ export default function EventDetails() {
                             ))}
                         </div>
                     )}
+
+                    {/* Strategic Shortcuts */}
+                    <div style={{
+                        background: "#fff",
+                        padding: "2.5rem",
+                        borderRadius: "32px",
+                        border: "1px solid #f1f5f9",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "1.5rem"
+                    }}>
+                        <h3 style={{ fontSize: "15px", fontWeight: 800, color: "#0f172a", marginBottom: "0.5rem" }}>Strategic Shortcuts</h3>
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                            <button
+                                onClick={() => navigate("/tasks")}
+                                style={{ padding: "1.25rem", borderRadius: "18px", background: "#f8fafc", border: "1px solid #f1f5f9", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.75rem", cursor: "pointer", transition: "all 0.2s" }}
+                                onMouseEnter={(e) => { e.currentTarget.style.background = "#eff6ff"; e.currentTarget.style.borderColor = "#bfdbfe"; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.background = "#f8fafc"; e.currentTarget.style.borderColor = "#f1f5f9"; }}
+                            >
+                                <div style={{ background: "#2563eb", color: "#fff", padding: "10px", borderRadius: "12px", boxShadow: "0 4px 12px rgba(37, 99, 235, 0.2)" }}>
+                                    <LayoutList size={20} />
+                                </div>
+                                <span style={{ fontSize: "12px", fontWeight: 800, color: "#1e293b" }}>Mission Tasks</span>
+                            </button>
+                            <button
+                                onClick={() => navigate("/guests")}
+                                style={{ padding: "1.25rem", borderRadius: "18px", background: "#f8fafc", border: "1px solid #f1f5f9", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.75rem", cursor: "pointer", transition: "all 0.2s" }}
+                                onMouseEnter={(e) => { e.currentTarget.style.background = "#ecfdf5"; e.currentTarget.style.borderColor = "#a7f3d0"; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.background = "#f8fafc"; e.currentTarget.style.borderColor = "#f1f5f9"; }}
+                            >
+                                <div style={{ background: "#10b981", color: "#fff", padding: "10px", borderRadius: "12px", boxShadow: "0 4px 12px rgba(16, 185, 129, 0.2)" }}>
+                                    <Target size={20} />
+                                </div>
+                                <span style={{ fontSize: "12px", fontWeight: 800, color: "#1e293b" }}>Guest RSVPs</span>
+                            </button>
+                            <button
+                                onClick={() => navigate("/budget")}
+                                style={{ padding: "1.25rem", borderRadius: "18px", background: "#f8fafc", border: "1px solid #f1f5f9", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.75rem", cursor: "pointer", transition: "all 0.2s" }}
+                                onMouseEnter={(e) => { e.currentTarget.style.background = "#fffbeb"; e.currentTarget.style.borderColor = "#fde68a"; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.background = "#f8fafc"; e.currentTarget.style.borderColor = "#f1f5f9"; }}
+                            >
+                                <div style={{ background: "#f59e0b", color: "#fff", padding: "10px", borderRadius: "12px", boxShadow: "0 4px 12px rgba(245, 158, 11, 0.2)" }}>
+                                    <IndianRupee size={20} />
+                                </div>
+                                <span style={{ fontSize: "12px", fontWeight: 800, color: "#1e293b" }}>Capital Log</span>
+                            </button>
+                            <button
+                                onClick={() => navigate("/analytics")}
+                                style={{ padding: "1.25rem", borderRadius: "18px", background: "#f8fafc", border: "1px solid #f1f5f9", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.75rem", cursor: "pointer", transition: "all 0.2s" }}
+                                onMouseEnter={(e) => { e.currentTarget.style.background = "#faf5ff"; e.currentTarget.style.borderColor = "#e9d5ff"; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.background = "#f8fafc"; e.currentTarget.style.borderColor = "#f1f5f9"; }}
+                            >
+                                <div style={{ background: "#7e22ce", color: "#fff", padding: "10px", borderRadius: "12px", boxShadow: "0 4px 12px rgba(126, 34, 206, 0.2)" }}>
+                                    <Activity size={20} />
+                                </div>
+                                <span style={{ fontSize: "12px", fontWeight: 800, color: "#1e293b" }}>Analytics</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
@@ -433,7 +488,11 @@ export default function EventDetails() {
                                 color: "#fff",
                                 fontWeight: 800,
                                 cursor: "pointer",
-                                backdropFilter: "blur(10px)"
+                                backdropFilter: "blur(10px)",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                gap: "0.5rem"
                             }}
                         >Explore Vendor Matrix <ArrowRight size={16} /></button>
                     </div>

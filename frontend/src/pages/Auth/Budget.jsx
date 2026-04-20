@@ -20,6 +20,7 @@ import {
     FileText,
     ExternalLink
 } from "lucide-react";
+import { LogoLoader } from "../../components/ui/Loader";
 
 export default function Budget() {
     const { user, events, selectedEventId, addNotification } = useOutletContext();
@@ -176,6 +177,9 @@ export default function Budget() {
         setShowModal(true);
     };
 
+    if (loading) {
+        return <LogoLoader text="Calculating Financials..." />;
+    }
 
     return (
         <div className="responsive-container" style={{

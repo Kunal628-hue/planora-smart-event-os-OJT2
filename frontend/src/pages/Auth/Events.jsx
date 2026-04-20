@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import { useDialog } from "../../context/DialogContext";
 import { Plus, Calendar, MapPin, Globe, ChevronRight, Loader2, X, Sparkles, LayoutGrid, Package, Wallet } from "lucide-react";
+import { LogoLoader } from "../../components/ui/Loader";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -160,9 +161,7 @@ export default function Events() {
                 gap: "1.5rem"
             }}>
                 {fetchLoading ? (
-                    <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "8rem" }}>
-                        <Loader2 size={40} color="#2563eb" style={{ margin: "0 auto" }} />
-                    </div>
+                    <LogoLoader text="Loading Portfolios..." />
                 ) : events.length === 0 ? (
                     <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "6rem", background: "#fff", border: "2px dashed #e2e8f0", borderRadius: "32px" }}>
                         <div style={{ width: "64px", height: "64px", background: "#f8fafc", borderRadius: "20px", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1.5rem", color: "#94a3b8" }}>

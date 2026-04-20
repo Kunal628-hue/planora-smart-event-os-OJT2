@@ -18,6 +18,7 @@ import {
     Check,
     AlertCircle
 } from "lucide-react";
+import { LogoLoader } from "../../components/ui/Loader";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -324,10 +325,7 @@ export default function Vendors() {
                 boxShadow: "0 4px 25px rgba(0,0,0,0.015)"
             }}>
                 {loading ? (
-                    <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "10rem 0", gap: "1.5rem" }}>
-                        <div style={{ width: "40px", height: "40px", border: "4px solid #f1f5f9", borderTopColor: "#2563eb", borderRadius: "50%", animation: "spin 1s linear infinite" }}></div>
-                        <p style={{ fontSize: "11px", fontWeight: 900, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.15em" }}>Matrix Sync in Progress...</p>
-                    </div>
+                    <LogoLoader text="Matrix Sync in Progress..." />
                 ) : filteredVendors.length === 0 ? (
                     <div style={{ padding: "8rem 2rem", textAlign: "center" }}>
                         <div style={{ width: "64px", height: "64px", background: "#f8fafc", borderRadius: "20px", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1.5rem", color: "#cbd5e1" }}>

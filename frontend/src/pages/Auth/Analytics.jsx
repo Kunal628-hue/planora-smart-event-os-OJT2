@@ -25,6 +25,7 @@ import {
     ChevronDown,
     AlertTriangle
 } from "lucide-react";
+import { LogoLoader } from "../../components/ui/Loader";
 import { jsPDF } from "jspdf";
 import autoTable from 'jspdf-autotable';
 
@@ -388,6 +389,10 @@ export default function Analytics() {
             if (addNotification) addNotification("Export Error", "PDF engine encountered a synchronization fault.");
         }
     };
+
+    if (loading) {
+        return <LogoLoader text="Analyzing Data..." />;
+    }
 
     return (
         <div className="responsive-container" style={{

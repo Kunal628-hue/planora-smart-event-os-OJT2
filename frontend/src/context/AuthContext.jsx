@@ -8,8 +8,7 @@ import {
     updateProfile
 } from "firebase/auth";
 import { auth, googleProvider } from "../firebase";
-
-const AuthContext = createContext();
+import { LogoLoader } from "../components/ui/Loader";const AuthContext = createContext();
 
 export const useAuth = () => {
     return useContext(AuthContext);
@@ -70,7 +69,7 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider value={value}>
-            {!loading && children}
+            {loading ? <LogoLoader text="Verifying Session..." /> : children}
         </AuthContext.Provider>
     );
 };

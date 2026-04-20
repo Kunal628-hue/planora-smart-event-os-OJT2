@@ -19,13 +19,7 @@ const Analytics = lazy(() => import("./pages/Auth/Analytics"));
 const Team = lazy(() => import("./pages/Auth/Team"));
 const Settings = lazy(() => import("./pages/Auth/Settings"));
 
-// Loading fallback
-const LoadingPage = () => (
-  <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", background: "#fcfdff" }}>
-    <div style={{ width: "40px", height: "40px", border: "3px solid #f1f5f9", borderTopColor: "#2563eb", borderRadius: "50%", animation: "spin 1s linear infinite" }}></div>
-    <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-  </div>
-);
+import { LogoLoader } from "./components/ui/Loader";
 
 import { DialogProvider } from "./context/DialogContext";
 import CustomDialog from "./components/ui/CustomDialog";
@@ -35,7 +29,7 @@ export default function App() {
     <DialogProvider>
       <AuthProvider>
         <BrowserRouter>
-          <Suspense fallback={<LoadingPage />}>
+          <Suspense fallback={<LogoLoader />}>
             <CustomDialog />
             <Routes>
               <Route path="/" element={<Landing />} />
