@@ -18,7 +18,8 @@ import {
     Check,
     AlertCircle
 } from "lucide-react";
-import { LogoLoader } from "../../components/ui/Loader";
+import Box from '@mui/material/Box';
+import Skeleton from '@mui/material/Skeleton';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -325,7 +326,26 @@ export default function Vendors() {
                 boxShadow: "0 4px 25px rgba(0,0,0,0.015)"
             }}>
                 {loading ? (
-                    <LogoLoader text="Matrix Sync in Progress..." />
+                    <Box sx={{ padding: '2rem' }}>
+                        {Array.from(new Array(5)).map((_, index) => (
+                            <Box key={index} sx={{ display: 'flex', alignItems: 'center', mb: 3, gap: 4 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1 }}>
+                                    <Skeleton animation="wave" variant="rounded" width={40} height={40} sx={{ borderRadius: '14px' }} />
+                                    <Box>
+                                        <Skeleton animation="wave" height={20} width={120} />
+                                        <Skeleton animation="wave" height={15} width={80} />
+                                    </Box>
+                                </Box>
+                                <Skeleton animation="wave" height={20} width={100} sx={{ flex: 1 }} />
+                                <Skeleton animation="wave" height={20} width={100} sx={{ flex: 1 }} />
+                                <Skeleton animation="wave" height={20} width={80} sx={{ flex: 1 }} />
+                                <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', flex: 1 }}>
+                                    <Skeleton animation="wave" variant="rounded" width={32} height={32} sx={{ borderRadius: '10px' }} />
+                                    <Skeleton animation="wave" variant="rounded" width={32} height={32} sx={{ borderRadius: '10px' }} />
+                                </Box>
+                            </Box>
+                        ))}
+                    </Box>
                 ) : filteredVendors.length === 0 ? (
                     <div style={{ padding: "8rem 2rem", textAlign: "center" }}>
                         <div style={{ width: "64px", height: "64px", background: "#f8fafc", borderRadius: "20px", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1.5rem", color: "#cbd5e1" }}>

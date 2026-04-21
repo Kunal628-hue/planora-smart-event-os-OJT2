@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useDialog } from "../../context/DialogContext";
 import { Plus, User, Mail, Shield, Check, ChevronRight, LayoutGrid, Users2, MoreHorizontal, Trash2, Edit2, X, Calendar, Phone } from "lucide-react";
-import { LogoLoader } from "../../components/ui/Loader";
-
+import Box from '@mui/material/Box';
+import Skeleton from '@mui/material/Skeleton';
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Team() {
@@ -238,11 +238,33 @@ export default function Team() {
                     </thead>
                     <tbody>
                         {loading ? (
-                            <tr>
-                                <td colSpan="4" style={{ padding: "4rem", textAlign: "center" }}>
-                                    <LogoLoader text="Syncing Team..." />
-                                </td>
-                            </tr>
+                            <>
+                                {Array.from(new Array(4)).map((_, idx) => (
+                                    <tr key={idx} style={{ borderBottom: "1px solid #f8fafc" }}>
+                                        <td style={{ padding: "0.85rem 1.5rem" }}>
+                                            <Box sx={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                                                <Skeleton animation="wave" variant="circular" width={32} height={32} />
+                                                <Box>
+                                                    <Skeleton animation="wave" height={20} width={100} />
+                                                    <Skeleton animation="wave" height={16} width={140} />
+                                                </Box>
+                                            </Box>
+                                        </td>
+                                        <td style={{ padding: "0.85rem 1.5rem" }}>
+                                            <Skeleton animation="wave" height={24} width={70} sx={{ borderRadius: "8px" }} />
+                                        </td>
+                                        <td style={{ padding: "0.85rem 1.5rem" }}>
+                                            <Skeleton animation="wave" height={20} width={160} />
+                                        </td>
+                                        <td style={{ padding: "0.85rem 1.5rem", textAlign: "right" }}>
+                                            <Box sx={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem" }}>
+                                                <Skeleton animation="wave" variant="rounded" width={30} height={30} sx={{ borderRadius: "8px" }} />
+                                                <Skeleton animation="wave" variant="rounded" width={30} height={30} sx={{ borderRadius: "8px" }} />
+                                            </Box>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </>
                         ) : members.map((member) => {
                             const colors = getRoleColor(member.role);
                             const isEditing = editingId === member._id;

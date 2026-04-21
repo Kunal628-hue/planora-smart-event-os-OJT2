@@ -3,7 +3,8 @@ import { useOutletContext } from "react-router-dom";
 import { animate, stagger } from "animejs";
 import { useDialog } from "../../context/DialogContext";
 import { Plus, ListTodo, Calendar, Clock, AlertCircle, Loader2, X, Edit2, Trash2 } from "lucide-react";
-import { LogoLoader } from "../../components/ui/Loader";
+import Box from '@mui/material/Box';
+import Skeleton from '@mui/material/Skeleton';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -191,7 +192,29 @@ export default function Tasks() {
             </div>
 
             {loading ? (
-                <LogoLoader text="Optimizing Flows..." />
+                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                    {Array.from(new Array(4)).map((_, idx) => (
+                        <Box key={idx} sx={{ background: "#fff", padding: "1.5rem 2.5rem", display: "grid", gridTemplateColumns: "1fr 180px 180px 140px 100px", alignItems: "center", borderRadius: "24px", border: "1px solid #f1f5f9" }}>
+                            <Box sx={{ display: "flex", gap: "1.5rem", alignItems: "center" }}>
+                                <Skeleton animation="wave" variant="rounded" width={28} height={28} sx={{ borderRadius: '10px' }} />
+                                <Skeleton animation="wave" width={150} height={24} />
+                            </Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                                <Skeleton animation="wave" width={80} height={24} sx={{ borderRadius: '100px' }} />
+                            </Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                                <Skeleton animation="wave" width={100} height={20} />
+                            </Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                                <Skeleton animation="wave" width={60} height={24} sx={{ borderRadius: '100px' }} />
+                            </Box>
+                            <Box sx={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem" }}>
+                                <Skeleton animation="wave" variant="rounded" width={32} height={32} sx={{ borderRadius: '10px' }} />
+                                <Skeleton animation="wave" variant="rounded" width={32} height={32} sx={{ borderRadius: '10px' }} />
+                            </Box>
+                        </Box>
+                    ))}
+                </div>
             ) : filteredTasks.length === 0 ? (
                 <div style={{
                     padding: "8rem 2rem",

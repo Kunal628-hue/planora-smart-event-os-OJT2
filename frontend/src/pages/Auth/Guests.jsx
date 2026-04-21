@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useDialog } from "../../context/DialogContext";
 import { UserPlus, Users, Trash2, Mail, Briefcase, Loader2, X, Calendar, Phone, Upload, FileText } from "lucide-react";
-import { LogoLoader } from "../../components/ui/Loader";
-
+import Box from '@mui/material/Box';
+import Skeleton from '@mui/material/Skeleton';
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Guests() {
@@ -255,7 +255,32 @@ export default function Guests() {
             </div>
 
             {loading ? (
-                <LogoLoader text="Analyzing RSVPs..." />
+                <div style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+                    gap: "1.5rem"
+                }}>
+                    {Array.from(new Array(6)).map((_, index) => (
+                        <Box key={index} sx={{ width: '100%', p: 3, background: "#fff", borderRadius: "32px", border: "1px solid #f1f5f9" }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+                                <Skeleton variant="rounded" width={56} height={56} sx={{ borderRadius: '18px' }} />
+                                <Box sx={{ display: 'flex', gap: 1 }}>
+                                    <Skeleton variant="rounded" width={80} height={24} sx={{ borderRadius: '100px' }} />
+                                    <Skeleton variant="rounded" width={28} height={28} sx={{ borderRadius: '8px' }} />
+                                </Box>
+                            </Box>
+                            <Box sx={{ pt: 0.5 }}>
+                                <Skeleton animation="wave" height={32} width="60%" />
+                                <Skeleton animation="wave" height={20} width="80%" sx={{ mt: 1 }} />
+                                <Skeleton animation="wave" height={20} width="50%" sx={{ mt: 1 }} />
+                            </Box>
+                            <Box sx={{ display: 'flex', gap: 1, mt: 3, pt: 2, borderTop: "1px solid #f1f5f9" }}>
+                                <Skeleton animation="wave" variant="rounded" width={60} height={24} sx={{ borderRadius: '8px' }} />
+                                <Skeleton animation="wave" variant="rounded" width={80} height={24} sx={{ borderRadius: '8px' }} />
+                            </Box>
+                        </Box>
+                    ))}
+                </div>
             ) : filteredGuests.length === 0 ? (
                 <div style={{
                     padding: "8rem 2rem",

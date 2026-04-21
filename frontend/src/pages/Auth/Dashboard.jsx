@@ -25,7 +25,8 @@ import {
     Mail
 } from "lucide-react";
 // eslint-disable-next-line
-import { LogoLoader } from "../../components/ui/Loader";
+import Box from '@mui/material/Box';
+import Skeleton from '@mui/material/Skeleton';
 
 const AiAssistant = lazy(() => import("../../components/AiAssistant"));
 
@@ -166,9 +167,18 @@ export default function Dashboard() {
 
     if (loading) {
         return (
-            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "70vh" }}>
-                <LogoLoader text="Scanning Optimal Pathways..." />
-            </div>
+            <Box sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 3 }}>
+                    <Skeleton animation="wave" variant="rounded" height={150} sx={{ borderRadius: '20px' }} />
+                    <Skeleton animation="wave" variant="rounded" height={150} sx={{ borderRadius: '20px' }} />
+                    <Skeleton animation="wave" variant="rounded" height={150} sx={{ borderRadius: '20px' }} />
+                </Box>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: '2fr 1fr' }, gap: 4 }}>
+                    <Skeleton animation="wave" variant="rounded" height={400} sx={{ borderRadius: '24px' }} />
+                    <Skeleton animation="wave" variant="rounded" height={400} sx={{ borderRadius: '32px' }} />
+                </Box>
+                <Skeleton animation="wave" variant="rounded" height={80} sx={{ borderRadius: '100px' }} />
+            </Box>
         );
     }
 

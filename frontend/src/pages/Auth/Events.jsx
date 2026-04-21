@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import { useDialog } from "../../context/DialogContext";
 import { Plus, Calendar, MapPin, Globe, ChevronRight, Loader2, X, Sparkles, LayoutGrid, Package, Wallet } from "lucide-react";
-import { LogoLoader } from "../../components/ui/Loader";
+import Box from '@mui/material/Box';
+import Skeleton from '@mui/material/Skeleton';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -161,7 +162,24 @@ export default function Events() {
                 gap: "1.5rem"
             }}>
                 {fetchLoading ? (
-                    <LogoLoader text="Loading Portfolios..." />
+                    Array.from(new Array(6)).map((_, index) => (
+                        <Box key={index} sx={{ background: "#fff", borderRadius: "24px", padding: "1.5rem", boxShadow: "0 4px 20px rgba(0,0,0,0.02)", border: "1px solid #f1f5f9", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                                <div>
+                                    <Skeleton animation="wave" height={28} width={150} style={{ marginBottom: 6 }} />
+                                    <Skeleton animation="wave" height={20} width={100} />
+                                </div>
+                                <Skeleton animation="wave" variant="rounded" width={80} height={24} style={{ borderRadius: 8 }} />
+                            </Box>
+                            <Box sx={{ background: "#f8fafc", padding: "1rem", borderRadius: "16px" }}>
+                                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
+                                    <Skeleton animation="wave" height={16} width={100} />
+                                    <Skeleton animation="wave" height={16} width={80} />
+                                </Box>
+                                <Skeleton animation="wave" variant="rounded" width="100%" height={6} style={{ borderRadius: 10 }} />
+                            </Box>
+                        </Box>
+                    ))
                 ) : events.length === 0 ? (
                     <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "6rem", background: "#fff", border: "2px dashed #e2e8f0", borderRadius: "32px" }}>
                         <div style={{ width: "64px", height: "64px", background: "#f8fafc", borderRadius: "20px", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1.5rem", color: "#94a3b8" }}>

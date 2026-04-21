@@ -25,7 +25,8 @@ import {
     ChevronDown,
     AlertTriangle
 } from "lucide-react";
-import { LogoLoader } from "../../components/ui/Loader";
+import Box from '@mui/material/Box';
+import Skeleton from '@mui/material/Skeleton';
 import { jsPDF } from "jspdf";
 import autoTable from 'jspdf-autotable';
 
@@ -391,7 +392,33 @@ export default function Analytics() {
     };
 
     if (loading) {
-        return <LogoLoader text="Analyzing Data..." />;
+        return (
+            <Box sx={{
+                fontFamily: "'Outfit', 'Inter', system-ui, sans-serif",
+                background: "#fff",
+                minHeight: "100vh",
+                p: { xs: 2, md: 4 },
+                backgroundImage: "radial-gradient(circle at 50% -20%, #eff6ff 0%, #ffffff 50%)"
+            }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 5 }}>
+                    <Box>
+                        <Skeleton animation="wave" height={20} width={150} sx={{ mb: 1, borderRadius: 1 }} />
+                        <Skeleton animation="wave" height={50} width={300} sx={{ borderRadius: 2 }} />
+                    </Box>
+                    <Skeleton animation="wave" variant="rounded" width={200} height={45} sx={{ borderRadius: '14px' }} />
+                </Box>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: 3, mb: 4 }}>
+                    {Array.from(new Array(4)).map((_, idx) => (
+                        <Skeleton key={idx} animation="wave" variant="rounded" height={140} sx={{ borderRadius: '28px' }} />
+                    ))}
+                </Box>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: '2fr 1fr' }, gap: 4, mb: 4 }}>
+                    <Skeleton animation="wave" variant="rounded" height={400} sx={{ borderRadius: '36px' }} />
+                    <Skeleton animation="wave" variant="rounded" height={400} sx={{ borderRadius: '36px' }} />
+                </Box>
+                <Skeleton animation="wave" variant="rounded" height={200} sx={{ borderRadius: '44px' }} />
+            </Box>
+        );
     }
 
     return (
