@@ -27,7 +27,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 export default function EventDetails() {
     const { eventId } = useParams();
     const navigate = useNavigate();
-    const { user, syncTimestamp } = useOutletContext();
+    const { user, syncTimestamp } = useOutletContext();    //all are states
     const { showConfirm } = useDialog();
     const [event, setEvent] = useState(null);
     const [loading, setLoading] = useState(true);

@@ -63,7 +63,7 @@ export default function Dashboard() {
             setHealthData(health);
             setRisks(riskData);
             setBudgetOpts(budgetData);
-            
+
             // Comprehensive Alert Logic
             if (health) {
                 if (health.metrics.overdueTasks > 0) {
@@ -351,15 +351,15 @@ export default function Dashboard() {
                         position: "relative",
                         overflow: "hidden"
                     }}
-                    onMouseEnter={e => {
-                        e.currentTarget.style.transform = "translateY(-4px)";
-                        e.currentTarget.style.boxShadow = "0 10px 30px rgba(0,0,0,0.05)";
-                    }}
-                    onMouseLeave={e => {
-                        e.currentTarget.style.transform = "translateY(0)";
-                        e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.02)";
-                    }}
-                >
+                        onMouseEnter={e => {
+                            e.currentTarget.style.transform = "translateY(-4px)";
+                            e.currentTarget.style.boxShadow = "0 10px 30px rgba(0,0,0,0.05)";
+                        }}
+                        onMouseLeave={e => {
+                            e.currentTarget.style.transform = "translateY(0)";
+                            e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.02)";
+                        }}
+                    >
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
                             <div style={{ fontSize: "12px", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em" }}>{kpi.label}</div>
                             {i === 0 && (
@@ -442,24 +442,24 @@ export default function Dashboard() {
                     </div>
 
                     {/* Milestone Intelligence - Added to fill space and provide value */}
-                    <div style={{ 
-                        marginTop: "3rem", 
-                        padding: "1.5rem", 
-                        background: "#f8fafc", 
-                        borderRadius: "20px", 
+                    <div style={{
+                        marginTop: "3rem",
+                        padding: "1.5rem",
+                        background: "#f8fafc",
+                        borderRadius: "20px",
                         border: "1px solid #f1f5f9",
                         display: "flex",
                         alignItems: "flex-start",
                         gap: "1.25rem"
                     }}>
-                        <div style={{ 
-                            width: "40px", 
-                            height: "40px", 
-                            borderRadius: "12px", 
-                            background: "#fff", 
-                            boxShadow: "0 4px 10px rgba(0,0,0,0.03)", 
-                            display: "flex", 
-                            alignItems: "center", 
+                        <div style={{
+                            width: "40px",
+                            height: "40px",
+                            borderRadius: "12px",
+                            background: "#fff",
+                            boxShadow: "0 4px 10px rgba(0,0,0,0.03)",
+                            display: "flex",
+                            alignItems: "center",
                             justifyContent: "center",
                             flexShrink: 0
                         }}>
@@ -468,7 +468,7 @@ export default function Dashboard() {
                         <div>
                             <div style={{ fontSize: "11px", fontWeight: 850, color: "#1e293b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "4px" }}>Strategic Guidance</div>
                             <p style={{ fontSize: "13px", color: "#64748b", margin: 0, lineHeight: 1.6, fontWeight: 500 }}>
-                                Based on your <strong>{selectedEvent?.type}</strong> context, you should focus on finalizing high-impact vendor contracts. 
+                                Based on your <strong>{selectedEvent?.type}</strong> context, you should focus on finalizing high-impact vendor contracts.
                                 Ensuring RSVP synchronization now will prevent logistics slippage in the later phases.
                             </p>
                         </div>
@@ -491,7 +491,7 @@ export default function Dashboard() {
                 }}>
                     {/* Decorative Background Glow */}
                     <div style={{ position: "absolute", top: "-20%", right: "-20%", width: "200px", height: "200px", background: "radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, transparent 70%)", borderRadius: "50%", zIndex: 0 }}></div>
-                    
+
                     <div style={{ position: "relative", zIndex: 1 }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
                             <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", fontWeight: 850, textTransform: "uppercase", letterSpacing: "0.15em" }}>Budget Summary</div>
@@ -502,10 +502,10 @@ export default function Dashboard() {
                         </div>
 
                         <div style={{ marginBottom: "2.5rem" }}>
-                            <div style={{ 
-                                fontSize: "42px", 
-                                fontWeight: 850, 
-                                color: "#fff", 
+                            <div style={{
+                                fontSize: "42px",
+                                fontWeight: 850,
+                                color: "#fff",
                                 letterSpacing: "-0.03em",
                                 textShadow: "0 4px 20px rgba(255,255,255,0.15)",
                                 marginBottom: "4px"
@@ -520,22 +520,22 @@ export default function Dashboard() {
 
                     {/* Spacing Refinement: Operational Intelligence Strip */}
                     <div style={{ margin: "auto 0", position: "relative", zIndex: 1 }}>
-                        <div style={{ 
-                            display: "flex", 
-                            alignItems: "center", 
-                            gap: "14px", 
-                            padding: "1.25rem", 
-                            background: "rgba(255, 255, 255, 0.02)", 
-                            borderRadius: "24px", 
-                            border: "1px solid rgba(255, 255, 255, 0.04)" 
+                        <div style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "14px",
+                            padding: "1.25rem",
+                            background: "rgba(255, 255, 255, 0.02)",
+                            borderRadius: "24px",
+                            border: "1px solid rgba(255, 255, 255, 0.04)"
                         }}>
-                            <div style={{ 
-                                width: "10px", 
-                                height: "10px", 
-                                background: "#3b82f6", 
-                                borderRadius: "50%", 
+                            <div style={{
+                                width: "10px",
+                                height: "10px",
+                                background: "#3b82f6",
+                                borderRadius: "50%",
                                 boxShadow: "0 0 12px #3b82f6",
-                                animation: "pulse 2s infinite" 
+                                animation: "pulse 2s infinite"
                             }}></div>
                             <div>
                                 <div style={{ fontSize: "11px", fontWeight: 850, color: "rgba(255,255,255,0.8)", marginBottom: "2px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Financial Velocity</div>
@@ -547,7 +547,7 @@ export default function Dashboard() {
                     <div style={{ position: "relative", zIndex: 1 }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", fontSize: "12px", fontWeight: 850, marginBottom: "0.75rem" }}>
                             <span style={{ color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Market Utilisation</span>
-                            <span style={{ 
+                            <span style={{
                                 color: getBudgetColor(healthData?.metrics?.budgetUsage || 0),
                                 fontSize: "16px",
                                 letterSpacing: "-0.02em"
@@ -608,15 +608,15 @@ export default function Dashboard() {
                                 <div style={{ display: "flex", flexDirection: "column" }}>
                                     <div style={{ fontSize: "14px", fontWeight: 800, color: "#1e293b" }}>{vendor.name}</div>
                                     <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                         <span style={{ fontSize: "10px", color: styles.color, fontWeight: 800, textTransform: "uppercase" }}>{vendor.service}</span>
-                                         <span style={{ width: "2px", height: "2px", background: "#cbd5e1", borderRadius: "50%" }}></span>
-                                         <span style={{ fontSize: "12px", color: "#94a3b8", fontWeight: 600 }}>{vendor.priceRange}</span>
-                                     </div>
-                                     {vendor.matchReason && (
-                                         <div style={{ fontSize: "10px", color: "#2563eb", fontWeight: 700, fontStyle: "italic", marginTop: "2px", maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis" }}>
-                                             {vendor.matchReason}
-                                         </div>
-                                     )}
+                                        <span style={{ fontSize: "10px", color: styles.color, fontWeight: 800, textTransform: "uppercase" }}>{vendor.service}</span>
+                                        <span style={{ width: "2px", height: "2px", background: "#cbd5e1", borderRadius: "50%" }}></span>
+                                        <span style={{ fontSize: "12px", color: "#94a3b8", fontWeight: 600 }}>{vendor.priceRange}</span>
+                                    </div>
+                                    {vendor.matchReason && (
+                                        <div style={{ fontSize: "10px", color: "#2563eb", fontWeight: 700, fontStyle: "italic", marginTop: "2px", maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                            {vendor.matchReason}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         );

@@ -124,7 +124,7 @@ export default function Budget() {
         e.preventDefault();
         try {
             const method = editingExpense ? "PATCH" : "POST";
-            const url = editingExpense 
+            const url = editingExpense
                 ? `${import.meta.env.VITE_API_URL}/vendors/${editingExpense._id}`
                 : `${import.meta.env.VITE_API_URL}/vendors`;
 
@@ -345,9 +345,9 @@ export default function Budget() {
                                             <td style={{ padding: "0 1rem", textAlign: "right" }}>
                                                 <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end", alignItems: "center" }}>
                                                     {v.receiptUrl && (
-                                                        <a 
-                                                            href={`${import.meta.env.VITE_API_URL}${v.receiptUrl}`} 
-                                                            target="_blank" 
+                                                        <a
+                                                            href={`${import.meta.env.VITE_API_URL}${v.receiptUrl}`}
+                                                            target="_blank"
                                                             rel="noopener noreferrer"
                                                             style={{ color: "#2563eb", padding: "4px", display: "flex" }}
                                                             title="View Receipt"
@@ -403,9 +403,9 @@ export default function Budget() {
                                 </div>
                             </div>
 
-                            <div style={{ 
-                                border: "2px dashed #e2e8f0", 
-                                borderRadius: "20px", 
+                            <div style={{
+                                border: "2px dashed #e2e8f0",
+                                borderRadius: "20px",
                                 padding: "1.5rem",
                                 textAlign: "center",
                                 position: "relative",
@@ -426,8 +426,8 @@ export default function Budget() {
                                             <div style={{ fontSize: "12px", fontWeight: 800, color: "#0369a1" }}>Proof Attached</div>
                                             <div style={{ fontSize: "10px", color: "#0ea5e9", fontWeight: 600 }}>Click to replace file</div>
                                         </div>
-                                        <input 
-                                            type="file" 
+                                        <input
+                                            type="file"
                                             onChange={handleFileUpload}
                                             style={{ position: "absolute", inset: 0, opacity: 0, cursor: "pointer" }}
                                             accept="image/*,.pdf"
@@ -438,8 +438,8 @@ export default function Budget() {
                                         <Upload size={20} color="#94a3b8" />
                                         <div style={{ fontSize: "13px", fontWeight: 800, color: "#64748b" }}>Attach Receipt / Bill</div>
                                         <div style={{ fontSize: "10px", color: "#94a3b8", fontWeight: 500 }}>PNG, JPG or PDF up to 5MB</div>
-                                        <input 
-                                            type="file" 
+                                        <input
+                                            type="file"
                                             onChange={handleFileUpload}
                                             style={{ position: "absolute", inset: 0, opacity: 0, cursor: "pointer" }}
                                             accept="image/*,.pdf"
@@ -456,6 +456,6 @@ export default function Budget() {
                 </div>
             )}
 
-</div>
+        </div>
     );
 }

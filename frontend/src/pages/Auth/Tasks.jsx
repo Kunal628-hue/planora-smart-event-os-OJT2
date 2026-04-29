@@ -354,7 +354,7 @@ export default function Tasks() {
                                 }}>{task.priority}</span>
                             </div>
 
-                             <div className="task-actions" style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem" }}>
+                            <div className="task-actions" style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem" }}>
                                 <button
                                     onClick={() => handleEditTask(task)}
                                     className="task-action-btn"

@@ -174,10 +174,10 @@ export default function AiAssistant({ eventId }) {
                                 animation: "bubbleIn 0.4s cubic-bezier(0.2, 1, 0.3, 1)"
                             }}>
                                 <ReactMarkdown components={{
-                                    p: ({node, ...props}) => <div style={{ marginBottom: "0.5rem" }} {...props} />,
-                                    ul: ({node, ...props}) => <ul style={{ margin: "0.5rem 0", paddingLeft: "1.25rem", color: "inherit" }} {...props} />,
-                                    li: ({node, ...props}) => <li style={{ marginBottom: "0.25rem" }} {...props} />,
-                                    strong: ({node, ...props}) => <strong style={{ fontWeight: 800, color: msg.role === "user" ? "#fff" : "#1e293b" }} {...props} />
+                                    p: ({ node, ...props }) => <div style={{ marginBottom: "0.5rem" }} {...props} />,
+                                    ul: ({ node, ...props }) => <ul style={{ margin: "0.5rem 0", paddingLeft: "1.25rem", color: "inherit" }} {...props} />,
+                                    li: ({ node, ...props }) => <li style={{ marginBottom: "0.25rem" }} {...props} />,
+                                    strong: ({ node, ...props }) => <strong style={{ fontWeight: 800, color: msg.role === "user" ? "#fff" : "#1e293b" }} {...props} />
                                 }}>
                                     {msg.text}
                                 </ReactMarkdown>

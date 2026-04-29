@@ -63,11 +63,6 @@ export default function DashboardLayout() {
     const [showNotifications, setShowNotifications] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-    const playNotificationSound = () => {
-        const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3");
-        audio.play().catch(e => console.log("Sound play blocked by browser policy"));
-    };
-
     const addNotification = (title, message) => {
         // Respect Smart Notifications preference
         const isEnabled = localStorage.getItem("planora_pref_smart_notif") !== "false";
@@ -81,7 +76,6 @@ export default function DashboardLayout() {
             read: false
         };
         setNotifications(prev => [newNotif, ...prev]);
-        playNotificationSound();
     };
 
     const removeNotification = (id) => {
@@ -94,7 +88,7 @@ export default function DashboardLayout() {
         if (user) {
             fetchEvents(user.uid);
             fetchAllVendors(user.uid);
-            
+
             // Exposure for manual verification
             window.pushNotification = (title, message) => addNotification(title, message);
 
@@ -125,9 +119,9 @@ export default function DashboardLayout() {
         try {
             const res = await fetch(`${API_URL}/events?user=${uid}&email=${user.email}`);
             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-            
+
             const data = await res.json();
-            
+
             if (Array.isArray(data)) {
                 setEvents(data);
 
@@ -180,17 +174,17 @@ export default function DashboardLayout() {
 
     useEffect(() => {
         if (!selectedEventId || !user) return;
-        
+
         const resolvePermissions = async () => {
             try {
                 // Fetch the event specifically to get its latest metadata including owner
                 const eventRes = await fetch(`${API_URL}/events/${selectedEventId}`);
                 const event = eventRes.ok ? await eventRes.json() : safeEvents.find(e => String(e.id || e._id) === String(selectedEventId));
-                
+
                 // 1. Ownership Check (UID + Email fallback)
                 const isSystemAdmin = user?.email && import.meta.env.VITE_ADMIN_EMAIL === user.email;
                 const isUIDOwner = event?.user && String(event.user) === String(user.uid);
-                
+
                 // Secondary check: If the owner's identity is stored as an email in a special field (if it exists)
                 // or if we can match any 'Event Lead' record with this email.
                 setIsOwner(isUIDOwner || isSystemAdmin);
@@ -205,14 +199,14 @@ export default function DashboardLayout() {
                 const res = await fetch(`${API_URL}/collaborators?user=${user.uid}&email=${user.email}&eventId=${selectedEventId}`);
                 if (res.ok) {
                     const data = await res.json();
-                    
+
                     // Look for ANY record matching this user that has elevated permissions
                     const collabList = Array.isArray(data) ? data : (data.collaborators || []);
-                    const myCollab = collabList.find(c => 
-                        String(c.userId) === String(user.uid) || 
+                    const myCollab = collabList.find(c =>
+                        String(c.userId) === String(user.uid) ||
                         c.email.toLowerCase() === user.email.toLowerCase()
                     );
-                    
+
                     const role = myCollab?.role || "Viewer";
                     console.log(`[Permission Intelligence] Collaborator Role Resolved: ${role} for ${user.email}`);
                     setCurrentRole(role);
@@ -331,8 +325,8 @@ export default function DashboardLayout() {
 
     return (
         <div className="dashboard-layout">
-            <div 
-                className={`sidebar-overlay ${isSidebarOpen ? 'visible' : ''}`} 
+            <div
+                className={`sidebar-overlay ${isSidebarOpen ? 'visible' : ''}`}
                 onClick={() => setIsSidebarOpen(false)}
             />
             <aside className={`dashboard-sidebar ${isSidebarOpen ? 'mobile-open' : ''}`}>
@@ -460,7 +454,7 @@ export default function DashboardLayout() {
                     borderBottom: "1px solid rgba(232, 232, 245, 0.5)"
                 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "1rem", flex: 1 }}>
-                        <button 
+                        <button
                             className="sidebar-toggle-btn"
                             onClick={() => setIsSidebarOpen(true)}
                         >
@@ -468,10 +462,10 @@ export default function DashboardLayout() {
                         </button>
                         <div className="search-input-wrapper">
                             <Search size={16} color="#94a3b8" style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)" }} />
-                            <input 
+                            <input
                                 id="global-search-input"
-                                type="text" 
-                                placeholder="Search events, vendors, tasks..." 
+                                type="text"
+                                placeholder="Search events, vendors, tasks..."
                                 value={searchQuery}
                                 onChange={e => {
                                     setSearchQuery(e.target.value);
@@ -572,10 +566,10 @@ export default function DashboardLayout() {
                     </div>
 
                     <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
-                        
+
                         {/* Notification Bell */}
                         <div style={{ position: "relative" }}>
-                            <button 
+                            <button
                                 onClick={() => setShowNotifications(!showNotifications)}
                                 style={{
                                     border: "none",
@@ -590,7 +584,7 @@ export default function DashboardLayout() {
                                     background: showNotifications ? "#f1f5f9" : "transparent"
                                 }}
                                 onMouseEnter={e => e.currentTarget.style.background = "#f1f5f9"}
-                                onMouseLeave={e => { if(!showNotifications) e.currentTarget.style.background = "transparent"}}
+                                onMouseLeave={e => { if (!showNotifications) e.currentTarget.style.background = "transparent" }}
                             >
                                 <Bell size={20} />
                                 {notifications.some(n => !n.read) && (
@@ -624,16 +618,16 @@ export default function DashboardLayout() {
                                 }}>
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem", paddingBottom: "0.75rem", borderBottom: "1px solid #f1f5f9" }}>
                                         <h3 style={{ fontSize: "14px", fontWeight: 800, color: "#1e293b", margin: 0 }}>Event Alerts</h3>
-                                        <button 
-                                            onClick={() => setNotifications(notifications.map(n => ({...n, read: true})))}
+                                        <button
+                                            onClick={() => setNotifications(notifications.map(n => ({ ...n, read: true })))}
                                             style={{ fontSize: "11px", fontWeight: 700, color: "#2563eb", border: "none", background: "none", cursor: "pointer" }}
                                         >Mark all read</button>
                                     </div>
                                     <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", maxHeight: "300px", overflowY: "auto" }}>
                                         {notifications.length > 0 ? notifications.map(notif => (
-                                            <div key={notif.id} style={{ 
-                                                padding: "0.75rem", 
-                                                borderRadius: "12px", 
+                                            <div key={notif.id} style={{
+                                                padding: "0.75rem",
+                                                borderRadius: "12px",
                                                 background: notif.read ? "transparent" : "#f0f7ff",
                                                 border: "1px solid",
                                                 borderColor: notif.read ? "#f1f5f9" : "#dbeafe",
@@ -642,10 +636,10 @@ export default function DashboardLayout() {
                                                 <div style={{ fontSize: "12px", fontWeight: 800, color: "#1e293b", marginBottom: "2px" }}>{notif.title}</div>
                                                 <div style={{ fontSize: "11px", color: "#64748b", lineHeight: 1.4 }}>{notif.message}</div>
                                                 <div style={{ fontSize: "9px", color: "#94a3b8", fontWeight: 700, marginTop: "6px", textTransform: "uppercase" }}>{notif.time}</div>
-                                                
+
                                                 <div style={{ position: "absolute", top: "12px", right: "12px", display: "flex", gap: "8px", alignItems: "center" }}>
                                                     {!notif.read && <div style={{ width: "6px", height: "6px", background: "#2563eb", borderRadius: "50%" }}></div>}
-                                                    <button 
+                                                    <button
                                                         onClick={(e) => { e.stopPropagation(); removeNotification(notif.id); }}
                                                         style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer", padding: "4px", opacity: 0.6, display: "flex", alignItems: "center", justifyContent: "center" }}
                                                         onMouseEnter={e => e.currentTarget.style.opacity = 1}
@@ -721,19 +715,19 @@ export default function DashboardLayout() {
                                     )}
                                 </div>
                                 <div className="user-info-text" style={{ textAlign: "left" }}>
-                                    <div style={{ 
-                                        fontSize: "0.9rem", 
-                                        fontWeight: 800, 
-                                        color: "#0f172a", 
+                                    <div style={{
+                                        fontSize: "0.9rem",
+                                        fontWeight: 800,
+                                        color: "#0f172a",
                                         lineHeight: 1,
                                         letterSpacing: "-0.01em"
                                     }}>
                                         {user?.displayName || user?.email?.split('@')[0] || "Planner"}
                                     </div>
                                 </div>
-                                <ChevronDown size={14} className="user-info-chevron" style={{ 
-                                    opacity: 0.4, 
-                                    transform: showUserMenu ? "rotate(180deg)" : "none", 
+                                <ChevronDown size={14} className="user-info-chevron" style={{
+                                    opacity: 0.4,
+                                    transform: showUserMenu ? "rotate(180deg)" : "none",
                                     transition: "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
                                     color: "#0f172a"
                                 }} />

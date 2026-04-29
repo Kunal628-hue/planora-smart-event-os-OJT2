@@ -28,13 +28,15 @@ export default function Guests() {
         if (!user) return;
         setLoading(true);
         try {
-            let url = `${API_URL}/guests?user=${user.uid}&email=${user.email}`;
+            let url = `${API_URL}/guests?user=${user.uid}&email=${encodeURIComponent(user.email || "")}`;
             if (selectedEventId) url += `&eventId=${selectedEventId}`;
             const res = await fetch(url);
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
             const data = await res.json();
             setGuests(Array.isArray(data) ? data : []);
         } catch (err) {
             console.error("Fetch error:", err);
+            setGuests([]);
         } finally {
             setLoading(false);
         }
@@ -353,7 +355,7 @@ export default function Guests() {
                                     fontWeight: 800,
                                     border: "1px solid #f1f5f9"
                                 }}>
-                                    {guest.name.charAt(0)}
+                                    {guest.name ? guest.name.charAt(0) : '?'}
                                 </div>
                                 <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.75rem" }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>

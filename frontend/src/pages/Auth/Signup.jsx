@@ -63,26 +63,26 @@ export default function Signup() {
     return (
         <div className="auth-page-new">
             <AuthBackground />
-            
+
             <Link to="/" className="auth-page-logo">
-                <img 
-                    src="/logo-new.svg" 
-                    alt="Planora" 
+                <img
+                    src="/logo-new.svg"
+                    alt="Planora"
                 />
             </Link>
 
             <div className="auth-container">
-                
+
                 <div className="auth-card-split">
                     {/* Left Side: Info */}
                     <div className="auth-info-side">
                         <h1 className="auth-title">Create account</h1>
-                        
+
                         <div className="feature-list">
                             <div className="feature-item">
                                 <div className="feature-icon">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
                                     </svg>
                                 </div>
                                 <div className="feature-text">
@@ -94,7 +94,7 @@ export default function Signup() {
                             <div className="feature-item">
                                 <div className="feature-icon">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                                     </svg>
                                 </div>
                                 <div className="feature-text">
@@ -123,7 +123,7 @@ export default function Signup() {
                                         name="name"
                                         value={form.name}
                                         onChange={handleChange}
-                                        placeholder="Jane Doe"
+                                        placeholder="Full Name"
                                         style={{ padding: '0.6rem 1rem' }}
                                         required
                                     />
@@ -137,7 +137,7 @@ export default function Signup() {
                                         name="email"
                                         value={form.email}
                                         onChange={handleChange}
-                                        placeholder="name@company.com"
+                                        placeholder="Your email"
                                         style={{ padding: '0.6rem 1rem' }}
                                         required
                                     />

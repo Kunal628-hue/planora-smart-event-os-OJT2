@@ -13,7 +13,7 @@ export default defineConfig({
         manualChunks: {
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
           'vendor-firebase': ['firebase/app', 'firebase/auth', 'firebase/firestore'],
-          'vendor-utils': ['gsap', 'animejs', 'lucide-react', '@studio-freight/lenis'],
+          'vendor-utils': ['gsap', 'animejs', 'lucide-react'],
         },
       },
     },
