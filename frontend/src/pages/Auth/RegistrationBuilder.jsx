@@ -979,7 +979,7 @@ export default function RegistrationBuilder() {
                                                         
                                                         {/* Barcode */}
                                                         <div style={{ marginTop: "18px", display: "inline-block", background: "rgba(255,255,255,0.9)", padding: "8px", borderRadius: "8px", border: "1px solid rgba(0,0,0,0.05)" }}>
-                                                            <div style={{ display: "flex", gap: "2px", height: "20px", alignItems: "center", justify-content: "center", marginBottom: "4px", opacity: 0.8 }}>
+                                                            <div style={{ display: "flex", gap: "2px", height: "20px", alignItems: "center", justifyContent: "center", marginBottom: "4px", opacity: 0.8 }}>
                                                                 {[1,2,3,1,2,1,4,1,2,3,1,2,1,3].map((w, i) => <div key={i} style={{ height: "100%", background: "#0f172a", width: `${w}px` }}></div>)}
                                                             </div>
                                                             <div style={{ fontFamily: "monospace", fontSize: "9px", fontWeight: 800, color: "#475569" }}>TECH-CONF-77</div>
