@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { animate } from "animejs";
+import InteractiveGrid from "../ui/InteractiveGrid";
 
 export default function DashboardBackground() {
     const containerRef = useRef(null);
@@ -30,10 +31,12 @@ export default function DashboardBackground() {
                 overflow: "hidden",
                 zIndex: 0,
                 pointerEvents: "none",
-                background: "var(--bg-base)"
             }}
         >
-            {/* Subtle orbs for depth */}
+            {/* Base Interactive Grid */}
+            <InteractiveGrid />
+
+            {/* Subtle orbs for depth - placed on top of grid for blending */}
             <div className="dash-orb" style={{
                 position: "absolute",
                 top: "10%",
@@ -41,8 +44,9 @@ export default function DashboardBackground() {
                 width: "400px",
                 height: "400px",
                 borderRadius: "50%",
-                background: "radial-gradient(circle, rgba(37, 99, 235, 0.03) 0%, transparent 70%)",
+                background: "radial-gradient(circle, rgba(249, 115, 22, 0.05) 0%, transparent 70%)",
                 filter: "blur(60px)",
+                zIndex: 1
             }} />
             <div className="dash-orb" style={{
                 position: "absolute",
@@ -51,17 +55,8 @@ export default function DashboardBackground() {
                 width: "500px",
                 height: "500px",
                 borderRadius: "50%",
-                background: "radial-gradient(circle, rgba(139, 92, 246, 0.03) 0%, transparent 70%)",
+                background: "radial-gradient(circle, rgba(251, 146, 60, 0.03) 0%, transparent 70%)",
                 filter: "blur(70px)",
-            }} />
-
-            {/* Subtle grid */}
-            <div style={{
-                position: "absolute",
-                inset: 0,
-                backgroundImage: `radial-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 1px)`,
-                backgroundSize: "40px 40px",
-                opacity: 0.5,
                 zIndex: 1
             }} />
         </div>

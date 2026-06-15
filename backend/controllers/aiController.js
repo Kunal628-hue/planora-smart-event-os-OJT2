@@ -7,7 +7,7 @@ import mongoose from "mongoose";
 
 dotenv.config();
 
-const generateGroqCompletion = async (prompt) => {
+export const generateGroqCompletion = async (prompt) => {
     if (!process.env.GROQ_API_KEY) throw new Error("GROQ_API_KEY is missing");
     
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -30,6 +30,132 @@ const generateGroqCompletion = async (prompt) => {
 
     const data = await response.json();
     return data.choices[0].message.content;
+};
+
+/**
+ * AI STRATEGIC PLANNING ENGINE
+ * Goal: Create a professional, granular budget division plan for Indian context.
+ */
+export const generateStrategicPlan = async (req, res) => {
+    try {
+        const { eventId } = req.params;
+        const event = await Event.findById(eventId);
+        if (!event) return res.status(404).json({ message: "Event context lost" });
+
+        const totalBudget = event.budget || 0;
+        if (totalBudget === 0) {
+            return res.status(400).json({ message: "Event budget is set to ₹0. Please define a budget in Event Settings before generating a strategic plan." });
+        }
+
+        const safetyBuffer = Math.round(totalBudget * 0.10);
+        const allocatableBudget = totalBudget - safetyBuffer;
+
+        console.log(`[AI Strategist] Generating plan for ${event.title} | Budget: ₹${totalBudget}`);
+
+        const prompt = `
+            You are an elite Indian Event Strategist. Generate a granular budget division plan for a "${event.type}" named "${event.title}" with a total budget of ₹${totalBudget.toLocaleString()}.
+
+            STRICT REQUIREMENTS:
+            1. LUXURY SCALE: If budget < 5L (Budget), 5L-20L (Premium), >20L (Luxury). Current: ₹${totalBudget}. Adjust task descriptions and item complexity accordingly.
+            2. 90/10 RULE: Allocate exactly ₹${allocatableBudget} (90%) across 6-8 categories. Reserve exactly ₹${safetyBuffer} (10%) as an 'Unallocated Safety Buffer'.
+            3. INDIAN CONTEXT: Focus on Indian meal timings (Breakfast, Lunch, High Tea, Dinner, Late Night Bites) and specific program-wise tasks (Haldi Decor, Mehendi Artist, Sangeet Choreography, etc.).
+            4. ITEMIZATION: Every task within a category must have a specific 'price' (₹ amount).
+            5. RATIONALE: Provide a 2-3 sentence strategic rationale (no emojis) explaining why this distribution is optimized for this budget scale.
+
+            OUTPUT FORMAT:
+            Return ONLY a valid JSON object with this structure:
+            {
+              "rationale": "Strategic reasoning goes here...",
+              "safetyBuffer": ${safetyBuffer},
+              "categories": [
+                {
+                  "name": "Catering: Wedding Dinner",
+                  "allocated": 500000,
+                  "tasks": [
+                    { "name": "Main Course Live Counters", "price": 300000 },
+                    { "name": "Dessert Bar & Exotic Fruits", "price": 200000 }
+                  ]
+                }
+              ]
+            }
+        `;
+
+        const aiResponse = await generateGroqCompletion(prompt);
+        console.log(`[AI Strategist] AI Response received (Length: ${aiResponse.length})`);
+        
+        // Robust JSON Extraction
+        const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+            console.error("[AI Strategist] Failed to find JSON in response:", aiResponse);
+            throw new Error("AI failed to return a valid strategic document.");
+        }
+        
+        const plan = JSON.parse(jsonMatch[0]);
+        console.log(`[AI Strategist] Plan synthesized successfully with ${plan.categories?.length} categories.`);
+
+        res.status(200).json(plan);
+    } catch (error) {
+        console.error("Strategic Plan Generation Error:", error);
+        res.status(500).json({ message: error.message || "Strategic engine failed to synthesize plan" });
+    }
+};
+
+export const applyStrategicPlan = async (req, res) => {
+    try {
+        const { eventId, plan, userId } = req.body;
+        const event = await Event.findById(eventId);
+        if (!event) return res.status(404).json({ message: "Event not found" });
+
+        // 1. Clear existing AI-generated tasks/vendors if needed? 
+        // For now, we append but maybe mark them.
+        
+        const tasksToCreate = [];
+        const vendorsToCreate = [];
+
+        plan.categories.forEach(cat => {
+            cat.tasks.forEach(task => {
+                // Add to Workflow Milestones
+                tasksToCreate.push({
+                    title: task.name,
+                    description: `AI Suggested Task for ${cat.name}`,
+                    budget: task.price,
+                    status: "To Do",
+                    event: eventId,
+                    user: userId,
+                    dueDate: event.date // Default to event date
+                });
+
+                // Add to Financial Ledger (Expenses)
+                const lowerCat = cat.name.toLowerCase();
+                let service = "Operations";
+                if (lowerCat.includes("catering") || lowerCat.includes("food") || lowerCat.includes("meal")) service = "Catering";
+                else if (lowerCat.includes("decor") || lowerCat.includes("design")) service = "Decor";
+                else if (lowerCat.includes("photo") || lowerCat.includes("video")) service = "Photography";
+                else if (lowerCat.includes("venue") || lowerCat.includes("hall")) service = "Venue";
+                else if (lowerCat.includes("music") || lowerCat.includes("entertainment") || lowerCat.includes("dj")) service = "Entertainment";
+                else if (lowerCat.includes("logistics") || lowerCat.includes("transport")) service = "Logistics";
+
+                vendorsToCreate.push({
+                    name: task.name,
+                    service: service,
+                    cost: task.price,
+                    status: "Inquiry", // Planned/Suggested
+                    event: eventId,
+                    user: userId
+                });
+            });
+        });
+
+        await Task.insertMany(tasksToCreate);
+        await Vendor.insertMany(vendorsToCreate);
+
+        console.log(`[AI Strategist] Successfully applied plan to ${eventId}. Created ${tasksToCreate.length} tasks and ${vendorsToCreate.length} ledger entries.`);
+
+        res.status(200).json({ message: "Strategic Plan synchronized successfully", tasksCount: tasksToCreate.length });
+    } catch (error) {
+        console.error("Apply Plan Error:", error);
+        res.status(500).json({ message: "Failed to synchronize strategic plan" });
+    }
 };
 
 export const getEventHealth = async (req, res) => {
@@ -475,29 +601,39 @@ export const askAiAssistant = async (req, res) => {
         const totalCost = vendors.reduce((sum, v) => sum + (v.cost || 0), 0);
         const completedTasks = tasks.filter(t => t.status === "Completed").length;
         const totalTasks = tasks.length;
+        const pendingTasksList = tasks.filter(t => t.status !== "Completed").map(t => `- ${t.title} (${t.dueDate})`).join("\n");
+        const vendorsList = vendors.map(v => `- ${v.name} (${v.service}): ₹${v.cost.toLocaleString()}`).join("\n");
         const confirmedGuests = guests.filter(g => g.status === "Confirmed").length;
         const totalGuests = guests.length;
 
         const context = `
-            You are Planora's AI Event Assistant. You have access to the following live data for the event "${event.title}":
-            - Event Type: ${event.type}
-            - Current Budget Usage: ₹${totalCost.toLocaleString()} spent out of ₹${event.budget.toLocaleString()}
-            - Task Progress: ${completedTasks}/${totalTasks} tasks completed.
-            - Guest Status: ${confirmedGuests}/${totalGuests} confirmed RSVPs.
-            - Event Date: ${event.date}
-            - Location: ${event.location}
+            You are Planora's AI Strategic Operations Unit. You are a highly advanced intelligence model integrated into the Smart Event OS.
+            
+            Current Operational Context for "${event.title}":
+            - Event Configuration: ${event.type} in ${event.location}, ${event.city}.
+            - Financial Health: Spent ₹${totalCost.toLocaleString()} of total budget ₹${event.budget.toLocaleString()}.
+            - Remaining Liquidity: ₹${(event.budget - totalCost).toLocaleString()}.
+            - Operational Status: ${completedTasks}/${totalTasks} milestones secured.
+            - Logistics: ${confirmedGuests}/${totalGuests} guests deployment confirmed.
+            - Temporal Reference: Event date is set for ${event.date}.
 
-            User Question: "${message}"
+            Critical Pending Milestones:
+            ${pendingTasksList || "All tactical objectives achieved."}
 
-            Core Directives:
-            1. Provide highly structured, clear, and detailed information.
-            2. STRICTLY NO EMOJIS are permitted in your response.
-            3. Use technical and professional language; avoid conversational fluff or excessive enthusiasm.
-            4. Format all responses using appropriate markdown:
-               - Use bold text for key metrics and important data points (e.g., **₹4,000,000**).
-               - Use bullet points for summarizing multiple data points.
-            5. When responding to general updates, lead with the most critical metrics first.
-            6. Ensure all numerical data used exactly matches the context provided above.
+            Active Vendor Matrix:
+            ${vendorsList || "No external assets deployed yet."}
+
+            User Query: "${message}"
+
+            Strategic Directives:
+            1. Response Quality: Provide high-density, actionable insights. Use the data above to answer specifically.
+            2. Language: Use professional, tactical terminology (e.g., "Operational liquidity," "Milestone status").
+            3. Formatting: 
+               - Use **Bold** for all numerical values and critical terms.
+               - Use Markdown Tables for budget breakdowns if requested.
+               - Use hierarchical bullet points for multi-step strategies.
+            4. Restrictions: STRICTLY NO EMOJIS. No conversational fluff.
+            5. Analysis: If budget is over 90%, issue a "Financial Risk Advisory". If tasks are behind, suggest "Operational Acceleration".
         `;
 
         const response = await generateGroqCompletion(context);

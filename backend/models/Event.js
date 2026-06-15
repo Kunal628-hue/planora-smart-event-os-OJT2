@@ -41,6 +41,10 @@ const eventSchema = mongoose.Schema(
         type: {
             type: String,
             default: "Other"
+        },
+        registrationConfig: {
+            type: Object,
+            default: null
         }
     },
     {

@@ -17,10 +17,13 @@ import {
     Sparkles,
     Search,
     RefreshCw,
-    Scan,
     Bell,
     Check,
-    X
+    X,
+    Info,
+    AlertTriangle,
+    CheckCircle2,
+    Trash2
 } from "lucide-react";
 import DashboardBackground from "./DashboardBackground";
 
@@ -29,6 +32,7 @@ const NAV_ITEMS = [
     { id: "events", label: "Events", path: "/events", icon: <Calendar size={20} /> },
     { id: "vendors", label: "Vendors", path: "/vendors", icon: <Handshake size={20} /> },
     { id: "guests", label: "Guests", path: "/guests", icon: <Users size={20} /> },
+    { id: "builder", label: "Registration Designer", path: "/builder", icon: <Sparkles size={20} /> },
     { id: "budget", label: "Budget", path: "/budget", icon: <Wallet size={20} /> },
     { id: "tasks", label: "Tasks / Timeline", path: "/tasks", icon: <ListTodo size={20} /> },
     { id: "analytics", label: "Analytics", path: "/analytics", icon: <BarChart3 size={20} /> },
@@ -56,14 +60,22 @@ export default function DashboardLayout() {
     const [isSyncing, setIsSyncing] = useState(false);
     const [isResearching, setIsResearching] = useState(false);
     const [syncTimestamp, setSyncTimestamp] = useState(Date.now());
-    const [notifications, setNotifications] = useState([
-        { id: 1, title: "AI Strategy Complete", message: "Optimum vendor matrix calculated for your event.", time: "Just now", read: false },
-        { id: 2, title: "Budget Warning", message: "Catering costs exceed projection by 12%.", time: "2h ago", read: true }
-    ]);
+    const [notifications, setNotifications] = useState(() => {
+        const saved = localStorage.getItem("planora_notifications");
+        if (saved) return JSON.parse(saved);
+        return [
+            { id: 1, title: "Welcome to Planora", message: "Your Smart Event OS is ready. Start by creating an event.", time: "System", read: false, type: "system" },
+            { id: 2, title: "AI Strategy Complete", message: "Optimum vendor matrix calculated for your event.", time: "2h ago", read: true, type: "ai" }
+        ];
+    });
+
+    useEffect(() => {
+        localStorage.setItem("planora_notifications", JSON.stringify(notifications));
+    }, [notifications]);
     const [showNotifications, setShowNotifications] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-    const addNotification = (title, message) => {
+    const addNotification = (title, message, type = "system") => {
         // Respect Smart Notifications preference
         const isEnabled = localStorage.getItem("planora_pref_smart_notif") !== "false";
         if (!isEnabled) return;
@@ -72,14 +84,30 @@ export default function DashboardLayout() {
             id: Date.now(),
             title,
             message,
-            time: "Just now",
-            read: false
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            read: false,
+            type
         };
         setNotifications(prev => [newNotif, ...prev]);
+
+        // Optional: Play subtle sound
+        try {
+            const audio = new Audio('/notification.mp3');
+            audio.volume = 0.2;
+            audio.play().catch(() => {});
+        } catch (e) {}
     };
 
     const removeNotification = (id) => {
         setNotifications(prev => prev.filter(n => n.id !== id));
+    };
+
+    const clearAllNotifications = () => {
+        setNotifications([]);
+    };
+
+    const markAllAsRead = () => {
+        setNotifications(prev => prev.map(n => ({ ...n, read: true })));
     };
 
     const API_URL = import.meta.env.VITE_API_URL;
@@ -379,7 +407,7 @@ export default function DashboardLayout() {
                                     <option value="">No events</option>
                                 ) : (
                                     safeEvents.map(event => (
-                                        <option key={event.id || event._id} value={event.id || event._id} style={{ background: "#1a1a2e", color: "#fff" }}>
+                                        <option key={event.id || event._id} value={event.id || event._id} style={{ background: "#18181b", color: "#fff" }}>
                                             {event.name}
                                         </option>
                                     ))
@@ -402,8 +430,8 @@ export default function DashboardLayout() {
                             onClick={() => setIsSidebarOpen(false)}
                             className={`sidebar-item${location.pathname === item.path ? " active" : ""}`}
                             style={{
-                                marginBottom: "2px",
-                                padding: "0.6rem 0.85rem",
+                                marginBottom: "1px",
+                                padding: "0.5rem 0.85rem",
                                 borderRadius: "10px",
                                 display: "flex",
                                 alignItems: "center",
@@ -449,9 +477,9 @@ export default function DashboardLayout() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    background: "rgba(255, 255, 255, 0.8)",
+                    background: "rgba(9, 9, 11, 0.8)",
                     backdropFilter: "blur(20px)",
-                    borderBottom: "1px solid rgba(232, 232, 245, 0.5)"
+                    borderBottom: "1px solid rgba(255, 255, 255, 0.05)"
                 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "1rem", flex: 1 }}>
                         <button
@@ -473,16 +501,16 @@ export default function DashboardLayout() {
                                 }}
                                 className="search-input"
                                 onFocus={e => {
-                                    e.target.style.background = "#fff";
+                                    e.target.style.background = "var(--bg-elevated)";
                                     e.target.style.borderColor = "var(--accent-primary)";
-                                    e.target.style.boxShadow = "0 4px 20px rgba(37, 99, 235, 0.08)";
+                                    e.target.style.boxShadow = "0 4px 20px rgba(249, 115, 22, 0.08)";
                                     if (searchQuery.trim()) setShowSearchResults(true);
                                 }}
                                 onBlur={e => {
                                     // Delay to allow clicking results
                                     setTimeout(() => {
-                                        e.target.style.background = "#f8fafc";
-                                        e.target.style.borderColor = "#e2e8f0";
+                                        e.target.style.background = "var(--bg-surface)";
+                                        e.target.style.borderColor = "var(--border-subtle)";
                                         e.target.style.boxShadow = "none";
                                         setShowSearchResults(false);
                                     }, 200);
@@ -495,10 +523,10 @@ export default function DashboardLayout() {
                                     top: "calc(100% + 8px)",
                                     left: 0,
                                     right: 0,
-                                    background: "#fff",
-                                    border: "1px solid #e8e8f5",
+                                    background: "var(--bg-surface)",
+                                    border: "1px solid var(--border-subtle)",
                                     borderRadius: "12px",
-                                    boxShadow: "0 15px 30px -5px rgba(0,0,0,0.1)",
+                                    boxShadow: "0 15px 30px -5px rgba(0,0,0,0.5)",
                                     padding: "8px",
                                     zIndex: 1000,
                                     maxHeight: "350px",
@@ -521,7 +549,7 @@ export default function DashboardLayout() {
                                                 transition: "all 0.15s"
                                             }}
                                             onMouseEnter={e => {
-                                                e.currentTarget.style.background = "#f8fafc";
+                                                e.currentTarget.style.background = "rgba(255,255,255,0.05)";
                                                 e.currentTarget.style.transform = "translateX(4px)";
                                             }}
                                             onMouseLeave={e => {
@@ -529,12 +557,12 @@ export default function DashboardLayout() {
                                                 e.currentTarget.style.transform = "none";
                                             }}
                                         >
-                                            <div style={{ color: "#2563eb", opacity: 0.8 }}>
+                                            <div style={{ color: "#f97316", opacity: 0.8 }}>
                                                 {result.icon}
                                             </div>
                                             <div style={{ flex: 1 }}>
-                                                <div style={{ fontSize: "13px", fontWeight: 700, color: "#1e293b" }}>{result.label}</div>
-                                                {result.subLabel && <div style={{ fontSize: "11px", color: "#64748b" }}>{result.subLabel}</div>}
+                                                <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--text-primary)" }}>{result.label}</div>
+                                                {result.subLabel && <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{result.subLabel}</div>}
                                             </div>
                                             <div style={{ fontSize: "10px", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase" }}>
                                                 {result.type}
@@ -550,10 +578,10 @@ export default function DashboardLayout() {
                                     top: "calc(100% + 8px)",
                                     left: 0,
                                     right: 0,
-                                    background: "#fff",
-                                    border: "1px solid #e8e8f5",
+                                    background: "var(--bg-surface)",
+                                    border: "1px solid var(--border-subtle)",
                                     borderRadius: "12px",
-                                    boxShadow: "0 15px 30px -5px rgba(0,0,0,0.1)",
+                                    boxShadow: "0 15px 30px -5px rgba(0,0,0,0.5)",
                                     padding: "24px",
                                     textAlign: "center",
                                     zIndex: 1000
@@ -581,9 +609,9 @@ export default function DashboardLayout() {
                                     alignItems: "center",
                                     justifyContent: "center",
                                     transition: "all 0.2s",
-                                    background: showNotifications ? "#f1f5f9" : "transparent"
+                                    background: showNotifications ? "rgba(255,255,255,0.05)" : "transparent"
                                 }}
-                                onMouseEnter={e => e.currentTarget.style.background = "#f1f5f9"}
+                                onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.05)"}
                                 onMouseLeave={e => { if (!showNotifications) e.currentTarget.style.background = "transparent" }}
                             >
                                 <Bell size={20} />
@@ -607,52 +635,131 @@ export default function DashboardLayout() {
                                     position: "absolute",
                                     top: "calc(100% + 12px)",
                                     right: "-10px",
-                                    width: "320px",
-                                    background: "#fff",
-                                    border: "1px solid #e8e8f5",
-                                    borderRadius: "16px",
-                                    boxShadow: "0 15px 35px -5px rgba(0,0,0,0.1)",
-                                    padding: "1rem",
+                                    width: "360px",
+                                    background: "rgba(23, 23, 23, 0.85)",
+                                    backdropFilter: "blur(12px) saturate(180%)",
+                                    border: "1px solid rgba(255,255,255,0.1)",
+                                    borderRadius: "20px",
+                                    boxShadow: "0 25px 50px -12px rgba(0,0,0,0.7)",
                                     zIndex: 1000,
-                                    animation: "fade-up 0.2s ease-out"
+                                    animation: "fade-up 0.2s ease-out",
+                                    overflow: "hidden"
                                 }}>
-                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem", paddingBottom: "0.75rem", borderBottom: "1px solid #f1f5f9" }}>
-                                        <h3 style={{ fontSize: "14px", fontWeight: 800, color: "#1e293b", margin: 0 }}>Event Alerts</h3>
-                                        <button
-                                            onClick={() => setNotifications(notifications.map(n => ({ ...n, read: true })))}
-                                            style={{ fontSize: "11px", fontWeight: 700, color: "#2563eb", border: "none", background: "none", cursor: "pointer" }}
-                                        >Mark all read</button>
+                                    <div style={{ 
+                                        display: "flex", 
+                                        justifyContent: "space-between", 
+                                        alignItems: "center", 
+                                        padding: "1.25rem", 
+                                        background: "rgba(255,255,255,0.03)",
+                                        borderBottom: "1px solid rgba(255,255,255,0.05)" 
+                                    }}>
+                                        <div>
+                                            <h3 style={{ fontSize: "15px", fontWeight: 900, color: "var(--text-primary)", margin: 0 }}>Central Alert Hub</h3>
+                                            <p style={{ fontSize: "10px", color: "var(--text-secondary)", margin: "2px 0 0 0" }}>{notifications.filter(n => !n.read).length} unread signals detected</p>
+                                        </div>
+                                        <div style={{ display: "flex", gap: "10px" }}>
+                                            <button
+                                                onClick={markAllAsRead}
+                                                style={{ fontSize: "11px", fontWeight: 700, color: "var(--accent-primary)", border: "none", background: "none", cursor: "pointer", opacity: 0.8 }}
+                                                onMouseEnter={e => e.currentTarget.style.opacity = 1}
+                                                onMouseLeave={e => e.currentTarget.style.opacity = 0.8}
+                                            >Mark all read</button>
+                                            <button
+                                                onClick={clearAllNotifications}
+                                                style={{ padding: "4px", color: "var(--accent-danger)", border: "none", background: "none", cursor: "pointer", opacity: 0.6 }}
+                                                onMouseEnter={e => e.currentTarget.style.opacity = 1}
+                                                onMouseLeave={e => e.currentTarget.style.opacity = 0.6}
+                                                title="Clear all"
+                                            ><Trash2 size={14} /></button>
+                                        </div>
                                     </div>
-                                    <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", maxHeight: "300px", overflowY: "auto" }}>
-                                        {notifications.length > 0 ? notifications.map(notif => (
-                                            <div key={notif.id} style={{
-                                                padding: "0.75rem",
-                                                borderRadius: "12px",
-                                                background: notif.read ? "transparent" : "#f0f7ff",
-                                                border: "1px solid",
-                                                borderColor: notif.read ? "#f1f5f9" : "#dbeafe",
-                                                position: "relative"
-                                            }}>
-                                                <div style={{ fontSize: "12px", fontWeight: 800, color: "#1e293b", marginBottom: "2px" }}>{notif.title}</div>
-                                                <div style={{ fontSize: "11px", color: "#64748b", lineHeight: 1.4 }}>{notif.message}</div>
-                                                <div style={{ fontSize: "9px", color: "#94a3b8", fontWeight: 700, marginTop: "6px", textTransform: "uppercase" }}>{notif.time}</div>
-
-                                                <div style={{ position: "absolute", top: "12px", right: "12px", display: "flex", gap: "8px", alignItems: "center" }}>
-                                                    {!notif.read && <div style={{ width: "6px", height: "6px", background: "#2563eb", borderRadius: "50%" }}></div>}
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); removeNotification(notif.id); }}
-                                                        style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer", padding: "4px", opacity: 0.6, display: "flex", alignItems: "center", justifyContent: "center" }}
-                                                        onMouseEnter={e => e.currentTarget.style.opacity = 1}
-                                                        onMouseLeave={e => e.currentTarget.style.opacity = 0.6}
-                                                    >
-                                                        <X size={12} strokeWidth={3} />
-                                                    </button>
+                                    <div className="custom-scrollbar" style={{ display: "flex", flexDirection: "column", maxHeight: "420px", overflowY: "auto", padding: "0.75rem" }}>
+                                        {notifications.length > 0 ? notifications.map(notif => {
+                                            const Icon = notif.type === "ai" ? Sparkles : notif.type === "warning" ? AlertTriangle : notif.type === "success" ? CheckCircle2 : Info;
+                                            const iconColor = notif.type === "ai" ? "var(--accent-primary)" : notif.type === "warning" ? "#ef4444" : notif.type === "success" ? "#10b981" : "#3b82f6";
+                                            
+                                            return (
+                                                <div 
+                                                    key={notif.id} 
+                                                    className="hover-reveal-parent"
+                                                    onClick={() => {
+                                                        setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, read: true } : n));
+                                                    }}
+                                                    style={{
+                                                        padding: "1.15rem",
+                                                        borderRadius: "16px",
+                                                        marginBottom: "6px",
+                                                        background: notif.read ? "transparent" : "rgba(255, 255, 255, 0.03)",
+                                                        border: "1px solid",
+                                                        borderColor: notif.read ? "transparent" : "rgba(255, 255, 255, 0.05)",
+                                                        display: "flex",
+                                                        gap: "14px",
+                                                        cursor: "pointer",
+                                                        transition: "all 0.25s",
+                                                        position: "relative"
+                                                    }}
+                                                    onMouseEnter={e => {
+                                                        e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+                                                        e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
+                                                        e.currentTarget.style.transform = "translateX(4px)";
+                                                    }}
+                                                    onMouseLeave={e => {
+                                                        e.currentTarget.style.background = notif.read ? "transparent" : "rgba(255, 255, 255, 0.03)";
+                                                        e.currentTarget.style.borderColor = notif.read ? "transparent" : "rgba(255, 255, 255, 0.05)";
+                                                        e.currentTarget.style.transform = "translateX(0)";
+                                                    }}
+                                                >
+                                                    <div style={{ 
+                                                        width: "40px", 
+                                                        height: "40px", 
+                                                        borderRadius: "12px", 
+                                                        background: `rgba(${notif.type === 'ai' ? '249, 115, 22' : '99, 102, 241'}, 0.1)`, 
+                                                        color: iconColor,
+                                                        display: "flex", 
+                                                        alignItems: "center", 
+                                                        justifyContent: "center",
+                                                        flexShrink: 0,
+                                                        boxShadow: notif.read ? "none" : `0 4px 12px rgba(${notif.type === 'ai' ? '249, 115, 22' : '99, 102, 241'}, 0.15)`
+                                                    }}>
+                                                        <Icon size={20} />
+                                                    </div>
+                                                    <div style={{ flex: 1 }}>
+                                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "4px" }}>
+                                                            <div style={{ fontSize: "14px", fontWeight: 800, color: notif.read ? "var(--text-secondary)" : "var(--text-primary)", letterSpacing: "-0.01em" }}>{notif.title}</div>
+                                                            <div style={{ fontSize: "9px", fontWeight: 700, color: "var(--text-muted)", marginTop: "3px", textTransform: "uppercase", letterSpacing: "0.05em" }}>{notif.time}</div>
+                                                        </div>
+                                                        <div style={{ fontSize: "12px", color: "var(--text-secondary)", lineHeight: "1.5", fontWeight: 500 }}>{notif.message}</div>
+                                                    </div>
+                                                    {!notif.read && (
+                                                        <div style={{ width: "6px", height: "6px", background: "var(--accent-primary)", borderRadius: "50%", position: "absolute", top: "20px", right: "12px" }}></div>
+                                                    )}
+                                                    <button 
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            removeNotification(notif.id);
+                                                        }}
+                                                        className="hover-reveal"
+                                                        style={{ position: "absolute", bottom: "12px", right: "12px", padding: "6px", color: "var(--text-muted)", border: "none", background: "rgba(255,255,255,0.05)", borderRadius: "8px", cursor: "pointer" }}
+                                                    ><X size={12} /></button>
+                                                </div>
+                                            );
+                                        }) : (
+                                            <div style={{ padding: "3rem 1.5rem", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}>
+                                                <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "rgba(255,255,255,0.03)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-muted)" }}>
+                                                    <Bell size={20} style={{ opacity: 0.3 }} />
+                                                </div>
+                                                <div>
+                                                    <div style={{ fontSize: "13px", fontWeight: 800, color: "var(--text-secondary)" }}>Silent Horizon</div>
+                                                    <p style={{ fontSize: "11px", color: "var(--text-muted)", margin: "4px 0 0 0" }}>No unread signals in the current sector.</p>
                                                 </div>
                                             </div>
-                                        )) : (
-                                            <div style={{ textAlign: "center", padding: "2rem 0", color: "#94a3b8", fontSize: "12px" }}>No new notifications</div>
                                         )}
                                     </div>
+                                    {notifications.length > 0 && (
+                                        <div style={{ padding: "0.75rem", borderTop: "1px solid rgba(255,255,255,0.05)", textAlign: "center" }}>
+                                            <button style={{ background: "none", border: "none", color: "var(--text-muted)", fontSize: "10px", fontWeight: 700, cursor: "pointer", letterSpacing: "0.05em", textTransform: "uppercase" }}>View Detailed Audit Log</button>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -674,21 +781,21 @@ export default function DashboardLayout() {
                                     padding: "0.35rem 1rem 0.35rem 0.35rem",
                                     borderRadius: "100px",
                                     transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
-                                    border: `1px solid ${showUserMenu ? '#2563eb' : 'transparent'}`,
-                                    background: showUserMenu ? "#fff" : "rgba(248, 250, 252, 0.6)",
-                                    boxShadow: showUserMenu ? "0 10px 25px -5px rgba(37, 99, 235, 0.12)" : "none",
+                                    border: `1px solid ${showUserMenu ? '#f97316' : 'transparent'}`,
+                                    background: showUserMenu ? "var(--bg-elevated)" : "rgba(255, 255, 255, 0.02)",
+                                    boxShadow: showUserMenu ? "0 10px 25px -5px rgba(249, 115, 22, 0.12)" : "none",
                                     outline: "none"
                                 }}
                                 onMouseEnter={(e) => {
                                     if (!showUserMenu) {
-                                        e.currentTarget.style.background = "#fff";
-                                        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.03)";
-                                        e.currentTarget.style.borderColor = "#e2e8f0";
+                                        e.currentTarget.style.background = "var(--bg-elevated)";
+                                        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
+                                        e.currentTarget.style.borderColor = "var(--border-subtle)";
                                     }
                                 }}
                                 onMouseLeave={(e) => {
                                     if (!showUserMenu) {
-                                        e.currentTarget.style.background = "rgba(248, 250, 252, 0.6)";
+                                        e.currentTarget.style.background = "rgba(255, 255, 255, 0.02)";
                                         e.currentTarget.style.boxShadow = "none";
                                         e.currentTarget.style.borderColor = "transparent";
                                     }
@@ -698,14 +805,14 @@ export default function DashboardLayout() {
                                     width: 38,
                                     height: 38,
                                     borderRadius: "50%",
-                                    background: "#fff",
-                                    color: "#2563eb",
+                                    background: "var(--bg-surface)",
+                                    color: "#f97316",
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
                                     overflow: "hidden",
-                                    border: "2px solid #fff",
-                                    boxShadow: "0 0 0 1px #e2e8f0, 0 2px 4px rgba(0,0,0,0.05)",
+                                    border: "2px solid var(--border-subtle)",
+                                    boxShadow: "0 0 0 1px rgba(255,255,255,0.05), 0 2px 4px rgba(0,0,0,0.2)",
                                     transition: "transform 0.3s ease"
                                 }}>
                                     {user?.photoURL ? (
@@ -718,7 +825,7 @@ export default function DashboardLayout() {
                                     <div style={{
                                         fontSize: "0.9rem",
                                         fontWeight: 800,
-                                        color: "#0f172a",
+                                        color: "var(--text-primary)",
                                         lineHeight: 1,
                                         letterSpacing: "-0.01em"
                                     }}>
@@ -729,7 +836,7 @@ export default function DashboardLayout() {
                                     opacity: 0.4,
                                     transform: showUserMenu ? "rotate(180deg)" : "none",
                                     transition: "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
-                                    color: "#0f172a"
+                                    color: "var(--text-primary)"
                                 }} />
                             </div>
 
@@ -739,10 +846,10 @@ export default function DashboardLayout() {
                                     top: "calc(100% + 8px)",
                                     right: 0,
                                     width: "180px",
-                                    background: "#fff",
-                                    border: "1px solid #e8e8f5",
+                                    background: "var(--bg-surface)",
+                                    border: "1px solid var(--border-subtle)",
                                     borderRadius: "12px",
-                                    boxShadow: "0 15px 30px -5px rgba(0,0,0,0.1)",
+                                    boxShadow: "0 15px 30px -5px rgba(0,0,0,0.5)",
                                     padding: "6px",
                                     zIndex: 1000,
                                     animation: "fade-up 0.2s ease-out"

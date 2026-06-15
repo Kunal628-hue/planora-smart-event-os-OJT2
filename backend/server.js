@@ -12,11 +12,15 @@ import uploadRoutes from "./routes/uploadRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import { initAlertEngine } from "./utils/alertService.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 dotenv.config();
+
+// Initialize AI Tactical Engines
+initAlertEngine();
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -44,8 +48,8 @@ app.use(cors({
   credentials: true
 }));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50kb' }));
+app.use(express.urlencoded({ limit: '50kb', extended: true }));
 
 // Ensure DB connection for every request (singleton handles efficiency)
 app.use(async (req, res, next) => {

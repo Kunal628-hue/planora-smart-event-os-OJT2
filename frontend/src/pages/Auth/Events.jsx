@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import { useDialog } from "../../context/DialogContext";
-import { Plus, Calendar, MapPin, Globe, ChevronRight, Loader2, X, Sparkles, LayoutGrid, Package, Wallet } from "lucide-react";
+import { Plus, Calendar, MapPin, Globe, ChevronRight, Loader2, X, Sparkles, LayoutGrid, Package, Wallet, RefreshCw, Activity } from "lucide-react";
 import Box from '@mui/material/Box';
-import Skeleton from '@mui/material/Skeleton';
+import MuiSkeleton from '@mui/material/Skeleton';
+import { TableSkeleton } from "../../components/ui/Skeleton";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -24,6 +25,9 @@ export default function Events() {
         country: ""
     });
 
+    const [timeline, setTimeline] = useState([]);
+    const [activeTab, setActiveTab] = useState("all");
+
     const fetchEvents = async () => {
         if (!user) return;
         try {
@@ -31,6 +35,9 @@ export default function Events() {
             const data = await response.json();
             if (Array.isArray(data)) {
                 setEvents(data);
+                if (data.length > 0) {
+                    fetchTimeline(data[0]);
+                }
             } else {
                 setEvents([]);
             }
@@ -38,6 +45,16 @@ export default function Events() {
             console.error("Fetch error:", err);
         } finally {
             setFetchLoading(false);
+        }
+    };
+
+    const fetchTimeline = async (event) => {
+        try {
+            const response = await fetch(`${API_URL}/ai/timeline?type=${event.type || "Wedding"}`);
+            const data = await response.json();
+            setTimeline(data);
+        } catch (err) {
+            console.error("Timeline fetch error:", err);
         }
     };
 
@@ -120,156 +137,238 @@ export default function Events() {
     const inputStyle = {
         width: "100%",
         padding: "0.65rem 0.85rem 0.65rem 2.5rem",
-        background: "#f8fafc",
-        border: "1px solid #e2e8f0",
+        background: "var(--bg-elevated)",
+        border: "1px solid var(--border-subtle)",
         borderRadius: "12px",
         fontSize: "0.85rem",
-        fontWeight: "650",
-        color: "#0f172a",
+        fontWeight: "600",
+        color: "var(--text-primary)",
         outline: "none"
     };
 
     const labelStyle = {
         display: "block",
         fontSize: "10px",
-        fontWeight: "850",
-        color: "#94a3b8",
+        fontWeight: "700",
+        color: "var(--text-secondary)",
         marginBottom: "0.4rem",
         textTransform: "uppercase",
         letterSpacing: "0.06em"
     };
 
+    const totalBudget = events.reduce((sum, e) => sum + (e.budget || 0), 0);
+    const totalSpent = events.reduce((sum, e) => sum + (e.spent || 0), 0);
+
+    const filteredEvents = events.filter(event => {
+        if (activeTab === "drafts") return event.status === "Draft" || event.status === "Planned";
+        if (activeTab === "archived") return event.status === "Archived" || event.status === "Completed";
+        return true;
+    });
+
     return (
-        <div className="responsive-container" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "3rem", gap: "1.5rem", flexWrap: "wrap" }}>
-                <div style={{ flex: 1, minWidth: "280px" }}>
-                    <h1 style={{ fontSize: "2rem", fontWeight: 850, color: "#0f172a", marginBottom: "0.25rem", letterSpacing: "-0.03em" }}>Event Portfolio</h1>
-                    <p style={{ color: "#64748b", fontSize: "1rem", fontWeight: 500 }}>Manage and coordinate your high-impact operational streams.</p>
+        <div className="responsive-container" style={{ paddingBottom: "4rem" }}>
+            {/* Header Bar */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", paddingBottom: "1.25rem", borderBottom: "1px solid var(--border-subtle)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
+                    <h1 style={{ fontSize: "20px", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>Events</h1>
+                    <div style={{ display: "flex", gap: "4px", background: "rgba(255,255,255,0.03)", padding: "4px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.05)" }}>
+                        <button onClick={() => setActiveTab("all")} style={{ background: activeTab === "all" ? "var(--accent-primary)" : "transparent", border: "none", color: activeTab === "all" ? "#fff" : "var(--text-secondary)", padding: "6px 14px", borderRadius: "8px", fontSize: "11px", fontWeight: 800, cursor: "pointer", transition: "all 0.2s" }}>All Events</button>
+                        <button onClick={() => setActiveTab("drafts")} style={{ background: activeTab === "drafts" ? "var(--accent-primary)" : "transparent", border: "none", color: activeTab === "drafts" ? "#fff" : "var(--text-secondary)", padding: "6px 14px", borderRadius: "8px", fontSize: "11px", fontWeight: 800, cursor: "pointer", transition: "all 0.2s" }}>Drafts</button>
+                        <button onClick={() => setActiveTab("archived")} style={{ background: activeTab === "archived" ? "var(--accent-primary)" : "transparent", border: "none", color: activeTab === "archived" ? "#fff" : "var(--text-secondary)", padding: "6px 14px", borderRadius: "8px", fontSize: "11px", fontWeight: 800, cursor: "pointer", transition: "all 0.2s" }}>Archived</button>
+                    </div>
                 </div>
                 <button
                     onClick={() => setShowModal(true)}
                     className="btn btn-primary"
-                    style={{ borderRadius: "14px", padding: "0.85rem 1.75rem", fontWeight: 800, fontSize: "14px", whiteSpace: "nowrap" }}
+                    style={{ borderRadius: "8px", padding: "0.5rem 1.25rem", fontWeight: 800, fontSize: "12px", height: "36px", display: "flex", alignItems: "center", gap: "8px" }}
                 >
-                    <Plus size={18} strokeWidth={3} />
-                    <span>Initialize Event</span>
+                    <Plus size={14} strokeWidth={4} />
+                    New Event
                 </button>
             </div>
 
-            <div className="portfolio-grid" style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
-                gap: "1.5rem"
-            }}>
-                {fetchLoading ? (
-                    Array.from(new Array(6)).map((_, index) => (
-                        <Box key={index} sx={{ background: "#fff", borderRadius: "24px", padding: "1.5rem", boxShadow: "0 4px 20px rgba(0,0,0,0.02)", border: "1px solid #f1f5f9", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                                <div>
-                                    <Skeleton animation="wave" height={28} width={150} style={{ marginBottom: 6 }} />
-                                    <Skeleton animation="wave" height={20} width={100} />
-                                </div>
-                                <Skeleton animation="wave" variant="rounded" width={80} height={24} style={{ borderRadius: 8 }} />
-                            </Box>
-                            <Box sx={{ background: "#f8fafc", padding: "1rem", borderRadius: "16px" }}>
-                                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
-                                    <Skeleton animation="wave" height={16} width={100} />
-                                    <Skeleton animation="wave" height={16} width={80} />
-                                </Box>
-                                <Skeleton animation="wave" variant="rounded" width="100%" height={6} style={{ borderRadius: 10 }} />
-                            </Box>
-                        </Box>
-                    ))
-                ) : events.length === 0 ? (
-                    <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "6rem", background: "#fff", border: "2px dashed #e2e8f0", borderRadius: "32px" }}>
-                        <div style={{ width: "64px", height: "64px", background: "#f8fafc", borderRadius: "20px", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1.5rem", color: "#94a3b8" }}>
-                            <Package size={32} />
-                        </div>
-                        <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "#0f172a", marginBottom: "0.5rem" }}>Portfolio Empty</h2>
-                        <p style={{ color: "#64748b", fontWeight: 500 }}>Initialize your first planning stream to activate management tools.</p>
-                    </div>
-                ) : (
-                    events.map(event => {
-                        const statusColor = getStatusColor(event.status);
-                        const spent = event.spent || 0;
-                        const remaining = event.budget - spent;
-                        const utilization = event.budget > 0 ? (spent / event.budget) * 100 : 0;
-
-                        return (
-                            <div
-                                key={event.id || event._id}
-                                className="event-card"
-                                onClick={() => navigate(`/events/${event.id || event._id}`)}
-                                style={{
-                                    background: "#fff",
-                                    borderRadius: "24px",
-                                    padding: "1.5rem",
-                                    boxShadow: "0 4px 20px rgba(0,0,0,0.02)",
-                                    border: "1px solid #f1f5f9",
-                                    cursor: "pointer",
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    gap: "1.5rem"
-                                }}
-                            >
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                                    <div>
-                                        <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "#0f172a", margin: "0 0 0.5rem", letterSpacing: "-0.01em" }}>{event.name}</h3>
-                                        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", color: "#94a3b8", fontSize: "12px", fontWeight: 600 }}>
-                                            <div style={{ display: "flex", alignItems: "center", gap: "4px" }}><Calendar size={13} /> {event.date}</div>
-                                            <div style={{ display: "flex", alignItems: "center", gap: "4px" }}><MapPin size={13} /> {event.location}</div>
-                                        </div>
-                                    </div>
-                                    <button
-                                        onClick={(e) => handleToggleStatus(e, event.id || event._id, event.status)}
-                                        style={{
-                                            padding: "4px 10px",
-                                            borderRadius: "8px",
-                                            background: `${statusColor}10`,
-                                            color: statusColor,
-                                            fontSize: "10px",
-                                            fontWeight: 900,
-                                            textTransform: "uppercase",
-                                            letterSpacing: "0.05em",
-                                            border: `1px solid ${statusColor}20`,
-                                            cursor: "pointer"
-                                        }}
-                                        title={`Click to mark as ${event.status === "Completed" ? "Planned" : "Completed"}`}
-                                    >
-                                        {event.status}
-                                    </button>
-                                </div>
-
-                                <div style={{ background: "#f8fafc", padding: "1rem", borderRadius: "16px" }}>
-                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
-                                        <div style={{ fontSize: "10px", fontWeight: 800, color: "#64748b", textTransform: "uppercase" }}>Capital Utilization</div>
-                                        <div style={{ fontSize: "12px", fontWeight: 800, color: "#0f172a" }}>₹{remaining.toLocaleString('en-IN')} left</div>
-                                    </div>
-                                    <div style={{ height: "6px", background: "#e2e8f0", borderRadius: "10px", overflow: "hidden" }}>
-                                        <div style={{
-                                            width: `${utilization}%`,
-                                            height: "100%",
-                                            background: utilization > 90 ? "#ef4444" : statusColor,
-                                            borderRadius: "10px"
-                                        }}></div>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })
-                )}
+            {/* Top Stat Row */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1.25rem", marginBottom: "1.5rem" }}>
+                <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "12px", padding: "1.25rem" }}>
+                    <div style={{ fontSize: "10px", color: "var(--text-secondary)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>Total Spent</div>
+                    <div style={{ fontSize: "20px", fontWeight: 900, color: "var(--text-primary)" }}>₹{totalSpent.toLocaleString('en-IN')}</div>
+                </div>
+                <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "12px", padding: "1.25rem" }}>
+                    <div style={{ fontSize: "10px", color: "var(--text-secondary)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>Allocated Budget</div>
+                    <div style={{ fontSize: "20px", fontWeight: 900, color: "#f97316" }}>₹{totalBudget.toLocaleString('en-IN')}</div>
+                </div>
+                <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "12px", padding: "1.25rem" }}>
+                    <div style={{ fontSize: "10px", color: "var(--text-secondary)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>Avg Utilization</div>
+                    <div style={{ fontSize: "20px", fontWeight: 900, color: "var(--text-primary)" }}>{totalBudget > 0 ? ((totalSpent / totalBudget) * 100).toFixed(1) : 0}%</div>
+                </div>
             </div>
 
-            {/* Redesigned Modal - Compressed Scale */}
+            {/* Compact Hero Section */}
+            <div style={{
+                background: "var(--bg-surface)",
+                border: "1px solid var(--border-subtle)",
+                borderRadius: "16px",
+                padding: "1.75rem 2rem",
+                marginBottom: "2rem",
+                maxHeight: "200px",
+                position: "relative",
+                overflow: "hidden",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center"
+            }}>
+                <div style={{ 
+                    position: "absolute", 
+                    right: "-50px", 
+                    top: "-50px", 
+                    width: "200px", 
+                    height: "200px", 
+                    background: "radial-gradient(circle, rgba(249, 115, 22, 0.08) 0%, transparent 70%)",
+                    animation: "floatOrb 10s infinite ease-in-out",
+                    borderRadius: "50%",
+                    pointerEvents: "none"
+                }}></div>
+                
+                <div style={{ fontSize: "10px", color: "#f97316", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.15em", marginBottom: "0.75rem" }}>Operational Overview</div>
+                <h2 style={{ fontSize: "28px", fontWeight: 900, color: "var(--text-primary)", margin: "0 0 0.5rem", lineHeight: 1, letterSpacing: "-0.02em" }}>
+                    {events.length} Active Production{events.length !== 1 ? 's' : ''}
+                </h2>
+                <p style={{ color: "var(--text-secondary)", fontSize: "13px", fontWeight: 500, margin: 0, maxWidth: "600px", lineHeight: 1.5 }}>
+                    System integrity optimal. All operational streams are currently synchronized. Next deployment phase: "{events[0]?.name || 'Hackathon'}" in active monitoring.
+                </p>
+            </div>
+
+            {/* Event Directory Table */}
+            <div style={{
+                background: "var(--bg-surface)",
+                border: "1px solid var(--border-subtle)",
+                borderRadius: "16px",
+                overflow: "hidden"
+            }}>
+                <div style={{ padding: "1.5rem", borderBottom: "1px solid var(--border-subtle)" }}>
+                    <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>Event Directory</h3>
+                </div>
+
+                <div style={{ width: "100%", overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                        <thead>
+                            <tr>
+                                <th style={{ textAlign: "left", padding: "1rem 1.5rem", fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "1px solid var(--border-subtle)" }}>Event Name</th>
+                                <th style={{ textAlign: "left", padding: "1rem 1.5rem", fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "1px solid var(--border-subtle)" }}>Date</th>
+                                <th style={{ textAlign: "left", padding: "1rem 1.5rem", fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "1px solid var(--border-subtle)" }}>Status</th>
+                                <th style={{ textAlign: "right", padding: "1rem 1.5rem", fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "1px solid var(--border-subtle)" }}>Budget Utilization</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {fetchLoading ? (
+                                <tr>
+                                    <td colSpan="4" style={{ padding: "0" }}>
+                                        <TableSkeleton rows={5} columns={4} />
+                                    </td>
+                                </tr>
+                            ) : filteredEvents.length === 0 ? (
+                                <tr><td colSpan="4" style={{ padding: "4rem", textAlign: "center", color: "var(--text-muted)" }}>No events found for {activeTab}.</td></tr>
+                            ) : (
+                                filteredEvents.map((event) => {
+                                    const spent = event.spent || 0;
+                                    const utilization = event.budget > 0 ? (spent / event.budget) * 100 : 0;
+                                    const isCompleted = event.status === "Completed";
+                                    
+                                    const categoryColors = {
+                                        "Wedding": "#f97316",
+                                        "Conference": "#3b82f6",
+                                        "Corporate": "#8b5cf6",
+                                        "Birthday": "#ec4899",
+                                        "Tech Summits": "#10b981"
+                                    };
+                                    const dotColor = categoryColors[event.type] || "#64748b";
+
+                                    return (
+                                        <tr 
+                                            key={event.id || event._id} 
+                                            onClick={() => navigate(`/events/${event.id || event._id}`)} 
+                                            className="event-row"
+                                            style={{ borderBottom: "1px solid var(--border-subtle)", cursor: "pointer", transition: "all 0.2s", position: "relative" }}
+                                        >
+                                            <td style={{ padding: "1rem 1.5rem" }}>
+                                                <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                                                    <div style={{ width: "32px", height: "32px", background: "rgba(255,255,255,0.03)", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", border: `1px solid ${dotColor}44` }}>
+                                                        <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: dotColor }}></div>
+                                                    </div>
+                                                    <div>
+                                                        <div style={{ fontSize: "13px", fontWeight: 800, color: "var(--text-primary)", marginBottom: "2px" }}>{event.name}</div>
+                                                        <div style={{ fontSize: "10px", color: "var(--text-muted)", fontWeight: 600 }}>{event.type} • {event.city || event.location}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td style={{ padding: "1rem 1.5rem" }}>
+                                                <div style={{ fontSize: "12px", color: "var(--text-primary)", fontWeight: 600, marginBottom: "2px" }}>{new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                                                <div style={{ fontSize: "10px", color: "var(--text-muted)", fontWeight: 600 }}>{event.country || "Global"}</div>
+                                            </td>
+                                            <td style={{ padding: "1rem 1.5rem" }}>
+                                                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                                    {!isCompleted && (
+                                                        <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#10b981", animation: "pulseDot 2s infinite" }}></div>
+                                                    )}
+                                                    <span style={{ 
+                                                        fontSize: "10px", 
+                                                        fontWeight: 900, 
+                                                        color: isCompleted ? "var(--text-muted)" : "#10b981",
+                                                        letterSpacing: "0.05em"
+                                                    }}>
+                                                        {isCompleted ? "PAST" : "ACTIVE"}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td style={{ padding: "1rem 1.5rem" }}>
+                                                <div style={{ display: "flex", flexDirection: "column", gap: "6px", maxWidth: "160px", marginLeft: "auto" }}>
+                                                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", fontWeight: 800 }}>
+                                                        <span style={{ color: "var(--text-primary)" }}>₹{spent.toLocaleString('en-IN')}</span>
+                                                        <span style={{ color: "var(--text-muted)" }}>{utilization.toFixed(0)}%</span>
+                                                    </div>
+                                                    <div style={{ height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "2px", overflow: "hidden" }}>
+                                                        <div style={{ width: `${Math.min(utilization, 100)}%`, height: "100%", background: utilization > 90 ? "#ef4444" : (isCompleted ? "var(--text-muted)" : "#f97316"), borderRadius: "2px", transition: "width 0.5s ease-out" }}></div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td style={{ padding: "1rem 1.5rem", textAlign: "right" }}>
+                                                <button style={{ background: "transparent", border: "none", color: "var(--text-muted)", cursor: "pointer", padding: "4px" }} onClick={(e) => e.stopPropagation()}>
+                                                    <RefreshCw size={14} />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "1rem 1.5rem", borderTop: "1px solid var(--border-subtle)" }}>
+                    <div style={{ fontSize: "11px", color: "var(--text-muted)", fontWeight: 500 }}>
+                        Showing 1 to {Math.max(1, filteredEvents.length)} of {filteredEvents.length} events
+                    </div>
+                    <div style={{ display: "flex", gap: "0.25rem" }}>
+                        <button style={{ width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "1px solid var(--border-subtle)", borderRadius: "4px", color: "var(--text-muted)", cursor: "pointer" }}>&lt;</button>
+                        <button style={{ width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)", borderRadius: "4px", color: "var(--text-primary)", fontWeight: 700, cursor: "pointer", fontSize: "11px" }}>1</button>
+                        <button style={{ width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "1px solid var(--border-subtle)", borderRadius: "4px", color: "var(--text-primary)", fontWeight: 700, cursor: "pointer", fontSize: "11px" }}>2</button>
+                        <button style={{ width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "1px solid var(--border-subtle)", borderRadius: "4px", color: "var(--text-primary)", fontWeight: 700, cursor: "pointer", fontSize: "11px" }}>3</button>
+                        <button style={{ width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "1px solid var(--border-subtle)", borderRadius: "4px", color: "var(--text-muted)", cursor: "pointer" }}>&gt;</button>
+                    </div>
+                </div>
+            </div>
+
+
+            {/* Redesigned Modal */}
             {showModal && (
-                <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(4px)" }}>
+                <div style={{ position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(8px)" }}>
                     <div className="modal-reveal mobile-full-width" style={{
                         width: "95%",
                         maxWidth: "400px",
-                        background: "#ffffff",
-                        padding: "1.75rem",
+                        background: "var(--bg-surface)",
+                        border: "1px solid var(--border-subtle)",
+                        padding: "2rem",
                         borderRadius: "24px",
-                        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.2)",
+                        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
                         position: "relative",
                         maxHeight: "90vh",
                         overflowY: "auto"
@@ -279,27 +378,28 @@ export default function Events() {
                             style={{
                                 position: "absolute",
                                 top: "1.25rem",
-                                right: "1.25rem",
-                                background: "#f8fafc",
-                                color: "#94a3b8",
-                                width: "28px",
-                                height: "28px",
+                                right: "1.5rem",
+                                background: "rgba(255,255,255,0.05)",
+                                color: "var(--text-muted)",
+                                width: "32px",
+                                height: "32px",
                                 borderRadius: "8px",
                                 cursor: "pointer",
                                 display: "flex",
                                 alignItems: "center",
-                                justifyContent: "center"
+                                justifyContent: "center",
+                                border: "1px solid var(--border-subtle)"
                             }}
                         >
                             <X size={16} strokeWidth={2.5} />
                         </button>
 
-                        <div style={{ marginBottom: "1.75rem" }}>
-                            <div style={{ width: "40px", height: "40px", borderRadius: "12px", background: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1rem" }}>
+                        <div style={{ marginBottom: "2rem" }}>
+                            <div style={{ width: "40px", height: "40px", borderRadius: "12px", background: "rgba(249, 115, 22, 0.1)", color: "var(--accent-primary)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1rem" }}>
                                 <Sparkles size={20} strokeWidth={2.5} />
                             </div>
-                            <h2 style={{ fontSize: "1.45rem", fontWeight: 850, letterSpacing: "-0.03em", margin: "0 0 0.15rem", color: "#0f172a" }}>Initialize Context</h2>
-                            <p style={{ color: "#64748b", fontSize: "0.85rem", fontWeight: 550, margin: 0 }}>Define operational parameters for the new stream.</p>
+                            <h2 style={{ fontSize: "1.5rem", fontWeight: 800, letterSpacing: "-0.02em", margin: "0 0 0.25rem", color: "var(--text-primary)" }}>Initialize Context</h2>
+                            <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", fontWeight: 500, margin: 0 }}>Define operational parameters for the new stream.</p>
                         </div>
 
                         <form onSubmit={handleCreateEvent} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
@@ -338,11 +438,14 @@ export default function Events() {
                                         onChange={e => setNewEvent({ ...newEvent, type: e.target.value })}
                                         style={{ ...inputStyle, paddingLeft: "0.85rem" }}
                                     >
-                                        <option>Wedding</option>
+                                        <option>Hackathon</option>
+                                        <option>Tech Fest</option>
+                                        <option>Tech Event</option>
                                         <option>Conference</option>
                                         <option>Corporate</option>
-                                        <option>Birthday</option>
                                         <option>Tech Summits</option>
+                                        <option>Wedding</option>
+                                        <option>Birthday</option>
                                         <option>Other</option>
                                     </select>
                                 </div>
@@ -394,7 +497,7 @@ export default function Events() {
                             <div>
                                 <label style={labelStyle}>Budget (₹)</label>
                                 <div style={{ position: "relative" }}>
-                                    <Wallet size={15} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+                                    <Wallet size={15} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
                                     <input
                                         required
                                         type="number"
@@ -414,17 +517,17 @@ export default function Events() {
                                     padding: "0.85rem",
                                     marginTop: "1rem",
                                     borderRadius: "12px",
-                                    background: "#2563eb",
+                                    background: "var(--accent-primary)",
                                     color: "#fff",
-                                    fontWeight: 850,
-                                    fontSize: "0.9rem",
+                                    fontWeight: 800,
+                                    fontSize: "0.95rem",
                                     border: "none",
                                     cursor: "pointer",
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
                                     gap: "0.6rem",
-                                    boxShadow: "0 10px 20px rgba(37, 99, 235, 0.15)"
+                                    boxShadow: "0 10px 20px rgba(249, 115, 22, 0.15)"
                                 }}
                             >
                                 {loading ? (
@@ -440,6 +543,28 @@ export default function Events() {
                     </div>
                 </div>
             )}
+            <style>{`
+                @keyframes floatOrb {
+                    0% { transform: translate(0, 0) scale(1); }
+                    33% { transform: translate(30px, -20px) scale(1.1); }
+                    66% { transform: translate(-20px, 40px) scale(0.9); }
+                    100% { transform: translate(0, 0) scale(1); }
+                }
+                @keyframes pulseDot {
+                    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+                    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+                    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+                }
+                .event-row:hover {
+                    background: rgba(255, 255, 255, 0.02) !important;
+                    box-shadow: inset 3px 0 0 0 #f97316;
+                }
+                .modal-reveal { animation: modalReveal 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+                @keyframes modalReveal {
+                    from { transform: scale(0.95) translateY(10px); opacity: 0; }
+                    to { transform: scale(1) translateY(0); opacity: 1; }
+                }
+            `}</style>
         </div>
     );
 }

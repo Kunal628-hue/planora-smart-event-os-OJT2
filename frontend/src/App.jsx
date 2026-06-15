@@ -18,6 +18,8 @@ const Tasks = lazy(() => import("./pages/Auth/Tasks"));
 const Analytics = lazy(() => import("./pages/Auth/Analytics"));
 const Team = lazy(() => import("./pages/Auth/Team"));
 const Settings = lazy(() => import("./pages/Auth/Settings"));
+const RegistrationBuilder = lazy(() => import("./pages/Auth/RegistrationBuilder"));
+const RegisterEvent = lazy(() => import("./pages/RegisterEvent"));
 
 import { LogoLoader } from "./components/ui/Loader";
 
@@ -35,6 +37,7 @@ export default function App() {
               <Route path="/" element={<Landing />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/register/:eventId" element={<RegisterEvent />} />
 
               {/* Protected Dashboard Routes */}
               <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
@@ -48,6 +51,7 @@ export default function App() {
                 <Route path="/analytics" element={<Analytics />} />
                 <Route path="/team" element={<Team />} />
                 <Route path="/settings" element={<Settings />} />
+                <Route path="/builder" element={<RegistrationBuilder />} />
                 {/* Redirect empty paths to dashboard */}
                 <Route path="/auth" element={<Navigate to="/dashboard" replace />} />
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />

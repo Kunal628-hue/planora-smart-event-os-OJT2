@@ -20,6 +20,8 @@ import {
     X
 } from "lucide-react";
 import { LogoLoader } from "../../components/ui/Loader";
+import Box from '@mui/material/Box';
+import Skeleton from '@mui/material/Skeleton';
 import AiAssistant from "../../components/AiAssistant";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -142,7 +144,27 @@ export default function EventDetails() {
     };
 
     if (loading) {
-        return <LogoLoader text="Hydrating Event State..." />;
+        return (
+            <div style={{ padding: "2.5rem", minHeight: "100vh" }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: "2.5rem", mb: "3.5rem" }}>
+                    <Skeleton animation="wave" variant="rounded" width={80} height={50} sx={{ borderRadius: '12px', bgcolor: 'var(--bg-elevated)' }} />
+                    <Box sx={{ flex: 1 }}>
+                        <Skeleton animation="wave" height={50} width={300} sx={{ bgcolor: 'var(--bg-elevated)' }} />
+                    </Box>
+                    <Box sx={{ display: 'flex', gap: "1rem" }}>
+                        <Skeleton animation="wave" variant="rounded" width={50} height={50} sx={{ borderRadius: '12px', bgcolor: 'var(--bg-elevated)' }} />
+                        <Skeleton animation="wave" variant="rounded" width={50} height={50} sx={{ borderRadius: '12px', bgcolor: 'var(--bg-elevated)' }} />
+                    </Box>
+                </Box>
+                <Box sx={{ display: 'grid', gridTemplateColumns: "2fr 1fr", gap: "2rem" }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: "2rem" }}>
+                        <Skeleton animation="wave" variant="rounded" height={250} sx={{ borderRadius: '24px', bgcolor: 'var(--bg-elevated)' }} />
+                        <Skeleton animation="wave" variant="rounded" height={300} sx={{ borderRadius: '24px', bgcolor: 'var(--bg-elevated)' }} />
+                    </Box>
+                    <Skeleton animation="wave" variant="rounded" height={600} sx={{ borderRadius: '24px', bgcolor: 'var(--bg-elevated)' }} />
+                </Box>
+            </div>
+        );
     }
 
     if (!event) return null;
@@ -151,17 +173,17 @@ export default function EventDetails() {
         <div style={{
             fontFamily: "'Outfit', 'Inter', system-ui, sans-serif",
             padding: "2.5rem",
-            background: "#fcfdff",
+            background: "transparent",
             minHeight: "100vh",
-            color: "#0f172a"
+            color: "var(--text-primary)"
         }}>
             {/* Header Area */}
             <div className="stagger-detail" style={{ display: "flex", alignItems: "center", gap: "2.5rem", marginBottom: "3.5rem" }}>
                 <button
                     onClick={() => navigate("/events")}
                     style={{
-                        background: "#fff",
-                        border: "1px solid #f1f5f9",
+                        background: "var(--bg-surface)",
+                        border: "1px solid var(--border-subtle)",
                         width: "56px",
                         height: "56px",
                         borderRadius: "18px",
@@ -169,17 +191,17 @@ export default function EventDetails() {
                         alignItems: "center",
                         justifyContent: "center",
                         cursor: "pointer",
-                        boxShadow: "0 4px 15px rgba(0,0,0,0.03)"
+                        boxShadow: "0 4px 15px rgba(0,0,0,0.2)"
                     }}
                 >
-                    <ChevronLeft size={24} color="#64748b" strokeWidth={2.5} />
+                    <ChevronLeft size={24} color="var(--text-secondary)" strokeWidth={2.5} />
                 </button>
                 <div style={{ flex: 1 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
-                        <h1 style={{ fontSize: "2.75rem", fontWeight: 800, letterSpacing: "-0.04em", margin: 0 }}>{event.name}</h1>
+                        <h1 style={{ fontSize: "2.75rem", fontWeight: 800, letterSpacing: "-0.04em", margin: 0, color: "var(--text-primary)" }}>{event.name}</h1>
                         <span style={{
-                            background: "#eff6ff",
-                            color: "#2563eb",
+                            background: "rgba(255,165,0,0.1)",
+                            color: "var(--accent-primary)",
                             fontSize: "12px",
                             fontWeight: 800,
                             padding: "6px 14px",
@@ -188,12 +210,12 @@ export default function EventDetails() {
                             letterSpacing: "0.05em"
                         }}>{event.type}</span>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", marginTop: "0.75rem", color: "#64748b", fontWeight: 500 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", marginTop: "0.75rem", color: "var(--text-secondary)", fontWeight: 500 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                             <Calendar size={16} />
                             {new Date(event.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                         </div>
-                        <span style={{ width: "4px", height: "4px", background: "#cbd5e1", borderRadius: "50%" }}></span>
+                        <span style={{ width: "4px", height: "4px", background: "var(--border-subtle)", borderRadius: "50%" }}></span>
                         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                             <MapPin size={16} />
                             {event.location}
@@ -206,27 +228,27 @@ export default function EventDetails() {
                         style={{
                             borderRadius: "14px",
                             padding: "1rem 1.5rem",
-                            border: "1px solid #e2e8f0",
-                            background: "#fff",
-                            color: "#0f172a",
+                            border: "1px solid var(--border-subtle)",
+                            background: "var(--bg-surface)",
+                            color: "var(--text-primary)",
                             fontWeight: 800,
                             display: "flex",
                             alignItems: "center",
                             gap: "0.75rem",
                             cursor: "pointer",
                             fontSize: "14px",
-                            boxShadow: "0 2px 8px rgba(0,0,0,0.02)"
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.2)"
                         }}>
-                        <Settings size={18} color="#64748b" /> Adjust Config
+                        <Settings size={18} color="var(--text-secondary)" /> Adjust Config
                     </button>
                     <button
                         onClick={handleDelete}
                         style={{
                             borderRadius: "14px",
                             padding: "1rem 1.5rem",
-                            background: "#fff1f2",
-                            border: "1px solid #fee2e2",
-                            color: "#be123c",
+                            background: "rgba(255,0,0,0.1)",
+                            border: "1px solid rgba(255,0,0,0.2)",
+                            color: "#ff4444",
                             fontWeight: 800,
                             display: "flex",
                             alignItems: "center",
@@ -243,16 +265,16 @@ export default function EventDetails() {
                 <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
                     {/* Operational Pulse Diagnostic */}
                     <div style={{
-                        background: "#fff",
+                        background: "var(--bg-surface)",
                         padding: "3rem",
                         borderRadius: "32px",
-                        border: "1px solid #f1f5f9",
-                        boxShadow: "0 10px 40px rgba(0,0,0,0.02)"
+                        border: "1px solid var(--border-subtle)",
+                        boxShadow: "0 10px 40px rgba(0,0,0,0.2)"
                     }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "3.5rem" }}>
                             <div>
-                                <h2 style={{ fontSize: "1.75rem", fontWeight: 800, letterSpacing: "-0.02em", margin: "0 0 0.5rem" }}>Operational Pulse</h2>
-                                <p style={{ color: "#64748b", margin: 0, fontWeight: 500 }}>Live diagnostic benchmark for your {event.type.toLowerCase()} event.</p>
+                                <h2 style={{ fontSize: "1.75rem", fontWeight: 800, letterSpacing: "-0.02em", margin: "0 0 0.5rem", color: "var(--text-primary)" }}>Operational Pulse</h2>
+                                <p style={{ color: "var(--text-secondary)", margin: 0, fontWeight: 500 }}>Live diagnostic benchmark for your {event.type.toLowerCase()} event.</p>
                             </div>
                             {healthData && (
                                 <div style={{
@@ -280,7 +302,7 @@ export default function EventDetails() {
                                             <stop offset="100%" stopColor={getHealthColor(healthData?.score || 0)} stopOpacity="0.8" />
                                         </linearGradient>
                                     </defs>
-                                    <circle cx="50" cy="50" r="44" fill="none" stroke="#f8fafc" strokeWidth="10" />
+                                    <circle cx="50" cy="50" r="44" fill="none" stroke="var(--bg-base)" strokeWidth="10" />
                                     <circle
                                         className="health-ring-path"
                                         cx="50" cy="50" r="44"
@@ -292,45 +314,45 @@ export default function EventDetails() {
                                         strokeLinecap="round"
                                         transform="rotate(-90 50 50)"
                                     />
-                                    <text x="50" y="52" textAnchor="middle" style={{ fontSize: "22px", fontWeight: 800, fill: "#0f172a", fontFamily: "Outfit" }}>
+                                    <text x="50" y="52" textAnchor="middle" style={{ fontSize: "22px", fontWeight: 800, fill: "var(--text-primary)", fontFamily: "Outfit" }}>
                                         {healthData?.score || 0}<tspan style={{ fontSize: "11px", opacity: 0.5 }}>%</tspan>
                                     </text>
-                                    <text x="50" y="65" textAnchor="middle" style={{ fontSize: "6px", fontWeight: 800, fill: "#94a3b8", textTransform: "uppercase", letterSpacing: "1px" }}>
+                                    <text x="50" y="65" textAnchor="middle" style={{ fontSize: "6px", fontWeight: 800, fill: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "1px" }}>
                                         Score
                                     </text>
                                 </svg>
                                 <div style={{
                                     position: "absolute",
                                     bottom: "-10px",
-                                    background: "#fff",
+                                    background: "var(--bg-elevated)",
                                     padding: "6px 14px",
                                     borderRadius: "100px",
-                                    boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-                                    border: "1px solid #f1f5f9",
+                                    boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+                                    border: "1px solid var(--border-subtle)",
                                     display: "flex",
                                     alignItems: "center",
                                     gap: "6px"
                                 }}>
                                     <div style={{ width: "6px", height: "6px", background: getHealthColor(healthData?.score || 0), borderRadius: "50%" }}></div>
-                                    <span style={{ fontSize: "10px", fontWeight: 800, color: "#1e293b" }}>LIVE AI ENGINE</span>
+                                    <span style={{ fontSize: "10px", fontWeight: 800, color: "var(--text-primary)" }}>LIVE AI ENGINE</span>
                                 </div>
                             </div>
                             <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
                                 {healthData && [
-                                    { label: "Logistics", value: healthData.metrics.taskCompletion, color: "#2563eb", icon: <LayoutList size={18} /> },
+                                    { label: "Logistics", value: healthData.metrics.taskCompletion, color: "#3b82f6", icon: <LayoutList size={18} /> },
                                     { label: "Stability", value: Math.max(0, 100 - (healthData.metrics.budgetUsage > 100 ? (healthData.metrics.budgetUsage - 100) : 0)), color: "#10b981", icon: <IndianRupee size={18} /> },
-                                    { label: "Synergy", value: healthData.metrics.vendorConfirmation, color: "#7e22ce", icon: <Handshake size={18} /> },
+                                    { label: "Synergy", value: healthData.metrics.vendorConfirmation, color: "#a855f7", icon: <Handshake size={18} /> },
                                     { label: "Velocity", value: healthData.metrics.rsvpRate, color: "#f59e0b", icon: <Zap size={18} /> },
                                 ].map(item => (
                                     <div key={item.label}>
                                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "13px", fontWeight: 700, marginBottom: "0.75rem" }}>
-                                            <span style={{ color: "#64748b", display: "flex", alignItems: "center", gap: "10px" }}>
-                                                <span style={{ color: item.color, background: `${item.color}15`, width: "32px", height: "32px", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center" }}>{item.icon}</span>
+                                            <span style={{ color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: "10px" }}>
+                                                <span style={{ color: item.color, background: `${item.color}25`, width: "32px", height: "32px", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center" }}>{item.icon}</span>
                                                 {item.label}
                                             </span>
-                                            <span style={{ color: "#0f172a" }}>{item.value}%</span>
+                                            <span style={{ color: "var(--text-primary)" }}>{item.value}%</span>
                                         </div>
-                                        <div style={{ height: "6px", background: "#f1f5f9", borderRadius: "100px" }}>
+                                        <div style={{ height: "6px", background: "var(--bg-elevated)", borderRadius: "100px" }}>
                                             <div style={{ width: `${item.value}%`, background: item.color, height: "100%", borderRadius: "100px" }}></div>
                                         </div>
                                     </div>
@@ -345,8 +367,8 @@ export default function EventDetails() {
                             {risks.map((risk, idx) => (
                                 <div key={idx} style={{
                                     padding: "2rem",
-                                    background: risk.type === "CRITICAL" ? "#fff1f2" : "#fffbeb",
-                                    border: `1px solid ${risk.type === "CRITICAL" ? "#fee2e2" : "#fef3c7"}`,
+                                    background: risk.type === "CRITICAL" ? "rgba(220, 38, 38, 0.1)" : "rgba(217, 119, 6, 0.1)",
+                                    border: `1px solid ${risk.type === "CRITICAL" ? "rgba(220, 38, 38, 0.2)" : "rgba(217, 119, 6, 0.2)"}`,
                                     borderRadius: "24px",
                                     display: "flex",
                                     alignItems: "flex-start",
@@ -357,7 +379,7 @@ export default function EventDetails() {
                                         width: "44px",
                                         height: "44px",
                                         borderRadius: "14px",
-                                        background: risk.type === "CRITICAL" ? "#be123c" : "#d97706",
+                                        background: risk.type === "CRITICAL" ? "#dc2626" : "#d97706",
                                         display: "flex",
                                         alignItems: "center",
                                         justifyContent: "center",
@@ -367,30 +389,30 @@ export default function EventDetails() {
                                     </div>
                                     <div style={{ flex: 1 }}>
                                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
-                                            <h4 style={{ fontSize: "16px", fontWeight: 800, color: risk.type === "CRITICAL" ? "#9f1239" : "#92400e", margin: 0 }}>{risk.category} Risk Identified</h4>
+                                            <h4 style={{ fontSize: "16px", fontWeight: 800, color: risk.type === "CRITICAL" ? "#ef4444" : "#f59e0b", margin: 0 }}>{risk.category} Risk Identified</h4>
                                             <span style={{
                                                 fontSize: "10px",
                                                 fontWeight: 900,
-                                                color: risk.type === "CRITICAL" ? "#be123c" : "#d97706",
-                                                background: risk.type === "CRITICAL" ? "#be123c10" : "#d9770610",
+                                                color: risk.type === "CRITICAL" ? "#ef4444" : "#f59e0b",
+                                                background: risk.type === "CRITICAL" ? "rgba(239,68,68,0.15)" : "rgba(245,158,11,0.15)",
                                                 padding: "4px 8px",
                                                 borderRadius: "6px",
                                                 textTransform: "uppercase"
                                             }}>{risk.type}</span>
                                         </div>
-                                        <p style={{ fontSize: "14px", color: risk.type === "CRITICAL" ? "#be123c" : "#92400e", margin: "0 0 1rem", fontWeight: 600 }}>{risk.message}</p>
+                                        <p style={{ fontSize: "14px", color: risk.type === "CRITICAL" ? "#fca5a5" : "#fcd34d", margin: "0 0 1rem", fontWeight: 600 }}>{risk.message}</p>
                                         <div style={{
-                                            background: "rgba(255,255,255,0.4)",
+                                            background: "rgba(0,0,0,0.2)",
                                             padding: "1rem",
                                             borderRadius: "16px",
                                             fontSize: "13px",
-                                            color: "#1e293b",
+                                            color: "var(--text-secondary)",
                                             display: "flex",
                                             alignItems: "center",
                                             gap: "10px"
                                         }}>
-                                            <Target size={14} color="#64748b" />
-                                            <span><strong>Smart Vector:</strong> {risk.suggestion}</span>
+                                            <Target size={14} color="var(--text-muted)" />
+                                            <span><strong style={{ color: "var(--text-primary)" }}>Smart Vector:</strong> {risk.suggestion}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -400,59 +422,59 @@ export default function EventDetails() {
 
                     {/* Strategic Shortcuts */}
                     <div style={{
-                        background: "#fff",
+                        background: "var(--bg-surface)",
                         padding: "2.5rem",
                         borderRadius: "32px",
-                        border: "1px solid #f1f5f9",
+                        border: "1px solid var(--border-subtle)",
                         display: "flex",
                         flexDirection: "column",
                         gap: "1.5rem"
                     }}>
-                        <h3 style={{ fontSize: "15px", fontWeight: 800, color: "#0f172a", marginBottom: "0.5rem" }}>Strategic Shortcuts</h3>
+                        <h3 style={{ fontSize: "15px", fontWeight: 800, color: "var(--text-primary)", marginBottom: "0.5rem" }}>Strategic Shortcuts</h3>
                         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                             <button
                                 onClick={() => navigate("/tasks")}
-                                style={{ padding: "1.25rem", borderRadius: "18px", background: "#f8fafc", border: "1px solid #f1f5f9", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.75rem", cursor: "pointer", transition: "all 0.2s" }}
-                                onMouseEnter={(e) => { e.currentTarget.style.background = "#eff6ff"; e.currentTarget.style.borderColor = "#bfdbfe"; }}
-                                onMouseLeave={(e) => { e.currentTarget.style.background = "#f8fafc"; e.currentTarget.style.borderColor = "#f1f5f9"; }}
+                                style={{ padding: "1.25rem", borderRadius: "18px", background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.75rem", cursor: "pointer", transition: "all 0.2s" }}
+                                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(37,99,235,0.15)"; e.currentTarget.style.borderColor = "#3b82f6"; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.background = "var(--bg-elevated)"; e.currentTarget.style.borderColor = "var(--border-subtle)"; }}
                             >
                                 <div style={{ background: "#2563eb", color: "#fff", padding: "10px", borderRadius: "12px", boxShadow: "0 4px 12px rgba(37, 99, 235, 0.2)" }}>
                                     <LayoutList size={20} />
                                 </div>
-                                <span style={{ fontSize: "12px", fontWeight: 800, color: "#1e293b" }}>Mission Tasks</span>
+                                <span style={{ fontSize: "12px", fontWeight: 800, color: "var(--text-primary)" }}>Mission Tasks</span>
                             </button>
                             <button
                                 onClick={() => navigate("/guests")}
-                                style={{ padding: "1.25rem", borderRadius: "18px", background: "#f8fafc", border: "1px solid #f1f5f9", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.75rem", cursor: "pointer", transition: "all 0.2s" }}
-                                onMouseEnter={(e) => { e.currentTarget.style.background = "#ecfdf5"; e.currentTarget.style.borderColor = "#a7f3d0"; }}
-                                onMouseLeave={(e) => { e.currentTarget.style.background = "#f8fafc"; e.currentTarget.style.borderColor = "#f1f5f9"; }}
+                                style={{ padding: "1.25rem", borderRadius: "18px", background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.75rem", cursor: "pointer", transition: "all 0.2s" }}
+                                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(16,185,129,0.15)"; e.currentTarget.style.borderColor = "#10b981"; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.background = "var(--bg-elevated)"; e.currentTarget.style.borderColor = "var(--border-subtle)"; }}
                             >
                                 <div style={{ background: "#10b981", color: "#fff", padding: "10px", borderRadius: "12px", boxShadow: "0 4px 12px rgba(16, 185, 129, 0.2)" }}>
                                     <Target size={20} />
                                 </div>
-                                <span style={{ fontSize: "12px", fontWeight: 800, color: "#1e293b" }}>Guest RSVPs</span>
+                                <span style={{ fontSize: "12px", fontWeight: 800, color: "var(--text-primary)" }}>Guest RSVPs</span>
                             </button>
                             <button
                                 onClick={() => navigate("/budget")}
-                                style={{ padding: "1.25rem", borderRadius: "18px", background: "#f8fafc", border: "1px solid #f1f5f9", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.75rem", cursor: "pointer", transition: "all 0.2s" }}
-                                onMouseEnter={(e) => { e.currentTarget.style.background = "#fffbeb"; e.currentTarget.style.borderColor = "#fde68a"; }}
-                                onMouseLeave={(e) => { e.currentTarget.style.background = "#f8fafc"; e.currentTarget.style.borderColor = "#f1f5f9"; }}
+                                style={{ padding: "1.25rem", borderRadius: "18px", background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.75rem", cursor: "pointer", transition: "all 0.2s" }}
+                                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(245,158,11,0.15)"; e.currentTarget.style.borderColor = "#f59e0b"; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.background = "var(--bg-elevated)"; e.currentTarget.style.borderColor = "var(--border-subtle)"; }}
                             >
                                 <div style={{ background: "#f59e0b", color: "#fff", padding: "10px", borderRadius: "12px", boxShadow: "0 4px 12px rgba(245, 158, 11, 0.2)" }}>
                                     <IndianRupee size={20} />
                                 </div>
-                                <span style={{ fontSize: "12px", fontWeight: 800, color: "#1e293b" }}>Capital Log</span>
+                                <span style={{ fontSize: "12px", fontWeight: 800, color: "var(--text-primary)" }}>Capital Log</span>
                             </button>
                             <button
                                 onClick={() => navigate("/analytics")}
-                                style={{ padding: "1.25rem", borderRadius: "18px", background: "#f8fafc", border: "1px solid #f1f5f9", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.75rem", cursor: "pointer", transition: "all 0.2s" }}
-                                onMouseEnter={(e) => { e.currentTarget.style.background = "#faf5ff"; e.currentTarget.style.borderColor = "#e9d5ff"; }}
-                                onMouseLeave={(e) => { e.currentTarget.style.background = "#f8fafc"; e.currentTarget.style.borderColor = "#f1f5f9"; }}
+                                style={{ padding: "1.25rem", borderRadius: "18px", background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.75rem", cursor: "pointer", transition: "all 0.2s" }}
+                                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(168,85,247,0.15)"; e.currentTarget.style.borderColor = "#a855f7"; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.background = "var(--bg-elevated)"; e.currentTarget.style.borderColor = "var(--border-subtle)"; }}
                             >
                                 <div style={{ background: "#7e22ce", color: "#fff", padding: "10px", borderRadius: "12px", boxShadow: "0 4px 12px rgba(126, 34, 206, 0.2)" }}>
                                     <Activity size={20} />
                                 </div>
-                                <span style={{ fontSize: "12px", fontWeight: 800, color: "#1e293b" }}>Analytics</span>
+                                <span style={{ fontSize: "12px", fontWeight: 800, color: "var(--text-primary)" }}>Analytics</span>
                             </button>
                         </div>
                     </div>
@@ -461,63 +483,66 @@ export default function EventDetails() {
                 <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
                     {/* Financial Summary */}
                     <div style={{
-                        background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
+                        background: "var(--bg-surface)",
+                        border: "1px solid var(--border-subtle)",
                         padding: "2.5rem",
                         borderRadius: "32px",
-                        color: "#fff",
-                        boxShadow: "0 20px 40px rgba(15, 23, 42, 0.15)",
+                        color: "var(--text-primary)",
+                        boxShadow: "0 10px 40px rgba(0,0,0,0.2)",
                         position: "relative",
                         overflow: "hidden"
                     }}>
-                        <div style={{ position: "absolute", top: "-20px", right: "-20px", width: "120px", height: "120px", background: "rgba(255,255,255,0.03)", borderRadius: "50%" }}></div>
-                        <h3 style={{ fontSize: "14px", color: "rgba(255,255,255,0.5)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "2rem" }}>Budget Allocation</h3>
+                        <div style={{ position: "absolute", top: "-20px", right: "-20px", width: "120px", height: "120px", background: "rgba(255,165,0,0.03)", borderRadius: "50%" }}></div>
+                        <h3 style={{ fontSize: "14px", color: "var(--text-secondary)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "2rem" }}>Budget Allocation</h3>
                         <div style={{ marginBottom: "2.5rem" }}>
                             <div style={{ fontSize: "42px", fontWeight: 800, letterSpacing: "-0.04em", marginBottom: "0.5rem" }}>₹{parseInt(event.budget).toLocaleString('en-IN')}</div>
-                            <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "rgba(255,255,255,0.4)", fontSize: "12px", fontWeight: 500 }}>
-                                <TrendingUp size={14} /> Recommended allocation for {event.type.toLowerCase()} niche.
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "var(--text-secondary)", fontSize: "12px", fontWeight: 500 }}>
+                                <TrendingUp size={14} color="var(--accent-primary)" /> Recommended allocation for {event.type.toLowerCase()} niche.
                             </div>
                         </div>
                         <button
                             onClick={() => navigate("/vendors")}
                             style={{
                                 width: "100%",
-                                background: "rgba(255,255,255,0.1)",
-                                border: "1px solid rgba(255,255,255,0.1)",
+                                background: "var(--bg-elevated)",
+                                border: "1px solid var(--border-subtle)",
                                 padding: "1.1rem",
                                 borderRadius: "18px",
-                                color: "#fff",
+                                color: "var(--text-primary)",
                                 fontWeight: 800,
                                 cursor: "pointer",
-                                backdropFilter: "blur(10px)",
+                                transition: "all 0.2s",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
                                 gap: "0.5rem"
                             }}
+                            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--bg-surface)"; e.currentTarget.style.borderColor = "var(--accent-primary)"; e.currentTarget.style.color = "var(--accent-primary)"; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.background = "var(--bg-elevated)"; e.currentTarget.style.borderColor = "var(--border-subtle)"; e.currentTarget.style.color = "var(--text-primary)"; }}
                         >Explore Vendor Matrix <ArrowRight size={16} /></button>
                     </div>
 
                     {/* Operational Vectors Tracking */}
                     <div style={{
-                        background: "#fff",
+                        background: "var(--bg-surface)",
                         padding: "2.5rem",
                         borderRadius: "32px",
-                        border: "1px solid #f1f5f9",
+                        border: "1px solid var(--border-subtle)",
                         display: "flex",
                         flexDirection: "column",
                         gap: "1.5rem"
                     }}>
-                        <h3 style={{ fontSize: "15px", fontWeight: 800, color: "#0f172a", marginBottom: "0.5rem" }}>Analytical Vectors</h3>
+                        <h3 style={{ fontSize: "15px", fontWeight: 800, color: "var(--text-primary)", marginBottom: "0.5rem" }}>Analytical Vectors</h3>
                         {[
-                            { label: "Critical Delays", value: healthData?.metrics.overdueTasks || 0, color: "#ef4444", icon: <AlertCircle size={18} />, bg: "#fef2f2" },
-                            { label: "Guest RSVP Velocity", value: `${healthData?.metrics.rsvpRate || 0}%`, color: "#2563eb", icon: <TrendingUp size={18} />, bg: "#eff6ff" },
-                            { label: "Provider Synergy", value: `${healthData?.metrics.vendorConfirmation || 0}%`, color: "#10b981", icon: <Handshake size={18} />, bg: "#f0fdf4" },
-                            { label: "Deployment State", value: event.status, color: "#6366f1", icon: <Target size={18} />, bg: "#f5f3ff" }
+                            { label: "Critical Delays", value: healthData?.metrics.overdueTasks || 0, color: "#ef4444", icon: <AlertCircle size={18} />, bg: "rgba(239,68,68,0.1)" },
+                            { label: "Guest RSVP Velocity", value: `${healthData?.metrics.rsvpRate || 0}%`, color: "#3b82f6", icon: <TrendingUp size={18} />, bg: "rgba(59,130,246,0.1)" },
+                            { label: "Provider Synergy", value: `${healthData?.metrics.vendorConfirmation || 0}%`, color: "#10b981", icon: <Handshake size={18} />, bg: "rgba(16,185,129,0.1)" },
+                            { label: "Deployment State", value: event.status, color: "#a855f7", icon: <Target size={18} />, bg: "rgba(168,85,247,0.1)" }
                         ].map(st => (
-                            <div key={st.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "1.25rem", background: "#f8fafc", borderRadius: "18px" }}>
+                            <div key={st.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "1.25rem", background: "var(--bg-elevated)", borderRadius: "18px" }}>
                                 <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                                    <div style={{ width: "40px", height: "40px", borderRadius: "12px", background: "#fff", border: "1px solid #f1f5f9", display: "flex", alignItems: "center", justifyContent: "center", color: st.color, boxShadow: "0 2px 6px rgba(0,0,0,0.02)" }}>{st.icon}</div>
-                                    <span style={{ fontSize: "13px", fontWeight: 700, color: "#475569" }}>{st.label}</span>
+                                    <div style={{ width: "40px", height: "40px", borderRadius: "12px", background: st.bg, border: "1px solid rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "center", color: st.color, boxShadow: "0 2px 6px rgba(0,0,0,0.2)" }}>{st.icon}</div>
+                                    <span style={{ fontSize: "13px", fontWeight: 700, color: "var(--text-primary)" }}>{st.label}</span>
                                 </div>
                                 <span style={{ fontSize: "14px", fontWeight: 800, color: st.color }}>{st.value}</span>
                             </div>
@@ -528,45 +553,48 @@ export default function EventDetails() {
 
             {/* Config Adjustment Modal */}
             {showEditModal && (
-                <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2000, backdropFilter: "blur(8px)" }}>
-                    <div style={{ background: "#fff", width: "100%", maxWidth: "550px", padding: "3rem", borderRadius: "32px", boxShadow: "0 25px 60px rgba(0,0,0,0.2)" }}>
+                <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2000, backdropFilter: "blur(8px)" }}>
+                    <div style={{ background: "var(--bg-surface)", width: "100%", maxWidth: "550px", padding: "3rem", borderRadius: "32px", border: "1px solid var(--border-subtle)", boxShadow: "0 25px 60px rgba(0,0,0,0.5)" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2.5rem" }}>
-                            <h2 style={{ fontSize: "1.75rem", fontWeight: 800, margin: 0, letterSpacing: "-0.03em" }}>Adjust Context</h2>
-                            <button onClick={() => setShowEditModal(false)} style={{ border: "none", background: "#f1f5f9", width: "32px", height: "32px", borderRadius: "50%", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={16} /></button>
+                            <h2 style={{ fontSize: "1.75rem", fontWeight: 800, margin: 0, letterSpacing: "-0.03em", color: "var(--text-primary)" }}>Adjust Context</h2>
+                            <button onClick={() => setShowEditModal(false)} style={{ border: "1px solid var(--border-subtle)", background: "var(--bg-elevated)", width: "32px", height: "32px", borderRadius: "50%", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-secondary)" }}><X size={16} /></button>
                         </div>
                         <form onSubmit={handleUpdate} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
                             <div>
-                                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#64748b", marginBottom: "8px", textTransform: "uppercase" }}>Event Identity</label>
-                                <input style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "15px", fontWeight: 600 }} value={editData.name} onChange={e => setEditData({ ...editData, name: e.target.value })} required />
+                                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-secondary)", marginBottom: "8px", textTransform: "uppercase" }}>Event Identity</label>
+                                <input style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid var(--border-subtle)", background: "var(--bg-elevated)", color: "var(--text-primary)", fontSize: "15px", fontWeight: 600 }} value={editData.name} onChange={e => setEditData({ ...editData, name: e.target.value })} required />
                             </div>
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
                                 <div>
-                                    <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#64748b", marginBottom: "8px", textTransform: "uppercase" }}>Target Date</label>
-                                    <input type="date" style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "15px", fontWeight: 600 }} value={editData.date} onChange={e => setEditData({ ...editData, date: e.target.value })} required />
+                                    <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-secondary)", marginBottom: "8px", textTransform: "uppercase" }}>Target Date</label>
+                                    <input type="date" style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid var(--border-subtle)", background: "var(--bg-elevated)", color: "var(--text-primary)", fontSize: "15px", fontWeight: 600 }} value={editData.date} onChange={e => setEditData({ ...editData, date: e.target.value })} required />
                                 </div>
                                 <div>
-                                    <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#64748b", marginBottom: "8px", textTransform: "uppercase" }}>Logic Type</label>
-                                    <select style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "15px", fontWeight: 700 }} value={editData.type} onChange={e => setEditData({ ...editData, type: e.target.value })}>
-                                        <option>Wedding</option>
+                                    <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-secondary)", marginBottom: "8px", textTransform: "uppercase" }}>Logic Type</label>
+                                    <select style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid var(--border-subtle)", background: "var(--bg-elevated)", color: "var(--text-primary)", fontSize: "15px", fontWeight: 700 }} value={editData.type} onChange={e => setEditData({ ...editData, type: e.target.value })}>
+                                        <option>Hackathon</option>
+                                        <option>Tech Fest</option>
+                                        <option>Tech Event</option>
                                         <option>Conference</option>
                                         <option>College Fest</option>
                                         <option>Birthday</option>
                                         <option>Corporate</option>
+                                        <option>Wedding</option>
                                         <option>Other</option>
                                     </select>
                                 </div>
                             </div>
                             <div>
-                                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#64748b", marginBottom: "8px", textTransform: "uppercase" }}>Geographical Coordinates</label>
-                                <input style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "15px", fontWeight: 600 }} value={editData.location} onChange={e => setEditData({ ...editData, location: e.target.value })} required />
+                                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-secondary)", marginBottom: "8px", textTransform: "uppercase" }}>Geographical Coordinates</label>
+                                <input style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid var(--border-subtle)", background: "var(--bg-elevated)", color: "var(--text-primary)", fontSize: "15px", fontWeight: 600 }} value={editData.location} onChange={e => setEditData({ ...editData, location: e.target.value })} required />
                             </div>
                             <div>
-                                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#64748b", marginBottom: "8px", textTransform: "uppercase" }}>Budget Allocation (₹)</label>
-                                <input type="number" style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "16px", fontWeight: 800 }} value={editData.budget} onChange={e => setEditData({ ...editData, budget: e.target.value })} required />
+                                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-secondary)", marginBottom: "8px", textTransform: "uppercase" }}>Budget Allocation (₹)</label>
+                                <input type="number" style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid var(--border-subtle)", background: "var(--bg-elevated)", color: "var(--text-primary)", fontSize: "16px", fontWeight: 800 }} value={editData.budget} onChange={e => setEditData({ ...editData, budget: e.target.value })} required />
                             </div>
                             <div style={{ display: "flex", gap: "1.25rem", marginTop: "1rem" }}>
-                                <button type="button" onClick={() => setShowEditModal(false)} style={{ flex: 1, padding: "1.1rem", borderRadius: "14px", border: "none", background: "#f1f5f9", fontWeight: 800, cursor: "pointer" }}>Abort</button>
-                                <button type="submit" style={{ flex: 2, padding: "1.1rem", borderRadius: "14px", border: "none", background: "#2563eb", color: "#fff", fontWeight: 900, cursor: "pointer", boxShadow: "0 8px 20px rgba(37, 99, 235, 0.2)" }} disabled={updateLoading}>
+                                <button type="button" onClick={() => setShowEditModal(false)} style={{ flex: 1, padding: "1.1rem", borderRadius: "14px", border: "1px solid var(--border-subtle)", background: "transparent", color: "var(--text-primary)", fontWeight: 800, cursor: "pointer" }}>Abort</button>
+                                <button type="submit" style={{ flex: 2, padding: "1.1rem", borderRadius: "14px", border: "none", background: "var(--accent-primary)", color: "#000", fontWeight: 900, cursor: "pointer", boxShadow: "0 8px 20px rgba(255, 165, 0, 0.2)" }} disabled={updateLoading}>
                                     {updateLoading ? "Synchronizing..." : "Apply Transformations"}
                                 </button>
                             </div>

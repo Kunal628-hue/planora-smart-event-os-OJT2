@@ -8,6 +8,7 @@ const taskSchema = mongoose.Schema(
         priority: { type: String, default: "Medium" }, // Low, Medium, High
         status: { type: String, default: "To Do" }, // To Do, In Progress, Completed
         event: { type: mongoose.Schema.Types.ObjectId, ref: "Event", required: true },
+        budget: { type: Number, default: 0 },
         user: { type: String, required: true }, // Firebase UID
     },
     { timestamps: true }

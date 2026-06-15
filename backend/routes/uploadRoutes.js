@@ -2,6 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { validateMimeType, validateFileExtension } from '../utils/inputValidator.js';
 
 const router = express.Router();
 
@@ -34,11 +35,12 @@ const upload = multer({
     storage: storage,
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB Limit
     fileFilter: (req, file, cb) => {
-        const filetypes = /jpeg|jpg|png|pdf/;
-        const mimetype = filetypes.test(file.mimetype);
-        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+        // Use Set-based allowlist instead of regex — O(1), immune to ReDoS on
+        // attacker-controlled MIME type strings.
+        const mimeOk = validateMimeType(file.mimetype);
+        const extOk  = validateFileExtension(path.extname(file.originalname).toLowerCase());
 
-        if (mimetype && extname) {
+        if (mimeOk && extOk) {
             return cb(null, true);
         }
         cb(new Error("Only images (jpeg, jpg, png) and PDFs are allowed!"));

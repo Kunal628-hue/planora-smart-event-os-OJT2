@@ -83,7 +83,8 @@ export const getEvents = async (req, res) => {
             budget: event.budget,
             status: event.status,
             user: event.user,
-            spent: spendMap[event._id.toString()] || 0
+            spent: spendMap[event._id.toString()] || 0,
+            registrationConfig: event.registrationConfig || null
         }));
 
         res.json(formattedEvents);
@@ -128,7 +129,8 @@ export const getEventById = async (req, res) => {
             type: event.type || "Other",
             budget: event.budget,
             status: event.status,
-            user: event.user
+            user: event.user,
+            registrationConfig: event.registrationConfig || null
         };
 
         res.json(formattedEvent);

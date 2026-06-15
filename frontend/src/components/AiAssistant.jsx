@@ -1,23 +1,29 @@
 import { useState, useRef, useEffect } from "react";
 import ReactMarkdown from 'react-markdown';
-import { MessageSquare, Sparkles, X as CloseIcon } from "lucide-react";
+import { MessageSquare, Sparkles, X as CloseIcon, Send, Trash2, Zap, ShieldAlert, BarChart3, ChevronRight } from "lucide-react";
 import { PlanoraSpinner } from "./ui/Loader";
 
 const API_URL = import.meta.env.VITE_API_URL;
+
+const QUICK_ACTIONS = [
+    { label: "Operational Status", icon: <BarChart3 size={12} />, prompt: "Provide a comprehensive operational status report for this event." },
+    { label: "Financial Risk", icon: <ShieldAlert size={12} />, prompt: "Analyze the current budget and identify potential financial risks." },
+    { label: "Next Milestones", icon: <Zap size={12} />, prompt: "What are the most critical pending milestones I should focus on next?" }
+];
 
 export default function AiAssistant({ eventId }) {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState(() => {
         const saved = localStorage.getItem(`planora_chat_${eventId || 'global'}`);
         return saved ? JSON.parse(saved) : [
-            { role: "assistant", text: "**Planora OS Intelligence Unit online.** Tactical event data analysis is ready. How may I assist with your strategy?" }
+            { role: "assistant", text: "**Neural Strategic Unit online.** Event context loaded. I have established a direct link to your live budget and task data. How shall we proceed with your tactical planning?" }
         ];
     });
 
     useEffect(() => {
         const saved = localStorage.getItem(`planora_chat_${eventId || 'global'}`);
         setMessages(saved ? JSON.parse(saved) : [
-            { role: "assistant", text: "**Planora OS Intelligence Unit online.** Tactical event data analysis is ready. How may I assist with your strategy?" }
+            { role: "assistant", text: "**Neural Strategic Unit online.** Event context loaded. I have established a direct link to your live budget and task data. How shall we proceed with your tactical planning?" }
         ]);
     }, [eventId]);
 
@@ -31,18 +37,16 @@ export default function AiAssistant({ eventId }) {
 
     useEffect(() => {
         if (scrollRef.current) {
-            scrollRef.current.scrollTo({
-                top: scrollRef.current.scrollHeight,
-                behavior: "smooth"
-            });
+            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
     }, [messages, loading]);
 
-    const handleSendMessage = async (e) => {
-        e.preventDefault();
-        if (!input.trim() || !eventId || loading) return;
+    const handleSendMessage = async (e, customPrompt = null) => {
+        if (e) e.preventDefault();
+        const textToSend = customPrompt || input;
+        if (!textToSend.trim() || !eventId || loading) return;
 
-        const userMsg = { role: "user", text: input };
+        const userMsg = { role: "user", text: textToSend };
         setMessages(prev => [...prev, userMsg]);
         setInput("");
         setLoading(true);
@@ -51,7 +55,7 @@ export default function AiAssistant({ eventId }) {
             const response = await fetch(`${API_URL}/ai/chat`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: input, eventId })
+                body: JSON.stringify({ message: textToSend, eventId })
             });
             const data = await response.json();
             setMessages(prev => [...prev, { role: "assistant", text: data.response }]);
@@ -62,48 +66,54 @@ export default function AiAssistant({ eventId }) {
         }
     };
 
+    const clearChat = () => {
+        const initialMsg = [{ role: "assistant", text: "**Memory purge complete.** Tactical context re-initialized. Awaiting fresh instructions." }];
+        setMessages(initialMsg);
+        localStorage.removeItem(`planora_chat_${eventId || 'global'}`);
+    };
+
     return (
-        <div style={{ position: "fixed", bottom: "2rem", right: "2rem", zIndex: 1000, fontFamily: "'Inter', sans-serif" }}>
+        <div style={{ position: "fixed", bottom: "1.5rem", right: "1.5rem", zIndex: 1000, fontFamily: "'Inter', sans-serif" }}>
             {isOpen && (
                 <div style={{
-                    width: "380px",
-                    height: "520px",
-                    maxHeight: "calc(100vh - 120px)",
+                    width: "400px",
+                    height: "600px",
+                    maxHeight: "calc(100vh - 100px)",
                     display: "flex",
                     flexDirection: "column",
                     marginBottom: "1rem",
-                    background: "rgba(255, 255, 255, 0.75)",
-                    backdropFilter: "blur(30px) saturate(180%)",
-                    WebkitBackdropFilter: "blur(30px) saturate(180%)",
-                    borderRadius: "20px",
+                    background: "rgba(10, 10, 12, 0.9)",
+                    backdropFilter: "blur(40px) saturate(200%)",
+                    WebkitBackdropFilter: "blur(40px) saturate(200%)",
+                    borderRadius: "24px",
                     overflow: "hidden",
-                    border: "1px solid #e2e8f0",
-                    boxShadow: "0 20px 50px rgba(0, 0, 0, 0.1)",
-                    animation: "slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    boxShadow: "0 25px 60px -12px rgba(0, 0, 0, 0.8)",
+                    animation: "slideUpChat 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
                     zIndex: 1001
                 }}>
                     {/* Header */}
                     <div style={{
-                        padding: "1rem 1.25rem",
-                        background: "#1e293b",
-                        color: "#fff",
+                        padding: "1.25rem 1.5rem",
+                        background: "rgba(255, 255, 255, 0.03)",
+                        borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center",
                     }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "0.85rem" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
                             <div style={{ position: "relative" }}>
                                 <div style={{
-                                    width: "42px",
-                                    height: "42px",
-                                    background: "rgba(255,255,255,0.2)",
-                                    borderRadius: "12px",
+                                    width: "44px",
+                                    height: "44px",
+                                    background: "linear-gradient(135deg, #f97316 0%, #ea580c 100%)",
+                                    borderRadius: "14px",
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
-                                    backdropFilter: "blur(4px)"
+                                    boxShadow: "0 0 20px rgba(249, 115, 22, 0.3)"
                                 }}>
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 8V4H8" /><rect width="16" height="12" x="4" y="8" rx="2" /><path d="M2 14h2" /><path d="M20 14h2" /><path d="M15 13v2" /><path d="M9 13v2" /></svg>
+                                    <Sparkles size={22} color="#fff" strokeWidth={2.5} />
                                 </div>
                                 <div style={{
                                     position: "absolute",
@@ -111,127 +121,165 @@ export default function AiAssistant({ eventId }) {
                                     right: "-2px",
                                     width: "12px",
                                     height: "12px",
-                                    background: "#22c55e",
+                                    background: "#10b981",
                                     borderRadius: "50%",
-                                    border: "2px solid #1e3a8a"
+                                    border: "2px solid #0a0a0c"
                                 }}></div>
                             </div>
                             <div>
-                                <div style={{ fontWeight: 700, fontSize: "0.9rem", letterSpacing: "-0.01em" }}>Neural Planner AI</div>
-                                <div style={{ fontSize: "0.65rem", opacity: 0.7, fontWeight: 500 }}>Intelligent Assistant</div>
+                                <div style={{ fontWeight: 900, fontSize: "14px", color: "#fff", letterSpacing: "-0.01em" }}>Planora OS Intelligence</div>
+                                <div style={{ fontSize: "10px", color: "var(--accent-primary)", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>Strategic Mode Active</div>
                             </div>
                         </div>
-                        <button
-                            onClick={() => setIsOpen(false)}
-                            style={{
-                                background: "rgba(255,255,255,0.15)",
-                                border: "none",
-                                color: "#fff",
-                                width: "32px",
-                                height: "32px",
-                                borderRadius: "50%",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                cursor: "pointer",
-                                transition: "all 0.2s"
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.25)"}
-                            onMouseLeave={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.15)"}
-                        >
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
-                        </button>
+                        <div style={{ display: "flex", gap: "8px" }}>
+                            <button onClick={clearChat} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.3)", cursor: "pointer", padding: "8px" }} title="Clear context">
+                                <Trash2 size={16} />
+                            </button>
+                            <button onClick={() => setIsOpen(false)} style={{ background: "rgba(255,255,255,0.05)", border: "none", color: "#fff", width: "32px", height: "32px", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                                <CloseIcon size={18} />
+                            </button>
+                        </div>
                     </div>
 
                     {/* Messages Area */}
                     <div
                         ref={scrollRef}
+                        className="custom-scrollbar"
                         style={{
                             flex: 1,
                             padding: "1.5rem",
                             overflowY: "auto",
                             display: "flex",
                             flexDirection: "column",
-                            gap: "1.25rem",
-                            background: "#f8fafc",
-                            scrollbarWidth: "thin"
+                            gap: "1.5rem",
+                            background: "transparent",
                         }}
                     >
                         {messages.map((msg, idx) => (
                             <div key={idx} style={{
                                 alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
-                                maxWidth: "85%",
-                                padding: "0.75rem 1rem",
-                                borderRadius: msg.role === "user" ? "16px 16px 2px 16px" : "16px 16px 16px 2px",
-                                fontSize: "0.85rem",
-                                fontWeight: 500,
-                                lineHeight: "1.6",
-                                background: msg.role === "user" ? "#1e293b" : "#fff",
-                                color: msg.role === "user" ? "#fff" : "#334155",
-                                border: msg.role === "assistant" ? "1px solid #e2e8f0" : "none",
-                                boxShadow: msg.role === "assistant" ? "0 2px 8px rgba(0,0,0,0.02)" : "none",
-                                position: "relative",
-                                animation: "bubbleIn 0.4s cubic-bezier(0.2, 1, 0.3, 1)"
+                                maxWidth: "88%",
+                                position: "relative"
                             }}>
-                                <ReactMarkdown components={{
-                                    p: ({ node, ...props }) => <div style={{ marginBottom: "0.5rem" }} {...props} />,
-                                    ul: ({ node, ...props }) => <ul style={{ margin: "0.5rem 0", paddingLeft: "1.25rem", color: "inherit" }} {...props} />,
-                                    li: ({ node, ...props }) => <li style={{ marginBottom: "0.25rem" }} {...props} />,
-                                    strong: ({ node, ...props }) => <strong style={{ fontWeight: 800, color: msg.role === "user" ? "#fff" : "#1e293b" }} {...props} />
+                                <div style={{
+                                    padding: "1rem 1.25rem",
+                                    borderRadius: msg.role === "user" ? "20px 20px 4px 20px" : "20px 20px 20px 4px",
+                                    fontSize: "13.5px",
+                                    fontWeight: 500,
+                                    lineHeight: "1.6",
+                                    background: msg.role === "user" ? "var(--accent-primary)" : "rgba(255,255,255,0.04)",
+                                    color: msg.role === "user" ? "#fff" : "#e4e4e7",
+                                    border: msg.role === "assistant" ? "1px solid rgba(255,255,255,0.08)" : "none",
+                                    boxShadow: msg.role === "assistant" ? "0 4px 15px rgba(0,0,0,0.1)" : "none",
+                                    animation: "bubbleIn 0.4s cubic-bezier(0.2, 1, 0.3, 1)"
                                 }}>
-                                    {msg.text}
-                                </ReactMarkdown>
+                                    <ReactMarkdown components={{
+                                        p: ({ node, ...props }) => <div style={{ marginBottom: "0.75rem" }} {...props} />,
+                                        ul: ({ node, ...props }) => <ul style={{ margin: "0.75rem 0", paddingLeft: "1.25rem", color: "inherit" }} {...props} />,
+                                        li: ({ node, ...props }) => <li style={{ marginBottom: "0.4rem" }} {...props} />,
+                                        strong: ({ node, ...props }) => <strong style={{ fontWeight: 800, color: msg.role === "user" ? "#fff" : "var(--accent-primary)" }} {...props} />,
+                                        table: ({ node, ...props }) => <div style={{ overflowX: "auto", margin: "1rem 0" }}><table style={{ width: "100%", borderCollapse: "collapse", fontSize: "11px" }} {...props} /></div>,
+                                        th: ({ node, ...props }) => <th style={{ border: "1px solid rgba(255,255,255,0.1)", padding: "8px", background: "rgba(255,255,255,0.05)", textAlign: "left" }} {...props} />,
+                                        td: ({ node, ...props }) => <td style={{ border: "1px solid rgba(255,255,255,0.1)", padding: "8px" }} {...props} />
+                                    }}>
+                                        {msg.text}
+                                    </ReactMarkdown>
+                                </div>
                             </div>
                         ))}
                         {loading && (
-                            <div style={{ alignSelf: "flex-start", padding: "0.75rem 1.25rem", background: "#fff", borderRadius: "20px 20px 20px 4px", border: "1px solid #e2e8f0", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
-                                <div style={{ display: "flex", gap: "6px" }}>
-                                    <div className="bot-dot" style={{ width: 8, height: 8, background: "#3b82f6", borderRadius: "50%", animation: "botBounce 1s infinite 0s" }}></div>
-                                    <div className="bot-dot" style={{ width: 8, height: 8, background: "#3b82f6", borderRadius: "50%", animation: "botBounce 1s infinite 0.2s" }}></div>
-                                    <div className="bot-dot" style={{ width: 8, height: 8, background: "#3b82f6", borderRadius: "50%", animation: "botBounce 1s infinite 0.4s" }}></div>
+                            <div style={{ alignSelf: "flex-start", padding: "1rem 1.5rem", background: "rgba(255,255,255,0.03)", borderRadius: "20px 20px 20px 4px", border: "1px solid rgba(255,255,255,0.05)" }}>
+                                <div style={{ display: "flex", gap: "8px" }}>
+                                    <div className="bot-dot" style={{ width: 8, height: 8, background: "var(--accent-primary)", borderRadius: "50%", animation: "botBounce 1s infinite 0s" }}></div>
+                                    <div className="bot-dot" style={{ width: 8, height: 8, background: "var(--accent-primary)", borderRadius: "50%", animation: "botBounce 1s infinite 0.2s" }}></div>
+                                    <div className="bot-dot" style={{ width: 8, height: 8, background: "var(--accent-primary)", borderRadius: "50%", animation: "botBounce 1s infinite 0.4s" }}></div>
                                 </div>
                             </div>
                         )}
                     </div>
+
+                    {/* Quick Actions */}
+                    {!loading && (
+                        <div style={{ 
+                            padding: "0.5rem 1.25rem", 
+                            display: "flex", 
+                            gap: "8px", 
+                            overflowX: "auto", 
+                            whiteSpace: "nowrap",
+                            background: "transparent",
+                            scrollbarWidth: "none"
+                        }} className="no-scrollbar">
+                            {QUICK_ACTIONS.map((action, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => handleSendMessage(null, action.prompt)}
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "6px",
+                                        padding: "8px 12px",
+                                        borderRadius: "10px",
+                                        background: "rgba(255, 255, 255, 0.05)",
+                                        border: "1px solid rgba(255, 255, 255, 0.08)",
+                                        color: "#a1a1aa",
+                                        fontSize: "11px",
+                                        fontWeight: 700,
+                                        cursor: "pointer",
+                                        transition: "all 0.2s"
+                                    }}
+                                    onMouseEnter={e => {
+                                        e.currentTarget.style.background = "rgba(249, 115, 22, 0.1)";
+                                        e.currentTarget.style.borderColor = "rgba(249, 115, 22, 0.3)";
+                                        e.currentTarget.style.color = "#fff";
+                                    }}
+                                    onMouseLeave={e => {
+                                        e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
+                                        e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.08)";
+                                        e.currentTarget.style.color = "#a1a1aa";
+                                    }}
+                                >
+                                    {action.icon}
+                                    {action.label}
+                                </button>
+                            ))}
+                        </div>
+                    )}
 
                     {/* Input Area */}
                     <form
                         onSubmit={handleSendMessage}
                         style={{
                             padding: "1.25rem 1.5rem",
-                            background: "#fff",
-                            borderTop: "1px solid #e2e8f0",
+                            background: "rgba(255, 255, 255, 0.02)",
+                            borderTop: "1px solid rgba(255, 255, 255, 0.05)",
                             display: "flex",
                             alignItems: "center",
-                            gap: "0.85rem",
-                            boxShadow: "0 -4px 15px rgba(0,0,0,0.02)"
+                            gap: "1rem",
                         }}
                     >
                         <div style={{ position: "relative", flex: 1 }}>
                             <input
-                                placeholder="Type a message..."
+                                placeholder="Command core intelligence..."
                                 value={input}
                                 onChange={e => setInput(e.target.value)}
                                 style={{
                                     width: "100%",
-                                    padding: "0.85rem 1.25rem",
-                                    background: "#f1f5f9",
-                                    border: "1px solid transparent",
+                                    padding: "1rem 1.5rem",
+                                    background: "rgba(255, 255, 255, 0.05)",
+                                    border: "1px solid rgba(255, 255, 255, 0.08)",
                                     borderRadius: "16px",
-                                    fontSize: "0.95rem",
+                                    fontSize: "14px",
                                     outline: "none",
-                                    transition: "all 0.2s",
-                                    color: "#1e293b"
+                                    transition: "all 0.3s",
+                                    color: "#fff"
                                 }}
                                 onFocus={(e) => {
-                                    e.target.style.background = "#fff";
-                                    e.target.style.borderColor = "#3b82f6";
-                                    e.target.style.boxShadow = "0 0 0 4px rgba(59, 130, 246, 0.1)";
+                                    e.target.style.background = "rgba(255, 255, 255, 0.08)";
+                                    e.target.style.borderColor = "var(--accent-primary)";
                                 }}
                                 onBlur={(e) => {
-                                    e.target.style.background = "#f1f5f9";
-                                    e.target.style.borderColor = "transparent";
-                                    e.target.style.boxShadow = "none";
+                                    e.target.style.background = "rgba(255, 255, 255, 0.05)";
+                                    e.target.style.borderColor = "rgba(255, 255, 255, 0.08)";
                                 }}
                             />
                         </div>
@@ -239,24 +287,24 @@ export default function AiAssistant({ eventId }) {
                             type="submit"
                             disabled={!input.trim() || loading}
                             style={{
-                                width: "48px",
-                                height: "48px",
-                                borderRadius: "14px",
-                                padding: 0,
-                                background: input.trim() ? "#1e293b" : "#f1f5f9",
-                                color: input.trim() ? "#fff" : "#94a3b8",
+                                width: "52px",
+                                height: "52px",
+                                borderRadius: "16px",
+                                background: input.trim() ? "var(--accent-primary)" : "rgba(255, 255, 255, 0.03)",
+                                color: "#fff",
                                 border: "none",
                                 cursor: input.trim() ? "pointer" : "default",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                transition: "all 0.2s"
+                                transition: "all 0.3s",
+                                boxShadow: input.trim() ? "0 8px 20px rgba(249, 115, 22, 0.3)" : "none"
                             }}
                         >
                             {loading ? (
-                                <PlanoraSpinner size={20} color={input.trim() ? "#fff" : "#2563eb"} />
+                                <PlanoraSpinner size={22} color="#fff" />
                             ) : (
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" transform="rotate(45)" style={{ marginLeft: "-2px", marginTop: "-2px" }}><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg>
+                                <Send size={20} strokeWidth={2.5} />
                             )}
                         </button>
                     </form>
@@ -267,56 +315,62 @@ export default function AiAssistant({ eventId }) {
                 <button
                     onClick={() => setIsOpen(true)}
                     style={{
-                        width: "48px",
-                        height: "48px",
-                        borderRadius: "50%",
-                        background: "#1e293b",
+                        width: "60px",
+                        height: "60px",
+                        borderRadius: "20px",
+                        background: "linear-gradient(135deg, #f97316 0%, #ea580c 100%)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                        boxShadow: "0 10px 30px rgba(234, 88, 12, 0.4), inset 0 1px 1px rgba(255,255,255,0.2)",
                         border: "1px solid rgba(255,255,255,0.1)",
                         cursor: "pointer",
-                        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                        transform: "rotate(0)",
+                        transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
                         color: "#fff",
-                        padding: 0
+                        padding: 0,
+                        position: "relative",
+                        overflow: "hidden"
                     }}
-                    className="ai-trigger-btn"
+                    className="ai-trigger-pulse"
                 >
-                    <MessageSquare size={22} strokeWidth={2.25} />
+                    <MessageSquare size={26} strokeWidth={2.5} />
+                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "linear-gradient(rgba(255,255,255,0.2), transparent)", pointerEvents: "none" }}></div>
                 </button>
             )}
             <style>{`
-                @keyframes slideUp {
-                    from { opacity: 0; transform: translateY(30px) scale(0.95); }
-                    to { opacity: 1; transform: translateY(0) scale(1); }
+                @keyframes slideUpChat {
+                    from { opacity: 0; transform: translateY(40px) scale(0.95); filter: blur(10px); }
+                    to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
                 }
                 @keyframes bubbleIn {
-                    from { opacity: 0; transform: translateY(15px) scale(0.9); }
+                    from { opacity: 0; transform: translateY(10px) scale(0.98); }
                     to { opacity: 1; transform: translateY(0) scale(1); }
                 }
                 @keyframes botBounce {
                     0%, 100% { transform: translateY(0); opacity: 0.4; }
-                    50% { transform: translateY(-6px); opacity: 1; }
+                    50% { transform: translateY(-8px); opacity: 1; }
                 }
-                .ai-trigger-btn:hover {
-                    transform: translateY(-2px) scale(1.05) !important;
-                    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2) !important;
-                    background: #334155 !important;
+                .ai-trigger-pulse:hover {
+                    transform: scale(1.1) translateY(-4px) !important;
+                    box-shadow: 0 15px 40px rgba(234, 88, 12, 0.5) !important;
                 }
-                div::-webkit-scrollbar {
-                    width: 6px;
+                .no-scrollbar::-webkit-scrollbar {
+                    display: none;
                 }
-                div::-webkit-scrollbar-track {
-                    background: transparent;
+                .ai-trigger-pulse::after {
+                    content: "";
+                    position: absolute;
+                    width: 100%;
+                    height: 100%;
+                    background: inherit;
+                    border-radius: inherit;
+                    z-index: -1;
+                    opacity: 0.4;
+                    animation: pulseBot 2s infinite;
                 }
-                div::-webkit-scrollbar-thumb {
-                    background: #cbd5e1;
-                    border-radius: 10px;
-                }
-                div::-webkit-scrollbar-thumb:hover {
-                    background: #94a3b8;
+                @keyframes pulseBot {
+                    0% { transform: scale(1); opacity: 0.4; }
+                    100% { transform: scale(1.6); opacity: 0; }
                 }
             `}</style>
         </div>

@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
-import { animate, stagger } from "animejs";
 import { useDialog } from "../../context/DialogContext";
-import { Plus, ListTodo, Calendar, Clock, AlertCircle, Loader2, X, Edit2, Trash2 } from "lucide-react";
+import { Plus, ListTodo, Clock, X, Edit2, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 
@@ -15,6 +14,10 @@ export default function Tasks() {
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [editingTask, setEditingTask] = useState(null);
+    const [statusFilter, setStatusFilter] = useState("All");
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
+    const [viewMode, setViewMode] = useState("list");
     const [newTask, setNewTask] = useState({
         title: "",
         dueDate: "",
@@ -38,27 +41,13 @@ export default function Tasks() {
         }
     };
 
-    useEffect(() => {
-        fetchData();
-    }, [user, selectedEventId]);
+    useEffect(() => { fetchData(); }, [user, selectedEventId]);
 
     useEffect(() => {
         if (selectedEventId) {
             setNewTask(prev => ({ ...prev, eventId: selectedEventId }));
         }
     }, [selectedEventId]);
-
-    useEffect(() => {
-        if (!loading && tasks.length > 0) {
-            animate('.task-row', {
-                translateX: [-20, 0],
-                opacity: [0, 1],
-                delay: stagger(50),
-                easing: 'easeOutExpo',
-                duration: 600
-            });
-        }
-    }, [loading, tasks.length]);
 
     const handleCreateTask = async (e) => {
         e.preventDefault();
@@ -79,12 +68,7 @@ export default function Tasks() {
             if (response.ok) {
                 setShowModal(false);
                 setEditingTask(null);
-                setNewTask({
-                    title: "",
-                    dueDate: "",
-                    priority: "Medium",
-                    eventId: selectedEventId
-                });
+                setNewTask({ title: "", dueDate: "", priority: "Medium", eventId: selectedEventId });
                 fetchData();
                 addNotification(editingTask ? "Milestone Updated" : "Milestone Created", `The directive '${newTask.title}' is now active.`);
             }
@@ -108,9 +92,7 @@ export default function Tasks() {
         const confirmed = await showConfirm("Delete Milestone", "Are you sure you want to remove this task from your active workflow?");
         if (!confirmed) return;
         try {
-            const response = await fetch(`${API_URL}/tasks/${taskId}`, {
-                method: "DELETE"
-            });
+            const response = await fetch(`${API_URL}/tasks/${taskId}`, { method: "DELETE" });
             if (response.ok) {
                 setTasks(tasks.filter(t => t._id !== taskId));
                 addNotification("Milestone Terminated", "Task has been removed from your active workflow.");
@@ -139,315 +121,291 @@ export default function Tasks() {
         }
     };
 
-    const filteredTasks = selectedEventId
-        ? tasks.filter(t => (t.event?._id || t.event) === selectedEventId)
-        : tasks;
+    const filteredTasks = useMemo(() => {
+        let list = selectedEventId ? tasks.filter(t => (t.event?._id || t.event) === selectedEventId) : tasks;
+        if (statusFilter !== "All") list = list.filter(t => (t.status || "Pending") === statusFilter);
+        return list;
+    }, [tasks, selectedEventId, statusFilter]);
+
+    const paginatedTasks = filteredTasks.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    const totalPages = Math.ceil(filteredTasks.length / itemsPerPage);
+
+    // Analytics
+    const completedCount = useMemo(() => tasks.filter(t => t.status === "Completed").length, [tasks]);
+    const completionRate = useMemo(() => tasks.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0, [completedCount, tasks.length]);
+    const upcomingDeadlines = useMemo(() => {
+        const now = new Date();
+        const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+        return tasks.filter(t => {
+            const due = new Date(t.dueDate);
+            return due >= now && due <= weekFromNow && t.status !== "Completed";
+        }).length;
+    }, [tasks]);
+    const past24h = useMemo(() => {
+        const now = new Date();
+        const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        return tasks.filter(t => new Date(t.dueDate) < now && new Date(t.dueDate) >= yesterday && t.status !== "Completed").length;
+    }, [tasks]);
+
+    const getContextCode = (eventName) => {
+        if (!eventName) return "EXT";
+        const words = eventName.split(" ");
+        return words.slice(0, 2).map(w => w.substring(0, 3).toUpperCase()).join("-");
+    };
+
+    const thStyle = { padding: "1.25rem 1.5rem", color: "#64748b", fontSize: "0.75rem", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", textAlign: "left" };
+    const tdStyle = { padding: "1.25rem 1.5rem" };
+    const inputStyle = { width: "100%", padding: "0.85rem 1rem", borderRadius: "10px", background: "#1a1a1a", border: "1px solid #222", color: "#fff", outline: "none", fontSize: "14px", fontWeight: 600 };
 
     return (
-        <div className="responsive-container" style={{
-            fontFamily: "'Outfit', 'Inter', system-ui, sans-serif",
-            background: "#fcfdff",
+        <div style={{
+            padding: "1.25rem 1.5rem",
+            color: "#fff",
+            fontFamily: "'Inter', sans-serif",
+            maxWidth: "1400px",
+            margin: "0 auto",
             minHeight: "100vh",
-            color: "#0f172a"
+            backgroundImage: "radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px)",
+            backgroundSize: "32px 32px"
         }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "3.5rem", gap: "1.5rem", flexWrap: "wrap" }}>
-                <div style={{ flex: 1, minWidth: "280px" }}>
-                    <h1 style={{ fontSize: "2.75rem", fontWeight: 800, letterSpacing: "-0.04em", margin: "0 0 0.5rem" }}>
-                        Workflow <span style={{ color: "#2563eb" }}>Milestones</span>
-                    </h1>
-                    <p style={{ color: "#64748b", fontSize: "1.1rem", fontWeight: 500, margin: 0 }}>
-                        Organize your chronological operations across all active event contexts.
-                    </p>
+            {/* Header */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", paddingBottom: "1.25rem", borderBottom: "1px solid #1a1a1a" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
+                    <h1 style={{ fontSize: "1.35rem", fontWeight: 900, margin: 0, letterSpacing: "-0.03em" }}>Workflow Milestones</h1>
+                    <div style={{ display: "flex", gap: "8px", background: "rgba(255,255,255,0.03)", padding: "4px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.05)" }}>
+                        <div style={{ padding: "6px 12px", borderRadius: "6px", background: "rgba(259, 115, 22, 0.1)", color: "#f97316", fontSize: "10px", fontWeight: 800, textTransform: "uppercase" }}>Active Monitoring</div>
+                    </div>
                 </div>
-                <button
-                    onClick={() => setShowModal(true)}
-                    disabled={events.length === 0}
-                    style={{
-                        borderRadius: "16px",
-                        padding: "1rem 2rem",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.75rem",
-                        background: "#2563eb",
-                        color: "#fff",
-                        border: "none",
-                        fontWeight: 800,
-                        fontSize: "15px",
-                        cursor: "pointer",
-                        boxShadow: "0 8px 20px rgba(37, 99, 235, 0.2)",
-                        transition: "all 0.2s ease"
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = "translateY(-2px)";
-                        e.currentTarget.style.boxShadow = "0 10px 25px rgba(37, 99, 235, 0.3)";
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = "translateY(0)";
-                        e.currentTarget.style.boxShadow = "0 8px 20px rgba(37, 99, 235, 0.2)";
-                    }}
-                >
-                    <Plus size={20} strokeWidth={3} />
-                    <span>New Task</span>
+                <button onClick={() => setShowModal(true)} disabled={events.length === 0}
+                    style={{ background: "#f97316", color: "#fff", border: "none", padding: "0.5rem 1rem", borderRadius: "8px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "12px", height: "36px", opacity: events.length === 0 ? 0.5 : 1 }}>
+                    <Plus size={14} strokeWidth={4} />
+                    New Task
                 </button>
             </div>
 
-            {loading ? (
-                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                    {Array.from(new Array(4)).map((_, idx) => (
-                        <Box key={idx} sx={{ background: "#fff", padding: "1.5rem 2.5rem", display: "grid", gridTemplateColumns: "1fr 180px 180px 140px 100px", alignItems: "center", borderRadius: "24px", border: "1px solid #f1f5f9" }}>
-                            <Box sx={{ display: "flex", gap: "1.5rem", alignItems: "center" }}>
-                                <Skeleton animation="wave" variant="rounded" width={28} height={28} sx={{ borderRadius: '10px' }} />
-                                <Skeleton animation="wave" width={150} height={24} />
-                            </Box>
-                            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                                <Skeleton animation="wave" width={80} height={24} sx={{ borderRadius: '100px' }} />
-                            </Box>
-                            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                                <Skeleton animation="wave" width={100} height={20} />
-                            </Box>
-                            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                                <Skeleton animation="wave" width={60} height={24} sx={{ borderRadius: '100px' }} />
-                            </Box>
-                            <Box sx={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem" }}>
-                                <Skeleton animation="wave" variant="rounded" width={32} height={32} sx={{ borderRadius: '10px' }} />
-                                <Skeleton animation="wave" variant="rounded" width={32} height={32} sx={{ borderRadius: '10px' }} />
-                            </Box>
-                        </Box>
-                    ))}
-                </div>
-            ) : filteredTasks.length === 0 ? (
-                <div style={{
-                    padding: "8rem 2rem",
-                    textAlign: "center",
-                    borderRadius: "40px",
-                    background: "#fff",
-                    border: "1px solid #f1f5f9",
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.02)"
-                }}>
-                    <div style={{ marginBottom: "2.5rem", display: "flex", justifyContent: "center" }}>
-                        <div style={{
-                            width: "100px",
-                            height: "100px",
-                            borderRadius: "32px",
-                            background: "#eff6ff",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: "#2563eb"
-                        }}>
-                            <ListTodo size={48} strokeWidth={2.5} />
-                        </div>
+            {/* Quick Stats Row */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1.25rem", marginBottom: "1.5rem" }}>
+                <div style={{ background: "#111", border: "1px solid #1a1a1a", borderRadius: "12px", padding: "1rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                        <div style={{ fontSize: "10px", fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Completion Rate</div>
+                        <div style={{ fontSize: "20px", fontWeight: 900, color: "#fff" }}>{completionRate}%</div>
                     </div>
-                    <h2 style={{ fontSize: "2rem", fontWeight: 800, color: "#0f172a", margin: "0 0 1rem" }}>No active milestones</h2>
-                    <p style={{ color: "#64748b", margin: "0 auto 2.5rem", maxWidth: "450px", fontSize: "1.1rem", fontWeight: 500, lineHeight: "1.6" }}>
-                        {events.length === 0 ? "You need an active event context before defining tasks. Create an event first to begin tracking." : "Scale your productivity by defining the first operational step for this event context."}
-                    </p>
-                    {events.length > 0 && (
-                        <button
-                            onClick={() => setShowModal(true)}
+                    <div style={{ width: "32px", height: "32px", borderRadius: "50%", border: "2px solid #222", position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <svg width="24" height="24" viewBox="0 0 36 36" style={{ transform: "rotate(-90 18 18)" }}>
+                            <circle cx="18" cy="18" r="16" fill="none" stroke="#f97316" strokeWidth="4" strokeDasharray={`${completionRate} 100`} strokeLinecap="round" />
+                        </svg>
+                    </div>
+                </div>
+                <div style={{ background: "#111", border: "1px solid #1a1a1a", borderRadius: "12px", padding: "1rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                        <div style={{ fontSize: "10px", fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Upcoming Deadlines</div>
+                        <div style={{ fontSize: "20px", fontWeight: 900, color: "#f97316" }}>{String(upcomingDeadlines).padStart(2, '0')}</div>
+                    </div>
+                    <Clock size={18} style={{ color: "#64748b" }} />
+                </div>
+                <div style={{ background: "#111", border: "1px solid #1a1a1a", borderRadius: "12px", padding: "1rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                        <div style={{ fontSize: "10px", fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Overdue Tasks</div>
+                        <div style={{ fontSize: "20px", fontWeight: 900, color: "#ef4444" }}>{String(past24h).padStart(2, '0')}</div>
+                    </div>
+                    <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#ef4444" }}></div>
+                </div>
+            </div>
+
+            {/* Status Filter Pills & View Toggle */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                    {[
+                        { id: "All", count: tasks.length },
+                        { id: "Pending", count: tasks.filter(t => t.status !== "Completed").length },
+                        { id: "Completed", count: completedCount }
+                    ].map(status => (
+                        <button key={status.id} onClick={() => { setStatusFilter(status.id); setCurrentPage(1); }}
                             style={{
-                                background: "#fff",
-                                border: "1.5px solid #e2e8f0",
-                                padding: "1rem 2rem",
-                                borderRadius: "14px",
-                                fontWeight: 800,
-                                cursor: "pointer",
-                                transition: "all 0.2s"
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = "#f8fafc"}
-                            onMouseLeave={(e) => e.currentTarget.style.background = "#fff"}
-                        >Define First Task</button>
-                    )}
-                </div>
-            ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                    <div className="task-row-header" style={{
-                        display: "grid",
-                        gridTemplateColumns: "1fr 180px 180px 140px 100px",
-                        padding: "0 2.5rem 1rem",
-                        color: "#94a3b8",
-                        fontSize: "11px",
-                        fontWeight: 800,
-                        textTransform: "uppercase",
-                        letterSpacing: "0.1em"
-                    }}>
-                        <span>Requirement</span>
-                        <span style={{ textAlign: "center" }}>Context</span>
-                        <span style={{ textAlign: "center" }}>Deadline</span>
-                        <span style={{ textAlign: "center" }}>Priority</span>
-                        <span style={{ textAlign: "right" }}>Actions</span>
-                    </div>
-                    {filteredTasks.map(task => (
-                        <div key={task._id} className="task-row" style={{
-                            background: "#fff",
-                            padding: "1.5rem 2.5rem",
-                            display: "grid",
-                            gridTemplateColumns: "1fr 180px 180px 140px 100px",
-                            alignItems: "center",
-                            borderRadius: "24px",
-                            border: "1px solid #f1f5f9",
-                            boxShadow: "0 2px 10px rgba(0,0,0,0.01)",
-                            transition: "all 0.2s ease"
-                        }}>
-                            <div style={{ display: "flex", gap: "1.5rem", alignItems: "center" }}>
-                                <div
-                                    onClick={() => toggleStatus(task._id, task.status)}
-                                    style={{
-                                        width: "28px",
-                                        height: "28px",
-                                        borderRadius: "10px",
-                                        border: `2px solid ${task.status === "Completed" ? "#10b981" : "#e2e8f0"}`,
-                                        background: task.status === "Completed" ? "#10b981" : "transparent",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        cursor: "pointer",
-                                        transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
-                                    }}
-                                >
-                                    {task.status === "Completed" && <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4"><polyline points="20 6 9 17 4 12" /></svg>}
-                                </div>
-                                <div>
-                                    <h3 style={{
-                                        fontWeight: 700,
-                                        fontSize: "16px",
-                                        margin: 0,
-                                        color: task.status === "Completed" ? "#94a3b8" : "#0f172a",
-                                        textDecoration: task.status === "Completed" ? "line-through" : "none",
-                                        transition: "color 0.2s"
-                                    }}>{task.title}</h3>
-                                </div>
-                            </div>
-
-                            <div style={{ textAlign: "center" }}>
-                                <span style={{
-                                    background: "#f1f5f9",
-                                    color: "#475569",
-                                    fontSize: "11px",
-                                    fontWeight: 800,
-                                    padding: "6px 12px",
-                                    borderRadius: "100px",
-                                    textTransform: "uppercase"
-                                }}>
-                                    {events.find(e => (e.id || e._id) === task.event)?.name || "External"}
-                                </span>
-                            </div>
-
-                            <div style={{ textAlign: "center", fontSize: "14px", fontWeight: 700, color: task.status === "Completed" ? "#cbd5e1" : "#64748b" }}>
-                                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
-                                    <Clock size={14} />
-                                    {new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                                </div>
-                            </div>
-
-                            <div style={{ textAlign: "center" }}>
-                                <span style={{
-                                    fontSize: "10px",
-                                    padding: "6px 14px",
-                                    background: task.priority === "High" ? "#fff1f2" : task.priority === "Medium" ? "#fffbeb" : "#eff6ff",
-                                    color: task.priority === "High" ? "#be123c" : task.priority === "Medium" ? "#92400e" : "#2563eb",
-                                    borderRadius: "100px",
-                                    fontWeight: 900,
-                                    textTransform: "uppercase",
-                                    letterSpacing: "0.05em",
-                                    border: `1px solid ${task.priority === "High" ? "#be123c20" : task.priority === "Medium" ? "#92400e20" : "#2563eb20"}`
-                                }}>{task.priority}</span>
-                            </div>
-
-                            <div className="task-actions" style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem" }}>
-                                <button
-                                    onClick={() => handleEditTask(task)}
-                                    className="task-action-btn"
-                                    style={{ background: "#f8fafc", border: "1px solid #e2e8f0", color: "#64748b", width: "32px", height: "32px", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.2s" }}
-                                    onMouseEnter={e => { e.currentTarget.style.background = "#eff6ff"; e.currentTarget.style.color = "#2563eb"; e.currentTarget.style.borderColor = "#dbeafe"; }}
-                                    onMouseLeave={e => { e.currentTarget.style.background = "#f8fafc"; e.currentTarget.style.color = "#64748b"; e.currentTarget.style.borderColor = "#e2e8f0"; }}
-                                    title="Edit task"
-                                >
-                                    <Edit2 size={14} />
-                                </button>
-                                <button
-                                    onClick={() => handleDeleteTask(task._id)}
-                                    className="task-action-btn"
-                                    style={{ background: "#fef2f2", border: "1px solid #fee2e2", color: "#ef4444", width: "32px", height: "32px", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.2s" }}
-                                    onMouseEnter={e => { e.currentTarget.style.background = "#fee2e2"; e.currentTarget.style.borderColor = "#fecaca"; }}
-                                    onMouseLeave={e => { e.currentTarget.style.background = "#fef2f2"; e.currentTarget.style.borderColor = "#fee2e2"; }}
-                                    title="Delete task"
-                                >
-                                    <Trash2 size={14} />
-                                </button>
-                            </div>
-                        </div>
+                                padding: "0.4rem 0.85rem", borderRadius: "8px", fontWeight: 800, fontSize: "11px", cursor: "pointer",
+                                border: statusFilter === status.id ? "none" : "1px solid #1a1a1a",
+                                background: statusFilter === status.id ? "#f97316" : "rgba(255,255,255,0.02)",
+                                color: statusFilter === status.id ? "#fff" : "#64748b",
+                                display: "flex", alignItems: "center", gap: "6px", transition: "all 0.2s"
+                            }}>
+                            {status.id}
+                            <span style={{ 
+                                background: statusFilter === status.id ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.05)", 
+                                padding: "1px 6px", borderRadius: "4px", fontSize: "10px" 
+                            }}>{status.count}</span>
+                        </button>
                     ))}
                 </div>
-            )}
+                <div style={{ display: "flex", background: "rgba(255,255,255,0.02)", padding: "4px", borderRadius: "8px", border: "1px solid #1a1a1a" }}>
+                    <button 
+                        onClick={() => setViewMode("list")}
+                        style={{ padding: "4px 8px", borderRadius: "6px", background: viewMode === "list" ? "rgba(259, 115, 22, 0.1)" : "transparent", color: viewMode === "list" ? "#f97316" : "#64748b", border: "none", cursor: "pointer" }}
+                    >
+                        <ListTodo size={14} />
+                    </button>
+                    <button 
+                        onClick={() => { setViewMode("kanban"); addNotification("Interface Locked", "Kanban visualization is currently in synchronized development."); }}
+                        style={{ padding: "4px 8px", borderRadius: "6px", background: viewMode === "kanban" ? "rgba(259, 115, 22, 0.1)" : "transparent", color: viewMode === "kanban" ? "#f97316" : "#64748b", border: "none", cursor: "pointer" }}
+                    >
+                        <Box sx={{ width: 14, height: 14, border: "2px solid currentColor", borderRadius: "3px" }} />
+                    </button>
+                </div>
+            </div>
 
-            {showModal && (
-                <div style={{ position: "fixed", inset: 0, background: "rgba(15, 23, 42, 0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2000, backdropFilter: "blur(8px)", padding: "1rem" }}>
-                    <div className="modal-reveal mobile-full-width" style={{ background: "#fff", width: "100%", maxWidth: "520px", padding: "2rem", borderRadius: "32px", boxShadow: "0 25px 60px rgba(0,0,0,0.2)", animation: "modalIn 0.3s ease-out", maxHeight: "90vh", overflowY: "auto" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2.5rem" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
-                                <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "#eff6ff", display: "flex", alignItems: "center", justifyContent: "center", color: "#2563eb" }}>
-                                    <ListTodo size={24} strokeWidth={2.5} />
-                                </div>
-                                <h2 style={{ fontSize: "1.75rem", fontWeight: 800, margin: 0, letterSpacing: "-0.03em" }}>{editingTask ? "Edit Milestone" : "Define Milestone"}</h2>
-                            </div>
-                            <button
-                                onClick={() => { setShowModal(false); setEditingTask(null); setNewTask({ title: "", dueDate: "", priority: "Medium", eventId: selectedEventId }); }}
-                                style={{ background: "#f1f5f9", border: "none", color: "#64748b", width: "36px", height: "36px", borderRadius: "50%", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
-                            ><X size={20} strokeWidth={2.5} /></button>
+            {/* Table */}
+            <div style={{ background: "#111", borderRadius: "20px", border: "1px solid #1a1a1a", overflow: "hidden" }}>
+                {loading ? (
+                    <Box sx={{ padding: '2rem' }}>
+                        {Array.from(new Array(4)).map((_, i) => (
+                            <Box key={i} sx={{ display: 'flex', alignItems: 'center', mb: 3, gap: 3 }}>
+                                <Skeleton animation="wave" variant="rounded" width={24} height={24} sx={{ borderRadius: '6px', bgcolor: '#1a1a1a' }} />
+                                <Skeleton animation="wave" height={20} width="25%" sx={{ bgcolor: '#1a1a1a' }} />
+                                <Skeleton animation="wave" height={20} width="12%" sx={{ bgcolor: '#1a1a1a' }} />
+                                <Skeleton animation="wave" height={20} width="15%" sx={{ bgcolor: '#1a1a1a' }} />
+                                <Skeleton animation="wave" height={20} width="10%" sx={{ bgcolor: '#1a1a1a' }} />
+                            </Box>
+                        ))}
+                    </Box>
+                ) : filteredTasks.length === 0 ? (
+                    <div style={{ padding: "3rem 1.5rem", textAlign: "center", minHeight: "280px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                        <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "rgba(255,255,255,0.02)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1.25rem" }}>
+                            <ListTodo size={24} style={{ color: "#333" }} />
                         </div>
-                        <form onSubmit={handleCreateTask} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-                            <div>
-                                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#64748b", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Milestone Title</label>
-                                <input style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "15px", fontWeight: 600 }} placeholder="e.g. Finalize Catering Menu" value={newTask.title} onChange={e => setNewTask({ ...newTask, title: e.target.value })} required />
+                        <h3 style={{ fontSize: "1rem", fontWeight: 900, margin: "0 0 0.5rem", color: "#fff" }}>No Active Milestones</h3>
+                        <p style={{ color: "#64748b", fontSize: "13px", maxWidth: "300px", margin: "0 auto", lineHeight: 1.5 }}>
+                            {events.length === 0 ? "Onboard your first event context to begin tactical operations." : "Initialize your first chronological requirement."}
+                        </p>
+                    </div>
+                ) : (
+                    <>
+                        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                            <thead>
+                                <tr style={{ borderBottom: "1px solid #1a1a1a" }}>
+                                    <th style={{ ...thStyle, width: "40px", padding: "1.25rem 0 1.25rem 1.5rem" }}></th>
+                                    <th style={thStyle}>REQUIREMENT</th>
+                                    <th style={thStyle}>CONTEXT</th>
+                                    <th style={thStyle}>DEADLINE</th>
+                                    <th style={thStyle}>PRIORITY</th>
+                                    <th style={{ ...thStyle, textAlign: "right" }}>ACTIONS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {paginatedTasks.map(task => {
+                                    const eventName = events.find(e => (e.id || e._id) === (task.event?._id || task.event))?.name;
+                                    const isCompleted = task.status === "Completed";
+                                    const priorityColor = task.priority === "High" ? "#ef4444" : task.priority === "Medium" ? "#f97316" : "#64748b";
+                                    
+                                    return (
+                                        <tr key={task._id} className="task-row" style={{ borderBottom: "1px solid #1a1a1a", cursor: "pointer", transition: "all 0.2s" }}>
+                                            <td style={{ padding: "0.75rem 0 0.75rem 1.5rem" }}>
+                                                <div onClick={() => toggleStatus(task._id, task.status)}
+                                                    style={{
+                                                        width: "18px", height: "18px", borderRadius: "5px", cursor: "pointer",
+                                                        border: isCompleted ? "none" : "2px solid #333",
+                                                        background: isCompleted ? "#3b82f6" : "transparent",
+                                                        display: "flex", alignItems: "center", justifyContent: "center",
+                                                        transition: "all 0.2s"
+                                                    }}>
+                                                    {isCompleted && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4"><polyline points="20 6 9 17 4 12" /></svg>}
+                                                </div>
+                                            </td>
+                                            <td style={{ padding: "0.75rem 1.5rem" }}>
+                                                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                                                    <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: priorityColor, boxShadow: `0 0 8px ${priorityColor}44` }}></div>
+                                                    <span style={{
+                                                        fontWeight: 800, fontSize: "13px",
+                                                        color: isCompleted ? "#4a5568" : "#fff",
+                                                        textDecoration: isCompleted ? "line-through" : "none"
+                                                    }}>{task.title}</span>
+                                                </div>
+                                            </td>
+                                            <td style={{ padding: "0.75rem 1.5rem" }}>
+                                                <span style={{
+                                                    background: "rgba(255,255,255,0.02)", border: "1px solid #1a1a1a", padding: "2px 8px",
+                                                    borderRadius: "4px", fontSize: "10px", fontWeight: 900, color: "#64748b",
+                                                    textTransform: "uppercase", letterSpacing: "0.05em"
+                                                }}>
+                                                    {getContextCode(eventName)}
+                                                </span>
+                                            </td>
+                                            <td style={{ padding: "0.75rem 1.5rem" }}>
+                                                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px", fontWeight: 700, color: isCompleted ? "#4a5568" : "#94a3b8", background: "rgba(255,255,255,0.02)", padding: "2px 8px", borderRadius: "4px", width: "fit-content" }}>
+                                                    <Clock size={12} />
+                                                    {task.dueDate ? new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : "—"}
+                                                </div>
+                                            </td>
+                                            <td style={{ padding: "0.75rem 1.5rem" }}>
+                                                <div style={{ width: "24px", height: "24px", borderRadius: "50%", background: "rgba(249, 115, 22, 0.1)", border: "1px solid rgba(249, 115, 22, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#f97316", fontSize: "10px", fontWeight: 900 }}>
+                                                    {user.email[0].toUpperCase()}
+                                                </div>
+                                            </td>
+                                            <td style={{ padding: "0.75rem 1.5rem", textAlign: "right" }}>
+                                                <div style={{ display: "flex", gap: "0.25rem", justifyContent: "flex-end" }}>
+                                                    <button onClick={() => handleEditTask(task)} style={{ background: "transparent", border: "none", color: "#4a5568", padding: "4px", borderRadius: "4px", cursor: "pointer" }}>
+                                                        <Edit2 size={14} />
+                                                    </button>
+                                                    <button onClick={() => handleDeleteTask(task._id)} style={{ background: "transparent", border: "none", color: "#ef4444", padding: "4px", borderRadius: "4px", cursor: "pointer", opacity: 0.6 }}>
+                                                        <Trash2 size={14} />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                        <div style={{ padding: "1.25rem 1.5rem", display: "flex", justifyContent: "space-between", alignItems: "center", color: "#64748b", fontSize: "0.85rem", borderTop: "1px solid #1a1a1a" }}>
+                            <span>Showing <strong>{paginatedTasks.length}</strong> of <strong>{filteredTasks.length}</strong> operational requirements</span>
+                            <div style={{ display: "flex", gap: "0.5rem" }}>
+                                <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} className="t-p-btn"><ChevronLeft size={18} /></button>
+                                <button disabled={currentPage >= totalPages} onClick={() => setCurrentPage(p => p + 1)} className="t-p-btn"><ChevronRight size={18} /></button>
                             </div>
+                        </div>
+                    </>
+                )}
+            </div>
 
-                            <div>
-                                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#64748b", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Associated Context</label>
-                                <select
-                                    style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "15px", fontWeight: 700 }}
-                                    value={newTask.eventId}
-                                    onChange={e => setNewTask({ ...newTask, eventId: e.target.value })}
-                                    required
-                                >
-                                    {events.map(event => (
-                                        <option key={event.id || event._id} value={event.id || event._id}>{event.name}</option>
-                                    ))}
+            <style>{`
+                .t-p-btn { background: #111; border: 1px solid #1a1a1a; border-radius: 8px; padding: 0.5rem; cursor: pointer; color: #fff; }
+                .t-p-btn:disabled { opacity: 0.3; cursor: default; }
+                .task-row:hover { background: rgba(255,255,255,0.02) !important; }
+                select option { background: #0c0c0c; color: #fff; }
+            `}</style>
+
+            {/* Modal */}
+            {showModal && (
+                <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2000, backdropFilter: "blur(10px)" }}>
+                    <div style={{ background: "#0c0c0c", width: "100%", maxWidth: "520px", padding: "2.5rem", borderRadius: "24px", border: "1px solid #1a1a1a" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "2rem" }}>
+                            <h2 style={{ fontSize: "1.5rem", fontWeight: 800 }}>{editingTask ? "Edit Milestone" : "Define Milestone"}</h2>
+                            <button onClick={() => { setShowModal(false); setEditingTask(null); setNewTask({ title: "", dueDate: "", priority: "Medium", eventId: selectedEventId }); }}
+                                style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer" }}><X size={24} /></button>
+                        </div>
+                        <form onSubmit={handleCreateTask} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                            <input style={inputStyle} placeholder="Milestone Title" value={newTask.title} onChange={e => setNewTask({ ...newTask, title: e.target.value })} required />
+                            <select style={inputStyle} value={newTask.eventId} onChange={e => setNewTask({ ...newTask, eventId: e.target.value })} required>
+                                <option value="">Select Event Context</option>
+                                {events.map(event => <option key={event.id || event._id} value={event.id || event._id}>{event.name}</option>)}
+                            </select>
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                                <input type="date" style={inputStyle} value={newTask.dueDate} onChange={e => setNewTask({ ...newTask, dueDate: e.target.value })} required />
+                                <select style={inputStyle} value={newTask.priority} onChange={e => setNewTask({ ...newTask, priority: e.target.value })}>
+                                    <option>Low</option><option>Medium</option><option>High</option>
                                 </select>
                             </div>
-
-                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
-                                <div>
-                                    <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#64748b", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Deadline</label>
-                                    <input type="date" style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "15px", fontWeight: 600 }} value={newTask.dueDate} onChange={e => setNewTask({ ...newTask, dueDate: e.target.value })} required />
-                                </div>
-                                <div>
-                                    <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "#64748b", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Priority Level</label>
-                                    <select style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "15px", fontWeight: 700 }} value={newTask.priority} onChange={e => setNewTask({ ...newTask, priority: e.target.value })}>
-                                        <option>Low</option>
-                                        <option>Medium</option>
-                                        <option>High</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div style={{ display: "flex", gap: "1.25rem", marginTop: "1rem" }}>
-                                <button type="button" onClick={() => { setShowModal(false); setEditingTask(null); setNewTask({ title: "", dueDate: "", priority: "Medium", eventId: selectedEventId }); }} style={{ flex: 1, padding: "1.1rem", borderRadius: "14px", border: "none", background: "#f1f5f9", fontWeight: 800, cursor: "pointer" }}>Cancel</button>
-                                <button type="submit" style={{ flex: 2, padding: "1.1rem", borderRadius: "14px", border: "none", background: "#2563eb", color: "#fff", fontWeight: 900, cursor: "pointer", boxShadow: "0 8px 20px rgba(37, 99, 235, 0.2)" }}>{editingTask ? "Update Milestone" : "Create Milestone"}</button>
-                            </div>
+                            <button type="submit" style={{ background: "#f97316", color: "#fff", padding: "1rem", borderRadius: "12px", fontWeight: 700, border: "none", cursor: "pointer", marginTop: "0.5rem" }}>
+                                {editingTask ? "Update Milestone" : "Create Milestone"}
+                            </button>
                         </form>
                     </div>
                 </div>
             )}
 
             <style>{`
-                @keyframes spin {
-                    from { transform: rotate(0deg); }
-                    to { transform: rotate(360deg); }
-                }
-                @keyframes modalIn {
-                    from { transform: translateY(40px); opacity: 0; }
-                    to { transform: translateY(0); opacity: 1; }
-                }
+                .t-p-btn { background: #111; border: 1px solid #1a1a1a; border-radius: 8px; padding: 0.5rem; cursor: pointer; color: #fff; }
+                .t-p-btn:disabled { opacity: 0.3; cursor: default; }
+                .t-card { background: #111; border-radius: 20px; border: 1px solid #1a1a1a; padding: 1.15rem; }
+                select option { background: #0c0c0c; color: #fff; }
             `}</style>
         </div>
     );

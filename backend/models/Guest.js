@@ -12,6 +12,9 @@ const guestSchema = mongoose.Schema(
         linkedIn: { type: String }, // For tech/college events
         portfolio: { type: String }, // For tech/college events
         rejectionReason: { type: String }, // For selection feedback
+        dietary: { type: String, default: "None" }, // Vegan, Vegetarian, etc.
+        notes: { type: String }, // General notes
+        entryCode: { type: String, unique: true, sparse: true }, // Unique pass code for event entry
         event: { type: mongoose.Schema.Types.ObjectId, ref: "Event", required: true },
         user: { type: String, required: true }, // Firebase UID
     },

@@ -1,24 +1,21 @@
-
 import mongoose from "mongoose";
 import Guest from "./models/Guest.js";
+import Event from "./models/Event.js";
 import dotenv from "dotenv";
 dotenv.config();
 
-async function test() {
-    try {
-        const id = "661e78453cc14b87ae9524fa"; // From screenshot
-        const familySize = "2";
-        const parsedSize = parseInt(familySize) || 1;
-        console.log("Parsed family size:", parsedSize);
-        
-        // This won't work without a real DB connection, but we can check the logic
-        console.log("Update object:", { 
-            status: "Confirmed",
-            familySize: parsedSize 
-        });
-    } catch (error) {
-        console.error("Error:", error);
+async function run() {
+    await mongoose.connect(process.env.MONGODB_URI);
+    
+    const guests = await Guest.find({ email: "imkunal2024@gmail.com" });
+    console.log("MATCHING GUESTS IN DB:");
+    for (const g of guests) {
+        console.log(`- ID: ${g._id.toString()}, Event ID: ${g.event}, Category: ${g.category}, Name: ${g.name}`);
     }
+    
+    process.exit(0);
 }
+run();
 
-test();
+
+
