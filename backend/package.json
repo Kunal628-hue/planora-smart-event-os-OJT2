@@ -7,10 +7,11 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
-    "test": "node tests/ssti.test.js && node tests/redos.test.js && node tests/resource.test.js",
+    "test": "node tests/ssti.test.js && node tests/redos.test.js && node tests/resource.test.js && node tests/nosql_injection.test.js",
     "test:ssti": "node tests/ssti.test.js",
     "test:redos": "node tests/redos.test.js",
     "test:resource": "node tests/resource.test.js",
+    "test:nosql": "NODE_ENV=test node tests/nosql_injection.test.js",
     "ci:regex-gate": "node ci-safe-regex.js"
   },
   "keywords": [
@@ -26,6 +27,7 @@
     "csv-parser": "^3.2.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "express-mongo-sanitize": "^2.2.0",
     "joi": "^18.2.1",
     "mongoose": "^9.2.4",
     "multer": "^2.1.1",

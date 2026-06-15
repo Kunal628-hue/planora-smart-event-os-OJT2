@@ -13,6 +13,7 @@ import authRoutes from "./routes/authRoutes.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import { initAlertEngine } from "./utils/alertService.js";
+import mongoSanitize from "express-mongo-sanitize";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -50,6 +51,14 @@ app.use(cors({
 
 app.use(express.json({ limit: '50kb' }));
 app.use(express.urlencoded({ limit: '50kb', extended: true }));
+
+// NoSQL Injection Protection
+app.use(mongoSanitize({
+  replaceWith: '_',
+  onSanitize: ({ key, req }) => {
+    console.warn('NoSQL injection attempt:', key, req.ip);
+  }
+}));
 
 // Ensure DB connection for every request (singleton handles efficiency)
 app.use(async (req, res, next) => {
@@ -93,8 +102,8 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-// Only listen if not in a serverless environment
-if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
+// Only listen if not in a serverless environment and not testing
+if (process.env.NODE_ENV !== "production" && process.env.NODE_ENV !== "test" && !process.env.VERCEL) {
   app.listen(PORT, () => {
     console.log(`✅ Planora backend running at http://localhost:${PORT}`);
   });

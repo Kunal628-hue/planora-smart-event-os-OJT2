@@ -6,6 +6,9 @@ const connectDB = async () => {
     if (isConnected) {
         return;
     }
+    if (process.env.NODE_ENV === 'test') {
+        return;
+    }
 
     try {
         const uri = process.env.MONGODB_URI;
