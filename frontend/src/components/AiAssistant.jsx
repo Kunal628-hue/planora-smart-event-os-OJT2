@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import ReactMarkdown from 'react-markdown';
-import { MessageSquare, Sparkles, X as CloseIcon, Send, Trash2, Zap, ShieldAlert, BarChart3, ChevronRight } from "lucide-react";
+import { MessageSquare, Sparkles, X as CloseIcon, Send, Trash2, Zap, ShieldAlert, BarChart3, ChevronLeft, Clock, Smile, Paperclip, Database } from "lucide-react";
 import { PlanoraSpinner } from "./ui/Loader";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -73,72 +73,76 @@ export default function AiAssistant({ eventId }) {
     };
 
     return (
-        <div style={{ position: "fixed", bottom: "1.5rem", right: "1.5rem", zIndex: 1000, fontFamily: "'Inter', sans-serif" }}>
+        <div style={{ position: "fixed", bottom: "1.5rem", right: "1.5rem", zIndex: 1000, fontFamily: "'Inter', sans-serif", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "1rem" }}>
             {isOpen && (
                 <div style={{
-                    width: "400px",
+                    width: "380px",
                     height: "600px",
-                    maxHeight: "calc(100vh - 100px)",
+                    maxHeight: "calc(100vh - 120px)",
                     display: "flex",
                     flexDirection: "column",
-                    marginBottom: "1rem",
-                    background: "rgba(10, 10, 12, 0.9)",
-                    backdropFilter: "blur(40px) saturate(200%)",
-                    WebkitBackdropFilter: "blur(40px) saturate(200%)",
+                    background: "var(--bg-surface)",
                     borderRadius: "24px",
                     overflow: "hidden",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    border: "1px solid var(--border-subtle)",
                     boxShadow: "0 25px 60px -12px rgba(0, 0, 0, 0.8)",
-                    animation: "slideUpChat 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
-                    zIndex: 1001
+                    animation: "slideUpChat 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+                    transformOrigin: "bottom right"
                 }}>
                     {/* Header */}
                     <div style={{
                         padding: "1.25rem 1.5rem",
-                        background: "rgba(255, 255, 255, 0.03)",
-                        borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+                        background: "var(--accent-primary)",
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center",
+                        borderTopLeftRadius: "24px",
+                        borderTopRightRadius: "24px"
                     }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                            <div style={{ position: "relative" }}>
+                            <button onClick={() => setIsOpen(false)} style={{ background: "none", border: "none", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", padding: 0 }}>
+                                <ChevronLeft size={24} />
+                            </button>
+                            <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
                                 <div style={{
-                                    width: "44px",
-                                    height: "44px",
-                                    background: "linear-gradient(135deg, #f97316 0%, #ea580c 100%)",
-                                    borderRadius: "14px",
+                                    width: "40px",
+                                    height: "40px",
+                                    background: "#0f172a",
+                                    borderRadius: "50%",
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
-                                    boxShadow: "0 0 20px rgba(249, 115, 22, 0.3)"
+                                    boxShadow: "0 0 10px rgba(0,0,0,0.2)",
+                                    border: "2px solid rgba(255,255,255,0.2)",
+                                    zIndex: 2
                                 }}>
-                                    <Sparkles size={22} color="#fff" strokeWidth={2.5} />
+                                    <Sparkles size={18} color="#fff" />
                                 </div>
                                 <div style={{
-                                    position: "absolute",
-                                    bottom: "-2px",
-                                    right: "-2px",
-                                    width: "12px",
-                                    height: "12px",
-                                    background: "#10b981",
+                                    width: "40px",
+                                    height: "40px",
+                                    background: "#1e293b",
                                     borderRadius: "50%",
-                                    border: "2px solid #0a0a0c"
-                                }}></div>
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    border: "2px solid rgba(255,255,255,0.2)",
+                                    marginLeft: "-15px",
+                                    zIndex: 1
+                                }}>
+                                    <BarChart3 size={16} color="rgba(255,255,255,0.6)" />
+                                </div>
                             </div>
                             <div>
-                                <div style={{ fontWeight: 900, fontSize: "14px", color: "#fff", letterSpacing: "-0.01em" }}>Planora OS Intelligence</div>
-                                <div style={{ fontSize: "10px", color: "var(--accent-primary)", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>Strategic Mode Active</div>
+                                <div style={{ fontWeight: 600, fontSize: "16px", color: "#fff" }}>Planora Intelligence</div>
+                                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.8)", display: "flex", alignItems: "center", gap: "4px", marginTop: "2px" }}>
+                                    <Clock size={10} /> Active now
+                                </div>
                             </div>
                         </div>
-                        <div style={{ display: "flex", gap: "8px" }}>
-                            <button onClick={clearChat} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.3)", cursor: "pointer", padding: "8px" }} title="Clear context">
-                                <Trash2 size={16} />
-                            </button>
-                            <button onClick={() => setIsOpen(false)} style={{ background: "rgba(255,255,255,0.05)", border: "none", color: "#fff", width: "32px", height: "32px", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-                                <CloseIcon size={18} />
-                            </button>
-                        </div>
+                        <button onClick={clearChat} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.7)", cursor: "pointer", padding: "8px" }} title="Clear context">
+                            <Trash2 size={16} />
+                        </button>
                     </div>
 
                     {/* Messages Area */}
@@ -155,38 +159,53 @@ export default function AiAssistant({ eventId }) {
                             background: "transparent",
                         }}
                     >
-                        {messages.map((msg, idx) => (
-                            <div key={idx} style={{
-                                alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
-                                maxWidth: "88%",
-                                position: "relative"
-                            }}>
-                                <div style={{
-                                    padding: "1rem 1.25rem",
-                                    borderRadius: msg.role === "user" ? "20px 20px 4px 20px" : "20px 20px 20px 4px",
-                                    fontSize: "13.5px",
-                                    fontWeight: 500,
-                                    lineHeight: "1.6",
-                                    background: msg.role === "user" ? "var(--accent-primary)" : "rgba(255,255,255,0.04)",
-                                    color: msg.role === "user" ? "#fff" : "#e4e4e7",
-                                    border: msg.role === "assistant" ? "1px solid rgba(255,255,255,0.08)" : "none",
-                                    boxShadow: msg.role === "assistant" ? "0 4px 15px rgba(0,0,0,0.1)" : "none",
-                                    animation: "bubbleIn 0.4s cubic-bezier(0.2, 1, 0.3, 1)"
+                        {messages.map((msg, idx) => {
+                            const isBot = msg.role === "assistant";
+                            return (
+                                <div key={idx} style={{
+                                    alignSelf: isBot ? "flex-start" : "flex-end",
+                                    maxWidth: "92%",
+                                    position: "relative",
+                                    display: "flex",
+                                    gap: "10px",
+                                    alignItems: "flex-end"
                                 }}>
-                                    <ReactMarkdown components={{
-                                        p: ({ node, ...props }) => <div style={{ marginBottom: "0.75rem" }} {...props} />,
-                                        ul: ({ node, ...props }) => <ul style={{ margin: "0.75rem 0", paddingLeft: "1.25rem", color: "inherit" }} {...props} />,
-                                        li: ({ node, ...props }) => <li style={{ marginBottom: "0.4rem" }} {...props} />,
-                                        strong: ({ node, ...props }) => <strong style={{ fontWeight: 800, color: msg.role === "user" ? "#fff" : "var(--accent-primary)" }} {...props} />,
-                                        table: ({ node, ...props }) => <div style={{ overflowX: "auto", margin: "1rem 0" }}><table style={{ width: "100%", borderCollapse: "collapse", fontSize: "11px" }} {...props} /></div>,
-                                        th: ({ node, ...props }) => <th style={{ border: "1px solid rgba(255,255,255,0.1)", padding: "8px", background: "rgba(255,255,255,0.05)", textAlign: "left" }} {...props} />,
-                                        td: ({ node, ...props }) => <td style={{ border: "1px solid rgba(255,255,255,0.1)", padding: "8px" }} {...props} />
+                                    {isBot && (
+                                        <div style={{
+                                            width: "32px", height: "32px", borderRadius: "50%", background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-muted)", flexShrink: 0
+                                        }}>
+                                            <Database size={16} />
+                                        </div>
+                                    )}
+                                    <div style={{
+                                        padding: "1rem 1.25rem",
+                                        borderRadius: "20px",
+                                        borderBottomRightRadius: !isBot ? "4px" : "20px",
+                                        borderBottomLeftRadius: isBot ? "4px" : "20px",
+                                        fontSize: "13.5px",
+                                        fontWeight: 500,
+                                        lineHeight: "1.6",
+                                        background: !isBot ? "var(--accent-primary)" : "var(--bg-elevated)",
+                                        color: !isBot ? "#fff" : "var(--text-primary)",
+                                        border: isBot ? "1px solid var(--border-subtle)" : "none",
+                                        boxShadow: isBot ? "0 4px 15px rgba(0,0,0,0.05)" : "0 4px 15px rgba(249, 115, 22, 0.2)",
+                                        animation: "bubbleIn 0.4s cubic-bezier(0.2, 1, 0.3, 1)"
                                     }}>
-                                        {msg.text}
-                                    </ReactMarkdown>
+                                        <ReactMarkdown components={{
+                                            p: ({ node, ...props }) => <div style={{ marginBottom: "0.75rem" }} {...props} />,
+                                            ul: ({ node, ...props }) => <ul style={{ margin: "0.75rem 0", paddingLeft: "1.25rem", color: "inherit" }} {...props} />,
+                                            li: ({ node, ...props }) => <li style={{ marginBottom: "0.4rem" }} {...props} />,
+                                            strong: ({ node, ...props }) => <strong style={{ fontWeight: 800, color: !isBot ? "#fff" : "var(--accent-primary)" }} {...props} />,
+                                            table: ({ node, ...props }) => <div style={{ overflowX: "auto", margin: "1rem 0" }}><table style={{ width: "100%", borderCollapse: "collapse", fontSize: "11px" }} {...props} /></div>,
+                                            th: ({ node, ...props }) => <th style={{ border: "1px solid var(--border-subtle)", padding: "8px", background: "var(--bg-surface)", textAlign: "left" }} {...props} />,
+                                            td: ({ node, ...props }) => <td style={{ border: "1px solid var(--border-subtle)", padding: "8px" }} {...props} />
+                                        }}>
+                                            {msg.text}
+                                        </ReactMarkdown>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                         {loading && (
                             <div style={{ alignSelf: "flex-start", padding: "1rem 1.5rem", background: "rgba(255,255,255,0.03)", borderRadius: "20px 20px 20px 4px", border: "1px solid rgba(255,255,255,0.05)" }}>
                                 <div style={{ display: "flex", gap: "8px" }}>
@@ -201,44 +220,36 @@ export default function AiAssistant({ eventId }) {
                     {/* Quick Actions */}
                     {!loading && (
                         <div style={{ 
-                            padding: "0.5rem 1.25rem", 
+                            padding: "0 1.5rem", 
                             display: "flex", 
+                            flexDirection: "column",
+                            alignItems: "flex-end",
                             gap: "8px", 
-                            overflowX: "auto", 
-                            whiteSpace: "nowrap",
                             background: "transparent",
-                            scrollbarWidth: "none"
-                        }} className="no-scrollbar">
+                        }}>
                             {QUICK_ACTIONS.map((action, i) => (
                                 <button
                                     key={i}
                                     onClick={() => handleSendMessage(null, action.prompt)}
                                     style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        gap: "6px",
-                                        padding: "8px 12px",
-                                        borderRadius: "10px",
-                                        background: "rgba(255, 255, 255, 0.05)",
-                                        border: "1px solid rgba(255, 255, 255, 0.08)",
-                                        color: "#a1a1aa",
-                                        fontSize: "11px",
-                                        fontWeight: 700,
+                                        padding: "10px 16px",
+                                        borderRadius: "8px",
+                                        background: "#1a1b35", // Darker indigo like the screenshot
+                                        border: "none",
+                                        color: "#818cf8",
+                                        fontSize: "12.5px",
+                                        fontWeight: 600,
                                         cursor: "pointer",
-                                        transition: "all 0.2s"
+                                        transition: "all 0.2s",
+                                        animation: `bubbleIn 0.4s cubic-bezier(0.2, 1, 0.3, 1) ${i * 0.1}s both`
                                     }}
                                     onMouseEnter={e => {
-                                        e.currentTarget.style.background = "rgba(249, 115, 22, 0.1)";
-                                        e.currentTarget.style.borderColor = "rgba(249, 115, 22, 0.3)";
-                                        e.currentTarget.style.color = "#fff";
+                                        e.currentTarget.style.background = "#23254a";
                                     }}
                                     onMouseLeave={e => {
-                                        e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
-                                        e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.08)";
-                                        e.currentTarget.style.color = "#a1a1aa";
+                                        e.currentTarget.style.background = "#1a1b35";
                                     }}
                                 >
-                                    {action.icon}
                                     {action.label}
                                 </button>
                             ))}
@@ -250,93 +261,93 @@ export default function AiAssistant({ eventId }) {
                         onSubmit={handleSendMessage}
                         style={{
                             padding: "1.25rem 1.5rem",
-                            background: "rgba(255, 255, 255, 0.02)",
-                            borderTop: "1px solid rgba(255, 255, 255, 0.05)",
+                            background: "transparent",
                             display: "flex",
                             alignItems: "center",
-                            gap: "1rem",
                         }}
                     >
-                        <div style={{ position: "relative", flex: 1 }}>
+                        <div style={{
+                            position: "relative", 
+                            flex: 1,
+                            display: "flex",
+                            alignItems: "center",
+                            background: "var(--bg-elevated)",
+                            border: "1px solid var(--border-subtle)",
+                            borderRadius: "24px",
+                            padding: "0.5rem 1rem",
+                            boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
+                        }}>
                             <input
-                                placeholder="Command core intelligence..."
+                                placeholder="Write a reply..."
                                 value={input}
                                 onChange={e => setInput(e.target.value)}
                                 style={{
-                                    width: "100%",
-                                    padding: "1rem 1.5rem",
-                                    background: "rgba(255, 255, 255, 0.05)",
-                                    border: "1px solid rgba(255, 255, 255, 0.08)",
-                                    borderRadius: "16px",
-                                    fontSize: "14px",
+                                    flex: 1,
+                                    background: "transparent",
+                                    border: "none",
+                                    fontSize: "13px",
                                     outline: "none",
-                                    transition: "all 0.3s",
-                                    color: "#fff"
-                                }}
-                                onFocus={(e) => {
-                                    e.target.style.background = "rgba(255, 255, 255, 0.08)";
-                                    e.target.style.borderColor = "var(--accent-primary)";
-                                }}
-                                onBlur={(e) => {
-                                    e.target.style.background = "rgba(255, 255, 255, 0.05)";
-                                    e.target.style.borderColor = "rgba(255, 255, 255, 0.08)";
+                                    color: "var(--text-primary)"
                                 }}
                             />
-                        </div>
-                        <button
-                            type="submit"
-                            disabled={!input.trim() || loading}
-                            style={{
-                                width: "52px",
-                                height: "52px",
-                                borderRadius: "16px",
-                                background: input.trim() ? "var(--accent-primary)" : "rgba(255, 255, 255, 0.03)",
-                                color: "#fff",
-                                border: "none",
-                                cursor: input.trim() ? "pointer" : "default",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                transition: "all 0.3s",
-                                boxShadow: input.trim() ? "0 8px 20px rgba(249, 115, 22, 0.3)" : "none"
-                            }}
-                        >
-                            {loading ? (
-                                <PlanoraSpinner size={22} color="#fff" />
+                            {input.trim() ? (
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    style={{
+                                        width: "32px",
+                                        height: "32px",
+                                        borderRadius: "50%",
+                                        background: "var(--accent-primary)",
+                                        color: "#fff",
+                                        border: "none",
+                                        cursor: "pointer",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        marginLeft: "8px"
+                                    }}
+                                >
+                                    {loading ? <PlanoraSpinner size={16} color="#fff" /> : <Send size={14} strokeWidth={2.5} />}
+                                </button>
                             ) : (
-                                <Send size={20} strokeWidth={2.5} />
+                                <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--text-muted)", marginLeft: "8px" }}>
+                                    <button onClick={() => setInput(prev => prev + '😊 ')} type="button" style={{ background: "none", border: "none", color: "inherit", cursor: "pointer", padding: 0, display: "flex", alignItems: "center" }}><Smile size={18} /></button>
+                                    <label style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
+                                        <input type="file" style={{ display: "none" }} onChange={(e) => { if(e.target.files[0]) setInput(prev => prev + `[Attached: ${e.target.files[0].name}] `) }} />
+                                        <Paperclip size={18} />
+                                    </label>
+                                </div>
                             )}
-                        </button>
+                        </div>
                     </form>
                 </div>
             )}
 
-            {!isOpen && (
-                <button
-                    onClick={() => setIsOpen(true)}
-                    style={{
-                        width: "60px",
-                        height: "60px",
-                        borderRadius: "20px",
-                        background: "linear-gradient(135deg, #f97316 0%, #ea580c 100%)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        boxShadow: "0 10px 30px rgba(234, 88, 12, 0.4), inset 0 1px 1px rgba(255,255,255,0.2)",
-                        border: "1px solid rgba(255,255,255,0.1)",
-                        cursor: "pointer",
-                        transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
-                        color: "#fff",
-                        padding: 0,
-                        position: "relative",
-                        overflow: "hidden"
-                    }}
-                    className="ai-trigger-pulse"
-                >
-                    <MessageSquare size={26} strokeWidth={2.5} />
-                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "linear-gradient(rgba(255,255,255,0.2), transparent)", pointerEvents: "none" }}></div>
-                </button>
-            )}
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                style={{
+                    width: "60px",
+                    height: "60px",
+                    borderRadius: "50%",
+                    background: "var(--accent-primary)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    boxShadow: "0 10px 30px rgba(0,0,0, 0.4)",
+                    border: "none",
+                    cursor: "pointer",
+                    transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+                    color: "#fff",
+                    padding: 0,
+                    position: "relative",
+                    overflow: "hidden"
+                }}
+                className={!isOpen ? "ai-trigger-pulse" : ""}
+            >
+                {isOpen ? <CloseIcon size={28} strokeWidth={2.5} /> : <MessageSquare size={26} strokeWidth={2.5} />}
+                {!isOpen && <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "linear-gradient(rgba(255,255,255,0.2), transparent)", pointerEvents: "none" }}></div>}
+            </button>
             <style>{`
                 @keyframes slideUpChat {
                     from { opacity: 0; transform: translateY(40px) scale(0.95); filter: blur(10px); }

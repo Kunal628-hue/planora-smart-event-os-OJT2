@@ -5,9 +5,11 @@ import {
     Linkedin, Globe, Heart, ChevronDown, ChevronUp, Loader2, CreditCard,
     ArrowLeft, Download
 } from "lucide-react";
+import { useDialog } from "../context/DialogContext";
 
 export default function RegisterEvent() {
     const { eventId } = useParams();
+    const { showAlert } = useDialog();
     const [event, setEvent] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -158,7 +160,7 @@ export default function RegisterEvent() {
         e.preventDefault();
         
         if (config.privacy.requireConsent && !consentChecked) {
-            alert("You must agree to the terms and conditions to proceed.");
+            showAlert("Consent Required", "You must agree to the terms and conditions to proceed.");
             return;
         }
 
@@ -189,7 +191,7 @@ export default function RegisterEvent() {
             setRegisteredGuest(data);
         } catch (err) {
             console.error("Submit RSVP error:", err);
-            alert(err.message || "Failed to register. Please try again.");
+            showAlert("Registration Failed", err.message || "Failed to register. Please try again.");
         } finally {
             setSubmitting(false);
         }

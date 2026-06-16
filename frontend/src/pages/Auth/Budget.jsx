@@ -26,10 +26,12 @@ import { LogoLoader, PlanoraSpinner } from "../../components/ui/Loader";
 import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { useUpload } from "../../context/UploadContext";
 
 export default function Budget() {
     const { user, events, selectedEventId, addNotification, hasFullAccess, refreshEvents } = useOutletContext();
     const { showConfirm } = useDialog();
+    const { startUpload, completeUpload, cancelUpload } = useUpload();
     const [vendors, setVendors] = useState([]);
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -153,6 +155,7 @@ export default function Budget() {
         const file = e.target.files[0];
         if (!file) return;
 
+        startUpload(file);
         setIsUploading(true);
         const formData = new FormData();
         formData.append("receipt", file);
@@ -164,14 +167,19 @@ export default function Budget() {
             });
             const data = await res.json();
             if (data.success) {
+                completeUpload();
                 setNewExpense(prev => ({ ...prev, receiptUrl: data.url }));
                 addNotification("Document Sanitized", "Your financial proof has been securely uploaded to the registry.");
+            } else {
+                cancelUpload();
             }
         } catch (err) {
+            cancelUpload();
             console.error("Upload failed:", err);
             addNotification("Upload Protocol Failed", "We couldn't synchronize the evidence folder.");
         } finally {
             setIsUploading(false);
+            e.target.value = "";
         }
     };
 

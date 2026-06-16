@@ -23,9 +23,17 @@ import {
     Info,
     AlertTriangle,
     CheckCircle2,
-    Trash2
+    Trash2,
+    CheckCheck,
+    Ticket,
+    Folder,
+    CalendarDays,
+    UserCircle2,
+    FileText,
+    Image as ImageIcon
 } from "lucide-react";
 import DashboardBackground from "./DashboardBackground";
+import GlobalSearch from "./GlobalSearch";
 
 const NAV_ITEMS = [
     { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={20} /> },
@@ -54,8 +62,6 @@ export default function DashboardLayout() {
     }, [selectedEventId]);
     const [localLoading, setLocalLoading] = useState(true);
     const [showUserMenu, setShowUserMenu] = useState(false);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [showSearchResults, setShowSearchResults] = useState(false);
     const [allVendors, setAllVendors] = useState([]);
     const [isSyncing, setIsSyncing] = useState(false);
     const [isResearching, setIsResearching] = useState(false);
@@ -64,8 +70,13 @@ export default function DashboardLayout() {
         const saved = localStorage.getItem("planora_notifications");
         if (saved) return JSON.parse(saved);
         return [
-            { id: 1, title: "Welcome to Planora", message: "Your Smart Event OS is ready. Start by creating an event.", time: "System", read: false, type: "system" },
-            { id: 2, title: "AI Strategy Complete", message: "Optimum vendor matrix calculated for your event.", time: "2h ago", read: true, type: "ai" }
+            { id: 1, title: "New ticket", message: "- Update the website", meta: "Brainin · Dev", time: "2min", read: false, type: "system" },
+            { id: 2, title: "New folder", message: "- Social", meta: "Home / Marketing / Attachments", time: "1d", read: false, type: "folder" },
+            { id: 3, title: "New event", message: "- New project", meta: "CeramicStore · 12:30h", time: "02/10", read: true, type: "event" },
+            { id: 4, title: "New lead", message: "- DocJob", meta: "Complete platform", time: "02/10", read: true, type: "lead" },
+            { id: 5, title: "Marfeel", message: "First iteration › Closing", meta: "Potential", time: "02/10", read: true, type: "success" },
+            { id: 6, title: "New file", message: "- dossier_corporativo.pdf", meta: "Marketing › Company", time: "02/10", read: true, type: "warning" },
+            { id: 7, title: "AI Strategy", message: "Optimum vendor matrix calculated.", meta: "Planora AI", time: "02/10", read: true, type: "ai" }
         ];
     });
 
@@ -74,6 +85,7 @@ export default function DashboardLayout() {
     }, [notifications]);
     const [showNotifications, setShowNotifications] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isEventDropdownOpen, setIsEventDropdownOpen] = useState(false);
 
     const addNotification = (title, message, type = "system") => {
         // Respect Smart Notifications preference
@@ -293,64 +305,6 @@ export default function DashboardLayout() {
         setTimeout(() => setIsResearching(false), 1500);
     };
 
-    const getSearchResults = () => {
-        if (!searchQuery.trim()) return [];
-
-        const query = searchQuery.toLowerCase();
-        const results = [];
-
-        // 1. Search Nav Items
-        NAV_ITEMS.forEach(item => {
-            if (item.label.toLowerCase().includes(query)) {
-                results.push({
-                    type: "page",
-                    label: item.label,
-                    path: item.path,
-                    icon: item.icon
-                });
-            }
-        });
-
-        // 2. Search Events
-        safeEvents.forEach(event => {
-            if (event.name.toLowerCase().includes(query)) {
-                results.push({
-                    type: "event",
-                    label: event.name,
-                    path: `/events/${event.id || event._id}`,
-                    icon: <Calendar size={16} />,
-                    id: event.id || event._id
-                });
-            }
-        });
-
-        // 3. Search Vendors
-        allVendors.forEach(vendor => {
-            if (vendor.name.toLowerCase().includes(query) || vendor.service.toLowerCase().includes(query)) {
-                results.push({
-                    type: "vendor",
-                    label: vendor.name,
-                    subLabel: vendor.service,
-                    path: "/vendors",
-                    icon: <Handshake size={16} />
-                });
-            }
-        });
-
-        return results.slice(0, 8); // Limit results
-    };
-
-    const searchResults = getSearchResults();
-
-    const handleSearchResultClick = (result) => {
-        if (result.type === "event") {
-            setSelectedEventId(result.id);
-        }
-        navigate(result.path);
-        setSearchQuery("");
-        setShowSearchResults(false);
-    };
-
     return (
         <div className="dashboard-layout">
             <div
@@ -372,53 +326,98 @@ export default function DashboardLayout() {
                     </Link>
                 </div>
 
-                {/* Event Selector - Functional Specification */}
+                {/* Event Selector - Custom Dropdown */}
                 <div style={{ padding: "0 1rem 1.5rem" }}>
-                    <div style={{
-                        background: "rgba(255, 255, 255, 0.03)",
-                        border: "1px solid rgba(255, 255, 255, 0.1)",
-                        borderRadius: "12px",
-                        padding: "0.5rem 0.75rem",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                        position: "relative"
-                    }}>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>Active Event</div>
-                            <select
-                                value={selectedEventId}
-                                onChange={(e) => handleEventChange(e.target.value)}
-                                style={{
-                                    background: "none",
-                                    border: "none",
-                                    fontSize: "12px",
-                                    color: "#fff",
-                                    fontWeight: 700,
-                                    width: "100%",
-                                    cursor: "pointer",
-                                    outline: "none",
-                                    appearance: "none",
-                                    paddingRight: "1.5rem",
-                                    textOverflow: "ellipsis"
-                                }}
-                            >
-                                {safeEvents.length === 0 ? (
-                                    <option value="">No events</option>
-                                ) : (
-                                    safeEvents.map(event => (
-                                        <option key={event.id || event._id} value={event.id || event._id} style={{ background: "#18181b", color: "#fff" }}>
-                                            {event.name}
-                                        </option>
-                                    ))
-                                )}
-                            </select>
-                            <ChevronDown
-                                size={12}
-                                color="rgba(255,255,255,0.4)"
-                                style={{ position: "absolute", right: "12px", bottom: "10px", pointerEvents: "none" }}
-                            />
+                    <div 
+                        onClick={() => setIsEventDropdownOpen(!isEventDropdownOpen)}
+                        style={{
+                            background: "rgba(255, 255, 255, 0.03)",
+                            border: "1px solid rgba(255, 255, 255, 0.08)",
+                            borderRadius: "14px",
+                            padding: "0.75rem 1rem",
+                            cursor: "pointer",
+                            position: "relative",
+                            userSelect: "none"
+                        }}
+                    >
+                        <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Active Event</div>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "8px" }}>
+                            <div style={{ fontSize: "16px", color: "#fff", fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                {selectedEvent ? selectedEvent.name : "Select Event"}
+                            </div>
+                            <ChevronDown size={14} color="rgba(255,255,255,0.4)" style={{ flexShrink: 0 }} />
                         </div>
+                        
+                        {isEventDropdownOpen && (
+                            <>
+                                {/* Invisible overlay to close dropdown */}
+                                <div 
+                                    style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 90 }} 
+                                    onClick={(e) => { e.stopPropagation(); setIsEventDropdownOpen(false); }} 
+                                />
+                                {/* Dropdown Menu */}
+                                <div 
+                                    onClick={e => e.stopPropagation()}
+                                    style={{
+                                        position: "absolute",
+                                        top: "calc(100% + 8px)",
+                                        left: 0,
+                                        right: 0,
+                                        background: "#18181b",
+                                        border: "1px solid rgba(255,255,255,0.1)",
+                                        borderRadius: "12px",
+                                        boxShadow: "0 10px 25px -5px rgba(0,0,0,0.5)",
+                                        zIndex: 100,
+                                        overflow: "hidden",
+                                        animation: "fade-up 0.2s ease-out"
+                                    }}
+                                >
+                                    {safeEvents.length === 0 ? (
+                                        <div style={{ padding: "12px", color: "rgba(255,255,255,0.4)", fontSize: "13px", textAlign: "center" }}>No events</div>
+                                    ) : (
+                                        safeEvents.map(event => (
+                                            <div 
+                                                key={event.id || event._id} 
+                                                onClick={() => {
+                                                    handleEventChange(event.id || event._id);
+                                                    setIsEventDropdownOpen(false);
+                                                }}
+                                                style={{
+                                                    padding: "12px 16px",
+                                                    display: "flex",
+                                                    justifyContent: "space-between",
+                                                    alignItems: "center",
+                                                    cursor: "pointer",
+                                                    transition: "background 0.2s",
+                                                    borderBottom: "1px solid rgba(255,255,255,0.03)"
+                                                }}
+                                                onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.04)"}
+                                                onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                                            >
+                                                <span style={{ fontSize: "14px", fontWeight: 500, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginRight: "12px" }}>
+                                                    {event.name}
+                                                </span>
+                                                <div style={{
+                                                    width: "28px",
+                                                    height: "28px",
+                                                    borderRadius: "50%",
+                                                    background: "rgba(249, 115, 22, 0.15)",
+                                                    color: "#f97316",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                    fontSize: "12px",
+                                                    fontWeight: 800,
+                                                    flexShrink: 0
+                                                }}>
+                                                    {event.name.charAt(0).toUpperCase()}
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
 
@@ -488,109 +487,7 @@ export default function DashboardLayout() {
                         >
                             <LayoutDashboard size={20} />
                         </button>
-                        <div className="search-input-wrapper">
-                            <Search size={16} color="#94a3b8" style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)" }} />
-                            <input
-                                id="global-search-input"
-                                type="text"
-                                placeholder="Search events, vendors, tasks..."
-                                value={searchQuery}
-                                onChange={e => {
-                                    setSearchQuery(e.target.value);
-                                    setShowSearchResults(true);
-                                }}
-                                className="search-input"
-                                onFocus={e => {
-                                    e.target.style.background = "var(--bg-elevated)";
-                                    e.target.style.borderColor = "var(--accent-primary)";
-                                    e.target.style.boxShadow = "0 4px 20px rgba(249, 115, 22, 0.08)";
-                                    if (searchQuery.trim()) setShowSearchResults(true);
-                                }}
-                                onBlur={e => {
-                                    // Delay to allow clicking results
-                                    setTimeout(() => {
-                                        e.target.style.background = "var(--bg-surface)";
-                                        e.target.style.borderColor = "var(--border-subtle)";
-                                        e.target.style.boxShadow = "none";
-                                        setShowSearchResults(false);
-                                    }, 200);
-                                }}
-                            />
-
-                            {showSearchResults && searchResults.length > 0 && (
-                                <div style={{
-                                    position: "absolute",
-                                    top: "calc(100% + 8px)",
-                                    left: 0,
-                                    right: 0,
-                                    background: "var(--bg-surface)",
-                                    border: "1px solid var(--border-subtle)",
-                                    borderRadius: "12px",
-                                    boxShadow: "0 15px 30px -5px rgba(0,0,0,0.5)",
-                                    padding: "8px",
-                                    zIndex: 1000,
-                                    maxHeight: "350px",
-                                    overflowY: "auto"
-                                }}>
-                                    <div style={{ padding: "8px 12px", fontSize: "10px", fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                                        Search Results
-                                    </div>
-                                    {searchResults.map((result, idx) => (
-                                        <div
-                                            key={idx}
-                                            onClick={() => handleSearchResultClick(result)}
-                                            style={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                                gap: "12px",
-                                                padding: "10px 12px",
-                                                borderRadius: "8px",
-                                                cursor: "pointer",
-                                                transition: "all 0.15s"
-                                            }}
-                                            onMouseEnter={e => {
-                                                e.currentTarget.style.background = "rgba(255,255,255,0.05)";
-                                                e.currentTarget.style.transform = "translateX(4px)";
-                                            }}
-                                            onMouseLeave={e => {
-                                                e.currentTarget.style.background = "transparent";
-                                                e.currentTarget.style.transform = "none";
-                                            }}
-                                        >
-                                            <div style={{ color: "#f97316", opacity: 0.8 }}>
-                                                {result.icon}
-                                            </div>
-                                            <div style={{ flex: 1 }}>
-                                                <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--text-primary)" }}>{result.label}</div>
-                                                {result.subLabel && <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{result.subLabel}</div>}
-                                            </div>
-                                            <div style={{ fontSize: "10px", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase" }}>
-                                                {result.type}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
-                            {showSearchResults && searchResults.length === 0 && searchQuery.trim() && (
-                                <div style={{
-                                    position: "absolute",
-                                    top: "calc(100% + 8px)",
-                                    left: 0,
-                                    right: 0,
-                                    background: "var(--bg-surface)",
-                                    border: "1px solid var(--border-subtle)",
-                                    borderRadius: "12px",
-                                    boxShadow: "0 15px 30px -5px rgba(0,0,0,0.5)",
-                                    padding: "24px",
-                                    textAlign: "center",
-                                    zIndex: 1000
-                                }}>
-                                    <div style={{ color: "#94a3b8", marginBottom: "8px" }}><Search size={24} style={{ opacity: 0.3 }} /></div>
-                                    <div style={{ fontSize: "13px", fontWeight: 700, color: "#64748b" }}>No results found for "{searchQuery}"</div>
-                                </div>
-                            )}
-                        </div>
+                        <GlobalSearch user={user} onEventSelect={handleEventChange} />
                     </div>
 
                     <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
@@ -635,12 +532,11 @@ export default function DashboardLayout() {
                                     position: "absolute",
                                     top: "calc(100% + 12px)",
                                     right: "-10px",
-                                    width: "360px",
-                                    background: "rgba(23, 23, 23, 0.85)",
-                                    backdropFilter: "blur(12px) saturate(180%)",
+                                    width: "380px",
+                                    background: "#18181b",
                                     border: "1px solid rgba(255,255,255,0.1)",
-                                    borderRadius: "20px",
-                                    boxShadow: "0 25px 50px -12px rgba(0,0,0,0.7)",
+                                    borderRadius: "16px",
+                                    boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)",
                                     zIndex: 1000,
                                     animation: "fade-up 0.2s ease-out",
                                     overflow: "hidden"
@@ -649,117 +545,134 @@ export default function DashboardLayout() {
                                         display: "flex", 
                                         justifyContent: "space-between", 
                                         alignItems: "center", 
-                                        padding: "1.25rem", 
-                                        background: "rgba(255,255,255,0.03)",
-                                        borderBottom: "1px solid rgba(255,255,255,0.05)" 
+                                        padding: "16px 20px", 
+                                        borderBottom: "1px solid rgba(255,255,255,0.08)" 
                                     }}>
-                                        <div>
-                                            <h3 style={{ fontSize: "15px", fontWeight: 900, color: "var(--text-primary)", margin: 0 }}>Central Alert Hub</h3>
-                                            <p style={{ fontSize: "10px", color: "var(--text-secondary)", margin: "2px 0 0 0" }}>{notifications.filter(n => !n.read).length} unread signals detected</p>
-                                        </div>
-                                        <div style={{ display: "flex", gap: "10px" }}>
+                                        <h3 style={{ fontSize: "18px", fontWeight: 500, color: "#f4f4f5", margin: 0 }}>Notifications</h3>
+                                        <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
                                             <button
                                                 onClick={markAllAsRead}
-                                                style={{ fontSize: "11px", fontWeight: 700, color: "var(--accent-primary)", border: "none", background: "none", cursor: "pointer", opacity: 0.8 }}
-                                                onMouseEnter={e => e.currentTarget.style.opacity = 1}
-                                                onMouseLeave={e => e.currentTarget.style.opacity = 0.8}
-                                            >Mark all read</button>
+                                                style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: 500, color: "#a1a1aa", border: "none", background: "none", cursor: "pointer", transition: "color 0.2s" }}
+                                                onMouseEnter={e => e.currentTarget.style.color = "#f4f4f5"}
+                                                onMouseLeave={e => e.currentTarget.style.color = "#a1a1aa"}
+                                            >
+                                                <CheckCheck size={16} />
+                                                Mark all as read
+                                            </button>
                                             <button
                                                 onClick={clearAllNotifications}
-                                                style={{ padding: "4px", color: "var(--accent-danger)", border: "none", background: "none", cursor: "pointer", opacity: 0.6 }}
-                                                onMouseEnter={e => e.currentTarget.style.opacity = 1}
-                                                onMouseLeave={e => e.currentTarget.style.opacity = 0.6}
+                                                style={{ color: "#a1a1aa", border: "none", background: "none", cursor: "pointer", transition: "color 0.2s", padding: 0 }}
+                                                onMouseEnter={e => e.currentTarget.style.color = "#ef4444"}
+                                                onMouseLeave={e => e.currentTarget.style.color = "#a1a1aa"}
                                                 title="Clear all"
-                                            ><Trash2 size={14} /></button>
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
                                         </div>
                                     </div>
-                                    <div className="custom-scrollbar" style={{ display: "flex", flexDirection: "column", maxHeight: "420px", overflowY: "auto", padding: "0.75rem" }}>
+                                    <div className="custom-scrollbar" style={{ display: "flex", flexDirection: "column", maxHeight: "450px", overflowY: "auto" }}>
                                         {notifications.length > 0 ? notifications.map(notif => {
-                                            const Icon = notif.type === "ai" ? Sparkles : notif.type === "warning" ? AlertTriangle : notif.type === "success" ? CheckCircle2 : Info;
-                                            const iconColor = notif.type === "ai" ? "var(--accent-primary)" : notif.type === "warning" ? "#ef4444" : notif.type === "success" ? "#10b981" : "#3b82f6";
+                                            let Icon = Sparkles;
+                                            let bgColor = "rgba(249, 115, 22, 0.1)"; 
+                                            let fgColor = "#f97316"; 
+                                            let avatarColor = "#3b82f6";
+                            
+                                            if (notif.type === "system" || notif.type === "ticket") { Icon = Ticket; bgColor = "rgba(59, 130, 246, 0.15)"; fgColor = "#3b82f6"; avatarColor = "#f59e0b"; }
+                                            else if (notif.type === "folder") { Icon = Folder; bgColor = "rgba(59, 130, 246, 0.15)"; fgColor = "#3b82f6"; avatarColor = "#10b981"; }
+                                            else if (notif.type === "event") { Icon = CalendarDays; bgColor = "rgba(59, 130, 246, 0.15)"; fgColor = "#3b82f6"; avatarColor = "#8b5cf6"; }
+                                            else if (notif.type === "lead") { Icon = UserCircle2; bgColor = "rgba(59, 130, 246, 0.15)"; fgColor = "#3b82f6"; avatarColor = "#f43f5e"; }
+                                            else if (notif.type === "success") { Icon = CheckCircle2; bgColor = "rgba(16, 185, 129, 0.15)"; fgColor = "#10b981"; avatarColor = "#14b8a6"; }
+                                            else if (notif.type === "warning") { Icon = FileText; bgColor = "rgba(239, 68, 68, 0.15)"; fgColor = "#ef4444"; avatarColor = "#eab308"; }
+                                            else if (notif.type === "ai") { Icon = Sparkles; bgColor = "rgba(249, 115, 22, 0.15)"; fgColor = "#f97316"; avatarColor = "#8b5cf6"; }
+                                            
+                                            // The action text should be primary color if it starts with dash, or if success it's green.
+                                            const actionColor = notif.type === "success" ? "#10b981" : "#3b82f6";
+                                            // For Planora, maybe action text is better blue like the screenshot, or orange?
+                                            // Let's use blue for links, orange for AI, green for success to match screenshot variety.
                                             
                                             return (
                                                 <div 
                                                     key={notif.id} 
-                                                    className="hover-reveal-parent"
                                                     onClick={() => {
                                                         setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, read: true } : n));
                                                     }}
                                                     style={{
-                                                        padding: "1.15rem",
-                                                        borderRadius: "16px",
-                                                        marginBottom: "6px",
-                                                        background: notif.read ? "transparent" : "rgba(255, 255, 255, 0.03)",
-                                                        border: "1px solid",
-                                                        borderColor: notif.read ? "transparent" : "rgba(255, 255, 255, 0.05)",
+                                                        padding: "16px 20px",
+                                                        background: notif.read ? "transparent" : "rgba(255, 255, 255, 0.02)",
+                                                        borderBottom: "1px solid rgba(255, 255, 255, 0.04)",
                                                         display: "flex",
-                                                        gap: "14px",
+                                                        gap: "16px",
                                                         cursor: "pointer",
-                                                        transition: "all 0.25s",
-                                                        position: "relative"
+                                                        transition: "background 0.2s"
                                                     }}
-                                                    onMouseEnter={e => {
-                                                        e.currentTarget.style.background = "rgba(255,255,255,0.06)";
-                                                        e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
-                                                        e.currentTarget.style.transform = "translateX(4px)";
-                                                    }}
-                                                    onMouseLeave={e => {
-                                                        e.currentTarget.style.background = notif.read ? "transparent" : "rgba(255, 255, 255, 0.03)";
-                                                        e.currentTarget.style.borderColor = notif.read ? "transparent" : "rgba(255, 255, 255, 0.05)";
-                                                        e.currentTarget.style.transform = "translateX(0)";
-                                                    }}
+                                                    onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.04)"}
+                                                    onMouseLeave={e => e.currentTarget.style.background = notif.read ? "transparent" : "rgba(255, 255, 255, 0.02)"}
                                                 >
-                                                    <div style={{ 
-                                                        width: "40px", 
-                                                        height: "40px", 
-                                                        borderRadius: "12px", 
-                                                        background: `rgba(${notif.type === 'ai' ? '249, 115, 22' : '99, 102, 241'}, 0.1)`, 
-                                                        color: iconColor,
-                                                        display: "flex", 
-                                                        alignItems: "center", 
-                                                        justifyContent: "center",
-                                                        flexShrink: 0,
-                                                        boxShadow: notif.read ? "none" : `0 4px 12px rgba(${notif.type === 'ai' ? '249, 115, 22' : '99, 102, 241'}, 0.15)`
-                                                    }}>
-                                                        <Icon size={20} />
-                                                    </div>
-                                                    <div style={{ flex: 1 }}>
-                                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "4px" }}>
-                                                            <div style={{ fontSize: "14px", fontWeight: 800, color: notif.read ? "var(--text-secondary)" : "var(--text-primary)", letterSpacing: "-0.01em" }}>{notif.title}</div>
-                                                            <div style={{ fontSize: "9px", fontWeight: 700, color: "var(--text-muted)", marginTop: "3px", textTransform: "uppercase", letterSpacing: "0.05em" }}>{notif.time}</div>
+                                                    <div style={{ position: "relative", width: "42px", height: "42px", flexShrink: 0 }}>
+                                                        <div style={{ 
+                                                            width: "100%", 
+                                                            height: "100%", 
+                                                            borderRadius: "10px", 
+                                                            background: bgColor, 
+                                                            color: fgColor,
+                                                            display: "flex", 
+                                                            alignItems: "center", 
+                                                            justifyContent: "center"
+                                                        }}>
+                                                            <Icon size={22} strokeWidth={1.5} />
                                                         </div>
-                                                        <div style={{ fontSize: "12px", color: "var(--text-secondary)", lineHeight: "1.5", fontWeight: 500 }}>{notif.message}</div>
+                                                        <div style={{
+                                                            position: "absolute",
+                                                            bottom: "-4px",
+                                                            right: "-4px",
+                                                            width: "18px",
+                                                            height: "18px",
+                                                            borderRadius: "50%",
+                                                            background: avatarColor,
+                                                            border: "2px solid #18181b",
+                                                            display: "flex",
+                                                            alignItems: "center",
+                                                            justifyContent: "center",
+                                                            color: "#fff",
+                                                        }}>
+                                                            <User size={10} strokeWidth={2.5} />
+                                                        </div>
                                                     </div>
-                                                    {!notif.read && (
-                                                        <div style={{ width: "6px", height: "6px", background: "var(--accent-primary)", borderRadius: "50%", position: "absolute", top: "20px", right: "12px" }}></div>
-                                                    )}
-                                                    <button 
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            removeNotification(notif.id);
-                                                        }}
-                                                        className="hover-reveal"
-                                                        style={{ position: "absolute", bottom: "12px", right: "12px", padding: "6px", color: "var(--text-muted)", border: "none", background: "rgba(255,255,255,0.05)", borderRadius: "8px", cursor: "pointer" }}
-                                                    ><X size={12} /></button>
+                                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                                        <div style={{ fontSize: "15px", fontWeight: 400, color: "#f4f4f5", marginBottom: "2px" }}>
+                                                            {notif.title}
+                                                        </div>
+                                                        <div style={{ fontSize: "14px", color: actionColor, marginBottom: "2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                                            {notif.message}
+                                                        </div>
+                                                        {notif.meta && (
+                                                            <div style={{ fontSize: "13px", color: "#a1a1aa", display: "flex", gap: "6px", alignItems: "center" }}>
+                                                                {notif.meta}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "8px", flexShrink: 0 }}>
+                                                        <div style={{ fontSize: "13px", color: "#a1a1aa" }}>
+                                                            {notif.time}
+                                                        </div>
+                                                        {!notif.read && (
+                                                            <div style={{ width: "8px", height: "8px", background: "#3b82f6", borderRadius: "50%" }}></div>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             );
                                         }) : (
                                             <div style={{ padding: "3rem 1.5rem", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}>
-                                                <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "rgba(255,255,255,0.03)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-muted)" }}>
+                                                <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "rgba(255,255,255,0.03)", display: "flex", alignItems: "center", justifyContent: "center", color: "#a1a1aa" }}>
                                                     <Bell size={20} style={{ opacity: 0.3 }} />
                                                 </div>
                                                 <div>
-                                                    <div style={{ fontSize: "13px", fontWeight: 800, color: "var(--text-secondary)" }}>Silent Horizon</div>
-                                                    <p style={{ fontSize: "11px", color: "var(--text-muted)", margin: "4px 0 0 0" }}>No unread signals in the current sector.</p>
+                                                    <div style={{ fontSize: "14px", fontWeight: 500, color: "#f4f4f5" }}>Silent Horizon</div>
+                                                    <p style={{ fontSize: "13px", color: "#a1a1aa", margin: "4px 0 0 0" }}>No unread signals in the current sector.</p>
                                                 </div>
                                             </div>
                                         )}
                                     </div>
-                                    {notifications.length > 0 && (
-                                        <div style={{ padding: "0.75rem", borderTop: "1px solid rgba(255,255,255,0.05)", textAlign: "center" }}>
-                                            <button style={{ background: "none", border: "none", color: "var(--text-muted)", fontSize: "10px", fontWeight: 700, cursor: "pointer", letterSpacing: "0.05em", textTransform: "uppercase" }}>View Detailed Audit Log</button>
-                                        </div>
-                                    )}
                                 </div>
                             )}
                         </div>

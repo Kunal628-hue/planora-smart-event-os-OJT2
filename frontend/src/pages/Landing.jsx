@@ -1,71 +1,128 @@
-import { Suspense, lazy } from "react";
+import { useEffect, useRef } from "react";
+import Lenis from "lenis";
+import "lenis/dist/lenis.css";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero";
+import Features from "../components/landing/Features";
+import HowItWorks from "../components/landing/HowItWorks";
+import Marquee from "../components/landing/Marquee";
+import Testimonials from "../components/landing/Testimonials";
+import FinalCTA from "../components/landing/FinalCTA";
+import Footer from "../components/landing/Footer";
+import "../landing.css";
 
-const Features = lazy(() => import("../components/landing/Features"));
-const Testimonials = lazy(() => import("../components/landing/Testimonials"));
-const Connect = lazy(() => import("../components/landing/Connect"));
-const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
+gsap.registerPlugin(ScrollTrigger);
+
+// Load Spline normally or we can keep it lazy since it doesn't affect document scrollHeight,
+// but for instant visual we can lazy load it.
+import React, { Suspense } from 'react';
+const Spline = React.lazy(() => import('@splinetool/react-spline'));
 import { Link } from "react-router-dom";
 
-const FOOTER_LINKS = {
-  "How it Work": ["Features", "Pricing", "Integrations", "Demo"],
-  Social: ["LinkedIn", "Facebook", "GitHub", "Dribbble"],
-  Legal: ["Terms", "Privacy", "Cookies", "Licenses"],
-};
-
 export default function Landing() {
+  const containerRef = useRef(null);
+  const splineBgRef = useRef(null);
+  const heroContentRef = useRef(null);
+  const scrollContentRef = useRef(null);
+
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      direction: "vertical",
+      gestureDirection: "vertical",
+      smooth: true,
+    });
+
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+    gsap.ticker.lagSmoothing(0);
+
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top top",
+          end: "+=2000", // Slightly longer scroll distance since we added more content
+          pin: true,
+          scrub: true, // Use exactly true to avoid double-smoothing lag with Lenis
+          invalidateOnRefresh: true, // Crucial: recalculates function-based values on resize/refresh
+        }
+      });
+
+      // 1. Slightly scale the 3D Spline and fade it out (using autoAlpha instantly stops WebGL GPU rendering once invisible!)
+      tl.to(splineBgRef.current, { scale: 1.5, autoAlpha: 0, duration: 1.5, ease: "power2.inOut" }, 0);
+      tl.to(heroContentRef.current, { autoAlpha: 0, duration: 0.3 }, 0);
+      
+      // Start scrolling the content UP very early (at 0.2s mark)
+      // Using function-based values so they dynamically read the latest scrollHeight!
+      tl.fromTo(scrollContentRef.current,
+        { y: () => window.innerHeight },
+        { y: () => -(scrollContentRef.current.scrollHeight - window.innerHeight), duration: 4, ease: "none" },
+        0.2
+      );
+
+      // Listen for any layout shifts (fonts loading, dynamic content) and tell GSAP to refresh
+      const ro = new ResizeObserver(() => {
+        ScrollTrigger.refresh();
+      });
+      if (scrollContentRef.current) {
+        ro.observe(scrollContentRef.current);
+      }
+
+      return () => ro.disconnect();
+
+    }, containerRef);
+
+    return () => {
+      ctx.revert();
+      lenis.destroy();
+      gsap.ticker.remove((time) => lenis.raf(time * 1000));
+    };
+  }, []);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#050505", color: "#FFFFFF", overflowX: "hidden" }}>
-      <Navbar />
-      <Hero />
-      <Suspense fallback={null}>
-        <Features />
-        <Testimonials />
-        <Connect />
-        <FinalCTA />
-      </Suspense>
-
-      {/* Footer matching reference video style (simple dark or light, video shows light footer at end) */}
-      <footer style={{ background: "#050505", paddingTop: "4rem", paddingBottom: "2.5rem", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 2.5rem" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "2rem", marginBottom: "3rem" }}>
-            <div>
-              <Link to="/" style={{ display: "block", marginBottom: "1.5rem" }}>
-                <img src="/logo-new.svg" alt="Planora" style={{ height: "2.2rem", width: "auto" }} />
-              </Link>
-              <p style={{ fontSize: "0.85rem", color: "#9CA3AF", lineHeight: 1.7, maxWidth: 260 }}>
-                Effortlessly manage tasks, set reminders, and stay organized – all in one intuitive platform.
-              </p>
-            </div>
-            {Object.entries(FOOTER_LINKS).map(([heading, links]) => (
-              <div key={heading}>
-                <p style={{ fontSize: "0.85rem", fontWeight: 700, color: "#fff", marginBottom: "1.2rem" }}>
-                  {heading}
-                </p>
-                <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "0.8rem", padding: 0, margin: 0 }}>
-                  {links.map((l) => (
-                    <li key={l}>
-                      <span style={{ fontSize: "0.85rem", color: "#9CA3AF", cursor: "pointer" }}
-                        onMouseEnter={e => e.currentTarget.style.color = "#fff"}
-                        onMouseLeave={e => e.currentTarget.style.color = "#9CA3AF"}
-                      >{l}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-          <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "1.5rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <p style={{ fontSize: "0.8rem", color: "#4B5563" }}>© {new Date().getFullYear()} Planora Technologies.</p>
-            <div style={{ display: "flex", gap: "1rem" }}>
-              <span style={{ fontSize: "0.8rem", color: "#9CA3AF", cursor: "pointer" }}>Privacy Policy</span>
-              <span style={{ fontSize: "0.8rem", color: "#9CA3AF", cursor: "pointer" }}>Terms of Service</span>
-            </div>
-          </div>
+    <div style={{ background: "#000000", color: "#FFFFFF" }}>
+      
+      {/* Pinned 100vh Viewport */}
+      <div ref={containerRef} style={{ width: "100%", height: "100vh", overflow: "hidden", position: "relative" }}>
+        
+        {/* Absolute Spline Background */}
+        <div ref={splineBgRef} style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", zIndex: 0, filter: "grayscale(1) contrast(1.2) brightness(1.3)" }}>
+          <Suspense fallback={null}>
+            <Spline scene="https://prod.spline.design/kSAf3vOQ6vxw0iYz/scene.splinecode" />
+          </Suspense>
         </div>
-      </footer>
+
+        {/* Navbar */}
+        <div style={{ position: "absolute", top: 0, width: "100%", padding: "2rem 3rem", display: "flex", justifyContent: "space-between", zIndex: 100, pointerEvents: "none" }}>
+            <div style={{ pointerEvents: "auto", display: "flex", alignItems: "center" }}>
+                <Link to="/">
+                    <img src="/logo-new.svg" alt="Planora" style={{ height: "40px" }} />
+                </Link>
+            </div>
+            <Navbar />
+        </div>
+
+        {/* Hero Content (Will fade out) */}
+        <div ref={heroContentRef} style={{ position: "absolute", inset: 0, zIndex: 1, pointerEvents: "none" }}>
+          <Hero />
+        </div>
+
+        {/* The Scrolling Content (Will slide up inside the pinned viewport) */}
+        <div ref={scrollContentRef} style={{ position: "absolute", top: 0, left: 0, width: "100%", zIndex: 2, pointerEvents: "auto" }}>
+           <Features />
+           <HowItWorks />
+           <Marquee />
+           <Testimonials />
+           <FinalCTA />
+           
+           <Footer />
+        </div>
+
+      </div>
     </div>
   );
 }

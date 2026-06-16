@@ -9,12 +9,14 @@ import {
 } from "lucide-react";
 import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
+import { useUpload } from "../../context/UploadContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Guests() {
     const { user, events, selectedEventId, syncTimestamp, addNotification, hasFullAccess, hasEditorAccess } = useOutletContext();
     const { showConfirm } = useDialog();
+    const { startUpload, completeUpload, cancelUpload } = useUpload();
     
     // State
     const [guests, setGuests] = useState([]);
@@ -200,6 +202,8 @@ export default function Guests() {
         const file = e.target.files[0];
         if (!file || !selectedEventId || bulkCooldown) return;
 
+        startUpload(file);
+        
         const formData = new FormData();
         formData.append("file", file);
         formData.append("eventId", selectedEventId);
@@ -213,16 +217,20 @@ export default function Guests() {
 
             const data = await response.json();
             if (response.ok) {
+                completeUpload();
                 addNotification("Bulk Onboarding Complete", data.message);
                 fetchData();
             } else if (response.status === 429) {
+                cancelUpload();
                 addNotification("AI Rate Limit", "The AI engine is busy. Please wait 2 minutes.");
                 setBulkCooldown(true);
                 setTimeout(() => setBulkCooldown(false), 30000);
             } else {
+                cancelUpload();
                 addNotification("Extraction Error", data.message || "Failed to parse file.");
             }
         } catch (err) {
+            cancelUpload();
             console.error("Bulk upload failed:", err);
         } finally {
             setBulkLoading(false);

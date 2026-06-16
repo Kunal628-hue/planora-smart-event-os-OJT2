@@ -1,63 +1,18 @@
 import { useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import NetworkAuroraBackground from "./NetworkAuroraBackground";
-import BlurText from "../animations/BlurText";
-
-gsap.registerPlugin(ScrollTrigger);
 
 export default function Hero() {
   const containerRef = useRef(null);
-  const titleRef = useRef(null);
-  const subRef = useRef(null);
-  const ctaRef = useRef(null);
-  const pill1Ref = useRef(null);
-  const authFormVibeRef = useRef(null);
+  const contentRef = useRef(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-
-      tl.fromTo(
-        pill1Ref.current,
-        { opacity: 0, y: 10 },
-        { opacity: 1, y: 0, duration: 0.8, delay: 0.2 }
-      )
-      .fromTo(
-        ctaRef.current,
-        { y: 20, opacity: 0, scale: 0.95 },
-        { y: 0, opacity: 1, scale: 1, duration: 0.8 },
-        "+=0.8"
-      )
-      .fromTo(
-        ".scroll-down",
-        { opacity: 0, y: -20 },
-        { opacity: 1, y: 0, duration: 1, ease: "power2.out" },
-        "+=0.2"
-      )
-      .add(() => {
-        ScrollTrigger.refresh();
-      });
-
-      // Hero Elements Parallax on Scroll - Using fromTo to prevent "disappearing" bug
-      gsap.fromTo(titleRef.current, 
-        { y: 0, opacity: 1 },
-        {
-          y: -50,
-          opacity: 0,
-          ease: "none",
-          overwrite: "auto",
-          immediateRender: false,
-          scrollTrigger: {
-            trigger: containerRef.current,
-            start: "top top",
-            end: "bottom top",
-            scrub: true,
-          },
-        }
+      // Simple fade up for the entire hero content
+      gsap.fromTo(
+        contentRef.current,
+        { opacity: 0, y: 50 },
+        { opacity: 1, y: 0, duration: 1.5, delay: 0.2, ease: "power3.out" }
       );
-
     }, containerRef);
     return () => ctx.revert();
   }, []);
@@ -66,151 +21,104 @@ export default function Hero() {
     <section ref={containerRef} id="hero" style={{
       position: "relative",
       minHeight: "100vh",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      paddingTop: "4rem",
-      background: "#050505",
+      width: "100%",
+      background: "transparent",
       overflow: "hidden",
       color: "#FFFFFF",
-      fontFamily: "'Inter', sans-serif"
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center"
     }}>
-      <NetworkAuroraBackground />
 
-      <div style={{ maxWidth: 1000, margin: "0 auto", position: "relative", zIndex: 10, padding: "0 2rem", width: "100%" }}>
+      {/* Background SVG Lines */}
+      <svg style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 0 }}>
+        <line x1="18%" y1="28%" x2="50%" y2="50%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+        <line x1="82%" y1="22%" x2="50%" y2="50%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+        <line x1="12%" y1="85%" x2="50%" y2="50%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+        <line x1="88%" y1="85%" x2="50%" y2="50%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+      </svg>
+
+      {/* Floating Badges */}
+      <div style={{ position: "absolute", top: "25%", left: "15%", display: "flex", alignItems: "center", gap: "10px", zIndex: 10 }}>
+        <div style={{ width: 24, height: 24, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ width: 4, height: 4, background: "#fff", borderRadius: "50%" }} />
+        </div>
+        <div>
+          <div style={{ color: "#fff", fontSize: "0.85rem", fontWeight: 600 }}>Guest List</div>
+          <div style={{ color: "#666", fontSize: "0.7rem" }}>20,945 loaded</div>
+        </div>
+      </div>
+
+      <div style={{ position: "absolute", top: "18%", right: "15%", display: "flex", alignItems: "center", gap: "10px", zIndex: 10 }}>
+        <div style={{ width: 24, height: 24, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <div>
+          <div style={{ color: "#fff", fontSize: "0.85rem", fontWeight: 600 }}>Automation</div>
+          <div style={{ color: "#666", fontSize: "0.7rem" }}>Live</div>
+        </div>
+      </div>
+
+      <div style={{ position: "absolute", bottom: "15%", left: "10%", display: "flex", alignItems: "center", gap: "10px", zIndex: 10 }}>
+        <div>
+          <div style={{ color: "#fff", fontSize: "0.85rem", fontWeight: 600 }}>Vendors</div>
+          <div style={{ color: "#666", fontSize: "0.7rem" }}>16 Connected</div>
+        </div>
+      </div>
+
+      <div style={{ position: "absolute", bottom: "12%", right: "12%", display: "flex", alignItems: "center", gap: "10px", zIndex: 10 }}>
+        <div style={{ width: 24, height: 24, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ width: 4, height: 4, background: "#f59e0b", borderRadius: "50%" }} />
+        </div>
+        <div>
+          <div style={{ color: "#fff", fontSize: "0.85rem", fontWeight: 600 }}>Budget</div>
+          <div style={{ color: "#666", fontSize: "0.7rem" }}>Synchronized</div>
+        </div>
+      </div>
+
+      {/* Main Center Content */}
+      <div ref={contentRef} style={{ position: "relative", zIndex: 10, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", pointerEvents: "none" }}>
         
-        {/* Main Text Area */}
-        <div style={{ textAlign: "center", position: "relative" }}>
-          
-          <div ref={pill1Ref} style={{
-            display: "inline-flex", alignItems: "center", gap: "0.5rem",
-            background: "rgba(255, 255, 255, 0.05)",
-            border: "1px solid rgba(255, 255, 255, 0.1)",
-            color: "#D1D5DB",
-            padding: "0.4rem 1rem",
-            borderRadius: "999px",
-            fontSize: "0.8rem",
-            fontWeight: 500,
-            marginBottom: "1.5rem",
-            backdropFilter: "blur(12px)"
-          }}>
-            <span style={{ width: 6, height: 6, background: "#10B981", borderRadius: "50%", boxShadow: "0 0 10px #10B981" }} />
-            Planora OS 2.0 Live
-          </div>
-
-          <h1 ref={titleRef} style={{
-            fontSize: "clamp(3rem, 6vw, 5rem)",
-            fontWeight: 600,
-            color: "#F9FAFB",
-            lineHeight: 1.1,
-            letterSpacing: "-0.04em",
-            maxWidth: 900,
-            margin: "0 auto 1.5rem",
-            position: "relative",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center"
-          }}>
-            <BlurText
-              text="One-source for Event"
-              delay={80}
-              animateBy="words"
-              direction="top"
-              className="mb-2"
-            />
-            <BlurText
-              text="Intelligence"
-              delay={50}
-              animateBy="letters"
-              direction="bottom"
-              className="hero-gradient-text inline-block"
-            />
-          </h1>
-
-          <div ref={subRef} style={{
-            fontSize: "1.1rem",
-            color: "#9CA3AF",
-            maxWidth: 550,
-            margin: "0 auto 3rem",
-            lineHeight: 1.6,
-            fontWeight: 400
-          }}>
-            <BlurText
-              text="Dive into automated event ecosystems, where innovative synchronization meets enterprise-grade execution."
-              delay={30}
-              animateBy="words"
-              direction="top"
-            />
-          </div>
-
-          <div ref={ctaRef} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "1rem" }}>
-            <Link to="/signup" style={{
-              background: "#F9FAFB",
-              color: "#030712",
-              border: "1px solid rgba(255,255,255,0.1)",
-              padding: "0.85rem 1.8rem",
-              borderRadius: "999px",
-              fontSize: "0.95rem",
-              fontWeight: 600,
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              textDecoration: "none",
-              transition: "transform 0.2s, background 0.2s",
-              boxShadow: "0 0 20px rgba(255,255,255,0.1)"
-            }}
-            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; }}
-            >
-              Open App ↗
-            </Link>
-
-            <a href="#features" style={{
-              background: "rgba(255, 255, 255, 0.05)",
-              color: "#F9FAFB",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
-              padding: "0.85rem 1.8rem",
-              borderRadius: "999px",
-              fontSize: "0.95rem",
-              fontWeight: 600,
-              display: "inline-flex",
-              alignItems: "center",
-              textDecoration: "none",
-              backdropFilter: "blur(10px)",
-              transition: "background 0.2s"
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)"; }}
-            >
-              Discover More
-            </a>
-          </div>
-        </div>
-
-      </div>
-
-      {/* Scroll Down Indicator */}
-      <div className="scroll-down" style={{
-        position: "absolute",
-        bottom: "2.5rem",
-        left: "2.5rem",
-        display: "flex",
-        alignItems: "center",
-        gap: "0.75rem",
-        zIndex: 10
-      }}>
-        <div style={{
-          width: 32, height: 32, borderRadius: "50%",
-          background: "rgba(255,255,255,0.08)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          border: "1px solid rgba(255,255,255,0.1)",
-          color: "#fff"
+        {/* Top Chip */}
+        <div style={{ 
+          display: "inline-flex", alignItems: "center", gap: "8px", 
+          padding: "6px 16px", background: "rgba(255,255,255,0.03)", 
+          border: "1px solid rgba(255,255,255,0.08)", borderRadius: "999px", 
+          fontSize: "0.8rem", color: "#ccc", marginBottom: "2.5rem" 
         }}>
-          ↓
+          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981" }} />
+          Planora OS 2.0 Live
         </div>
-        <span style={{ fontSize: "0.75rem", color: "#9CA3AF", letterSpacing: "0.05em", textTransform: "uppercase" }}>01/05 — Scroll down</span>
-      </div>
 
+        {/* Main Heading */}
+        <h1 className="flammini-heading" style={{
+          fontSize: "clamp(3rem, 7vw, 6.5rem)",
+          color: "#fff",
+          margin: 0,
+          lineHeight: 1.1,
+          letterSpacing: "-0.02em",
+          fontWeight: 700
+        }}>
+          One-source for Event<br />
+          <span style={{ color: "#fff", display: "inline-block" }}>
+            Intelligence
+          </span>
+        </h1>
+
+        {/* Subheadline */}
+        <p style={{ 
+          color: "#888", 
+          fontSize: "1.15rem", 
+          maxWidth: "600px", 
+          lineHeight: 1.6, 
+          marginTop: "2.5rem",
+          fontWeight: 400
+        }}>
+          Dive into automated event ecosystems, where innovative synchronization meets enterprise-grade execution.
+        </p>
+
+      </div>
     </section>
   );
 }

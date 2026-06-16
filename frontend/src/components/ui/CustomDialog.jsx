@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useDialog } from "../../context/DialogContext";
-import { AlertTriangle, Info, HelpCircle, X, Check } from "lucide-react";
+import { AlertCircle, Info, HelpCircle, X, Check, CreditCard } from "lucide-react";
 
 export default function CustomDialog() {
     const { dialog, closeDialog } = useDialog();
@@ -14,8 +14,14 @@ export default function CustomDialog() {
 
     if (!dialog.isOpen) return null;
 
-    const Icon = dialog.type === "alert" ? Info : dialog.type === "confirm" ? HelpCircle : AlertTriangle;
-    const iconColor = dialog.type === "alert" ? "#2563eb" : dialog.type === "confirm" ? "#f59e0b" : "#ef4444";
+    // Use AlertCircle for alerts that might be errors/warnings. 
+    // Use HelpCircle for confirms.
+    const Icon = dialog.type === "alert" ? Info : dialog.type === "confirm" ? HelpCircle : AlertCircle;
+    
+    // In dark mode, we don't want harsh pure colors if we want it to look elegant like the screenshot.
+    // The screenshot has a clean black and white look.
+    // Let's use #f4f4f5 for the icon to match the monochrome sleekness.
+    const iconColor = dialog.type === "alert" ? "#3b82f6" : dialog.type === "confirm" ? "#f4f4f5" : "#f97316";
 
     return (
         <div style={{
@@ -29,19 +35,23 @@ export default function CustomDialog() {
             alignItems: "center",
             justifyContent: "center",
             padding: "20px",
-            background: "rgba(15, 23, 42, 0.4)",
+            background: "rgba(0, 0, 0, 0.6)",
             backdropFilter: "blur(8px)",
             animation: "fade-in 0.2s ease-out"
         }}>
             <div style={{
                 width: "100%",
-                maxWidth: "400px",
-                background: "#fff",
+                maxWidth: "420px",
+                background: "#18181b", // Matches Dashboard theme
+                border: "1px solid rgba(255,255,255,0.1)",
                 borderRadius: "24px",
-                boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
-                padding: "2rem",
+                boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.7)",
+                padding: "2.5rem 2rem 2rem 2rem",
                 position: "relative",
-                overflow: "hidden",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                textAlign: "center",
                 animation: "scale-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)"
             }}>
                 {/* Close Button */}
@@ -49,122 +59,123 @@ export default function CustomDialog() {
                     onClick={() => closeDialog(null)}
                     style={{
                         position: "absolute",
-                        top: "1.5rem",
-                        right: "1.5rem",
+                        top: "1.25rem",
+                        right: "1.25rem",
                         background: "none",
                         border: "none",
-                        color: "#94a3b8",
+                        color: "#a1a1aa",
                         cursor: "pointer",
-                        padding: "4px",
-                        borderRadius: "8px",
-                        transition: "all 0.2s"
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.background = "#f1f5f9"}
-                    onMouseLeave={e => e.currentTarget.style.background = "none"}
-                >
-                    <X size={18} />
-                </button>
-
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
-                    <div style={{
-                        width: "56px",
-                        height: "56px",
-                        borderRadius: "16px",
-                        background: `${iconColor}10`,
-                        color: iconColor,
+                        padding: "6px",
+                        borderRadius: "50%",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        marginBottom: "1.5rem"
-                    }}>
-                        <Icon size={28} />
-                    </div>
+                        transition: "all 0.2s"
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.1)"}
+                    onMouseLeave={e => e.currentTarget.style.background = "none"}
+                >
+                    <X size={20} strokeWidth={2} />
+                </button>
 
-                    <h3 style={{
-                        fontSize: "20px",
-                        fontWeight: 800,
-                        color: "#1e293b",
-                        margin: "0 0 0.75rem 0",
-                        letterSpacing: "-0.02em"
-                    }}>
-                        {dialog.title}
-                    </h3>
+                {/* Big Icon */}
+                <div style={{
+                    color: iconColor,
+                    marginBottom: "1.5rem"
+                }}>
+                    <Icon size={48} strokeWidth={1.5} />
+                </div>
 
-                    <p style={{
-                        fontSize: "15px",
-                        color: "#64748b",
-                        lineHeight: 1.6,
-                        margin: "0 0 1.5rem 0"
-                    }}>
-                        {dialog.message}
-                    </p>
+                <h3 style={{
+                    fontSize: "20px",
+                    fontWeight: 700,
+                    color: "#f4f4f5",
+                    margin: "0 0 0.5rem 0",
+                    letterSpacing: "-0.02em"
+                }}>
+                    {dialog.title}
+                </h3>
 
-                    {dialog.type === "prompt" && (
-                        <input 
-                            autoFocus
-                            value={inputValue}
-                            onChange={(e) => setInputValue(e.target.value)}
-                            onKeyDown={(e) => e.key === "Enter" && closeDialog(inputValue)}
-                            style={{
-                                width: "100%",
-                                padding: "12px 16px",
-                                borderRadius: "12px",
-                                border: "2px solid #e2e8f0",
-                                fontSize: "14px",
-                                fontWeight: 600,
-                                color: "#1e293b",
-                                marginBottom: "1.5rem",
-                                outline: "none",
-                                transition: "all 0.2s"
-                            }}
-                            onFocus={e => e.target.style.borderColor = "#2563eb"}
-                            onBlur={e => e.target.style.borderColor = "#e2e8f0"}
-                        />
-                    )}
+                <p style={{
+                    fontSize: "15px",
+                    color: "#a1a1aa",
+                    lineHeight: 1.5,
+                    margin: "0 0 2rem 0"
+                }}>
+                    {dialog.message}
+                </p>
 
-                    <div style={{ display: "flex", gap: "12px", width: "100%" }}>
-                        {(dialog.type === "confirm" || dialog.type === "prompt") && (
-                            <button
-                                onClick={() => closeDialog(null)}
-                                style={{
-                                    flex: 1,
-                                    padding: "0.85rem",
-                                    background: "#f1f5f9",
-                                    color: "#475569",
-                                    border: "none",
-                                    borderRadius: "12px",
-                                    fontSize: "14px",
-                                    fontWeight: 700,
-                                    cursor: "pointer",
-                                    transition: "all 0.2s"
-                                }}
-                                onMouseEnter={e => e.currentTarget.style.background = "#e2e8f0"}
-                                onMouseLeave={e => e.currentTarget.style.background = "#f1f5f9"}
-                            >
-                                Cancel
-                            </button>
-                        )}
+                {dialog.type === "prompt" && (
+                    <input 
+                        autoFocus
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && closeDialog(inputValue)}
+                        style={{
+                            width: "100%",
+                            padding: "14px 16px",
+                            borderRadius: "14px",
+                            background: "rgba(0,0,0,0.2)",
+                            border: "1px solid rgba(255,255,255,0.1)",
+                            fontSize: "15px",
+                            color: "#f4f4f5",
+                            marginBottom: "2rem",
+                            outline: "none",
+                            transition: "all 0.2s"
+                        }}
+                        onFocus={e => {
+                            e.target.style.borderColor = "#f97316";
+                            e.target.style.boxShadow = "0 0 0 3px rgba(249, 115, 22, 0.1)";
+                        }}
+                        onBlur={e => {
+                            e.target.style.borderColor = "rgba(255,255,255,0.1)";
+                            e.target.style.boxShadow = "none";
+                        }}
+                    />
+                )}
+
+                <div style={{ display: "flex", gap: "12px", width: "100%" }}>
+                    {(dialog.type === "confirm" || dialog.type === "prompt") && (
                         <button
-                            onClick={() => closeDialog(dialog.type === "prompt" ? inputValue : true)}
+                            onClick={() => closeDialog(null)}
                             style={{
                                 flex: 1,
-                                padding: "0.85rem",
-                                background: "var(--accent-primary, #2563eb)",
-                                color: "#fff",
+                                padding: "14px",
+                                background: "rgba(255,255,255,0.05)",
+                                color: "#f4f4f5",
                                 border: "none",
-                                borderRadius: "12px",
-                                fontSize: "14px",
-                                fontWeight: 700,
+                                borderRadius: "14px",
+                                fontSize: "15px",
+                                fontWeight: 600,
                                 cursor: "pointer",
-                                boxShadow: "0 4px 12px rgba(37, 99, 235, 0.2)",
                                 transition: "all 0.2s"
                             }}
-                            onMouseEnter={e => e.currentTarget.style.transform = "translateY(-1px)"}
-                            onMouseLeave={e => e.currentTarget.style.transform = "none"}
+                            onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.1)"}
+                            onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.05)"}
                         >
-                            {dialog.type === "alert" ? "Got it" : dialog.type === "confirm" ? "Confirm" : "Submit"}
+                            Cancel
                         </button>
-                    </div>
+                    )}
+                    <button
+                        onClick={() => closeDialog(dialog.type === "prompt" ? inputValue : true)}
+                        style={{
+                            flex: 1,
+                            padding: "14px",
+                            background: dialog.type === "alert" ? "rgba(255,255,255,0.1)" : "#f97316",
+                            color: dialog.type === "alert" ? "#f4f4f5" : "#fff",
+                            border: "none",
+                            borderRadius: "14px",
+                            fontSize: "15px",
+                            fontWeight: 600,
+                            cursor: "pointer",
+                            boxShadow: dialog.type !== "alert" ? "0 4px 12px rgba(249, 115, 22, 0.2)" : "none",
+                            transition: "all 0.2s"
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.transform = "scale(1.02)"}
+                        onMouseLeave={e => e.currentTarget.style.transform = "none"}
+                    >
+                        {dialog.type === "alert" ? "Got it" : dialog.type === "confirm" ? "Confirm" : "Submit"}
+                    </button>
                 </div>
             </div>
 

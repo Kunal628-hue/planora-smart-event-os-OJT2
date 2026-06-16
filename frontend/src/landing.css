@@ -1,0 +1,86 @@
+/* Custom styles for the landing page */
+
+/* Custom scrollbar matching flammini.design */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #ffffff;
+    border-radius: 10px;
+}
+
+/* Text selection matching flammini.design */
+::selection {
+    background: #ffffff;
+    color: #000;
+}
+::-moz-selection {
+    background: #ffffff;
+    color: #000;
+}
+
+/* Animations & Utilities */
+.flammini-accent {
+    color: #ffffff;
+}
+
+.flammini-bg {
+    background-color: #000000;
+}
+
+.flammini-heading {
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    text-transform: uppercase;
+    line-height: 1;
+}
+
+/* Flammini-style Link Hover (Animated Underline) */
+.flammini-link-hover::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: #ffffff;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.flammini-link-hover:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+/* Spline container full width and height */
+.spline-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Marquee infinite scroll */
+.marquee-wrapper {
+    display: flex;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.marquee-content {
+    display: flex;
+    animation: scroll-marquee 20s linear infinite;
+}
+
+@keyframes scroll-marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}

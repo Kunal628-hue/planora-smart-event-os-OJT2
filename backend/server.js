@@ -10,6 +10,7 @@ import aiRoutes from "./routes/aiRoutes.js";
 import collaboratorRoutes from "./routes/collaboratorRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import searchRoutes from "./routes/searchRoutes.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import { initAlertEngine } from "./utils/alertService.js";
@@ -85,6 +86,7 @@ app.use("/api/ai", aiRoutes);
 app.use("/api/collaborators", collaboratorRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/search", searchRoutes);
 
 // Static files for uploads (prefixed with /api to match VITE_API_URL expectations)
 // Note: Local static serving is disabled in production to prevent Vercel boot-time conflicts.

@@ -25,12 +25,14 @@ import { LogoLoader } from "./components/ui/Loader";
 
 import { DialogProvider } from "./context/DialogContext";
 import CustomDialog from "./components/ui/CustomDialog";
+import { UploadProvider } from "./context/UploadContext";
 
 export default function App() {
   return (
     <DialogProvider>
-      <AuthProvider>
-        <BrowserRouter>
+      <UploadProvider>
+        <AuthProvider>
+          <BrowserRouter>
           <Suspense fallback={<LogoLoader />}>
             <CustomDialog />
             <Routes>
@@ -60,6 +62,7 @@ export default function App() {
           </Suspense>
         </BrowserRouter>
       </AuthProvider>
+      </UploadProvider>
     </DialogProvider>
   );
 }

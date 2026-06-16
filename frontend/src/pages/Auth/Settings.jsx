@@ -32,8 +32,11 @@ import {
     Key,
     Trash2,
     RefreshCw,
-    Search
+    Search,
+    Copy
 } from "lucide-react";
+
+import { useCopyToClipboard } from "../../hooks/useCopyToClipboard";
 
 const API_URL_ENV = import.meta.env.VITE_API_URL;
 
@@ -51,6 +54,9 @@ export default function Settings() {
     const [teamMembers, setTeamMembers] = useState([]);
     const [loadingTeam, setLoadingTeam] = useState(false);
     const [isCheckingDomain, setIsCheckingDomain] = useState(false);
+    
+    // Clipboard hook integration for secure copy functionality
+    const { isCopied, copyToClipboard } = useCopyToClipboard();
 
     // Fetch Team
     useEffect(() => {
@@ -168,10 +174,7 @@ export default function Settings() {
     const tabs = [
         { id: "Organization", icon: <SettingsIcon size={14} /> },
         { id: "Billing", icon: <CreditCard size={14} /> },
-        { id: "Security", icon: <Shield size={14} /> },
-        { id: "Integrations", icon: <Cpu size={14} /> },
-        { id: "Notifications", icon: <Bell size={14} /> },
-        { id: "API Keys", icon: <Key size={14} /> }
+        { id: "Security", icon: <Shield size={14} /> }
     ];
 
     return (
@@ -232,22 +235,86 @@ export default function Settings() {
                         <div style={{ padding: "4px 10px", background: "rgba(249, 115, 22, 0.1)", borderRadius: "6px", color: "var(--accent-primary)", fontSize: "10px", fontWeight: 800, letterSpacing: "0.05em" }}>OPERATIONAL ENTITY</div>
                     </div>
                     
-                    <div style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "3rem" }}>
-                        {/* LEFT COLUMN: LOGO */}
-                        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <label style={{ fontSize: "11px", fontWeight: 800, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Logo Asset</label>
-                                <Info size={12} color="var(--text-muted)" style={{ cursor: "help" }} title="Used in public pages and generated invoices." />
+                    <div style={{ display: "grid", gridTemplateColumns: "260px 1fr", gap: "3rem" }}>
+                        {/* LEFT COLUMN: USER PROFILE CARD */}
+                        <div style={{
+                            position: "relative",
+                            background: "var(--bg-elevated)",
+                            borderRadius: "16px",
+                            padding: "2.5rem 1.5rem 1.5rem",
+                            border: "1px solid var(--border-subtle)",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            textAlign: "center",
+                            boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+                            overflow: "hidden"
+                        }}>
+                            {/* Ribbon */}
+                            <div style={{
+                                position: "absolute",
+                                top: 0,
+                                left: "50%",
+                                transform: "translateX(-50%)",
+                                width: "32px",
+                                height: "36px",
+                                background: "var(--accent-primary)",
+                                borderBottomLeftRadius: "6px",
+                                borderBottomRightRadius: "6px",
+                                boxShadow: "0 4px 10px rgba(249, 115, 22, 0.4)"
+                            }}></div>
+
+                            {/* 'Free' Badge Removed */}
+
+                            {/* Alphabet Logo */}
+                            <div style={{
+                                width: "80px",
+                                height: "80px",
+                                borderRadius: "50%",
+                                background: "var(--bg-surface)",
+                                border: "1px solid var(--border-subtle)",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                fontSize: "28px",
+                                fontWeight: 800,
+                                color: "var(--accent-primary)",
+                                marginTop: "0.5rem",
+                                marginBottom: "1.25rem"
+                            }}>
+                                {name ? name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : user?.email?.[0].toUpperCase() || "AH"}
                             </div>
-                            <div style={{ width: "160px", height: "160px", background: "var(--bg-elevated)", borderRadius: "20px", border: "2px dashed var(--border-subtle)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "12px", cursor: "pointer", transition: "all 0.2s" }} onMouseEnter={e => e.currentTarget.style.borderColor="var(--accent-primary)"} onMouseLeave={e => e.currentTarget.style.borderColor="var(--border-subtle)"}>
-                                <div style={{ width: "60px", height: "60px", background: "rgba(249, 115, 22, 0.1)", borderRadius: "14px", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent-primary)" }}>
-                                    <Globe size={28} />
-                                </div>
-                                <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--text-muted)" }}>Upload Logo</span>
-                            </div>
-                            <p style={{ fontSize: "10px", color: "var(--text-muted)", lineHeight: 1.6, margin: 0 }}>
-                                Recommended: 400x400px.<br/>PNG, SVG or WEBP (Max 2MB)
+
+                            {/* Name & Details */}
+                            <h4 style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--text-primary)", margin: "0 0 0.25rem" }}>
+                                {name || "User Name"}
+                            </h4>
+                            <p style={{ fontSize: "12px", color: "var(--text-secondary)", margin: "0 0 0.25rem" }}>
+                                Event Administrator
                             </p>
+                            <p style={{ fontSize: "11px", color: "var(--text-muted)", margin: "0 0 1.5rem" }}>
+                                {user?.email || "alexishillprados@gmail.com"}
+                            </p>
+
+                            {/* Button */}
+                            <button style={{
+                                width: "100%",
+                                padding: "0.75rem",
+                                background: "#0c0c0c",
+                                border: "1px solid var(--border-subtle)",
+                                borderRadius: "10px",
+                                color: "var(--text-primary)",
+                                fontSize: "13px",
+                                fontWeight: 800,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                gap: "6px",
+                                cursor: "pointer",
+                                transition: "all 0.2s"
+                            }} onMouseEnter={e => e.currentTarget.style.borderColor = "var(--accent-primary)"} onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border-subtle)"}>
+                                Upgrade to <span style={{ background: "var(--accent-primary)", padding: "2px 6px", borderRadius: "4px", fontSize: "10px", color: "#000" }}>PRO</span>
+                            </button>
                         </div>
                         
                         {/* RIGHT COLUMN: FIELDS */}
@@ -267,18 +334,17 @@ export default function Settings() {
                                         <Info size={12} color="var(--text-muted)" style={{ cursor: "help" }} title="Your unique URL prefix for public event pages." />
                                     </div>
                                     <div style={{ display: "flex", gap: "10px" }}>
-                                        <div style={{ flex: 1, display: "flex", alignItems: "stretch", overflow: "hidden", borderRadius: "12px", border: "1px solid var(--border-subtle)" }}>
+                                        <div style={{ flex: 1, display: "flex", alignItems: "stretch", overflow: "hidden", borderRadius: "12px", border: "1px solid var(--border-subtle)", position: "relative" }}>
                                             <div style={{ padding: "0 1rem", background: "var(--bg-surface)", borderRight: "1px solid var(--border-subtle)", color: "var(--text-muted)", fontSize: "14px", fontWeight: 600, display: "flex", alignItems: "center" }}>planora.app/</div>
-                                            <input value="global-ops" readOnly style={{ flex: 1, padding: "1rem", background: "var(--bg-elevated)", border: "none", color: "var(--text-primary)", fontSize: "14px", fontWeight: 700, outline: "none" }} />
+                                            <input value="global-ops" readOnly style={{ flex: 1, padding: "1rem", background: "var(--bg-elevated)", border: "none", color: "var(--text-primary)", fontSize: "14px", fontWeight: 700, outline: "none", paddingRight: "3rem" }} />
+                                            <button 
+                                                onClick={() => copyToClipboard("planora.app/global-ops")}
+                                                style={{ position: "absolute", right: "0.5rem", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: isCopied ? "var(--accent-primary)" : "var(--text-muted)", cursor: "pointer" }}
+                                                title="Copy domain link securely"
+                                            >
+                                                {isCopied ? <CheckCircle2 size={16} /> : <Copy size={16} />}
+                                            </button>
                                         </div>
-                                        <button 
-                                            onClick={handleCheckAvailability}
-                                            disabled={isCheckingDomain}
-                                            style={{ padding: "0 1.5rem", background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)", borderRadius: "12px", color: "var(--text-primary)", fontSize: "12px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
-                                        >
-                                            {isCheckingDomain ? <RefreshCw size={14} className="animate-spin" /> : <Search size={14} />}
-                                            Check Availability
-                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -573,19 +639,7 @@ export default function Settings() {
                 </div>
             )}
 
-            {(activeTab === "Integrations" || activeTab === "API Keys") && (
-                <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "24px", padding: "5rem 2rem", textAlign: "center", animation: "scale-up 0.3s ease-out" }}>
-                    <div style={{ width: "80px", height: "80px", borderRadius: "20px", background: "rgba(249, 115, 22, 0.05)", color: "var(--accent-primary)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 2rem", position: "relative" }}>
-                        <Cpu size={40} strokeWidth={1.5} />
-                        <div style={{ position: "absolute", top: "-5px", right: "-5px", background: "var(--accent-primary)", width: "24px", height: "24px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", border: "4px solid var(--bg-surface)" }}>
-                            <Lock size={10} color="#000" />
-                        </div>
-                    </div>
-                    <h2 style={{ fontSize: "1.75rem", fontWeight: 900, marginBottom: "0.75rem", color: "var(--text-primary)", letterSpacing: "-0.02em" }}>Advanced Developer Protocols</h2>
-                    <p style={{ color: "var(--text-secondary)", maxWidth: "500px", margin: "0 auto 2.5rem", fontSize: "15px", lineHeight: 1.6 }}> Programmatic access to Planora OS and third-party webhooks are currently restricted to verified enterprise partners for security integrity. Contact the infrastructure team to request an API Provisioning Token.</p>
-                    <button style={{ padding: "1rem 2.5rem", background: "var(--accent-primary)", border: "none", borderRadius: "14px", color: "#000", fontWeight: 900, cursor: "pointer", boxShadow: "0 10px 25px rgba(249, 115, 22, 0.2)" }}>Contact Infrastructure Hub</button>
-                </div>
-            )}
+
 
             {/* STICKY FOOTER: SAVE CHANGES */}
             {hasChanges && (
