@@ -26,7 +26,7 @@ export default function Navbar() {
           transform-origin: left;
         }
       `}</style>
-      <div style={{ pointerEvents: "auto", display: "flex", gap: "2.5rem", alignItems: "center" }}>
+      <div className="landing-navbar" style={{ pointerEvents: "auto", display: "flex", alignItems: "center" }}>
         <Link to="/login" style={{ color: "#fff", textDecoration: "none", fontWeight: 600, fontSize: "0.95rem", textTransform: "uppercase", letterSpacing: "0.05em" }} className="flammini-hover">Log in</Link>
       </div>
     </>

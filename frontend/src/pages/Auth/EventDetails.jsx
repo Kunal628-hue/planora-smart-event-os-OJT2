@@ -156,7 +156,7 @@ export default function EventDetails() {
                         <Skeleton animation="wave" variant="rounded" width={50} height={50} sx={{ borderRadius: '12px', bgcolor: 'var(--bg-elevated)' }} />
                     </Box>
                 </Box>
-                <Box sx={{ display: 'grid', gridTemplateColumns: "2fr 1fr", gap: "2rem" }}>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: "1fr", lg: "2fr 1fr" }, gap: "2rem" }}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: "2rem" }}>
                         <Skeleton animation="wave" variant="rounded" height={250} sx={{ borderRadius: '24px', bgcolor: 'var(--bg-elevated)' }} />
                         <Skeleton animation="wave" variant="rounded" height={300} sx={{ borderRadius: '24px', bgcolor: 'var(--bg-elevated)' }} />
@@ -178,51 +178,54 @@ export default function EventDetails() {
             color: "var(--text-primary)"
         }}>
             {/* Header Area */}
-            <div className="stagger-detail" style={{ display: "flex", alignItems: "center", gap: "2.5rem", marginBottom: "3.5rem" }}>
-                <button
-                    onClick={() => navigate("/events")}
-                    style={{
-                        background: "var(--bg-surface)",
-                        border: "1px solid var(--border-subtle)",
-                        width: "56px",
-                        height: "56px",
-                        borderRadius: "18px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        cursor: "pointer",
-                        boxShadow: "0 4px 15px rgba(0,0,0,0.2)"
-                    }}
-                >
-                    <ChevronLeft size={24} color="var(--text-secondary)" strokeWidth={2.5} />
-                </button>
-                <div style={{ flex: 1 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
-                        <h1 style={{ fontSize: "2.75rem", fontWeight: 800, letterSpacing: "-0.04em", margin: 0, color: "var(--text-primary)" }}>{event.name}</h1>
-                        <span style={{
-                            background: "rgba(255,165,0,0.1)",
-                            color: "var(--accent-primary)",
-                            fontSize: "12px",
-                            fontWeight: 800,
-                            padding: "6px 14px",
-                            borderRadius: "100px",
-                            textTransform: "uppercase",
-                            letterSpacing: "0.05em"
-                        }}>{event.type}</span>
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", marginTop: "0.75rem", color: "var(--text-secondary)", fontWeight: 500 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                            <Calendar size={16} />
-                            {new Date(event.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+            <div className="stagger-detail events-header" style={{ marginBottom: "3.5rem" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", flex: 1 }}>
+                    <button
+                        onClick={() => navigate("/events")}
+                        style={{
+                            background: "var(--bg-surface)",
+                            border: "1px solid var(--border-subtle)",
+                            width: "56px",
+                            height: "56px",
+                            borderRadius: "18px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            cursor: "pointer",
+                            boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
+                            flexShrink: 0
+                        }}
+                    >
+                        <ChevronLeft size={24} color="var(--text-secondary)" strokeWidth={2.5} />
+                    </button>
+                    <div>
+                        <div style={{ display: "flex", alignItems: "center", gap: "1.25rem", flexWrap: "wrap" }}>
+                            <h1 style={{ fontSize: "2.75rem", fontWeight: 800, letterSpacing: "-0.04em", margin: 0, color: "var(--text-primary)" }}>{event.name}</h1>
+                            <span style={{
+                                background: "rgba(255,165,0,0.1)",
+                                color: "var(--accent-primary)",
+                                fontSize: "12px",
+                                fontWeight: 800,
+                                padding: "6px 14px",
+                                borderRadius: "100px",
+                                textTransform: "uppercase",
+                                letterSpacing: "0.05em"
+                            }}>{event.type}</span>
                         </div>
-                        <span style={{ width: "4px", height: "4px", background: "var(--border-subtle)", borderRadius: "50%" }}></span>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                            <MapPin size={16} />
-                            {event.location}
+                        <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", marginTop: "0.75rem", color: "var(--text-secondary)", fontWeight: 500, flexWrap: "wrap" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                <Calendar size={16} />
+                                {new Date(event.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                            </div>
+                            <span className="mobile-hide" style={{ width: "4px", height: "4px", background: "var(--border-subtle)", borderRadius: "50%" }}></span>
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                <MapPin size={16} />
+                                {event.location}
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div style={{ display: "flex", gap: "1rem" }}>
+                <div className="events-header-buttons" style={{ display: "flex", gap: "1rem" }}>
                     <button
                         onClick={() => setShowEditModal(true)}
                         style={{
@@ -261,7 +264,7 @@ export default function EventDetails() {
                 </div>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1.2fr", gap: "2.5rem" }}>
+            <div className="event-details-split-grid" style={{ gap: "2.5rem" }}>
                 <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
                     {/* Operational Pulse Diagnostic */}
                     <div style={{
@@ -293,7 +296,7 @@ export default function EventDetails() {
                             )}
                         </div>
 
-                        <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1.8fr", gap: "3.5rem", alignItems: "center" }}>
+                        <div className="operational-pulse-split" style={{ gap: "3.5rem", alignItems: "center" }}>
                             <div style={{ display: "flex", justifyContent: "center", position: "relative" }}>
                                 <svg width="240" height="240" viewBox="0 0 100 100">
                                     <defs>
@@ -431,7 +434,7 @@ export default function EventDetails() {
                         gap: "1.5rem"
                     }}>
                         <h3 style={{ fontSize: "15px", fontWeight: 800, color: "var(--text-primary)", marginBottom: "0.5rem" }}>Strategic Shortcuts</h3>
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                        <div className="grid-2-col" style={{ gap: "1rem" }}>
                             <button
                                 onClick={() => navigate("/tasks")}
                                 style={{ padding: "1.25rem", borderRadius: "18px", background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.75rem", cursor: "pointer", transition: "all 0.2s" }}
@@ -564,7 +567,7 @@ export default function EventDetails() {
                                 <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-secondary)", marginBottom: "8px", textTransform: "uppercase" }}>Event Identity</label>
                                 <input style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid var(--border-subtle)", background: "var(--bg-elevated)", color: "var(--text-primary)", fontSize: "15px", fontWeight: 600 }} value={editData.name} onChange={e => setEditData({ ...editData, name: e.target.value })} required />
                             </div>
-                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+                            <div className="grid-2-col" style={{ gap: "1.5rem" }}>
                                 <div>
                                     <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-secondary)", marginBottom: "8px", textTransform: "uppercase" }}>Target Date</label>
                                     <input type="date" style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid var(--border-subtle)", background: "var(--bg-elevated)", color: "var(--text-primary)", fontSize: "15px", fontWeight: 600 }} value={editData.date} onChange={e => setEditData({ ...editData, date: e.target.value })} required />

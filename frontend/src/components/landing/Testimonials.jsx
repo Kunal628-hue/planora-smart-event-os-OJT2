@@ -61,16 +61,12 @@ export default function Testimonials() {
       padding: "5rem 0",
       position: "relative"
     }}>
-      <div style={{
+      <div className="testimonials-grid" style={{
         maxWidth: 1200,
         margin: "0 auto",
         padding: "0 2.5rem",
-        display: "grid",
-        gridTemplateColumns: "1fr 1.2fr",
-        gap: "6rem",
         position: "relative",
-        zIndex: 1,
-        alignItems: "start"
+        zIndex: 1
       }}>
         
         {/* Left Column (Sticky) */}
@@ -104,10 +100,7 @@ export default function Testimonials() {
         </div>
 
         {/* Right Column (Staggered Masonry Cards) */}
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "2rem",
+        <div className="testimonials-masonry" style={{
           paddingBottom: "4rem",
           position: "relative"
         }}>

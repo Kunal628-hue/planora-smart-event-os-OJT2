@@ -513,7 +513,7 @@ export default function Dashboard() {
             </div>
 
             {/* Split Layout */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))", gap: "1.5rem" }}>
+            <div className="dashboard-split-grid">
                 <div style={{
                     background: "var(--bg-surface)",
                     border: "1px solid var(--border-subtle)",
@@ -565,7 +565,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* New Compact KPI Row */}
-                <div style={{ gridColumn: "1 / -1", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1.5rem" }}>
+                <div className="dashboard-kpi-grid" style={{ gridColumn: "1 / -1" }}>
                     {[
                         { label: "Active Vendors", value: "12", trend: "+2", color: "#10b981" },
                         { label: "Pending Tasks", value: "08", trend: "-3", color: "#f97316" },

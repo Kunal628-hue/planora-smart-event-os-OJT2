@@ -190,7 +190,7 @@ export default function Team() {
             color: "var(--text-primary)",
             paddingBottom: "4rem"
         }}>
-            <div style={{ marginBottom: "2rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div className="events-header" style={{ marginBottom: "2rem" }}>
                 <div>
                     <h1 style={{ fontSize: "1.25rem", fontWeight: 800, margin: "0 0 0.25rem", color: "#fff" }}>Team Directory</h1>
                     <p style={{ color: "var(--text-secondary)", fontSize: "12px", fontWeight: 500, margin: 0 }}>
@@ -205,7 +205,7 @@ export default function Team() {
             </div>
 
             {/* Top Cards Grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1.25rem", marginBottom: "2rem" }}>
+            <div className="dashboard-kpi-grid" style={{ gap: "1.25rem", marginBottom: "2rem" }}>
                 <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "12px", padding: "1rem", display: "flex", flexDirection: "column" }}>
                     <span style={{ fontSize: "10px", fontWeight: 800, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.25rem" }}>Total Members</span>
                     <span style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--text-primary)", lineHeight: 1 }}>{members.length}</span>
@@ -619,7 +619,7 @@ export default function Team() {
                             <div>
                                 <input placeholder="Invitee WhatsApp Number (Triggers Message)" value={inviteData.whatsapp} onChange={e => setInviteData({ ...inviteData, whatsapp: e.target.value })} style={{ width: "100%", padding: "0.85rem", borderRadius: "10px", border: "1px solid var(--border-subtle)", background: "var(--bg-elevated)", color: "var(--text-primary)", fontSize: "13px", outline: "none" }} />
                             </div>
-                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                            <div className="grid-2-col" style={{ gap: "1rem" }}>
                                 <select value={inviteData.role} onChange={e => setInviteData({ ...inviteData, role: e.target.value })} style={{ width: "100%", padding: "0.85rem", borderRadius: "10px", border: "1px solid var(--border-subtle)", background: "var(--bg-elevated)", color: "var(--text-primary)", fontSize: "13px", outline: "none", cursor: "pointer" }}>
                                     <option>Editor</option>
                                     <option>Viewer</option>

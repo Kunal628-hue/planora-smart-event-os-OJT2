@@ -32,7 +32,7 @@ export default function Hero() {
     }}>
 
       {/* Background SVG Lines */}
-      <svg style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 0 }}>
+      <svg className="hero-bg-svg" style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 0 }}>
         <line x1="18%" y1="28%" x2="50%" y2="50%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
         <line x1="82%" y1="22%" x2="50%" y2="50%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
         <line x1="12%" y1="85%" x2="50%" y2="50%" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
@@ -40,7 +40,7 @@ export default function Hero() {
       </svg>
 
       {/* Floating Badges */}
-      <div style={{ position: "absolute", top: "25%", left: "15%", display: "flex", alignItems: "center", gap: "10px", zIndex: 10 }}>
+      <div className="hero-badge-1" style={{ position: "absolute", top: "25%", left: "15%", display: "flex", alignItems: "center", gap: "10px", zIndex: 10 }}>
         <div style={{ width: 24, height: 24, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div style={{ width: 4, height: 4, background: "#fff", borderRadius: "50%" }} />
         </div>
@@ -50,7 +50,7 @@ export default function Hero() {
         </div>
       </div>
 
-      <div style={{ position: "absolute", top: "18%", right: "15%", display: "flex", alignItems: "center", gap: "10px", zIndex: 10 }}>
+      <div className="hero-badge-2" style={{ position: "absolute", top: "18%", right: "15%", display: "flex", alignItems: "center", gap: "10px", zIndex: 10 }}>
         <div style={{ width: 24, height: 24, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
         </div>
@@ -60,14 +60,14 @@ export default function Hero() {
         </div>
       </div>
 
-      <div style={{ position: "absolute", bottom: "15%", left: "10%", display: "flex", alignItems: "center", gap: "10px", zIndex: 10 }}>
+      <div className="hero-badge-3" style={{ position: "absolute", bottom: "15%", left: "10%", display: "flex", alignItems: "center", gap: "10px", zIndex: 10 }}>
         <div>
           <div style={{ color: "#fff", fontSize: "0.85rem", fontWeight: 600 }}>Vendors</div>
           <div style={{ color: "#666", fontSize: "0.7rem" }}>16 Connected</div>
         </div>
       </div>
 
-      <div style={{ position: "absolute", bottom: "12%", right: "12%", display: "flex", alignItems: "center", gap: "10px", zIndex: 10 }}>
+      <div className="hero-badge-4" style={{ position: "absolute", bottom: "12%", right: "12%", display: "flex", alignItems: "center", gap: "10px", zIndex: 10 }}>
         <div style={{ width: 24, height: 24, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div style={{ width: 4, height: 4, background: "#f59e0b", borderRadius: "50%" }} />
         </div>

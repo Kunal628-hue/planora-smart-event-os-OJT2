@@ -235,7 +235,7 @@ export default function Settings() {
                         <div style={{ padding: "4px 10px", background: "rgba(249, 115, 22, 0.1)", borderRadius: "6px", color: "var(--accent-primary)", fontSize: "10px", fontWeight: 800, letterSpacing: "0.05em" }}>OPERATIONAL ENTITY</div>
                     </div>
                     
-                    <div style={{ display: "grid", gridTemplateColumns: "260px 1fr", gap: "3rem" }}>
+                    <div className="settings-split-layout" style={{ gap: "3rem" }}>
                         {/* LEFT COLUMN: USER PROFILE CARD */}
                         <div style={{
                             position: "relative",
@@ -349,7 +349,7 @@ export default function Settings() {
                                 </div>
                             </div>
 
-                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
+                            <div className="grid-2-col" style={{ gap: "2rem" }}>
                                 <div>
                                     <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px" }}>
                                         <label style={{ fontSize: "11px", fontWeight: 800, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Timezone</label>
@@ -465,7 +465,7 @@ export default function Settings() {
                 </div>
 
                 {/* Preference Matrices */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", marginBottom: "1.5rem" }}>
+                <div className="grid-2-col" style={{ gap: "1.5rem", marginBottom: "1.5rem" }}>
                     {/* Notification Preferences */}
                     <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "16px", padding: "2rem" }}>
                         <h3 style={{ fontSize: "16px", fontWeight: 800, margin: "0 0 2rem", color: "var(--text-primary)" }}>Communication Protocol</h3>
@@ -554,7 +554,7 @@ export default function Settings() {
                         <h3 style={{ fontSize: "16px", fontWeight: 800, margin: 0, color: "#fca5a5" }}>Infrastructure Risk Hub (Danger Zone)</h3>
                     </div>
 
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
+                    <div className="grid-2-col" style={{ gap: "2rem" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "1.5rem", background: "rgba(255,255,255,0.02)", border: "1px solid var(--border-subtle)", borderRadius: "14px" }}>
                             <div style={{ maxWidth: "70%" }}>
                                 <div style={{ fontSize: "14px", fontWeight: 800, color: "var(--text-primary)", marginBottom: "4px" }}>Transfer Primary Ownership</div>
@@ -583,7 +583,7 @@ export default function Settings() {
                         </div>
                         <h2 style={{ fontSize: "1.5rem", fontWeight: 900, marginBottom: "0.5rem", color: "var(--text-primary)" }}>Enterprise Tier Active</h2>
                         <p style={{ color: "var(--text-secondary)", maxWidth: "400px", margin: "0 auto 2rem", fontSize: "14px", lineHeight: 1.6 }}>You are currently on the professional workspace tier with unlimited events, premium AI capabilities, and advanced team hierarchy controls.</p>
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", maxWidth: "500px", margin: "0 auto" }}>
+                        <div className="grid-2-col" style={{ gap: "1.5rem", maxWidth: "500px", margin: "0 auto" }}>
                             <div style={{ background: "var(--bg-elevated)", padding: "1.5rem", borderRadius: "16px", border: "1px solid var(--border-subtle)" }}>
                                 <div style={{ fontSize: "11px", fontWeight: 800, color: "var(--text-muted)", marginBottom: "8px", textTransform: "uppercase" }}>Next Renewal</div>
                                 <div style={{ fontSize: "18px", fontWeight: 900, color: "var(--text-primary)" }}>June 12, 2026</div>
@@ -614,7 +614,7 @@ export default function Settings() {
 
             {activeTab === "Security" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", animation: "scale-up 0.3s ease-out" }}>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+                    <div className="grid-2-col" style={{ gap: "1.5rem" }}>
                         <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "20px", padding: "2.5rem" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "1.5rem" }}>
                                 <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: "rgba(249, 115, 22, 0.1)", color: "var(--accent-primary)", display: "flex", alignItems: "center", justifyContent: "center" }}>

@@ -291,7 +291,7 @@ export default function Analytics() {
             margin: "0 auto"
         }}>
             {/* Header */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "3rem" }}>
+            <div className="events-header" style={{ marginBottom: "3rem" }}>
                 <div>
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
                         <div style={{ width: "20px", height: "2px", background: "#f97316" }}></div>
@@ -327,9 +327,7 @@ export default function Analytics() {
             </div>
 
             {/* KPI Strip */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1.5rem", marginBottom: "3rem" }}>
-            {/* KPI Strip */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem", marginBottom: "2rem" }}>
+            <div className="analytics-kpi-grid" style={{ gap: "1rem", marginBottom: "2rem" }}>
                 {[
                     { label: "GUEST VELOCITY", val: stats.visits, trend: "+12%", icon: Users },
                     { label: "RSVP CONVERSION", val: `${stats.checkInRate}%`, trend: "+5.2%", icon: Ticket },
@@ -372,10 +370,9 @@ export default function Analytics() {
                     </div>
                 ))}
             </div>
-            </div>
 
             {/* Main Content Grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "2.2fr 1fr", gap: "1.5rem", marginBottom: "1.5rem" }}>
+            <div className="analytics-main-split" style={{ gap: "1.5rem", marginBottom: "1.5rem" }}>
                 {/* Trajectory Module */}
                 <div style={{ background: "#111", padding: "1.5rem", borderRadius: "20px", border: "1px solid #1a1a1a" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
@@ -461,7 +458,7 @@ export default function Analytics() {
             </div>
 
             {/* Diagnostic Row */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", marginBottom: "1.5rem" }}>
+            <div className="grid-2-col" style={{ gap: "1.5rem", marginBottom: "1.5rem" }}>
                 <div style={{ background: "#111", padding: "1.5rem", borderRadius: "20px", border: "1px solid #1a1a1a" }}>
                     <h3 style={{ fontSize: "0.9rem", fontWeight: 900, marginBottom: "1.25rem", color: "#64748b" }}>TOP PERFORMING SEGMENTS</h3>
                     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
@@ -500,7 +497,7 @@ export default function Analytics() {
             </div>
 
             {/* Bottom Section */}
-            <div style={{ background: "#111", padding: "2.5rem", borderRadius: "20px", border: "1px solid #1a1a1a" }}>
+            <div className="analytics-module" style={{ background: "#111", borderRadius: "20px", border: "1px solid #1a1a1a" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
                     <h3 style={{ fontSize: "1.2rem", fontWeight: 800 }}>Event Milestone Log</h3>
                     <span onClick={() => navigate("/tasks")} style={{ fontSize: "0.75rem", fontWeight: 800, color: "#f97316", letterSpacing: "0.1em", cursor: "pointer" }}>VIEW FULL STACK</span>

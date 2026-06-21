@@ -186,8 +186,8 @@ export default function Tasks() {
             backgroundSize: "32px 32px"
         }}>
             {/* Header */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", paddingBottom: "1.25rem", borderBottom: "1px solid #1a1a1a" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
+            <div className="events-header">
+                <div className="events-header-left">
                     <h1 style={{ fontSize: "1.35rem", fontWeight: 900, margin: 0, letterSpacing: "-0.03em" }}>Workflow Milestones</h1>
                     <div style={{ display: "flex", gap: "8px", background: "rgba(255,255,255,0.03)", padding: "4px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.05)" }}>
                         <div style={{ padding: "6px 12px", borderRadius: "6px", background: "rgba(259, 115, 22, 0.1)", color: "#f97316", fontSize: "10px", fontWeight: 800, textTransform: "uppercase" }}>Active Monitoring</div>
@@ -201,7 +201,7 @@ export default function Tasks() {
             </div>
 
             {/* Quick Stats Row */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1.25rem", marginBottom: "1.5rem" }}>
+            <div className="tasks-kpi-grid">
                 <div style={{ background: "#111", border: "1px solid #1a1a1a", borderRadius: "12px", padding: "1rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>
                         <div style={{ fontSize: "10px", fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Completion Rate</div>

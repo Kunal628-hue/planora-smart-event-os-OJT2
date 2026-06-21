@@ -165,14 +165,7 @@ export default function Features() {
             <div
               key={f.title}
               ref={el => cardsRef.current[i] = el}
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                gap: "4rem",
-                borderTop: "1px solid #1f1f1f",
-                paddingTop: "3rem"
-              }}
+              className="feature-row"
             >
               <div style={{ flex: 1 }}>
                 <div style={{

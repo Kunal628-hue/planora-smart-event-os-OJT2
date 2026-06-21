@@ -30,7 +30,8 @@ import {
     CalendarDays,
     UserCircle2,
     FileText,
-    Image as ImageIcon
+    Image as ImageIcon,
+    Menu
 } from "lucide-react";
 import DashboardBackground from "./DashboardBackground";
 import GlobalSearch from "./GlobalSearch";
@@ -485,7 +486,7 @@ export default function DashboardLayout() {
                             className="sidebar-toggle-btn"
                             onClick={() => setIsSidebarOpen(true)}
                         >
-                            <LayoutDashboard size={20} />
+                            <Menu size={20} />
                         </button>
                         <GlobalSearch user={user} onEventSelect={handleEventChange} />
                     </div>

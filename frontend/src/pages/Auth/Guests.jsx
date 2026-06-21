@@ -434,12 +434,12 @@ export default function Guests() {
             backgroundSize: "32px 32px"
         }}>
             {/* Header */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "2rem" }}>
+            <div className="events-header" style={{ marginBottom: "2rem" }}>
                 <div>
                     <h1 style={{ fontSize: "1.85rem", fontWeight: 800, margin: 0, letterSpacing: "-0.04em" }}>Attendee Directory</h1>
                     <p style={{ color: "#64748b", marginTop: "0.25rem", fontSize: "0.85rem" }}>Monitor attendance velocity and catering preferences in real-time.</p>
                 </div>
-                <div style={{ display: "flex", gap: "0.75rem" }}>
+                <div className="events-header-buttons" style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
                     {isProfessionalEvent && (
                         <button onClick={() => setShowBadges(!showBadges)} style={{ background: showBadges ? "#f97316" : "#111", border: "1px solid #222", color: "#fff", padding: "0.6rem 1rem", borderRadius: "8px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.8rem" }}>
                             <CreditCard size={16} />
@@ -464,7 +464,7 @@ export default function Guests() {
             </div>
 
             {/* Stats */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1.25rem", marginBottom: "2rem" }}>
+            <div className="analytics-kpi-grid" style={{ gap: "1.25rem", marginBottom: "2rem" }}>
                 {[
                     { label: "TOTAL INVITED", value: stats.total, border: "#f97316", sub: "base population" },
                     { label: "CONFIRMED", value: stats.confirmed, border: "#10b981", sub: `${stats.total > 0 ? Math.round((stats.confirmed/stats.total)*100) : 0}% of total` },
@@ -480,7 +480,7 @@ export default function Guests() {
             </div>
 
             {/* Analytics Strip (Moved Up) */}
-            <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: "1.5rem", marginBottom: "2rem" }}>
+            <div className="responsive-split" style={{ gap: "1.5rem", marginBottom: "2rem" }}>
                 <div className="card" style={{ padding: "1.25rem" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1.5rem" }}>
                         <h3 style={{ fontSize: "0.8rem", fontWeight: 900, letterSpacing: "0.05em", color: "#64748b" }}>REGISTRATION VELOCITY</h3>
@@ -512,7 +512,7 @@ export default function Guests() {
 
             {/* Controls & Quick Actions */}
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginBottom: "1.5rem" }}>
-                <div style={{ display: "flex", gap: "1rem" }}>
+                <div className="guests-controls-row" style={{ display: "flex", gap: "1rem" }}>
                     <div style={{ position: "relative", flex: 1 }}>
                         <Search size={16} style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: "#64748b" }} />
                         <input 

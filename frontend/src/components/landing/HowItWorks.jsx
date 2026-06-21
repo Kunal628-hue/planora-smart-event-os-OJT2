@@ -39,7 +39,7 @@ export default function HowItWorks() {
       padding: "8rem 0",
       background: "transparent"
     }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 2.5rem", display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: "6rem", alignItems: "center" }}>
+      <div className="how-it-works-grid" style={{ maxWidth: 1200, margin: "0 auto", padding: "0 2.5rem" }}>
         
         {/* Left Column */}
         <div>
@@ -66,7 +66,7 @@ export default function HowItWorks() {
         </div>
 
         {/* Right Column - Grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+        <div className="how-it-works-steps">
           {steps.map((step, i) => (
             <div key={i} style={{
               background: "rgba(255,255,255,0.02)",

@@ -75,6 +75,43 @@
     overflow: hidden;
 }
 
+/* Landing Page Grid & Flex Responsiveness */
+
+.feature-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4rem;
+    border-top: 1px solid #1f1f1f;
+    padding-top: 3rem;
+}
+
+.how-it-works-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 6rem;
+    align-items: center;
+}
+
+.how-it-works-steps {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.testimonials-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 6rem;
+    align-items: start;
+}
+
+.testimonials-masonry {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
 .marquee-content {
     display: flex;
     animation: scroll-marquee 20s linear infinite;
@@ -84,3 +121,110 @@
     0% { transform: translateX(0); }
     100% { transform: translateX(-50%); }
 }
+
+/* Media Queries for Tablet and Mobile Layouts */
+
+@media (max-width: 1024px) {
+    .how-it-works-grid {
+        grid-template-columns: 1fr !important;
+        gap: 3rem !important;
+        text-align: center;
+    }
+    
+    .how-it-works-grid h2 {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .testimonials-grid {
+        grid-template-columns: 1fr !important;
+        gap: 3rem !important;
+    }
+
+    .masonry-col-2 {
+        margin-top: 0 !important;
+    }
+
+    .hero-badge-1, .hero-badge-2, .hero-badge-3, .hero-badge-4 {
+        display: none !important;
+    }
+    
+    .feature-row {
+        gap: 2rem !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .feature-row {
+        flex-direction: column !important;
+        text-align: center;
+    }
+    
+    .feature-row > div {
+        width: 100% !important;
+    }
+    
+    .feature-row > div:nth-child(1) {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .feature-row svg {
+        margin-bottom: 0.5rem;
+    }
+    
+    #features {
+        padding: 3rem 0 !important;
+    }
+    
+    #features h2 {
+        font-size: 2.5rem !important;
+    }
+    
+    #features .flammini-heading {
+        margin-bottom: 2rem !important;
+    }
+    
+    #how-it-works {
+        padding: 4rem 0 !important;
+    }
+    
+    #testimonials {
+        padding: 3rem 0 !important;
+    }
+    
+    #testimonials h2 {
+        font-size: 2.2rem !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .how-it-works-steps {
+        grid-template-columns: 1fr !important;
+    }
+
+    .testimonials-masonry {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .problem-card {
+        padding: 2rem !important;
+    }
+
+    #hero h1 {
+        font-size: 2.6rem !important;
+        line-height: 1.2 !important;
+    }
+
+    #hero p {
+        font-size: 0.95rem !important;
+        margin-top: 1.5rem !important;
+        padding: 0 0.5rem;
+    }
+    
+    .landing-navbar {
+        gap: 1.5rem !important;
+    }
+}
+

@@ -168,8 +168,8 @@ export default function Events() {
     return (
         <div className="responsive-container" style={{ paddingBottom: "4rem" }}>
             {/* Header Bar */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", paddingBottom: "1.25rem", borderBottom: "1px solid var(--border-subtle)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
+            <div className="events-header">
+                <div className="events-header-left">
                     <h1 style={{ fontSize: "20px", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>Events</h1>
                     <div style={{ display: "flex", gap: "4px", background: "rgba(255,255,255,0.03)", padding: "4px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.05)" }}>
                         <button onClick={() => setActiveTab("all")} style={{ background: activeTab === "all" ? "var(--accent-primary)" : "transparent", border: "none", color: activeTab === "all" ? "#fff" : "var(--text-secondary)", padding: "6px 14px", borderRadius: "8px", fontSize: "11px", fontWeight: 800, cursor: "pointer", transition: "all 0.2s" }}>All Events</button>
@@ -188,7 +188,7 @@ export default function Events() {
             </div>
 
             {/* Top Stat Row */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1.25rem", marginBottom: "1.5rem" }}>
+            <div className="events-stat-grid" style={{ marginBottom: "1.5rem" }}>
                 <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "12px", padding: "1.25rem" }}>
                     <div style={{ fontSize: "10px", color: "var(--text-secondary)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>Total Spent</div>
                     <div style={{ fontSize: "20px", fontWeight: 900, color: "var(--text-primary)" }}>₹{totalSpent.toLocaleString('en-IN')}</div>

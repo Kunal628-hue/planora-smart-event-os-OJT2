@@ -351,12 +351,12 @@ export default function Budget() {
     if (loading) {
         return (
             <div className="responsive-container" style={{ padding: "2rem", minHeight: "100vh" }}>
-                <Box sx={{ display: 'grid', gridTemplateColumns: "minmax(350px, 1.5fr) 1fr 1fr", gap: "1.5rem", mb: "1.5rem" }}>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" }, gap: "1.5rem", mb: "1.5rem" }}>
                     <Skeleton animation="wave" variant="rounded" height={180} sx={{ borderRadius: '16px', bgcolor: 'var(--bg-elevated)' }} />
                     <Skeleton animation="wave" variant="rounded" height={180} sx={{ borderRadius: '16px', bgcolor: 'var(--bg-elevated)' }} />
                     <Skeleton animation="wave" variant="rounded" height={180} sx={{ borderRadius: '16px', bgcolor: 'var(--bg-elevated)' }} />
                 </Box>
-                <Box sx={{ display: 'grid', gridTemplateColumns: "1fr 300px", gap: "1.5rem" }}>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: "1fr", lg: "1fr 300px" }, gap: "1.5rem" }}>
                     <Skeleton animation="wave" variant="rounded" height={400} sx={{ borderRadius: '16px', bgcolor: 'var(--bg-elevated)' }} />
                     <Skeleton animation="wave" variant="rounded" height={400} sx={{ borderRadius: '16px', bgcolor: 'var(--bg-elevated)' }} />
                 </Box>
@@ -373,7 +373,7 @@ export default function Budget() {
             color: "var(--text-primary)"
         }}>
             {/* Header Actions */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
+            <div className="budget-header">
                 <div>
                     <h1 style={{ fontSize: "24px", fontWeight: 900, color: "var(--text-primary)", margin: 0, letterSpacing: "-0.03em" }}>Financial Studio</h1>
                     <p style={{ fontSize: "13px", color: "var(--text-secondary)", marginTop: "4px" }}>Strategic budget allocation and expense monitoring.</p>
@@ -407,12 +407,7 @@ export default function Budget() {
                 border: "1px solid var(--border-subtle)",
                 marginBottom: "2rem"
             }}>
-                <div style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr 1fr",
-                    gap: "2rem",
-                    marginBottom: "2rem"
-                }}>
+                <div className="dashboard-kpi-grid" style={{ marginBottom: "2rem" }}>
                     {/* Total Budget Card */}
                     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -595,7 +590,7 @@ export default function Budget() {
                         </div>
                     </div>
 
-                    <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "1.5rem", marginBottom: "1.5rem" }}>
+                    <div className="analytics-main-split" style={{ marginBottom: "1.5rem" }}>
                         {/* Rationale Card */}
                         <div style={{ background: "var(--bg-surface)", padding: "2rem", borderRadius: "24px", border: "1px solid var(--border-subtle)", display: "flex", gap: "1.5rem", alignItems: "center" }}>
                             <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "rgba(99, 102, 241, 0.1)", color: "#6366f1", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -642,7 +637,7 @@ export default function Budget() {
                 </div>
             )}
 
-            <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: "1.5rem", marginBottom: "1.5rem" }}>
+            <div className="budget-charts-grid">
                 {/* Monthly Burn Rate Chart */}
                 <div style={{
                     background: "var(--bg-surface)",

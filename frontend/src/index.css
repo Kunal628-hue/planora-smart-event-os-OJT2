@@ -1531,3 +1531,260 @@ td {
     background-position: -200% 0;
   }
 }
+
+/* ── Sidebar Mobile Drawer & Overlay ───────── */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sidebar-toggle-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  color: #fff;
+  transition: all 0.2s;
+}
+
+.sidebar-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 1024px) {
+  .dashboard-sidebar {
+    position: fixed !important;
+    left: -280px !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    height: 100vh !important;
+    z-index: 1000 !important;
+    width: 280px !important;
+    transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  
+  .dashboard-sidebar.mobile-open {
+    left: 0 !important;
+  }
+  
+  .top-bar {
+    padding: 0 1.5rem !important;
+  }
+
+  .sidebar-toggle-btn {
+    display: flex !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .top-bar {
+    padding: 0 1rem !important;
+  }
+}
+
+/* ── Custom Dashboard Grid Override ───────── */
+.dashboard-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Grid 2-Column Responsive Stack ──────── */
+.grid-2-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .grid-2-col {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+/* ── Event Details Split Grid ─────────────── */
+.event-details-split-grid {
+  display: grid;
+  grid-template-columns: 1.8fr 1.2fr;
+  gap: 2.5rem;
+}
+
+@media (max-width: 1024px) {
+  .event-details-split-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+/* ── Operational Pulse Gauge Grid ──────────── */
+.operational-pulse-split {
+  display: grid;
+  grid-template-columns: 1.2fr 1.8fr;
+  gap: 3.5rem;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .operational-pulse-split {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    justify-items: center;
+  }
+}
+
+/* ── Settings Split Layout ───────────────── */
+.settings-split-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 3rem;
+}
+
+@media (max-width: 1024px) {
+  .settings-split-layout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+/* ── Analytics Main Split ─────────────────── */
+.analytics-main-split {
+  display: grid;
+  grid-template-columns: 2.2fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .analytics-main-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Guests Controls Row ──────────────────── */
+.guests-controls-row {
+  display: flex;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .guests-controls-row {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .guests-controls-row > div,
+  .guests-controls-row select,
+  .guests-controls-row input {
+    width: 100% !important;
+    max-width: none !important;
+  }
+}
+
+/* ── Registration Builder Workspace ───────── */
+.builder-workspace {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.builder-editor-panel {
+  width: 380px;
+  flex-shrink: 0;
+}
+
+.builder-preview-panel {
+  padding: 2rem;
+}
+
+.device-frame-desktop, .device-frame-tablet, .device-frame-mobile {
+  max-width: 100% !important;
+}
+
+@media (max-width: 1024px) {
+  .builder-workspace {
+    flex-direction: column;
+    overflow-y: auto !important;
+  }
+  
+  .builder-editor-panel {
+    width: 100% !important;
+    border-right: none !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    height: auto !important;
+    overflow-y: visible !important;
+  }
+  
+  .builder-preview-panel {
+    padding: 1.5rem 1rem !important;
+    height: auto !important;
+    min-height: 500px;
+  }
+  
+  .builder-container {
+    height: auto !important;
+    min-height: 100vh;
+  }
+  
+  .builder-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start !important;
+    padding: 1rem 1.5rem !important;
+  }
+  
+  .builder-header > div {
+    width: 100% !important;
+    justify-content: space-between;
+  }
+  
+  .builder-header-buttons {
+    width: 100% !important;
+    flex-wrap: wrap;
+  }
+}
+
+/* ── Global Layout Padding Overrides ─────── */
+.dashboard-content {
+  padding: 3rem;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-content {
+    padding: 2rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-content {
+    padding: 1.5rem 1rem !important;
+  }
+}
+

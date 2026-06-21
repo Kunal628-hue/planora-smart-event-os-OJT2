@@ -154,8 +154,8 @@ export default function Vendors() {
             backgroundSize: "32px 32px"
         }}>
             {/* Header */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", paddingBottom: "1.25rem", borderBottom: "1px solid #1a1a1a" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
+            <div className="events-header">
+                <div className="events-header-left">
                     <h1 style={{ fontSize: "1.35rem", fontWeight: 900, margin: 0, letterSpacing: "-0.03em" }}>Vendor Registry</h1>
                     <div style={{ display: "flex", gap: "8px", background: "rgba(255,255,255,0.03)", padding: "4px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.05)" }}>
                         <div style={{ padding: "6px 12px", borderRadius: "6px", background: "rgba(259, 115, 22, 0.1)", color: "#f97316", fontSize: "10px", fontWeight: 800, textTransform: "uppercase" }}>Strategic Monitoring</div>
@@ -169,7 +169,7 @@ export default function Vendors() {
             </div>
 
             {/* Quick Stats Row */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1.25rem", marginBottom: "1.5rem" }}>
+            <div className="vendors-kpi-grid">
                 {[
                     { label: "Total Vendors", value: vendors.length, icon: <Users size={16} /> },
                     { label: "Active Contracts", value: vendors.filter(v => v.status === "Paid").length, icon: <Handshake size={16} /> },
@@ -186,19 +186,7 @@ export default function Vendors() {
             </div>
 
             {/* Filters - Sticky */}
-            <div style={{ 
-                display: "flex", 
-                gap: "1rem", 
-                marginBottom: "1.5rem", 
-                position: "sticky", 
-                top: "10px", 
-                zIndex: 100, 
-                background: "rgba(10, 10, 10, 0.8)", 
-                backdropFilter: "blur(12px)", 
-                padding: "8px", 
-                borderRadius: "16px",
-                border: "1px solid rgba(255,255,255,0.03)"
-            }}>
+            <div className="vendors-filters">
                 <div style={{ position: "relative", flex: 1 }}>
                     <Search size={16} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "#64748b" }} />
                     <input placeholder="Search partners..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
@@ -328,7 +316,7 @@ export default function Vendors() {
             </div>
 
             {/* Analytics Dashboard */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem", marginTop: "1.25rem" }}>
+            <div className="vendors-dir-grid" style={{ marginTop: "1.25rem" }}>
                 <div className="v-card" style={{ gridColumn: "span 1" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1.5rem" }}>
                         <h3 style={{ fontSize: "0.7rem", fontWeight: 800, letterSpacing: "0.08em", color: "#94a3b8", textTransform: "uppercase" }}>Stream Context</h3>

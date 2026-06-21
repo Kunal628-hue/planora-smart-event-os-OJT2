@@ -336,7 +336,7 @@ export default function RegistrationBuilder() {
     const currentThemeStyle = themeStyles[selectedTheme] || themeStyles["quantum-cyber"];
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 72px)", color: "#fff", fontFamily: "'Inter', sans-serif" }}>
+        <div className="builder-container" style={{ display: "flex", flexDirection: "column", color: "#fff", fontFamily: "'Inter', sans-serif" }}>
             <style>{`
                 .builder-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
                 .builder-btn:hover { transform: translateY(-1px); }
@@ -362,7 +362,7 @@ export default function RegistrationBuilder() {
             `}</style>
 
             {/* Top Toolbar */}
-            <div style={{ display: "flex", justifySelf: "flex-start", justifyContent: "space-between", alignItems: "center", padding: "0.85rem 1.5rem", borderBottom: "1px solid rgba(255, 255, 255, 0.08)", background: "rgba(9, 9, 11, 0.6)", backdropFilter: "blur(10px)" }}>
+            <div className="builder-header" style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.08)", background: "rgba(9, 9, 11, 0.6)", backdropFilter: "blur(10px)" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                     <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "rgba(249, 115, 22, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", color: "#f97316" }}>
                         <Sparkles size={18} style={{ margin: "auto" }} />
@@ -506,10 +506,10 @@ export default function RegistrationBuilder() {
             </div>
 
             {/* Split Screen Panel */}
-            <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+            <div className="builder-workspace" style={{ display: "flex", flex: 1, overflow: "hidden" }}>
                 {/* Left Panel - Editor Controls */}
                 {!previewMode && (
-                    <div className="custom-scrollbar" style={{ width: "380px", borderRight: "1px solid rgba(255,255,255,0.08)", background: "rgba(9, 9, 11, 0.45)", display: "flex", flexDirection: "column", overflowY: "auto" }}>
+                    <div className="custom-scrollbar builder-editor-panel" style={{ borderRight: "1px solid rgba(255,255,255,0.08)", background: "rgba(9, 9, 11, 0.45)", display: "flex", flexDirection: "column", overflowY: "auto" }}>
                         {/* Editor Controls Body */}
                         <div style={{ padding: "1.5rem", flex: 1 }}>
                             
@@ -904,7 +904,7 @@ export default function RegistrationBuilder() {
                 )}
 
                 {/* Right Panel - Live Preview Canvas */}
-                <div style={{ flex: 1, background: "#09090b", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem", overflow: "auto", backgroundImage: "radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px)", backgroundSize: "24px 24px" }}>
+                <div className="builder-preview-panel" style={{ flex: 1, background: "#09090b", display: "flex", alignItems: "center", justifyContent: "center", overflow: "auto", backgroundImage: "radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px)", backgroundSize: "24px 24px" }}>
                     <div 
                         className={`device-frame-${device}`} 
                         style={{ 
