@@ -27,12 +27,17 @@ export const eventSchema = Joi.object({
 
 export const vendorSchema = Joi.object({
   name: Joi.string().required(),
-  serviceType: Joi.string().required(),
+  service: Joi.string().allow('', null),
+  serviceType: Joi.string().allow('', null),
+  contact: Joi.string().allow('', null),
   email: Joi.string().email().allow('', null),
   phone: Joi.string().allow('', null),
+  cost: Joi.number().allow(null),
   rating: Joi.number().allow(null),
   status: Joi.string().allow('', null),
-  eventId: Joi.string().required()
+  event: Joi.string().allow('', null),
+  eventId: Joi.string().allow('', null),
+  user: Joi.string().allow('', null)
 });
 
 export const guestSchema = Joi.object({

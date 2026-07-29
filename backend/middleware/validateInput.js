@@ -132,33 +132,38 @@ const vendorSchemas = {
         name:       fields.shortText(80).required()
             .messages({ "string.max": "Vendor name cannot exceed 80 characters" }),
         service:    fields.shortText(80).required(),
-        contact:    fields.phone.optional(),
-        email:      fields.email.optional(),
+        contact:    fields.shortText(200).optional().allow(""),
+        email:      fields.email.optional().allow(""),
         cost:       Joi.number().min(0).max(10_000_000_000).optional(),
-        status:     Joi.string().valid("Inquiry", "Booked", "Paid").optional(),
+        status:     Joi.string().valid("Inquiry", "Booked", "Paid", "Unpaid", "Pending").optional().allow(""),
         receiptUrl: fields.url.optional().allow(""),
         event:      fields.objectId.required(),
-        user:       fields.firebaseUid.optional(),
+        user:       fields.firebaseUid.optional().allow(""),
+        eventId:    fields.objectId.optional().allow(""),
     }),
     update: Joi.object({
         name:       fields.shortText(80).optional(),
         service:    fields.shortText(80).optional(),
-        contact:    fields.phone.optional(),
-        email:      fields.email.optional(),
+        contact:    fields.shortText(200).optional().allow(""),
+        email:      fields.email.optional().allow(""),
         cost:       Joi.number().min(0).max(10_000_000_000).optional(),
-        status:     Joi.string().valid("Inquiry", "Booked", "Paid").optional(),
+        status:     Joi.string().valid("Inquiry", "Booked", "Paid", "Unpaid", "Pending").optional().allow(""),
         receiptUrl: fields.url.optional().allow(""),
+        event:      fields.objectId.optional().allow(""),
+        user:       fields.firebaseUid.optional().allow(""),
+        eventId:    fields.objectId.optional().allow(""),
     }).min(1),
 };
+
 
 // ---------- TASK ----------
 const taskSchemas = {
     create: Joi.object({
         title:       fields.shortText(100).required(),
         description: fields.longText(5000).optional().allow(""),
-        dueDate:     Joi.string().max(50).optional(),
+        dueDate:     Joi.string().max(50).optional().allow(""),
         priority:    Joi.string().valid("Low", "Medium", "High").optional(),
-        status:      Joi.string().valid("To Do", "In Progress", "Completed").optional(),
+        status:      Joi.string().valid("To Do", "In Progress", "Completed", "Pending").optional(),
         event:       fields.objectId.required(),
         user:        fields.firebaseUid.optional(),
         budget:      Joi.number().min(0).max(10_000_000_000).optional(),
@@ -166,9 +171,9 @@ const taskSchemas = {
     update: Joi.object({
         title:       fields.shortText(100).optional(),
         description: fields.longText(5000).optional().allow(""),
-        dueDate:     Joi.string().max(50).optional(),
+        dueDate:     Joi.string().max(50).optional().allow(""),
         priority:    Joi.string().valid("Low", "Medium", "High").optional(),
-        status:      Joi.string().valid("To Do", "In Progress", "Completed").optional(),
+        status:      Joi.string().valid("To Do", "In Progress", "Completed", "Pending").optional(),
         budget:      Joi.number().min(0).max(10_000_000_000).optional(),
     }).min(1),
 };

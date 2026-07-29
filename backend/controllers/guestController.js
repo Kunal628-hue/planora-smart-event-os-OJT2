@@ -113,7 +113,17 @@ export const getGuests = async (req, res) => {
         }
 
         const guests = await Guest.find(filter).sort({ name: 1 });
-        res.json(guests);
+        
+        // Auto-heal missing entry codes for legacy records
+        const updatedGuests = await Promise.all(guests.map(async (g) => {
+            if (!g.entryCode) {
+                g.entryCode = generateEntryCode();
+                await g.save().catch(() => {});
+            }
+            return g;
+        }));
+
+        res.json(updatedGuests);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -364,6 +374,7 @@ export const bulkUploadGuests = async (req, res) => {
                     ...guestData,
                     event: eventId,
                     user: event.user,
+                    entryCode: generateEntryCode(),
                     status: "Pending"
                 };
 

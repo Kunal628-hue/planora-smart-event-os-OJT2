@@ -33,37 +33,39 @@ export default function App() {
       <UploadProvider>
         <AuthProvider>
           <BrowserRouter>
-          <Suspense fallback={<LogoLoader />}>
-            <CustomDialog />
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/register/:eventId" element={<RegisterEvent />} />
+            <Suspense fallback={<LogoLoader />}>
+              <CustomDialog />
+              <Routes>
+                <Route path="/" element={<Landing />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/register/:eventId" element={<RegisterEvent />} />
 
-              {/* Protected Dashboard Routes */}
-              <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/events" element={<Events />} />
-                <Route path="/events/:eventId" element={<EventDetails />} />
-                <Route path="/vendors" element={<Vendors />} />
-                <Route path="/guests" element={<Guests />} />
-                <Route path="/budget" element={<Budget />} />
-                <Route path="/tasks" element={<Tasks />} />
-                <Route path="/analytics" element={<Analytics />} />
-                <Route path="/team" element={<Team />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/builder" element={<RegistrationBuilder />} />
-                {/* Redirect empty paths to dashboard */}
-                <Route path="/auth" element={<Navigate to="/dashboard" replace />} />
-                <Route path="*" element={<Navigate to="/dashboard" replace />} />
-              </Route>
-            </Routes>
-          </Suspense>
-        </BrowserRouter>
-      </AuthProvider>
+                {/* Protected Dashboard Routes */}
+                <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/events" element={<Events />} />
+                  <Route path="/events/:eventId" element={<EventDetails />} />
+                  <Route path="/vendors" element={<Vendors />} />
+                  <Route path="/guests" element={<Guests />} />
+                  <Route path="/budget" element={<Budget />} />
+                  <Route path="/tasks" element={<Tasks />} />
+                  <Route path="/analytics" element={<Analytics />} />
+                  <Route path="/team" element={<Team />} />
+                  <Route path="/settings" element={<Settings />} />
+                  <Route path="/builder" element={<RegistrationBuilder />} />
+                  {/* Redirect empty paths to dashboard */}
+                  <Route path="/auth" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                </Route>
+              </Routes>
+            </Suspense>
+          </BrowserRouter>
+        </AuthProvider>
       </UploadProvider>
     </DialogProvider>
   );
 }
+
+//sample
 

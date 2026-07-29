@@ -1788,3 +1788,198 @@ td {
   }
 }
 
+/* ── Page Header & Layout Standard ─────────── */
+.events-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+  flex-wrap: wrap;
+}
+
+.events-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+/* ── KPI & Stat Grids ──────────────────────── */
+.events-stat-grid,
+.tasks-kpi-grid,
+.vendors-kpi-grid,
+.team-kpi-grid,
+.budget-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+.guests-kpi-grid,
+.analytics-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+@media (max-width: 1024px) {
+  .events-stat-grid,
+  .tasks-kpi-grid,
+  .vendors-kpi-grid,
+  .team-kpi-grid,
+  .budget-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .guests-kpi-grid,
+  .analytics-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Filter Bars Standard ───────────────────── */
+.vendors-filters {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.vendors-dir-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+@media (max-width: 1024px) {
+  .vendors-dir-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .vendors-dir-grid > div {
+    grid-column: span 1 !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .vendors-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .events-header-left {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .vendors-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .events-stat-grid,
+  .tasks-kpi-grid,
+  .vendors-kpi-grid,
+  .guests-kpi-grid,
+  .team-kpi-grid,
+  .budget-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vendors-dir-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Print Media Styles for Formal Monochrome PDF & Document Printing ── */
+.print-manifest-document {
+  display: none;
+}
+
+@media print {
+  *,
+  *::before,
+  *::after {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  html,
+  body,
+  #root,
+  .app-container,
+  .layout-container,
+  .main-content,
+  .responsive-container,
+  div,
+  main,
+  section {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    min-height: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide screen elements inside responsive-container and app shell */
+  .responsive-container > *:not(.print-manifest-document),
+  .sidebar-container,
+  .sidebar,
+  .navbar,
+  .nav-header,
+  header,
+  nav,
+  .ai-assistant-container,
+  .events-header,
+  .guests-kpi-grid,
+  .responsive-split,
+  .guests-controls-row,
+  .p-btn,
+  button,
+  input,
+  select,
+  .custom-select,
+  .modal-reveal,
+  .Toastify,
+  iframe,
+  .event-card-hover,
+  .event-row {
+    display: none !important;
+  }
+
+  /* Show only the monochrome print manifest document */
+  .print-manifest-document {
+    display: block !important;
+    position: relative !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 12mm 15mm 12mm 15mm;
+  }
+}
+
+

@@ -1,9 +1,29 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import { useDialog } from "../../context/DialogContext";
-import { Plus, Calendar, MapPin, Globe, ChevronRight, Loader2, X, Sparkles, LayoutGrid, Package, Wallet, RefreshCw, Activity } from "lucide-react";
-import Box from '@mui/material/Box';
-import MuiSkeleton from '@mui/material/Skeleton';
+import { 
+    Plus, 
+    Calendar, 
+    MapPin, 
+    Globe, 
+    ChevronRight, 
+    Loader2, 
+    X, 
+    Sparkles, 
+    LayoutGrid, 
+    Wallet, 
+    RefreshCw, 
+    Activity,
+    Search,
+    TrendingUp,
+    PieChart,
+    Table as TableIcon,
+    Grid as GridIcon,
+    FolderKanban,
+    DollarSign,
+    SlidersHorizontal,
+    ArrowUpRight
+} from "lucide-react";
 import { TableSkeleton } from "../../components/ui/Skeleton";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -12,9 +32,17 @@ export default function Events() {
     const { user, addNotification } = useOutletContext();
     const { showAlert } = useDialog();
     const navigate = useNavigate();
+    
     const [events, setEvents] = useState([]);
     const [fetchLoading, setFetchLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
+    const [loading, setLoading] = useState(false);
+    
+    const [activeTab, setActiveTab] = useState("all");
+    const [searchQuery, setSearchQuery] = useState("");
+    const [categoryFilter, setCategoryFilter] = useState("All");
+    const [viewMode, setViewMode] = useState("table"); // "table" | "grid"
+    
     const [newEvent, setNewEvent] = useState({
         name: "",
         date: "",
@@ -25,19 +53,14 @@ export default function Events() {
         country: ""
     });
 
-    const [timeline, setTimeline] = useState([]);
-    const [activeTab, setActiveTab] = useState("all");
-
     const fetchEvents = async () => {
         if (!user) return;
         try {
+            setFetchLoading(true);
             const response = await fetch(`${API_URL}/events?user=${user.uid}&email=${user.email}`);
             const data = await response.json();
             if (Array.isArray(data)) {
                 setEvents(data);
-                if (data.length > 0) {
-                    fetchTimeline(data[0]);
-                }
             } else {
                 setEvents([]);
             }
@@ -48,40 +71,9 @@ export default function Events() {
         }
     };
 
-    const fetchTimeline = async (event) => {
-        try {
-            const response = await fetch(`${API_URL}/ai/timeline?type=${event.type || "Wedding"}`);
-            const data = await response.json();
-            setTimeline(data);
-        } catch (err) {
-            console.error("Timeline fetch error:", err);
-        }
-    };
-
     useEffect(() => {
         fetchEvents();
     }, [user]);
-
-
-    const [loading, setLoading] = useState(false);
-
-    const handleToggleStatus = async (e, eventId, currentStatus) => {
-        e.stopPropagation();
-        try {
-            const newStatus = currentStatus === "Completed" ? "Planned" : "Completed";
-            const response = await fetch(`${API_URL}/events/${eventId}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ status: newStatus })
-            });
-            if (response.ok) {
-                fetchEvents();
-                addNotification("Status Updated", `Event context transitioned to '${newStatus}'.`);
-            }
-        } catch (err) {
-            console.error("Status update failed:", err);
-        }
-    };
 
     const handleCreateEvent = async (e) => {
         e.preventDefault();
@@ -95,8 +87,8 @@ export default function Events() {
             budget: parseInt(newEvent.budget) || 0,
             userId: user.uid,
             status: "Planned",
-            city: newEvent.city,
-            country: newEvent.country
+            city: newEvent.city || "",
+            country: newEvent.country || ""
         };
 
         setLoading(true);
@@ -115,35 +107,50 @@ export default function Events() {
                 addNotification("Event Created", `'${eventData.name}' has been successfully onboarded.`);
             } else {
                 const errorData = await response.json();
-                await showAlert("Initialization Error", errorData.message || "Failed to create event stream. Please verify your parameters.");
+                await showAlert("Initialization Error", errorData.message || "Failed to create event. Please verify parameters.");
             }
         } catch (err) {
             console.error("Fetch error:", err);
-            await showAlert("Nexus Connection Error", "External synchronization failed. Is the backend strategic module active?");
+            await showAlert("Connection Error", "External synchronization failed. Please check backend connection.");
         } finally {
             setLoading(false);
         }
     };
 
-    const getStatusColor = (status) => {
-        switch (status) {
-            case "Planned": return "#3b82f6"; // Blue
-            case "Completed": return "#10b981"; // Green
-            case "At Risk": return "#f59e0b"; // Amber
-            default: return "#64748b";
-        }
-    };
+    const totalBudget = useMemo(() => events.reduce((sum, e) => sum + (e.budget || 0), 0), [events]);
+    const totalSpent = useMemo(() => events.reduce((sum, e) => sum + (e.spent || 0), 0), [events]);
+    const avgUtilization = totalBudget > 0 ? ((totalSpent / totalBudget) * 100).toFixed(1) : "0.0";
+
+    const filteredEvents = useMemo(() => {
+        return events.filter(event => {
+            if (activeTab === "drafts" && !(event.status === "Draft" || event.status === "Planned")) return false;
+            if (activeTab === "archived" && !(event.status === "Archived" || event.status === "Completed")) return false;
+
+            if (searchQuery.trim()) {
+                const q = searchQuery.toLowerCase();
+                const matchName = event.name?.toLowerCase().includes(q);
+                const matchLocation = (event.location || "").toLowerCase().includes(q) || (event.city || "").toLowerCase().includes(q);
+                const matchType = (event.type || "").toLowerCase().includes(q);
+                if (!matchName && !matchLocation && !matchType) return false;
+            }
+
+            if (categoryFilter !== "All" && event.type !== categoryFilter) return false;
+
+            return true;
+        });
+    }, [events, activeTab, searchQuery, categoryFilter]);
 
     const inputStyle = {
         width: "100%",
-        padding: "0.65rem 0.85rem 0.65rem 2.5rem",
+        padding: "0.7rem 0.85rem 0.7rem 2.5rem",
         background: "var(--bg-elevated)",
-        border: "1px solid var(--border-subtle)",
+        border: "1px solid var(--border-medium)",
         borderRadius: "12px",
         fontSize: "0.85rem",
         fontWeight: "600",
         color: "var(--text-primary)",
-        outline: "none"
+        outline: "none",
+        transition: "border-color 0.2s"
     };
 
     const labelStyle = {
@@ -156,157 +163,466 @@ export default function Events() {
         letterSpacing: "0.06em"
     };
 
-    const totalBudget = events.reduce((sum, e) => sum + (e.budget || 0), 0);
-    const totalSpent = events.reduce((sum, e) => sum + (e.spent || 0), 0);
-
-    const filteredEvents = events.filter(event => {
-        if (activeTab === "drafts") return event.status === "Draft" || event.status === "Planned";
-        if (activeTab === "archived") return event.status === "Archived" || event.status === "Completed";
-        return true;
-    });
+    const categoryColors = {
+        "Wedding": "#f97316",
+        "Conference": "#3b82f6",
+        "Corporate": "#8b5cf6",
+        "Birthday": "#ec4899",
+        "Tech Summits": "#10b981",
+        "Tech Fest": "#06b6d4",
+        "Hackathon": "#eab308"
+    };
 
     return (
         <div className="responsive-container" style={{ paddingBottom: "4rem" }}>
             {/* Header Bar */}
             <div className="events-header">
                 <div className="events-header-left">
-                    <h1 style={{ fontSize: "20px", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>Events</h1>
-                    <div style={{ display: "flex", gap: "4px", background: "rgba(255,255,255,0.03)", padding: "4px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.05)" }}>
-                        <button onClick={() => setActiveTab("all")} style={{ background: activeTab === "all" ? "var(--accent-primary)" : "transparent", border: "none", color: activeTab === "all" ? "#fff" : "var(--text-secondary)", padding: "6px 14px", borderRadius: "8px", fontSize: "11px", fontWeight: 800, cursor: "pointer", transition: "all 0.2s" }}>All Events</button>
-                        <button onClick={() => setActiveTab("drafts")} style={{ background: activeTab === "drafts" ? "var(--accent-primary)" : "transparent", border: "none", color: activeTab === "drafts" ? "#fff" : "var(--text-secondary)", padding: "6px 14px", borderRadius: "8px", fontSize: "11px", fontWeight: 800, cursor: "pointer", transition: "all 0.2s" }}>Drafts</button>
-                        <button onClick={() => setActiveTab("archived")} style={{ background: activeTab === "archived" ? "var(--accent-primary)" : "transparent", border: "none", color: activeTab === "archived" ? "#fff" : "var(--text-secondary)", padding: "6px 14px", borderRadius: "8px", fontSize: "11px", fontWeight: 800, cursor: "pointer", transition: "all 0.2s" }}>Archived</button>
+                    <div>
+                        <h1 style={{ fontSize: "24px", fontWeight: 900, color: "var(--text-primary)", margin: 0, letterSpacing: "-0.02em" }}>
+                            Events
+                        </h1>
+                    </div>
+                    {/* Tab Selection Pills */}
+                    <div style={{
+                        display: "inline-flex",
+                        gap: "4px",
+                        background: "rgba(255, 255, 255, 0.03)",
+                        padding: "4px",
+                        borderRadius: "12px",
+                        border: "1px solid rgba(255, 255, 255, 0.08)"
+                    }}>
+                        <button
+                            onClick={() => setActiveTab("all")}
+                            style={{
+                                background: activeTab === "all" ? "var(--accent-primary)" : "transparent",
+                                border: "none",
+                                color: activeTab === "all" ? "#ffffff" : "var(--text-secondary)",
+                                padding: "7px 16px",
+                                borderRadius: "9px",
+                                fontSize: "12px",
+                                fontWeight: 700,
+                                cursor: "pointer",
+                                transition: "all 0.2s ease",
+                                boxShadow: activeTab === "all" ? "0 4px 12px rgba(249, 115, 22, 0.3)" : "none"
+                            }}
+                        >
+                            All Events ({events.length})
+                        </button>
+                        <button
+                            onClick={() => setActiveTab("drafts")}
+                            style={{
+                                background: activeTab === "drafts" ? "var(--accent-primary)" : "transparent",
+                                border: "none",
+                                color: activeTab === "drafts" ? "#ffffff" : "var(--text-secondary)",
+                                padding: "7px 16px",
+                                borderRadius: "9px",
+                                fontSize: "12px",
+                                fontWeight: 700,
+                                cursor: "pointer",
+                                transition: "all 0.2s ease",
+                                boxShadow: activeTab === "drafts" ? "0 4px 12px rgba(249, 115, 22, 0.3)" : "none"
+                            }}
+                        >
+                            Active & Drafts
+                        </button>
+                        <button
+                            onClick={() => setActiveTab("archived")}
+                            style={{
+                                background: activeTab === "archived" ? "var(--accent-primary)" : "transparent",
+                                border: "none",
+                                color: activeTab === "archived" ? "#ffffff" : "var(--text-secondary)",
+                                padding: "7px 16px",
+                                borderRadius: "9px",
+                                fontSize: "12px",
+                                fontWeight: 700,
+                                cursor: "pointer",
+                                transition: "all 0.2s ease",
+                                boxShadow: activeTab === "archived" ? "0 4px 12px rgba(249, 115, 22, 0.3)" : "none"
+                            }}
+                        >
+                            Archived & Completed
+                        </button>
                     </div>
                 </div>
+
                 <button
                     onClick={() => setShowModal(true)}
-                    className="btn btn-primary"
-                    style={{ borderRadius: "8px", padding: "0.5rem 1.25rem", fontWeight: 800, fontSize: "12px", height: "36px", display: "flex", alignItems: "center", gap: "8px" }}
+                    style={{
+                        background: "linear-gradient(135deg, #f97316 0%, #ea580c 100%)",
+                        color: "#ffffff",
+                        borderRadius: "10px",
+                        padding: "0.6rem 1.35rem",
+                        fontWeight: 800,
+                        fontSize: "13px",
+                        height: "40px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        border: "none",
+                        boxShadow: "0 4px 14px rgba(249, 115, 22, 0.35)",
+                        cursor: "pointer",
+                        transition: "all 0.2s ease"
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.transform = "translateY(-1px)"}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = "translateY(0)"}
                 >
-                    <Plus size={14} strokeWidth={4} />
+                    <Plus size={16} strokeWidth={3} />
                     New Event
                 </button>
             </div>
 
-            {/* Top Stat Row */}
-            <div className="events-stat-grid" style={{ marginBottom: "1.5rem" }}>
-                <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "12px", padding: "1.25rem" }}>
-                    <div style={{ fontSize: "10px", color: "var(--text-secondary)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>Total Spent</div>
-                    <div style={{ fontSize: "20px", fontWeight: 900, color: "var(--text-primary)" }}>₹{totalSpent.toLocaleString('en-IN')}</div>
+            {/* Top Stat Row (3-Column Grid) */}
+            <div className="events-stat-grid">
+                {/* Stat Card 1 */}
+                <div style={{
+                    background: "var(--bg-surface)",
+                    border: "1px solid var(--border-subtle)",
+                    borderRadius: "16px",
+                    padding: "1.25rem 1.5rem",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    position: "relative",
+                    overflow: "hidden"
+                }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
+                        <span style={{ fontSize: "11px", color: "var(--text-secondary)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                            Total Spent
+                        </span>
+                        <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "rgba(249, 115, 22, 0.1)", color: "#f97316", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <Wallet size={18} />
+                        </div>
+                    </div>
+                    <div>
+                        <div style={{ fontSize: "24px", fontWeight: 900, color: "var(--text-primary)", letterSpacing: "-0.02em", marginBottom: "2px" }}>
+                            ₹{totalSpent.toLocaleString('en-IN')}
+                        </div>
+                        <div style={{ fontSize: "11px", color: "var(--text-muted)", fontWeight: 600 }}>
+                            Consumed across registered events
+                        </div>
+                    </div>
                 </div>
-                <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "12px", padding: "1.25rem" }}>
-                    <div style={{ fontSize: "10px", color: "var(--text-secondary)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>Allocated Budget</div>
-                    <div style={{ fontSize: "20px", fontWeight: 900, color: "#f97316" }}>₹{totalBudget.toLocaleString('en-IN')}</div>
+
+                {/* Stat Card 2 */}
+                <div style={{
+                    background: "var(--bg-surface)",
+                    border: "1px solid var(--border-subtle)",
+                    borderRadius: "16px",
+                    padding: "1.25rem 1.5rem",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    position: "relative",
+                    overflow: "hidden"
+                }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
+                        <span style={{ fontSize: "11px", color: "var(--text-secondary)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                            Allocated Budget
+                        </span>
+                        <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "rgba(59, 130, 246, 0.1)", color: "#3b82f6", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <PieChart size={18} />
+                        </div>
+                    </div>
+                    <div>
+                        <div style={{ fontSize: "24px", fontWeight: 900, color: "#f97316", letterSpacing: "-0.02em", marginBottom: "2px" }}>
+                            ₹{totalBudget.toLocaleString('en-IN')}
+                        </div>
+                        <div style={{ fontSize: "11px", color: "var(--text-muted)", fontWeight: 600 }}>
+                            Total pool across {events.length} active project{events.length !== 1 ? 's' : ''}
+                        </div>
+                    </div>
                 </div>
-                <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "12px", padding: "1.25rem" }}>
-                    <div style={{ fontSize: "10px", color: "var(--text-secondary)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>Avg Utilization</div>
-                    <div style={{ fontSize: "20px", fontWeight: 900, color: "var(--text-primary)" }}>{totalBudget > 0 ? ((totalSpent / totalBudget) * 100).toFixed(1) : 0}%</div>
+
+                {/* Stat Card 3 */}
+                <div style={{
+                    background: "var(--bg-surface)",
+                    border: "1px solid var(--border-subtle)",
+                    borderRadius: "16px",
+                    padding: "1.25rem 1.5rem",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    position: "relative",
+                    overflow: "hidden"
+                }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
+                        <span style={{ fontSize: "11px", color: "var(--text-secondary)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                            Avg Utilization
+                        </span>
+                        <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "rgba(16, 185, 129, 0.1)", color: "#10b981", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <TrendingUp size={18} />
+                        </div>
+                    </div>
+                    <div>
+                        <div style={{ fontSize: "24px", fontWeight: 900, color: "var(--text-primary)", letterSpacing: "-0.02em", marginBottom: "2px" }}>
+                            {avgUtilization}%
+                        </div>
+                        <div style={{ fontSize: "11px", color: "var(--text-muted)", fontWeight: 600 }}>
+                            {parseFloat(avgUtilization) > 85 ? "High expenditure zone" : "Budget utilization within safe parameters"}
+                        </div>
+                    </div>
                 </div>
             </div>
 
             {/* Compact Hero Section */}
             <div style={{
-                background: "var(--bg-surface)",
+                background: "linear-gradient(135deg, rgba(24, 24, 27, 0.9) 0%, rgba(18, 18, 20, 0.95) 100%)",
                 border: "1px solid var(--border-subtle)",
                 borderRadius: "16px",
                 padding: "1.75rem 2rem",
                 marginBottom: "2rem",
-                maxHeight: "200px",
                 position: "relative",
                 overflow: "hidden",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center"
+                boxShadow: "0 10px 30px rgba(0,0,0,0.2)"
             }}>
                 <div style={{ 
                     position: "absolute", 
-                    right: "-50px", 
-                    top: "-50px", 
-                    width: "200px", 
-                    height: "200px", 
-                    background: "radial-gradient(circle, rgba(249, 115, 22, 0.08) 0%, transparent 70%)",
+                    right: "-40px", 
+                    top: "-40px", 
+                    width: "220px", 
+                    height: "220px", 
+                    background: "radial-gradient(circle, rgba(249, 115, 22, 0.12) 0%, transparent 70%)",
                     animation: "floatOrb 10s infinite ease-in-out",
                     borderRadius: "50%",
                     pointerEvents: "none"
                 }}></div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "0.75rem" }}>
+                    <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#10b981", animation: "pulseDot 2s infinite" }}></div>
+                    <span style={{ fontSize: "10px", color: "#f97316", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.15em" }}>
+                        Operational Overview
+                    </span>
+                </div>
                 
-                <div style={{ fontSize: "10px", color: "#f97316", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.15em", marginBottom: "0.75rem" }}>Operational Overview</div>
-                <h2 style={{ fontSize: "28px", fontWeight: 900, color: "var(--text-primary)", margin: "0 0 0.5rem", lineHeight: 1, letterSpacing: "-0.02em" }}>
+                <h2 style={{ fontSize: "26px", fontWeight: 900, color: "var(--text-primary)", margin: "0 0 0.5rem", lineHeight: 1.2, letterSpacing: "-0.02em" }}>
                     {events.length} Active Production{events.length !== 1 ? 's' : ''}
                 </h2>
-                <p style={{ color: "var(--text-secondary)", fontSize: "13px", fontWeight: 500, margin: 0, maxWidth: "600px", lineHeight: 1.5 }}>
-                    System integrity optimal. All operational streams are currently synchronized. Next deployment phase: "{events[0]?.name || 'Hackathon'}" in active monitoring.
+                
+                <p style={{ color: "var(--text-secondary)", fontSize: "13px", fontWeight: 500, margin: 0, maxWidth: "650px", lineHeight: 1.6 }}>
+                    System integrity optimal. All operational streams are currently synchronized. Next deployment phase: "{events[0]?.name || 'Sample Event'}" in active monitoring.
                 </p>
             </div>
 
-            {/* Event Directory Table */}
+            {/* Event Directory Section */}
             <div style={{
                 background: "var(--bg-surface)",
                 border: "1px solid var(--border-subtle)",
                 borderRadius: "16px",
-                overflow: "hidden"
+                overflow: "hidden",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.1)"
             }}>
-                <div style={{ padding: "1.5rem", borderBottom: "1px solid var(--border-subtle)" }}>
-                    <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>Event Directory</h3>
+                {/* Directory Controls Header */}
+                <div style={{ 
+                    padding: "1.25rem 1.5rem", 
+                    borderBottom: "1px solid var(--border-subtle)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: "1rem",
+                    flexWrap: "wrap"
+                }}>
+                    <div>
+                        <h3 style={{ fontSize: "16px", fontWeight: 800, color: "var(--text-primary)", margin: 0, letterSpacing: "-0.01em" }}>
+                            Event Directory
+                        </h3>
+                        <span style={{ fontSize: "11px", color: "var(--text-muted)", fontWeight: 500 }}>
+                            Manage, monitor, and synchronize your event lifecycle.
+                        </span>
+                    </div>
+
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
+                        {/* Search Input */}
+                        <div style={{ position: "relative", minWidth: "220px" }}>
+                            <Search size={15} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
+                            <input
+                                type="text"
+                                placeholder="Search events..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                style={{
+                                    width: "100%",
+                                    padding: "0.45rem 0.85rem 0.45rem 2.3rem",
+                                    background: "rgba(255,255,255,0.04)",
+                                    border: "1px solid var(--border-subtle)",
+                                    borderRadius: "8px",
+                                    fontSize: "12px",
+                                    fontWeight: 600,
+                                    color: "var(--text-primary)",
+                                    outline: "none"
+                                }}
+                            />
+                            {searchQuery && (
+                                <button
+                                    onClick={() => setSearchQuery("")}
+                                    style={{ position: "absolute", right: "0.6rem", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer" }}
+                                >
+                                    <X size={12} />
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Category Dropdown */}
+                        <select
+                            value={categoryFilter}
+                            onChange={(e) => setCategoryFilter(e.target.value)}
+                            style={{
+                                padding: "0.45rem 0.85rem",
+                                background: "rgba(255,255,255,0.04)",
+                                border: "1px solid var(--border-subtle)",
+                                borderRadius: "8px",
+                                fontSize: "12px",
+                                fontWeight: 700,
+                                color: "var(--text-primary)",
+                                outline: "none",
+                                cursor: "pointer"
+                            }}
+                        >
+                            <option value="All">All Categories</option>
+                            <option value="Wedding">Wedding</option>
+                            <option value="Conference">Conference</option>
+                            <option value="Corporate">Corporate</option>
+                            <option value="Tech Summits">Tech Summits</option>
+                            <option value="Tech Fest">Tech Fest</option>
+                            <option value="Hackathon">Hackathon</option>
+                            <option value="Birthday">Birthday</option>
+                            <option value="Other">Other</option>
+                        </select>
+
+                        {/* View Mode Toggle */}
+                        <div style={{ display: "flex", background: "rgba(255,255,255,0.03)", padding: "2px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.08)" }}>
+                            <button
+                                onClick={() => setViewMode("table")}
+                                style={{
+                                    background: viewMode === "table" ? "var(--bg-elevated)" : "transparent",
+                                    border: "none",
+                                    color: viewMode === "table" ? "var(--accent-primary)" : "var(--text-muted)",
+                                    padding: "5px 8px",
+                                    borderRadius: "6px",
+                                    cursor: "pointer",
+                                    display: "flex",
+                                    alignItems: "center"
+                                }}
+                                title="Table View"
+                            >
+                                <TableIcon size={14} />
+                            </button>
+                            <button
+                                onClick={() => setViewMode("grid")}
+                                style={{
+                                    background: viewMode === "grid" ? "var(--bg-elevated)" : "transparent",
+                                    border: "none",
+                                    color: viewMode === "grid" ? "var(--accent-primary)" : "var(--text-muted)",
+                                    padding: "5px 8px",
+                                    borderRadius: "6px",
+                                    cursor: "pointer",
+                                    display: "flex",
+                                    alignItems: "center"
+                                }}
+                                title="Grid View"
+                            >
+                                <GridIcon size={14} />
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
-                <div style={{ width: "100%", overflowX: "auto" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                        <thead>
-                            <tr>
-                                <th style={{ textAlign: "left", padding: "1rem 1.5rem", fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "1px solid var(--border-subtle)" }}>Event Name</th>
-                                <th style={{ textAlign: "left", padding: "1rem 1.5rem", fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "1px solid var(--border-subtle)" }}>Date</th>
-                                <th style={{ textAlign: "left", padding: "1rem 1.5rem", fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "1px solid var(--border-subtle)" }}>Status</th>
-                                <th style={{ textAlign: "right", padding: "1rem 1.5rem", fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "1px solid var(--border-subtle)" }}>Budget Utilization</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {fetchLoading ? (
-                                <tr>
-                                    <td colSpan="4" style={{ padding: "0" }}>
-                                        <TableSkeleton rows={5} columns={4} />
-                                    </td>
+                {/* Directory Content */}
+                {fetchLoading ? (
+                    <div style={{ padding: "1.5rem" }}>
+                        <TableSkeleton rows={5} columns={4} />
+                    </div>
+                ) : filteredEvents.length === 0 ? (
+                    <div style={{ padding: "4rem 2rem", textAlign: "center" }}>
+                        <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "rgba(255,255,255,0.04)", color: "var(--text-muted)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem" }}>
+                            <FolderKanban size={24} />
+                        </div>
+                        <h4 style={{ fontSize: "15px", fontWeight: 800, color: "var(--text-primary)", margin: "0 0 0.4rem" }}>
+                            No events found
+                        </h4>
+                        <p style={{ fontSize: "12px", color: "var(--text-muted)", margin: "0 0 1.25rem", maxWidth: "360px", marginInline: "auto" }}>
+                            {searchQuery ? `No results matching "${searchQuery}" in ${activeTab}.` : `No event records registered under ${activeTab}.`}
+                        </p>
+                        <button
+                            onClick={() => setShowModal(true)}
+                            style={{
+                                background: "var(--accent-primary)",
+                                color: "#ffffff",
+                                border: "none",
+                                borderRadius: "8px",
+                                padding: "0.5rem 1rem",
+                                fontSize: "12px",
+                                fontWeight: 800,
+                                cursor: "pointer",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "6px"
+                            }}
+                        >
+                            <Plus size={14} />
+                            Create New Event
+                        </button>
+                    </div>
+                ) : viewMode === "table" ? (
+                    /* Table View */
+                    <div style={{ width: "100%", overflowX: "auto" }}>
+                        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                            <thead>
+                                <tr style={{ background: "rgba(255,255,255,0.01)" }}>
+                                    <th style={{ textAlign: "left", padding: "0.85rem 1.5rem", fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", borderBottom: "1px solid var(--border-subtle)" }}>
+                                        Event Name
+                                    </th>
+                                    <th style={{ textAlign: "left", padding: "0.85rem 1.5rem", fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", borderBottom: "1px solid var(--border-subtle)" }}>
+                                        Date & Location
+                                    </th>
+                                    <th style={{ textAlign: "left", padding: "0.85rem 1.5rem", fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", borderBottom: "1px solid var(--border-subtle)" }}>
+                                        Status
+                                    </th>
+                                    <th style={{ textAlign: "right", padding: "0.85rem 1.5rem", fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", borderBottom: "1px solid var(--border-subtle)" }}>
+                                        Budget Utilization
+                                    </th>
+                                    <th style={{ padding: "0.85rem 1.5rem", borderBottom: "1px solid var(--border-subtle)" }}></th>
                                 </tr>
-                            ) : filteredEvents.length === 0 ? (
-                                <tr><td colSpan="4" style={{ padding: "4rem", textAlign: "center", color: "var(--text-muted)" }}>No events found for {activeTab}.</td></tr>
-                            ) : (
-                                filteredEvents.map((event) => {
+                            </thead>
+                            <tbody>
+                                {filteredEvents.map((event) => {
                                     const spent = event.spent || 0;
                                     const utilization = event.budget > 0 ? (spent / event.budget) * 100 : 0;
                                     const isCompleted = event.status === "Completed";
-                                    
-                                    const categoryColors = {
-                                        "Wedding": "#f97316",
-                                        "Conference": "#3b82f6",
-                                        "Corporate": "#8b5cf6",
-                                        "Birthday": "#ec4899",
-                                        "Tech Summits": "#10b981"
-                                    };
-                                    const dotColor = categoryColors[event.type] || "#64748b";
+                                    const dotColor = categoryColors[event.type] || "#f97316";
 
                                     return (
                                         <tr 
                                             key={event.id || event._id} 
                                             onClick={() => navigate(`/events/${event.id || event._id}`)} 
                                             className="event-row"
-                                            style={{ borderBottom: "1px solid var(--border-subtle)", cursor: "pointer", transition: "all 0.2s", position: "relative" }}
+                                            style={{ borderBottom: "1px solid var(--border-subtle)", cursor: "pointer", transition: "all 0.2s" }}
                                         >
                                             <td style={{ padding: "1rem 1.5rem" }}>
                                                 <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                                                    <div style={{ width: "32px", height: "32px", background: "rgba(255,255,255,0.03)", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", border: `1px solid ${dotColor}44` }}>
-                                                        <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: dotColor }}></div>
+                                                    <div style={{ width: "36px", height: "36px", background: "rgba(255,255,255,0.03)", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center", border: `1px solid ${dotColor}44`, flexShrink: 0 }}>
+                                                        <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: dotColor }}></div>
                                                     </div>
                                                     <div>
-                                                        <div style={{ fontSize: "13px", fontWeight: 800, color: "var(--text-primary)", marginBottom: "2px" }}>{event.name}</div>
-                                                        <div style={{ fontSize: "10px", color: "var(--text-muted)", fontWeight: 600 }}>{event.type} • {event.city || event.location}</div>
+                                                        <div style={{ fontSize: "14px", fontWeight: 800, color: "var(--text-primary)", marginBottom: "2px" }}>
+                                                            {event.name}
+                                                        </div>
+                                                        <div style={{ fontSize: "11px", color: "var(--text-muted)", fontWeight: 600 }}>
+                                                            {event.type}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td style={{ padding: "1rem 1.5rem" }}>
-                                                <div style={{ fontSize: "12px", color: "var(--text-primary)", fontWeight: 600, marginBottom: "2px" }}>{new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
-                                                <div style={{ fontSize: "10px", color: "var(--text-muted)", fontWeight: 600 }}>{event.country || "Global"}</div>
+                                                <div style={{ fontSize: "12px", color: "var(--text-primary)", fontWeight: 700, marginBottom: "2px" }}>
+                                                    {event.date ? new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : "Date TBD"}
+                                                </div>
+                                                <div style={{ fontSize: "11px", color: "var(--text-muted)", fontWeight: 600 }}>
+                                                    {event.city || event.location || "Location TBD"} {event.country ? `, ${event.country}` : ""}
+                                                </div>
                                             </td>
                                             <td style={{ padding: "1rem 1.5rem" }}>
-                                                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                                <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "4px 10px", borderRadius: "20px", background: isCompleted ? "rgba(255,255,255,0.04)" : "rgba(16, 185, 129, 0.1)", border: `1px solid ${isCompleted ? "rgba(255,255,255,0.08)" : "rgba(16, 185, 129, 0.2)"}` }}>
                                                     {!isCompleted && (
                                                         <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#10b981", animation: "pulseDot 2s infinite" }}></div>
                                                     )}
@@ -314,61 +630,140 @@ export default function Events() {
                                                         fontSize: "10px", 
                                                         fontWeight: 900, 
                                                         color: isCompleted ? "var(--text-muted)" : "#10b981",
-                                                        letterSpacing: "0.05em"
+                                                        letterSpacing: "0.06em"
                                                     }}>
-                                                        {isCompleted ? "PAST" : "ACTIVE"}
+                                                        {isCompleted ? "COMPLETED" : "ACTIVE"}
                                                     </span>
                                                 </div>
                                             </td>
                                             <td style={{ padding: "1rem 1.5rem" }}>
                                                 <div style={{ display: "flex", flexDirection: "column", gap: "6px", maxWidth: "160px", marginLeft: "auto" }}>
-                                                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", fontWeight: 800 }}>
+                                                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", fontWeight: 800 }}>
                                                         <span style={{ color: "var(--text-primary)" }}>₹{spent.toLocaleString('en-IN')}</span>
                                                         <span style={{ color: "var(--text-muted)" }}>{utilization.toFixed(0)}%</span>
                                                     </div>
-                                                    <div style={{ height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "2px", overflow: "hidden" }}>
-                                                        <div style={{ width: `${Math.min(utilization, 100)}%`, height: "100%", background: utilization > 90 ? "#ef4444" : (isCompleted ? "var(--text-muted)" : "#f97316"), borderRadius: "2px", transition: "width 0.5s ease-out" }}></div>
+                                                    <div style={{ height: "5px", background: "rgba(255,255,255,0.06)", borderRadius: "3px", overflow: "hidden" }}>
+                                                        <div style={{ 
+                                                            width: `${Math.min(utilization, 100)}%`, 
+                                                            height: "100%", 
+                                                            background: utilization > 90 ? "#ef4444" : (isCompleted ? "var(--text-muted)" : "linear-gradient(90deg, #f97316, #ea580c)"), 
+                                                            borderRadius: "3px", 
+                                                            transition: "width 0.5s ease-out" 
+                                                        }}></div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td style={{ padding: "1rem 1.5rem", textAlign: "right" }}>
-                                                <button style={{ background: "transparent", border: "none", color: "var(--text-muted)", cursor: "pointer", padding: "4px" }} onClick={(e) => e.stopPropagation()}>
-                                                    <RefreshCw size={14} />
-                                                </button>
+                                                <div style={{ width: "28px", height: "28px", borderRadius: "8px", background: "rgba(255,255,255,0.04)", display: "inline-flex", alignItems: "center", justifyContent: "center", color: "var(--text-muted)" }}>
+                                                    <ChevronRight size={15} />
+                                                </div>
                                             </td>
                                         </tr>
                                     );
-                                })
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : (
+                    /* Grid View */
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1.25rem", padding: "1.5rem" }}>
+                        {filteredEvents.map((event) => {
+                            const spent = event.spent || 0;
+                            const utilization = event.budget > 0 ? (spent / event.budget) * 100 : 0;
+                            const isCompleted = event.status === "Completed";
+                            const dotColor = categoryColors[event.type] || "#f97316";
+
+                            return (
+                                <div
+                                    key={event.id || event._id}
+                                    onClick={() => navigate(`/events/${event.id || event._id}`)}
+                                    style={{
+                                        background: "rgba(255,255,255,0.02)",
+                                        border: "1px solid var(--border-subtle)",
+                                        borderRadius: "14px",
+                                        padding: "1.25rem",
+                                        cursor: "pointer",
+                                        transition: "all 0.2s ease",
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        justifyContent: "space-between"
+                                    }}
+                                    className="event-card-hover"
+                                >
+                                    <div>
+                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.75rem" }}>
+                                            <span style={{ fontSize: "10px", fontWeight: 800, padding: "3px 8px", borderRadius: "6px", background: `${dotColor}22`, color: dotColor }}>
+                                                {event.type}
+                                            </span>
+                                            <span style={{ fontSize: "10px", fontWeight: 800, color: isCompleted ? "var(--text-muted)" : "#10b981" }}>
+                                                {isCompleted ? "COMPLETED" : "ACTIVE"}
+                                            </span>
+                                        </div>
+
+                                        <h4 style={{ fontSize: "16px", fontWeight: 800, color: "var(--text-primary)", margin: "0 0 0.5rem" }}>
+                                            {event.name}
+                                        </h4>
+
+                                        <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginBottom: "1rem" }}>
+                                            <div style={{ fontSize: "11px", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "6px" }}>
+                                                <Calendar size={13} />
+                                                {event.date ? new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : "Date TBD"}
+                                            </div>
+                                            <div style={{ fontSize: "11px", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "6px" }}>
+                                                <MapPin size={13} />
+                                                {event.city || event.location || "Location TBD"}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div style={{ borderTop: "1px solid var(--border-subtle)", paddingTop: "0.85rem" }}>
+                                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", fontWeight: 800, marginBottom: "6px" }}>
+                                            <span style={{ color: "var(--text-secondary)" }}>Budget</span>
+                                            <span style={{ color: "var(--text-primary)" }}>₹{(event.budget || 0).toLocaleString('en-IN')}</span>
+                                        </div>
+                                        <div style={{ height: "4px", background: "rgba(255,255,255,0.06)", borderRadius: "2px", overflow: "hidden" }}>
+                                            <div style={{ width: `${Math.min(utilization, 100)}%`, height: "100%", background: dotColor, borderRadius: "2px" }}></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+
+                {/* Footer Controls */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "1rem 1.5rem", borderTop: "1px solid var(--border-subtle)" }}>
                     <div style={{ fontSize: "11px", color: "var(--text-muted)", fontWeight: 500 }}>
-                        Showing 1 to {Math.max(1, filteredEvents.length)} of {filteredEvents.length} events
+                        Showing {filteredEvents.length} of {events.length} events
                     </div>
                     <div style={{ display: "flex", gap: "0.25rem" }}>
-                        <button style={{ width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "1px solid var(--border-subtle)", borderRadius: "4px", color: "var(--text-muted)", cursor: "pointer" }}>&lt;</button>
-                        <button style={{ width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)", borderRadius: "4px", color: "var(--text-primary)", fontWeight: 700, cursor: "pointer", fontSize: "11px" }}>1</button>
-                        <button style={{ width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "1px solid var(--border-subtle)", borderRadius: "4px", color: "var(--text-primary)", fontWeight: 700, cursor: "pointer", fontSize: "11px" }}>2</button>
-                        <button style={{ width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "1px solid var(--border-subtle)", borderRadius: "4px", color: "var(--text-primary)", fontWeight: 700, cursor: "pointer", fontSize: "11px" }}>3</button>
-                        <button style={{ width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "1px solid var(--border-subtle)", borderRadius: "4px", color: "var(--text-muted)", cursor: "pointer" }}>&gt;</button>
+                        <button style={{ width: "28px", height: "28px", display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "1px solid var(--border-subtle)", borderRadius: "6px", color: "var(--text-muted)", cursor: "pointer" }}>&lt;</button>
+                        <button style={{ width: "28px", height: "28px", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--accent-primary)", border: "none", borderRadius: "6px", color: "#fff", fontWeight: 800, cursor: "pointer", fontSize: "11px" }}>1</button>
+                        <button style={{ width: "28px", height: "28px", display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "1px solid var(--border-subtle)", borderRadius: "6px", color: "var(--text-muted)", cursor: "pointer" }}>&gt;</button>
                     </div>
                 </div>
             </div>
 
-
             {/* Redesigned Modal */}
             {showModal && (
-                <div style={{ position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, backdropFilter: "blur(8px)" }}>
+                <div style={{ 
+                    position: "fixed", 
+                    inset: 0, 
+                    background: "rgba(0, 0, 0, 0.75)", 
+                    display: "flex", 
+                    alignItems: "center", 
+                    justifyContent: "center", 
+                    zIndex: 1000, 
+                    backdropFilter: "blur(12px)" 
+                }}>
                     <div className="modal-reveal mobile-full-width" style={{
                         width: "95%",
-                        maxWidth: "400px",
+                        maxWidth: "440px",
                         background: "var(--bg-surface)",
-                        border: "1px solid var(--border-subtle)",
+                        border: "1px solid var(--border-medium)",
                         padding: "2rem",
-                        borderRadius: "24px",
-                        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
+                        borderRadius: "20px",
+                        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.7)",
                         position: "relative",
                         maxHeight: "90vh",
                         overflowY: "auto"
@@ -394,22 +789,26 @@ export default function Events() {
                             <X size={16} strokeWidth={2.5} />
                         </button>
 
-                        <div style={{ marginBottom: "2rem" }}>
-                            <div style={{ width: "40px", height: "40px", borderRadius: "12px", background: "rgba(249, 115, 22, 0.1)", color: "var(--accent-primary)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1rem" }}>
-                                <Sparkles size={20} strokeWidth={2.5} />
+                        <div style={{ marginBottom: "1.75rem" }}>
+                            <div style={{ width: "42px", height: "42px", borderRadius: "12px", background: "rgba(249, 115, 22, 0.12)", color: "var(--accent-primary)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1rem" }}>
+                                <Sparkles size={22} strokeWidth={2.5} />
                             </div>
-                            <h2 style={{ fontSize: "1.5rem", fontWeight: 800, letterSpacing: "-0.02em", margin: "0 0 0.25rem", color: "var(--text-primary)" }}>Initialize Context</h2>
-                            <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", fontWeight: 500, margin: 0 }}>Define operational parameters for the new stream.</p>
+                            <h2 style={{ fontSize: "1.35rem", fontWeight: 900, letterSpacing: "-0.02em", margin: "0 0 0.25rem", color: "var(--text-primary)" }}>
+                                Initialize Event
+                            </h2>
+                            <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", fontWeight: 500, margin: 0 }}>
+                                Define operational parameters for the new event stream.
+                            </p>
                         </div>
 
                         <form onSubmit={handleCreateEvent} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                             <div>
                                 <label style={labelStyle}>Event Title</label>
                                 <div style={{ position: "relative" }}>
-                                    <LayoutGrid size={15} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+                                    <LayoutGrid size={15} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
                                     <input
                                         required
-                                        placeholder=""
+                                        placeholder="e.g. Annual Tech Summit 2026"
                                         value={newEvent.name}
                                         onChange={e => setNewEvent({ ...newEvent, name: e.target.value })}
                                         style={inputStyle}
@@ -421,7 +820,7 @@ export default function Events() {
                                 <div>
                                     <label style={labelStyle}>Date</label>
                                     <div style={{ position: "relative" }}>
-                                        <Calendar size={15} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+                                        <Calendar size={15} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
                                         <input
                                             required
                                             type="date"
@@ -455,10 +854,10 @@ export default function Events() {
                                 <div>
                                     <label style={labelStyle}>Country</label>
                                     <div style={{ position: "relative" }}>
-                                        <Globe size={15} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+                                        <Globe size={15} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
                                         <input
                                             required
-                                            placeholder="USA, India, etc."
+                                            placeholder="India, USA..."
                                             value={newEvent.country}
                                             onChange={e => setNewEvent({ ...newEvent, country: e.target.value })}
                                             style={inputStyle}
@@ -468,10 +867,10 @@ export default function Events() {
                                 <div>
                                     <label style={labelStyle}>City</label>
                                     <div style={{ position: "relative" }}>
-                                        <MapPin size={15} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+                                        <MapPin size={15} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
                                         <input
                                             required
-                                            placeholder="New York, Mumbai, etc."
+                                            placeholder="Mumbai, New York..."
                                             value={newEvent.city}
                                             onChange={e => setNewEvent({ ...newEvent, city: e.target.value })}
                                             style={inputStyle}
@@ -483,10 +882,10 @@ export default function Events() {
                             <div>
                                 <label style={labelStyle}>Venue Location</label>
                                 <div style={{ position: "relative" }}>
-                                    <LayoutGrid size={15} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+                                    <MapPin size={15} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
                                     <input
                                         required
-                                        placeholder="Specific Hotel, Hall, or Address..."
+                                        placeholder="Hotel, Convention Center, or Address..."
                                         value={newEvent.location}
                                         onChange={e => setNewEvent({ ...newEvent, location: e.target.value })}
                                         style={inputStyle}
@@ -501,7 +900,7 @@ export default function Events() {
                                     <input
                                         required
                                         type="number"
-                                        placeholder="0.00"
+                                        placeholder="500000"
                                         value={newEvent.budget}
                                         onChange={e => setNewEvent({ ...newEvent, budget: e.target.value })}
                                         style={{ ...inputStyle, paddingLeft: "2.5rem" }}
@@ -515,10 +914,10 @@ export default function Events() {
                                 style={{
                                     width: "100%",
                                     padding: "0.85rem",
-                                    marginTop: "1rem",
+                                    marginTop: "0.75rem",
                                     borderRadius: "12px",
-                                    background: "var(--accent-primary)",
-                                    color: "#fff",
+                                    background: "linear-gradient(135deg, #f97316 0%, #ea580c 100%)",
+                                    color: "#ffffff",
                                     fontWeight: 800,
                                     fontSize: "0.95rem",
                                     border: "none",
@@ -527,14 +926,15 @@ export default function Events() {
                                     alignItems: "center",
                                     justifyContent: "center",
                                     gap: "0.6rem",
-                                    boxShadow: "0 10px 20px rgba(249, 115, 22, 0.15)"
+                                    boxShadow: "0 10px 20px rgba(249, 115, 22, 0.25)",
+                                    transition: "opacity 0.2s"
                                 }}
                             >
                                 {loading ? (
-                                    <Loader2 size={18} />
+                                    <Loader2 size={18} className="animate-spin" />
                                 ) : (
                                     <>
-                                        Initialize Event
+                                        Initialize Event Stream
                                         <ChevronRight size={16} strokeWidth={3} />
                                     </>
                                 )}
@@ -543,6 +943,7 @@ export default function Events() {
                     </div>
                 </div>
             )}
+
             <style>{`
                 @keyframes floatOrb {
                     0% { transform: translate(0, 0) scale(1); }
@@ -556,12 +957,16 @@ export default function Events() {
                     100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
                 }
                 .event-row:hover {
-                    background: rgba(255, 255, 255, 0.02) !important;
-                    box-shadow: inset 3px 0 0 0 #f97316;
+                    background: rgba(255, 255, 255, 0.03) !important;
                 }
-                .modal-reveal { animation: modalReveal 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+                .event-card-hover:hover {
+                    border-color: rgba(249, 115, 22, 0.4) !important;
+                    transform: translateY(-2px);
+                    box-shadow: 0 12px 24px -10px rgba(0,0,0,0.3);
+                }
+                .modal-reveal { animation: modalReveal 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
                 @keyframes modalReveal {
-                    from { transform: scale(0.95) translateY(10px); opacity: 0; }
+                    from { transform: scale(0.95) translateY(12px); opacity: 0; }
                     to { transform: scale(1) translateY(0); opacity: 1; }
                 }
             `}</style>
