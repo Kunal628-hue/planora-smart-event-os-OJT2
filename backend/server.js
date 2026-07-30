@@ -106,8 +106,16 @@ app.get("/health", (req, res) => {
 
 // Only listen if not in a serverless environment and not testing
 if (process.env.NODE_ENV !== "production" && process.env.NODE_ENV !== "test" && !process.env.VERCEL) {
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`✅ Planora backend running at http://localhost:${PORT}`);
+  });
+
+  server.on("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+      console.error(`⚠️  Port ${PORT} is already in use by a background process.`);
+      console.error(`👉 Run 'lsof -ti:${PORT} | xargs kill -9' to free port ${PORT}.`);
+      process.exit(1);
+    }
   });
 }
 

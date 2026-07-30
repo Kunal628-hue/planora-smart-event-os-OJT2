@@ -26,6 +26,14 @@ const eventSchema = mongoose.Schema(
             type: String, // String to match frontend date-picker format easily
             required: true,
         },
+        startDate: {
+            type: String,
+            required: false,
+        },
+        endDate: {
+            type: String,
+            required: false,
+        },
         user: {
             type: String, // Firebase UID
             required: true,

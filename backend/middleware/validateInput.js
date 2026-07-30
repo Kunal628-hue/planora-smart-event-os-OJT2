@@ -28,13 +28,18 @@ const fields = {
 
     firebaseUid: Joi.string().max(128).trim(),
 
-    email: Joi.string().email({ tlds: { allow: false } }).max(254).trim(),
+    email: Joi.string().email({ tlds: { allow: false } }).max(254).trim()
+        .pattern(/^[a-zA-Z0-9]+([._%+-][a-zA-Z0-9]+)*@[a-zA-Z0-9]+([.-][a-zA-Z0-9]+)*\.[a-zA-Z]{2,}$/)
+        .messages({ 
+            "string.email": "Please provide a valid, proper email address (e.g. name@domain.com)",
+            "string.pattern.base": "Please enter a proper email address format (e.g. name@domain.com)"
+        }),
 
     password: Joi.string().min(8).max(128),
 
     phone: Joi.string().max(20).trim()
-        .pattern(/^[+\d\s\-()]*$/)
-        .messages({ "string.pattern.base": "Phone number contains invalid characters" }),
+        .pattern(/^(\+?[0-9]{1,4}[\s\-]?)?[0-9]{10}$/)
+        .messages({ "string.pattern.base": "Phone number must contain a valid 10-digit mobile number (e.g. 9876543210 or +91 9876543210)" }),
 
     url: Joi.string().uri({ scheme: ["http", "https"] }).max(2048).trim(),
 
@@ -68,6 +73,9 @@ const eventSchemas = {
         city:        fields.shortText(80).optional(),
         country:     fields.shortText(80).optional(),
         date:        Joi.string().max(50).required(),
+        startDate:   Joi.date().iso().optional().allow(""),
+        endDate:     Joi.date().iso().min(Joi.ref('startDate')).optional().allow("")
+            .messages({ "date.min": "End Date cannot be earlier than Start Date" }),
         userId:      fields.firebaseUid.required(),
         budget:      Joi.number().min(0).max(10_000_000_000).optional(),
         status:      Joi.string().valid("Planned", "Active", "Completed", "Cancelled").optional(),
@@ -81,6 +89,9 @@ const eventSchemas = {
         city:        fields.shortText(80).optional(),
         country:     fields.shortText(80).optional(),
         date:        Joi.string().max(50).optional(),
+        startDate:   Joi.date().iso().optional().allow(""),
+        endDate:     Joi.date().iso().min(Joi.ref('startDate')).optional().allow("")
+            .messages({ "date.min": "End Date cannot be earlier than Start Date" }),
         budget:      Joi.number().min(0).max(10_000_000_000).optional(),
         status:      Joi.string().valid("Planned", "Active", "Completed", "Cancelled").optional(),
         type:        fields.shortText(50).optional(),

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Link, useNavigate, useLocation, Outlet } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import {
@@ -31,10 +32,17 @@ import {
     UserCircle2,
     FileText,
     Image as ImageIcon,
-    Menu
+    Menu,
+    Plus,
+    LayoutGrid,
+    Globe,
+    MapPin,
+    ChevronRight,
+    Loader2
 } from "lucide-react";
 import DashboardBackground from "./DashboardBackground";
 import GlobalSearch from "./GlobalSearch";
+import { validateDateRange, getMinEndDate } from "../../utils/validation";
 
 const NAV_ITEMS = [
     { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={20} /> },
@@ -87,6 +95,21 @@ export default function DashboardLayout() {
     const [showNotifications, setShowNotifications] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isEventDropdownOpen, setIsEventDropdownOpen] = useState(false);
+    
+    // Quick Event Creation Modal State
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [createLoading, setCreateLoading] = useState(false);
+    const [newEventData, setNewEventData] = useState({
+        name: "",
+        date: "",
+        startDate: "",
+        endDate: "",
+        location: "",
+        type: "Wedding",
+        budget: "",
+        city: "",
+        country: ""
+    });
 
     const addNotification = (title, message, type = "system") => {
         // Respect Smart Notifications preference
@@ -184,6 +207,60 @@ export default function DashboardLayout() {
             console.error("Layout fetch error:", err);
         } finally {
             setLocalLoading(false);
+        }
+    };
+
+    const handleQuickCreateEvent = async (e) => {
+        e.preventDefault();
+        if (!user) return navigate("/login");
+
+        const startDateVal = newEventData.startDate || newEventData.date;
+        if (startDateVal && newEventData.endDate) {
+            const dateCheck = validateDateRange(startDateVal, newEventData.endDate);
+            if (!dateCheck.valid) {
+                alert(dateCheck.message);
+                return;
+            }
+        }
+
+        const payload = {
+            name: newEventData.name || "New Event",
+            date: startDateVal || "",
+            startDate: startDateVal || "",
+            endDate: newEventData.endDate || "",
+            location: newEventData.location || "Main Venue",
+            type: newEventData.type || "Other",
+            budget: parseInt(newEventData.budget) || 0,
+            userId: user.uid,
+            status: "Planned",
+            city: newEventData.city || "",
+            country: newEventData.country || ""
+        };
+
+        setCreateLoading(true);
+        try {
+            const res = await fetch(`${API_URL}/events`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                const created = await res.json();
+                const newId = created._id || created.id;
+                setShowCreateModal(false);
+                setNewEventData({ name: "", date: "", startDate: "", endDate: "", location: "", type: "Wedding", budget: "", city: "", country: "" });
+                await fetchEvents(user.uid);
+                if (newId) handleEventChange(newId);
+                addNotification("Event Created", `'${payload.name}' has been initialized.`);
+            } else {
+                const errData = await res.json();
+                alert(errData.message || "Failed to initialize event.");
+            }
+        } catch (err) {
+            console.error("Error creating event:", err);
+        } finally {
+            setCreateLoading(false);
         }
     };
 
@@ -374,48 +451,95 @@ export default function DashboardLayout() {
                                     }}
                                 >
                                     {safeEvents.length === 0 ? (
-                                        <div style={{ padding: "12px", color: "rgba(255,255,255,0.4)", fontSize: "13px", textAlign: "center" }}>No events</div>
+                                        <div style={{ padding: "12px", color: "rgba(255,255,255,0.4)", fontSize: "13px", textAlign: "center" }}>No events found</div>
                                     ) : (
-                                        safeEvents.map(event => (
-                                            <div 
-                                                key={event.id || event._id} 
-                                                onClick={() => {
-                                                    handleEventChange(event.id || event._id);
-                                                    setIsEventDropdownOpen(false);
-                                                }}
-                                                style={{
-                                                    padding: "12px 16px",
-                                                    display: "flex",
-                                                    justifyContent: "space-between",
-                                                    alignItems: "center",
-                                                    cursor: "pointer",
-                                                    transition: "background 0.2s",
-                                                    borderBottom: "1px solid rgba(255,255,255,0.03)"
-                                                }}
-                                                onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.04)"}
-                                                onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-                                            >
-                                                <span style={{ fontSize: "14px", fontWeight: 500, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginRight: "12px" }}>
-                                                    {event.name}
-                                                </span>
-                                                <div style={{
-                                                    width: "28px",
-                                                    height: "28px",
-                                                    borderRadius: "50%",
-                                                    background: "rgba(249, 115, 22, 0.15)",
-                                                    color: "#f97316",
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                    justifyContent: "center",
-                                                    fontSize: "12px",
-                                                    fontWeight: 800,
-                                                    flexShrink: 0
-                                                }}>
-                                                    {event.name.charAt(0).toUpperCase()}
+                                        safeEvents.map(event => {
+                                            const evId = event.id || event._id;
+                                            const isSelected = String(evId) === String(selectedEventId);
+                                            return (
+                                                <div 
+                                                    key={evId} 
+                                                    onClick={() => {
+                                                        handleEventChange(evId);
+                                                        setIsEventDropdownOpen(false);
+                                                    }}
+                                                    style={{
+                                                        padding: "12px 16px",
+                                                        display: "flex",
+                                                        justifyContent: "space-between",
+                                                        alignItems: "center",
+                                                        cursor: "pointer",
+                                                        transition: "all 0.2s",
+                                                        borderBottom: "1px solid rgba(255,255,255,0.04)",
+                                                        background: isSelected ? "rgba(249, 115, 22, 0.14)" : "transparent",
+                                                        borderLeft: isSelected ? "4px solid #f97316" : "4px solid transparent"
+                                                    }}
+                                                    onMouseEnter={e => {
+                                                        if (!isSelected) e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+                                                    }}
+                                                    onMouseLeave={e => {
+                                                        if (!isSelected) e.currentTarget.style.background = "transparent";
+                                                    }}
+                                                >
+                                                    <div style={{ display: "flex", alignItems: "center", gap: "8px", overflow: "hidden", marginRight: "8px" }}>
+                                                        {isSelected && <Check size={14} color="#f97316" strokeWidth={3} style={{ flexShrink: 0 }} />}
+                                                        <span style={{ 
+                                                            fontSize: "14px", 
+                                                            fontWeight: isSelected ? 800 : 500, 
+                                                            color: isSelected ? "#fff" : "rgba(255,255,255,0.8)", 
+                                                            whiteSpace: "nowrap", 
+                                                            overflow: "hidden", 
+                                                            textOverflow: "ellipsis" 
+                                                        }}>
+                                                            {event.name}
+                                                        </span>
+                                                    </div>
+                                                    <div style={{
+                                                        width: "28px",
+                                                        height: "28px",
+                                                        borderRadius: "50%",
+                                                        background: isSelected ? "linear-gradient(135deg, #f97316 0%, #ea580c 100%)" : "rgba(249, 115, 22, 0.15)",
+                                                        color: isSelected ? "#000" : "#f97316",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                        fontSize: "12px",
+                                                        fontWeight: 900,
+                                                        flexShrink: 0,
+                                                        boxShadow: isSelected ? "0 0 10px rgba(249, 115, 22, 0.5)" : "none"
+                                                    }}>
+                                                        {event.name.charAt(0).toUpperCase()}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        ))
+                                            );
+                                        })
                                     )}
+
+                                    {/* + Add New Event Button */}
+                                    <div 
+                                        onClick={() => {
+                                            setIsEventDropdownOpen(false);
+                                            setShowCreateModal(true);
+                                        }}
+                                        style={{
+                                            padding: "12px 16px",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: "10px",
+                                            background: "rgba(249, 115, 22, 0.08)",
+                                            borderTop: "1px solid rgba(255,255,255,0.1)",
+                                            color: "#f97316",
+                                            fontWeight: 800,
+                                            fontSize: "13px",
+                                            cursor: "pointer",
+                                            transition: "all 0.2s"
+                                        }}
+                                        onMouseEnter={e => e.currentTarget.style.background = "rgba(249, 115, 22, 0.2)"}
+                                        onMouseLeave={e => e.currentTarget.style.background = "rgba(249, 115, 22, 0.08)"}
+                                    >
+                                        <Plus size={16} strokeWidth={3} />
+                                        <span>+ Add New Event</span>
+                                    </div>
                                 </div>
                             </>
                         )}
@@ -812,6 +936,248 @@ export default function DashboardLayout() {
                     }} />
                 </div>
             </main>
+
+            {/* Global Quick Create Event Modal via Portal */}
+            {showCreateModal && createPortal(
+                <div style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    width: "100vw",
+                    height: "100vh",
+                    background: "rgba(0,0,0,0.85)",
+                    backdropFilter: "blur(12px)",
+                    WebkitBackdropFilter: "blur(12px)",
+                    zIndex: 999999,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "1rem"
+                }}>
+                    <div style={{
+                        background: "#121118",
+                        border: "1px solid rgba(255,255,255,0.12)",
+                        borderRadius: "20px",
+                        width: "95%",
+                        maxWidth: "680px",
+                        padding: "1.5rem 1.75rem",
+                        boxShadow: "0 25px 60px -15px rgba(0,0,0,0.95)",
+                        position: "relative",
+                        maxHeight: "90vh",
+                        overflowY: "auto",
+                        display: "flex",
+                        flexDirection: "column",
+                        animation: "fade-up 0.25s cubic-bezier(0.16, 1, 0.3, 1)"
+                    }}>
+                        {/* Header */}
+                        <div style={{ flexShrink: 0, marginBottom: "1rem", paddingRight: "2rem", display: "flex", alignItems: "center", gap: "12px" }}>
+                            <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "rgba(249, 115, 22, 0.12)", color: "#f97316", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <Sparkles size={20} strokeWidth={2.5} />
+                            </div>
+                            <div>
+                                <h2 style={{ fontSize: "1.3rem", fontWeight: 900, letterSpacing: "-0.02em", margin: 0, color: "#fff" }}>
+                                    Initialize Event
+                                </h2>
+                                <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.8rem", fontWeight: 500, margin: 0 }}>
+                                    Define operational parameters for the new event stream.
+                                </p>
+                            </div>
+                        </div>
+
+                        <button 
+                            onClick={() => setShowCreateModal(false)}
+                            style={{ 
+                                position: "absolute",
+                                top: "1.25rem",
+                                right: "1.25rem",
+                                background: "rgba(255,255,255,0.05)", 
+                                border: "1px solid rgba(255,255,255,0.1)", 
+                                color: "rgba(255,255,255,0.7)", 
+                                width: "30px", 
+                                height: "30px", 
+                                borderRadius: "50%", 
+                                cursor: "pointer", 
+                                display: "flex", 
+                                alignItems: "center", 
+                                justifyContent: "center",
+                                zIndex: 10
+                            }}
+                        >
+                            <X size={15} strokeWidth={2.5} />
+                        </button>
+
+                        {/* Compact Grid Form Body */}
+                        <form onSubmit={handleQuickCreateEvent} style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
+                            {/* EVENT TITLE */}
+                            <div>
+                                <label style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "rgba(255,255,255,0.6)", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>EVENT TITLE</label>
+                                <div style={{ position: "relative" }}>
+                                    <LayoutGrid size={14} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.4)" }} />
+                                    <input 
+                                        type="text" 
+                                        placeholder="e.g. Annual Tech Summit 2026" 
+                                        value={newEventData.name} 
+                                        onChange={e => setNewEventData({ ...newEventData, name: e.target.value })} 
+                                        required 
+                                        style={{ width: "100%", padding: "0.75rem 1rem 0.75rem 2.5rem", borderRadius: "10px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", color: "#fff", fontSize: "13px", fontWeight: 600, outline: "none", boxSizing: "border-box" }}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* START DATE & END DATE */}
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.85rem" }}>
+                                <div>
+                                    <label style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "rgba(255,255,255,0.6)", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>START DATE *</label>
+                                    <div style={{ position: "relative" }}>
+                                        <Calendar size={14} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.4)" }} />
+                                        <input 
+                                            type="date" 
+                                            value={newEventData.startDate || newEventData.date} 
+                                            onChange={e => {
+                                                const s = e.target.value;
+                                                setNewEventData(prev => ({
+                                                    ...prev,
+                                                    date: s,
+                                                    startDate: s,
+                                                    endDate: prev.endDate && prev.endDate < s ? s : prev.endDate
+                                                }));
+                                            }} 
+                                            required 
+                                            style={{ width: "100%", padding: "0.75rem 1rem 0.75rem 2.5rem", borderRadius: "10px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", color: "#fff", fontSize: "13px", fontWeight: 600, outline: "none", boxSizing: "border-box" }}
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "rgba(255,255,255,0.6)", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>END DATE (OPTIONAL)</label>
+                                    <div style={{ position: "relative" }}>
+                                        <Calendar size={14} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.4)" }} />
+                                        <input 
+                                            type="date" 
+                                            min={getMinEndDate(newEventData.startDate || newEventData.date)}
+                                            value={newEventData.endDate} 
+                                            onChange={e => setNewEventData({ ...newEventData, endDate: e.target.value })} 
+                                            style={{ width: "100%", padding: "0.75rem 1rem 0.75rem 2.5rem", borderRadius: "10px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", color: "#fff", fontSize: "13px", fontWeight: 600, outline: "none", boxSizing: "border-box" }}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* CATEGORY & BUDGET (Side by Side) */}
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.85rem" }}>
+                                <div>
+                                    <label style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "rgba(255,255,255,0.6)", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>CATEGORY</label>
+                                    <select 
+                                        value={newEventData.type} 
+                                        onChange={e => setNewEventData({ ...newEventData, type: e.target.value })}
+                                        style={{ width: "100%", padding: "0.75rem 1rem", borderRadius: "10px", background: "#18181b", border: "1px solid rgba(255,255,255,0.08)", color: "#fff", fontSize: "13px", fontWeight: 600, outline: "none", boxSizing: "border-box" }}
+                                    >
+                                        <option value="Wedding">Wedding</option>
+                                        <option value="Hackathon">Hackathon</option>
+                                        <option value="Tech Fest">Tech Fest</option>
+                                        <option value="Conference">Conference</option>
+                                        <option value="Corporate">Corporate</option>
+                                        <option value="Birthday">Birthday</option>
+                                        <option value="College Fest">College Fest</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "rgba(255,255,255,0.6)", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>BUDGET (₹)</label>
+                                    <div style={{ position: "relative" }}>
+                                        <Wallet size={14} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.4)" }} />
+                                        <input 
+                                            type="number" 
+                                            placeholder="500000" 
+                                            value={newEventData.budget} 
+                                            onChange={e => setNewEventData({ ...newEventData, budget: e.target.value })} 
+                                            style={{ width: "100%", padding: "0.75rem 1rem 0.75rem 2.5rem", borderRadius: "10px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", color: "#fff", fontSize: "13px", fontWeight: 600, outline: "none", boxSizing: "border-box" }}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* COUNTRY & CITY */}
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.85rem" }}>
+                                <div>
+                                    <label style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "rgba(255,255,255,0.6)", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>COUNTRY</label>
+                                    <div style={{ position: "relative" }}>
+                                        <Globe size={14} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.4)" }} />
+                                        <input 
+                                            type="text" 
+                                            placeholder="India, USA..." 
+                                            value={newEventData.country} 
+                                            onChange={e => setNewEventData({ ...newEventData, country: e.target.value })} 
+                                            style={{ width: "100%", padding: "0.75rem 1rem 0.75rem 2.5rem", borderRadius: "10px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", color: "#fff", fontSize: "13px", fontWeight: 600, outline: "none", boxSizing: "border-box" }}
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "rgba(255,255,255,0.6)", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>CITY</label>
+                                    <div style={{ position: "relative" }}>
+                                        <MapPin size={14} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.4)" }} />
+                                        <input 
+                                            type="text" 
+                                            placeholder="Mumbai, New York..." 
+                                            value={newEventData.city} 
+                                            onChange={e => setNewEventData({ ...newEventData, city: e.target.value })} 
+                                            style={{ width: "100%", padding: "0.75rem 1rem 0.75rem 2.5rem", borderRadius: "10px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", color: "#fff", fontSize: "13px", fontWeight: 600, outline: "none", boxSizing: "border-box" }}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* VENUE LOCATION */}
+                            <div>
+                                <label style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "rgba(255,255,255,0.6)", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>VENUE LOCATION</label>
+                                <div style={{ position: "relative" }}>
+                                    <MapPin size={14} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.4)" }} />
+                                    <input 
+                                        type="text" 
+                                        placeholder="Hotel, Convention Center, or Address..." 
+                                        value={newEventData.location} 
+                                        onChange={e => setNewEventData({ ...newEventData, location: e.target.value })} 
+                                        style={{ width: "100%", padding: "0.75rem 1rem 0.75rem 2.5rem", borderRadius: "10px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", color: "#fff", fontSize: "13px", fontWeight: 600, outline: "none", boxSizing: "border-box" }}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* SUBMIT BUTTON */}
+                            <button 
+                                type="submit" 
+                                disabled={createLoading}
+                                style={{ 
+                                    width: "100%", 
+                                    padding: "0.85rem", 
+                                    marginTop: "0.5rem", 
+                                    borderRadius: "12px", 
+                                    background: "linear-gradient(135deg, #f97316 0%, #ea580c 100%)", 
+                                    color: "#ffffff", 
+                                    fontWeight: 800, 
+                                    fontSize: "0.9rem", 
+                                    border: "none", 
+                                    cursor: "pointer", 
+                                    display: "flex", 
+                                    alignItems: "center", 
+                                    justifyContent: "center", 
+                                    gap: "0.5rem", 
+                                    boxShadow: "0 8px 20px rgba(249, 115, 22, 0.4)", 
+                                    transition: "all 0.2s" 
+                                }}
+                            >
+                                {createLoading ? (
+                                    <Loader2 size={16} className="animate-spin" />
+                                ) : (
+                                    <>
+                                        <span>Initialize Event Stream</span>
+                                        <ChevronRight size={16} />
+                                    </>
+                                )}
+                            </button>
+                        </form>
+                    </div>
+                </div>,
+                document.body
+            )}
         </div>
     );
 }

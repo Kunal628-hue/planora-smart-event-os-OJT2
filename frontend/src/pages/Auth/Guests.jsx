@@ -37,6 +37,7 @@ import {
 import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 import { useUpload } from "../../context/UploadContext";
+import { validateEmail, validatePhone } from "../../utils/validation";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -229,6 +230,22 @@ export default function Guests() {
         if (!targetEventId) {
             await showAlert("Event Missing", "Please select an event context for this attendee.");
             return;
+        }
+
+        if (newGuest.email) {
+            const emailCheck = validateEmail(newGuest.email, false);
+            if (!emailCheck.valid) {
+                await showAlert("Invalid Email Address", emailCheck.message);
+                return;
+            }
+        }
+
+        if (newGuest.whatsapp) {
+            const phoneCheck = validatePhone(newGuest.whatsapp, false);
+            if (!phoneCheck.valid) {
+                await showAlert("Invalid Phone Number", phoneCheck.message);
+                return;
+            }
         }
 
         try {

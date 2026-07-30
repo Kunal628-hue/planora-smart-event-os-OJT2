@@ -6,6 +6,7 @@ import {
     ArrowLeft, Download
 } from "lucide-react";
 import { useDialog } from "../context/DialogContext";
+import { validateEmail, validatePhone } from "../utils/validation";
 
 export default function RegisterEvent() {
     const { eventId } = useParams();
@@ -162,6 +163,23 @@ export default function RegisterEvent() {
         if (config.privacy.requireConsent && !consentChecked) {
             showAlert("Consent Required", "You must agree to the terms and conditions to proceed.");
             return;
+        }
+
+        // Email & Phone Validation
+        if (form.email) {
+            const emailCheck = validateEmail(form.email, true);
+            if (!emailCheck.valid) {
+                showAlert("Invalid Email Address", emailCheck.message);
+                return;
+            }
+        }
+
+        if (form.whatsapp) {
+            const phoneCheck = validatePhone(form.whatsapp, false);
+            if (!phoneCheck.valid) {
+                showAlert("Invalid Phone Number", phoneCheck.message);
+                return;
+            }
         }
 
         setSubmitting(true);

@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
+import { validateEmail, validatePhone } from "../../utils/validation";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -84,6 +85,25 @@ export default function Vendors() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Contact validation (if email or phone)
+        if (formVendor.contact && formVendor.contact.trim()) {
+            const trimmedContact = formVendor.contact.trim();
+            if (trimmedContact.includes("@")) {
+                const emailCheck = validateEmail(trimmedContact, false);
+                if (!emailCheck.valid) {
+                    await showAlert("Invalid Email Contact", emailCheck.message);
+                    return;
+                }
+            } else if (/^[\d+\s\-()]+$/.test(trimmedContact)) {
+                const phoneCheck = validatePhone(trimmedContact, false);
+                if (!phoneCheck.valid) {
+                    await showAlert("Invalid Phone Contact", phoneCheck.message);
+                    return;
+                }
+            }
+        }
+
         setSubmitLoading(true);
         const method = editingVendor ? "PATCH" : "POST";
         const url = editingVendor ? `${API_URL}/vendors/${editingVendor._id}` : `${API_URL}/vendors`;

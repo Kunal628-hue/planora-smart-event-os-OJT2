@@ -23,6 +23,7 @@ import { LogoLoader } from "../../components/ui/Loader";
 import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 import AiAssistant from "../../components/AiAssistant";
+import { validateDateRange, getMinEndDate } from "../../utils/validation";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -30,7 +31,7 @@ export default function EventDetails() {
     const { eventId } = useParams();
     const navigate = useNavigate();
     const { user, syncTimestamp } = useOutletContext();    //all are states
-    const { showConfirm } = useDialog();
+    const { showConfirm, showAlert } = useDialog();
     const [event, setEvent] = useState(null);
     const [loading, setLoading] = useState(true);
     const [healthData, setHealthData] = useState(null);
@@ -40,6 +41,8 @@ export default function EventDetails() {
     const [editData, setEditData] = useState({
         name: "",
         date: "",
+        startDate: "",
+        endDate: "",
         location: "",
         type: "Wedding",
         budget: ""
@@ -71,6 +74,8 @@ export default function EventDetails() {
             setEditData({
                 name: eventData.name,
                 date: eventData.date,
+                startDate: eventData.startDate || eventData.date || "",
+                endDate: eventData.endDate || "",
                 location: eventData.location,
                 type: eventData.type,
                 budget: eventData.budget
@@ -93,6 +98,21 @@ export default function EventDetails() {
 
     const handleUpdate = async (e) => {
         e.preventDefault();
+
+        // Date range validation
+        const startDateVal = editData.startDate || editData.date;
+        if (startDateVal && editData.endDate) {
+            const dateCheck = validateDateRange(startDateVal, editData.endDate);
+            if (!dateCheck.valid) {
+                if (showAlert) {
+                    await showAlert("Invalid Date Range", dateCheck.message);
+                } else {
+                    alert(dateCheck.message);
+                }
+                return;
+            }
+        }
+
         setUpdateLoading(true);
 
         try {
@@ -101,7 +121,9 @@ export default function EventDetails() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     title: editData.name,
-                    date: editData.date,
+                    date: editData.startDate || editData.date,
+                    startDate: editData.startDate || editData.date,
+                    endDate: editData.endDate || "",
                     location: editData.location,
                     type: editData.type,
                     budget: parseInt(editData.budget) || 0
@@ -567,25 +589,49 @@ export default function EventDetails() {
                                 <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-secondary)", marginBottom: "8px", textTransform: "uppercase" }}>Event Identity</label>
                                 <input style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid var(--border-subtle)", background: "var(--bg-elevated)", color: "var(--text-primary)", fontSize: "15px", fontWeight: 600 }} value={editData.name} onChange={e => setEditData({ ...editData, name: e.target.value })} required />
                             </div>
-                            <div className="grid-2-col" style={{ gap: "1.5rem" }}>
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
                                 <div>
-                                    <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-secondary)", marginBottom: "8px", textTransform: "uppercase" }}>Target Date</label>
-                                    <input type="date" style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid var(--border-subtle)", background: "var(--bg-elevated)", color: "var(--text-primary)", fontSize: "15px", fontWeight: 600 }} value={editData.date} onChange={e => setEditData({ ...editData, date: e.target.value })} required />
+                                    <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-secondary)", marginBottom: "8px", textTransform: "uppercase" }}>Start Date *</label>
+                                    <input 
+                                        type="date" 
+                                        style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid var(--border-subtle)", background: "var(--bg-elevated)", color: "var(--text-primary)", fontSize: "15px", fontWeight: 600 }} 
+                                        value={editData.startDate || editData.date} 
+                                        onChange={e => {
+                                            const newStart = e.target.value;
+                                            setEditData(prev => ({
+                                                ...prev,
+                                                date: newStart,
+                                                startDate: newStart,
+                                                endDate: prev.endDate && prev.endDate < newStart ? newStart : prev.endDate
+                                            }));
+                                        }} 
+                                        required 
+                                    />
                                 </div>
                                 <div>
-                                    <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-secondary)", marginBottom: "8px", textTransform: "uppercase" }}>Logic Type</label>
-                                    <select style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid var(--border-subtle)", background: "var(--bg-elevated)", color: "var(--text-primary)", fontSize: "15px", fontWeight: 700 }} value={editData.type} onChange={e => setEditData({ ...editData, type: e.target.value })}>
-                                        <option>Hackathon</option>
-                                        <option>Tech Fest</option>
-                                        <option>Tech Event</option>
-                                        <option>Conference</option>
-                                        <option>College Fest</option>
-                                        <option>Birthday</option>
-                                        <option>Corporate</option>
-                                        <option>Wedding</option>
-                                        <option>Other</option>
-                                    </select>
+                                    <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-secondary)", marginBottom: "8px", textTransform: "uppercase" }}>End Date (Optional)</label>
+                                    <input 
+                                        type="date" 
+                                        min={getMinEndDate(editData.startDate || editData.date)}
+                                        style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid var(--border-subtle)", background: "var(--bg-elevated)", color: "var(--text-primary)", fontSize: "15px", fontWeight: 600 }} 
+                                        value={editData.endDate} 
+                                        onChange={e => setEditData({ ...editData, endDate: e.target.value })} 
+                                    />
                                 </div>
+                            </div>
+                            <div>
+                                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-secondary)", marginBottom: "8px", textTransform: "uppercase" }}>Category</label>
+                                <select style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid var(--border-subtle)", background: "var(--bg-elevated)", color: "var(--text-primary)", fontSize: "15px", fontWeight: 700 }} value={editData.type} onChange={e => setEditData({ ...editData, type: e.target.value })}>
+                                    <option>Hackathon</option>
+                                    <option>Tech Fest</option>
+                                    <option>Tech Event</option>
+                                    <option>Conference</option>
+                                    <option>College Fest</option>
+                                    <option>Birthday</option>
+                                    <option>Corporate</option>
+                                    <option>Wedding</option>
+                                    <option>Other</option>
+                                </select>
                             </div>
                             <div>
                                 <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-secondary)", marginBottom: "8px", textTransform: "uppercase" }}>Geographical Coordinates</label>

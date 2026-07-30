@@ -25,6 +25,7 @@ import {
     ArrowUpRight
 } from "lucide-react";
 import { TableSkeleton } from "../../components/ui/Skeleton";
+import { validateDateRange, getMinEndDate } from "../../utils/validation";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -46,6 +47,8 @@ export default function Events() {
     const [newEvent, setNewEvent] = useState({
         name: "",
         date: "",
+        startDate: "",
+        endDate: "",
         location: "",
         type: "Wedding",
         budget: "",
@@ -79,9 +82,21 @@ export default function Events() {
         e.preventDefault();
         if (!user) return navigate("/login");
 
+        // Validate Date Range
+        const startDateVal = newEvent.startDate || newEvent.date;
+        if (startDateVal && newEvent.endDate) {
+            const dateCheck = validateDateRange(startDateVal, newEvent.endDate);
+            if (!dateCheck.valid) {
+                await showAlert("Invalid Date Range", dateCheck.message);
+                return;
+            }
+        }
+
         const eventData = {
             name: newEvent.name || "Unnamed Event",
-            date: newEvent.date || "",
+            date: newEvent.startDate || newEvent.date || "",
+            startDate: newEvent.startDate || newEvent.date || "",
+            endDate: newEvent.endDate || "",
             location: newEvent.location || "",
             type: newEvent.type || "Other",
             budget: parseInt(newEvent.budget) || 0,
@@ -818,36 +833,59 @@ export default function Events() {
 
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                                 <div>
-                                    <label style={labelStyle}>Date</label>
+                                    <label style={labelStyle}>Start Date *</label>
                                     <div style={{ position: "relative" }}>
                                         <Calendar size={15} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
                                         <input
                                             required
                                             type="date"
-                                            value={newEvent.date}
-                                            onChange={e => setNewEvent({ ...newEvent, date: e.target.value })}
+                                            value={newEvent.startDate || newEvent.date}
+                                            onChange={e => {
+                                                const newStart = e.target.value;
+                                                setNewEvent(prev => ({
+                                                    ...prev,
+                                                    date: newStart,
+                                                    startDate: newStart,
+                                                    // If endDate is earlier than newStart, update endDate to match newStart
+                                                    endDate: prev.endDate && prev.endDate < newStart ? newStart : prev.endDate
+                                                }));
+                                            }}
                                             style={inputStyle}
                                         />
                                     </div>
                                 </div>
                                 <div>
-                                    <label style={labelStyle}>Category</label>
-                                    <select
-                                        value={newEvent.type}
-                                        onChange={e => setNewEvent({ ...newEvent, type: e.target.value })}
-                                        style={{ ...inputStyle, paddingLeft: "0.85rem" }}
-                                    >
-                                        <option>Hackathon</option>
-                                        <option>Tech Fest</option>
-                                        <option>Tech Event</option>
-                                        <option>Conference</option>
-                                        <option>Corporate</option>
-                                        <option>Tech Summits</option>
-                                        <option>Wedding</option>
-                                        <option>Birthday</option>
-                                        <option>Other</option>
-                                    </select>
+                                    <label style={labelStyle}>End Date (Optional)</label>
+                                    <div style={{ position: "relative" }}>
+                                        <Calendar size={15} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
+                                        <input
+                                            type="date"
+                                            min={getMinEndDate(newEvent.startDate || newEvent.date)}
+                                            value={newEvent.endDate}
+                                            onChange={e => setNewEvent({ ...newEvent, endDate: e.target.value })}
+                                            style={inputStyle}
+                                        />
+                                    </div>
                                 </div>
+                            </div>
+
+                            <div>
+                                <label style={labelStyle}>Category</label>
+                                <select
+                                    value={newEvent.type}
+                                    onChange={e => setNewEvent({ ...newEvent, type: e.target.value })}
+                                    style={{ ...inputStyle, paddingLeft: "0.85rem" }}
+                                >
+                                    <option>Hackathon</option>
+                                    <option>Tech Fest</option>
+                                    <option>Tech Event</option>
+                                    <option>Conference</option>
+                                    <option>Corporate</option>
+                                    <option>Tech Summits</option>
+                                    <option>Wedding</option>
+                                    <option>Birthday</option>
+                                    <option>Other</option>
+                                </select>
                             </div>
 
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
