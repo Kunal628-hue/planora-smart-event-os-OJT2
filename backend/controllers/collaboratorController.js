@@ -2,6 +2,7 @@ import Collaborator from "../models/Collaborator.js";
 import Event from "../models/Event.js";
 import Profile from "../models/Profile.js";
 import { sendCollaboratorInvite } from "../utils/emailService.js";
+import { handleControllerError } from "../utils/errorHandler.js";
 
 export const getCollaborators = async (req, res) => {
     try {
@@ -18,17 +19,11 @@ export const getCollaborators = async (req, res) => {
 
         const collaborators = await Collaborator.find(query);
         
-        // If eventId is provided, we should also find and return the Owner of the event
-        // as they are the "Original Team Leader"
         let ownerInfo = null;
         if (eventId) {
             const event = await Event.findById(eventId);
             if (event) {
                 const ownerProfile = await Profile.findOne({ user: event.user });
-                
-                // --- Authentic Identity Capture ---
-                // We attempt to find the human name of the owner from any invite they've sent
-                // across the entire system, not just this event, to ensure we get a real name.
                 const systemWideInvite = await Collaborator.findOne({ user: event.user, inviterName: { $exists: true, $ne: "Workspace Owner" } });
                 const authenticName = systemWideInvite?.inviterName || ownerProfile?.organization || "Original Team Lead";
 
@@ -48,7 +43,7 @@ export const getCollaborators = async (req, res) => {
 
         res.json(eventId ? { collaborators, owner: ownerInfo } : collaborators);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return handleControllerError(res, error, "Failed to retrieve collaborators. Please try again.");
     }
 };
 
@@ -56,8 +51,6 @@ export const createCollaborator = async (req, res) => {
     try {
         const { inviterName, ...collabData } = req.body;
         
-        // --- Proactive Contact Capture ---
-        // Fetch the Team Leader's WhatsApp from their profile to attach to the invitation metadata.
         if (collabData.user) {
             const leaderProfile = await Profile.findOne({ user: collabData.user });
             if (leaderProfile && leaderProfile.whatsapp) {
@@ -67,7 +60,6 @@ export const createCollaborator = async (req, res) => {
 
         const collaborator = await Collaborator.create(collabData);
         
-        // Find the event title and location for the invitation email
         let eventName = "Event Context";
         let eventLocation = "";
         if (collaborator.event) {
@@ -78,12 +70,11 @@ export const createCollaborator = async (req, res) => {
             }
         }
 
-        // Send notification email
         await sendCollaboratorInvite(collaborator, inviterName || "A Team Lead", eventName, eventLocation);
         
         res.status(201).json(collaborator);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return handleControllerError(res, error, "Failed to create collaborator. Please try again.");
     }
 };
 
@@ -92,7 +83,7 @@ export const updateCollaborator = async (req, res) => {
         const collaborator = await Collaborator.findByIdAndUpdate(req.params.id, req.body, { new: true });
         res.json(collaborator);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return handleControllerError(res, error, "Failed to update collaborator. Please try again.");
     }
 };
 
@@ -101,6 +92,6 @@ export const deleteCollaborator = async (req, res) => {
         await Collaborator.findByIdAndDelete(req.params.id);
         res.json({ message: "Collaborator removed" });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return handleControllerError(res, error, "Failed to delete collaborator. Please try again.");
     }
 };

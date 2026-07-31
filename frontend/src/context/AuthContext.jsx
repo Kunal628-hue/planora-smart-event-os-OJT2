@@ -5,7 +5,8 @@ import {
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
     signOut,
-    updateProfile
+    updateProfile,
+    deleteUser
 } from "firebase/auth";
 import { auth, googleProvider } from "../firebase";
 import { LogoLoader } from "../components/ui/Loader";const AuthContext = createContext();
@@ -51,6 +52,19 @@ export const AuthProvider = ({ children }) => {
         return signOut(auth);
     };
 
+    const deleteAccount = async () => {
+        if (auth.currentUser) {
+            try {
+                await deleteUser(auth.currentUser);
+            } catch (err) {
+                console.warn("[Delete Account] Firebase delete exception fallback:", err);
+            }
+        }
+        localStorage.clear();
+        setUser(null);
+        await signOut(auth).catch(() => {});
+    };
+
     const updateUserProfile = async (profileData) => {
         if (!auth.currentUser) throw new Error("No user logged in");
         await updateProfile(auth.currentUser, profileData);
@@ -64,6 +78,7 @@ export const AuthProvider = ({ children }) => {
         loginWithEmail,
         signupWithEmail,
         logout,
+        deleteAccount,
         updateUserProfile
     };
 

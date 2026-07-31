@@ -95,8 +95,7 @@ export const generateStrategicPlan = async (req, res) => {
 
         res.status(200).json(plan);
     } catch (error) {
-        console.error("Strategic Plan Generation Error:", error);
-        res.status(500).json({ message: error.message || "Strategic engine failed to synthesize plan" });
+        return handleControllerError(res, error, "Strategic engine failed to synthesize plan. Please try again.");
     }
 };
 

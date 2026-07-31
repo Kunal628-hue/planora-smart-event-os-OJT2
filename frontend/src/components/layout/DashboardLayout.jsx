@@ -60,9 +60,25 @@ const NAV_ITEMS = [
 export default function DashboardLayout() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { user, logout, updateUserProfile } = useAuth();
+    const { user, logout, deleteAccount, updateUserProfile } = useAuth();
     const [events, setEvents] = useState([]);
     const [selectedEventId, setSelectedEventId] = useState(() => localStorage.getItem("planora_active_event_id") || "");
+
+    const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
+    const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+
+    const handleDeleteAccountConfirm = async () => {
+        setIsDeletingAccount(true);
+        try {
+            await deleteAccount();
+            navigate("/login");
+        } catch (err) {
+            console.error("Delete account error:", err);
+        } finally {
+            setIsDeletingAccount(false);
+            setShowDeleteAccountModal(false);
+        }
+    };
 
     useEffect(() => {
         if (selectedEventId) {
@@ -77,16 +93,24 @@ export default function DashboardLayout() {
     const [syncTimestamp, setSyncTimestamp] = useState(Date.now());
     const [notifications, setNotifications] = useState(() => {
         const saved = localStorage.getItem("planora_notifications");
-        if (saved) return JSON.parse(saved);
-        return [
-            { id: 1, title: "New ticket", message: "- Update the website", meta: "Brainin · Dev", time: "2min", read: false, type: "system" },
-            { id: 2, title: "New folder", message: "- Social", meta: "Home / Marketing / Attachments", time: "1d", read: false, type: "folder" },
-            { id: 3, title: "New event", message: "- New project", meta: "CeramicStore · 12:30h", time: "02/10", read: true, type: "event" },
-            { id: 4, title: "New lead", message: "- DocJob", meta: "Complete platform", time: "02/10", read: true, type: "lead" },
-            { id: 5, title: "Marfeel", message: "First iteration › Closing", meta: "Potential", time: "02/10", read: true, type: "success" },
-            { id: 6, title: "New file", message: "- dossier_corporativo.pdf", meta: "Marketing › Company", time: "02/10", read: true, type: "warning" },
-            { id: 7, title: "AI Strategy", message: "Optimum vendor matrix calculated.", meta: "Planora AI", time: "02/10", read: true, type: "ai" }
-        ];
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                // Filter out legacy fake hardcoded notifications & trivial spam
+                const real = parsed.filter(n => 
+                    typeof n.id !== "number" || n.id > 1000
+                ).filter(n => 
+                    n.title !== "New ticket" && 
+                    n.title !== "New folder" && 
+                    n.title !== "Marfeel" && 
+                    n.title !== "New file" && 
+                    n.title !== "2FA Settings Updated" && 
+                    n.title !== "Backup Codes Copied"
+                );
+                return real;
+            } catch (e) {}
+        }
+        return [];
     });
 
     useEffect(() => {
@@ -116,15 +140,21 @@ export default function DashboardLayout() {
         const isEnabled = localStorage.getItem("planora_pref_smart_notif") !== "false";
         if (!isEnabled) return;
 
-        const newNotif = {
-            id: Date.now(),
-            title,
-            message,
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            read: false,
-            type
-        };
-        setNotifications(prev => [newNotif, ...prev]);
+        setNotifications(prev => {
+            // Prevent duplicate notification spam
+            if (prev.some(n => n.title === title && n.message === message)) {
+                return prev;
+            }
+            const newNotif = {
+                id: Date.now(),
+                title,
+                message,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                read: false,
+                type
+            };
+            return [newNotif, ...prev];
+        });
 
         // Optional: Play subtle sound
         try {
@@ -594,7 +624,6 @@ export default function DashboardLayout() {
                 <DashboardBackground />
                 <header className="top-bar" style={{
                     height: "72px",
-                    padding: "0 2.5rem",
                     position: "sticky",
                     top: 0,
                     zIndex: 100,
@@ -605,17 +634,18 @@ export default function DashboardLayout() {
                     backdropFilter: "blur(20px)",
                     borderBottom: "1px solid rgba(255, 255, 255, 0.05)"
                 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "1rem", flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flex: 1, minWidth: 0, paddingRight: "0.5rem" }}>
                         <button
                             className="sidebar-toggle-btn"
                             onClick={() => setIsSidebarOpen(true)}
+                            style={{ flexShrink: 0 }}
                         >
                             <Menu size={20} />
                         </button>
                         <GlobalSearch user={user} onEventSelect={handleEventChange} />
                     </div>
 
-                    <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexShrink: 0 }}>
 
                         {/* Notification Bell */}
                         <div style={{ position: "relative" }}>
@@ -653,28 +683,18 @@ export default function DashboardLayout() {
                             </button>
 
                             {showNotifications && (
-                                <div style={{
-                                    position: "absolute",
-                                    top: "calc(100% + 12px)",
-                                    right: "-10px",
-                                    width: "380px",
-                                    background: "#18181b",
-                                    border: "1px solid rgba(255,255,255,0.1)",
-                                    borderRadius: "16px",
-                                    boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)",
-                                    zIndex: 1000,
-                                    animation: "fade-up 0.2s ease-out",
-                                    overflow: "hidden"
-                                }}>
+                                <div className="notification-dropdown-panel">
                                     <div style={{ 
                                         display: "flex", 
                                         justifyContent: "space-between", 
                                         alignItems: "center", 
-                                        padding: "16px 20px", 
-                                        borderBottom: "1px solid rgba(255,255,255,0.08)" 
+                                        padding: "14px 16px", 
+                                        borderBottom: "1px solid rgba(255,255,255,0.08)",
+                                        flexWrap: "wrap",
+                                        gap: "8px"
                                     }}>
-                                        <h3 style={{ fontSize: "18px", fontWeight: 500, color: "#f4f4f5", margin: 0 }}>Notifications</h3>
-                                        <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+                                        <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#f4f4f5", margin: 0 }}>Notifications</h3>
+                                        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
                                             <button
                                                 onClick={markAllAsRead}
                                                 style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: 500, color: "#a1a1aa", border: "none", background: "none", cursor: "pointer", transition: "color 0.2s" }}
@@ -883,44 +903,111 @@ export default function DashboardLayout() {
                                     position: "absolute",
                                     top: "calc(100% + 8px)",
                                     right: 0,
-                                    width: "180px",
-                                    background: "var(--bg-surface)",
-                                    border: "1px solid var(--border-subtle)",
-                                    borderRadius: "12px",
-                                    boxShadow: "0 15px 30px -5px rgba(0,0,0,0.5)",
+                                    width: "200px",
+                                    background: "#181720",
+                                    border: "1px solid rgba(255,255,255,0.12)",
+                                    borderRadius: "14px",
+                                    boxShadow: "0 15px 35px -5px rgba(0,0,0,0.5)",
                                     padding: "6px",
                                     zIndex: 1000,
-                                    animation: "fade-up 0.2s ease-out"
+                                    animation: "fade-up 0.2s ease-out",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: "2px"
                                 }}>
+                                    <button
+                                        onClick={() => { setShowUserMenu(false); navigate("/settings"); }}
+                                        style={{
+                                            width: "100%", display: "flex", alignItems: "center", gap: "10px",
+                                            padding: "0.6rem 0.85rem", borderRadius: "8px", color: "var(--text-primary)",
+                                            fontSize: "0.85rem", fontWeight: 600, cursor: "pointer", background: "transparent",
+                                            border: "none", textAlign: "left", transition: "all 0.2s"
+                                        }}
+                                        onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.05)"}
+                                        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                                    >
+                                        <SettingsIcon size={14} />
+                                        Account Settings
+                                    </button>
+
                                     <button
                                         onClick={handleLogout}
                                         style={{
-                                            width: "100%",
-                                            display: "flex",
-                                            alignItems: "center",
-                                            gap: "10px",
-                                            padding: "0.6rem 0.85rem",
-                                            borderRadius: "8px",
-                                            color: "#ef4444",
-                                            fontSize: "0.85rem",
-                                            fontWeight: 600,
-                                            cursor: "pointer",
-                                            background: "rgba(239, 68, 68, 0.05)",
-                                            border: "none",
-                                            textAlign: "left",
-                                            transition: "all 0.2s"
+                                            width: "100%", display: "flex", alignItems: "center", gap: "10px",
+                                            padding: "0.6rem 0.85rem", borderRadius: "8px", color: "#f59e0b",
+                                            fontSize: "0.85rem", fontWeight: 600, cursor: "pointer", background: "transparent",
+                                            border: "none", textAlign: "left", transition: "all 0.2s"
                                         }}
-                                        onMouseEnter={e => e.currentTarget.style.background = "rgba(239, 68, 68, 0.1)"}
-                                        onMouseLeave={e => e.currentTarget.style.background = "rgba(239, 68, 68, 0.05)"}
+                                        onMouseEnter={e => e.currentTarget.style.background = "rgba(245, 158, 11, 0.08)"}
+                                        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                                     >
                                         <LogOut size={14} />
                                         Sign Out
+                                    </button>
+
+                                    <div style={{ height: "1px", background: "rgba(255,255,255,0.08)", margin: "4px 0" }} />
+
+                                    <button
+                                        onClick={() => { setShowUserMenu(false); setShowDeleteAccountModal(true); }}
+                                        style={{
+                                            width: "100%", display: "flex", alignItems: "center", gap: "10px",
+                                            padding: "0.6rem 0.85rem", borderRadius: "8px", color: "#ef4444",
+                                            fontSize: "0.85rem", fontWeight: 600, cursor: "pointer", background: "rgba(239, 68, 68, 0.08)",
+                                            border: "1px solid rgba(239, 68, 68, 0.2)", textAlign: "left", transition: "all 0.2s"
+                                        }}
+                                        onMouseEnter={e => e.currentTarget.style.background = "rgba(239, 68, 68, 0.18)"}
+                                        onMouseLeave={e => e.currentTarget.style.background = "rgba(239, 68, 68, 0.08)"}
+                                    >
+                                        <Trash2 size={14} />
+                                        Delete Account
                                     </button>
                                 </div>
                             )}
                         </div>
                     </div>
                 </header>
+
+                {/* Delete Account Modal */}
+                {showDeleteAccountModal && (
+                    <div style={{
+                        position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+                        background: "rgba(0, 0, 0, 0.85)", backdropFilter: "blur(12px)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        zIndex: 10000, padding: "1rem"
+                    }}>
+                        <div style={{ width: "100%", maxWidth: "440px", background: "#121118", border: "1px solid rgba(239, 68, 68, 0.3)", borderRadius: "20px", padding: "1.75rem", boxShadow: "0 25px 50px -12px rgba(239, 68, 68, 0.25)" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "1.25rem" }}>
+                                <div style={{ width: "40px", height: "40px", borderRadius: "12px", background: "rgba(239, 68, 68, 0.15)", color: "#ef4444", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                    <Trash2 size={20} />
+                                </div>
+                                <div>
+                                    <h3 style={{ fontSize: "17px", fontWeight: 900, margin: 0, color: "#fff" }}>Delete Account Permanently</h3>
+                                    <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", margin: 0 }}>Irreversible Security Action</p>
+                                </div>
+                            </div>
+
+                            <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.7)", marginBottom: "1.5rem", lineHeight: 1.5 }}>
+                                Are you sure you want to delete your account? All your events, budgets, guest lists, and credentials will be permanently erased.
+                            </p>
+
+                            <div style={{ display: "flex", gap: "0.75rem", justifyContent: "flex-end" }}>
+                                <button 
+                                    onClick={() => setShowDeleteAccountModal(false)}
+                                    style={{ padding: "0.75rem 1.25rem", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", color: "#fff", fontWeight: 700, fontSize: "13px", cursor: "pointer" }}
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    onClick={handleDeleteAccountConfirm}
+                                    disabled={isDeletingAccount}
+                                    style={{ padding: "0.75rem 1.25rem", background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)", border: "none", borderRadius: "10px", color: "#fff", fontWeight: 800, fontSize: "13px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
+                                >
+                                    {isDeletingAccount ? <Loader2 size={16} className="animate-spin" /> : "Permanently Delete"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
                 <div className="dashboard-content">
                     <Outlet context={{
                         user,

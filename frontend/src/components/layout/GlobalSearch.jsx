@@ -87,7 +87,7 @@ const GlobalSearch = ({ user, onEventSelect }) => {
     ];
 
     return (
-        <div className="search-input-wrapper" ref={searchRef} style={{ position: 'relative', flex: 1, maxWidth: '600px' }}>
+        <div className="search-input-wrapper" ref={searchRef} style={{ position: 'relative', flex: 1, maxWidth: '600px', minWidth: 0 }}>
             <Search size={16} color="#94a3b8" style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)" }} />
             <input
                 id="global-search-input"

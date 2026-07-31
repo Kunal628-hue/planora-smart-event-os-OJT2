@@ -1,6 +1,7 @@
 import Vendor from "../models/Vendor.js";
 import Event from "../models/Event.js";
 import { getAllowedEventIds } from "../utils/authHelper.js";
+import { handleControllerError } from "../utils/errorHandler.js";
 
 export const createVendor = async (req, res) => {
     try {
@@ -15,7 +16,7 @@ export const createVendor = async (req, res) => {
         const vendor = await Vendor.create(vendorData);
         res.status(201).json(vendor);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return handleControllerError(res, error, "Failed to create vendor. Please try again.");
     }
 };
 
@@ -33,7 +34,7 @@ export const getVendors = async (req, res) => {
         const vendors = await Vendor.find(filter).sort({ name: 1 });
         res.json(vendors);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return handleControllerError(res, error, "Failed to retrieve vendors. Please try again.");
     }
 };
 
@@ -42,7 +43,7 @@ export const updateVendor = async (req, res) => {
         const vendor = await Vendor.findByIdAndUpdate(req.params.id, req.body, { new: true });
         res.json(vendor);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return handleControllerError(res, error, "Failed to update vendor. Please try again.");
     }
 };
 
@@ -51,6 +52,6 @@ export const deleteVendor = async (req, res) => {
         await Vendor.findByIdAndDelete(req.params.id);
         res.json({ message: "Vendor removed" });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return handleControllerError(res, error, "Failed to delete vendor. Please try again.");
     }
 };

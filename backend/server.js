@@ -15,6 +15,11 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { initAlertEngine } from "./utils/alertService.js";
 import mongoSanitize from "express-mongo-sanitize";
+import {
+  authRateLimiter,
+  publicRateLimiter,
+  authenticatedRateLimiter
+} from "./middleware/rateLimiter.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -77,35 +82,47 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes
-app.use("/api/events", eventRoutes);
-app.use("/api/guests", guestRoutes);
-app.use("/api/vendors", vendorRoutes);
-app.use("/api/tasks", taskRoutes);
-app.use("/api/ai", aiRoutes);
-app.use("/api/collaborators", collaboratorRoutes);
-app.use("/api/upload", uploadRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/search", searchRoutes);
+// Tiered Rate-Limited Routes
+// 1. Strict Authentication Routes (Per-IP & Per-Account + Exponential Backoff)
+app.use("/api/auth", authRateLimiter, authRoutes);
 
-// Static files for uploads (prefixed with /api to match VITE_API_URL expectations)
-// Note: Local static serving is disabled in production to prevent Vercel boot-time conflicts.
+// 2. Moderate Public Routes
+app.use("/api/search", publicRateLimiter, searchRoutes);
+
+// 3. Looser Authenticated Feature Routes
+app.use("/api/events", authenticatedRateLimiter, eventRoutes);
+app.use("/api/guests", authenticatedRateLimiter, guestRoutes);
+app.use("/api/vendors", authenticatedRateLimiter, vendorRoutes);
+app.use("/api/tasks", authenticatedRateLimiter, taskRoutes);
+app.use("/api/ai", authenticatedRateLimiter, aiRoutes);
+app.use("/api/collaborators", authenticatedRateLimiter, collaboratorRoutes);
+app.use("/api/upload", authenticatedRateLimiter, uploadRoutes);
+
+// Static files for uploads with strict non-executable response headers
 if (process.env.NODE_ENV !== "production") {
-  app.use("/api/uploads", express.static(path.join(__dirname, "uploads")));
+  app.use("/api/uploads", express.static(path.join(__dirname, "uploads"), {
+    setHeaders: (res) => {
+      res.setHeader("X-Content-Type-Options", "nosniff");
+      res.setHeader("Content-Security-Policy", "default-src 'none'");
+      res.setHeader("X-Frame-Options", "DENY");
+    }
+  }));
 }
 
-// Test route
-app.get("/", (req, res) => {
+// Test route with Public Rate Limiter
+app.get("/", publicRateLimiter, (req, res) => {
   res.json({ message: "Planora backend running 🚀" });
 });
 
-// Health check
-app.get("/health", (req, res) => {
+// Health check with Public Rate Limiter
+app.get("/health", publicRateLimiter, (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-// Only listen if not in a serverless environment and not testing
-if (process.env.NODE_ENV !== "production" && process.env.NODE_ENV !== "test" && !process.env.VERCEL) {
+// Only listen if executed directly (not imported as a module) and not in production serverless environment
+const isDirectRun = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1];
+
+if (isDirectRun && process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
   const server = app.listen(PORT, () => {
     console.log(`✅ Planora backend running at http://localhost:${PORT}`);
   });
@@ -122,26 +139,16 @@ if (process.env.NODE_ENV !== "production" && process.env.NODE_ENV !== "test" && 
 // Global Error Handler - Operational Integrity
 app.use((err, req, res, next) => {
   console.error(`[Operational Failure] ${err.name}: ${err.message}`);
-  console.error(err.stack);
-  
-  // Proactive Environment Audit
-  const missingEnv = [];
-  if (!process.env.MONGODB_URI) missingEnv.push("MONGODB_URI");
-  if (!process.env.EMAIL_USER) missingEnv.push("EMAIL_USER");
-  if (!process.env.EMAIL_PASS) missingEnv.push("EMAIL_PASS");
-  if (!process.env.GEMINI_API_KEY) missingEnv.push("GEMINI_API_KEY");
-
-  const envDiagnostics = missingEnv.length > 0 
-    ? `Critical Configuration Missing: ${missingEnv.join(", ")}. Please check your Vercel Dashboard environment variables.`
-    : null;
+  if (err.stack) {
+    console.error(err.stack);
+  }
 
   // Ensure CORS headers are present even in failure states
   res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
   res.header("Access-Control-Allow-Credentials", "true");
   
   res.status(500).json({ 
-    message: "Internal Operational Failure. Transaction aborted.",
-    systemDetail: envDiagnostics || err.message || 'Access backend logs for diagnostic traces.'
+    message: "An unexpected internal server error occurred. Please try again later."
   });
 });
 

@@ -3,6 +3,7 @@ import Vendor from "../models/Vendor.js";
 import Profile from "../models/Profile.js";
 import Collaborator from "../models/Collaborator.js";
 import { getAllowedEventIds } from "../utils/authHelper.js";
+import { handleControllerError } from "../utils/errorHandler.js";
 
 // @desc    Create a new event
 // @route   POST /api/events
@@ -26,7 +27,7 @@ export const createEvent = async (req, res) => {
 
         res.status(201).json(event);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return handleControllerError(res, error, "Failed to create event. Please try again.");
     }
 };
 
@@ -42,12 +43,9 @@ export const getEvents = async (req, res) => {
 
         const allowedEventIds = await getAllowedEventIds(userId, userEmail);
 
-        // --- Strategic Component: Profile & Team Leader Presence Synchronization ---
-        // When a Team Leader logs in, we ensure their contact intelligence is propagated to their team.
         if (userId) {
             const leaderProfile = await Profile.findOne({ user: userId });
             if (leaderProfile && leaderProfile.whatsapp) {
-                console.log(`[Presence Intelligence] Synchronizing Team Leader contact (${leaderProfile.whatsapp}) across operational pool.`);
                 await Collaborator.updateMany(
                     { user: userId },
                     { $set: { inviterWhatsApp: leaderProfile.whatsapp } }
@@ -55,11 +53,8 @@ export const getEvents = async (req, res) => {
             }
         }
 
-        console.log(`[Backend Access Analytics] User: ${userEmail || userId} | Allowed Scope: [${allowedEventIds.join(', ')}]`);
         const events = await Event.find({ _id: { $in: allowedEventIds } }).sort({ createdAt: -1 });
-        console.log(`[Backend Access Analytics] Retrieved ${events.length} events from database.`);
 
-        // Calculate actual spent for each event
         const eventIds = events.map(e => e._id);
         const spendings = await Vendor.aggregate([
             { $match: { event: { $in: eventIds } } },
@@ -71,7 +66,6 @@ export const getEvents = async (req, res) => {
             return acc;
         }, {});
 
-        // Map 'title' back to 'name' and '_id' to 'id' for frontend compatibility
         const formattedEvents = events.map(event => ({
             id: event._id,
             name: event.title,
@@ -88,10 +82,8 @@ export const getEvents = async (req, res) => {
         }));
 
         res.json(formattedEvents);
-        console.log(`[Backend Data Transmission] Sent ${formattedEvents.length} formatted events to client.`);
     } catch (error) {
-        console.error("[Backend] Error in getEvents:", error);
-        res.status(500).json({ message: "Failed to retrieve events. Check database connectivity.", error: error.message });
+        return handleControllerError(res, error, "Failed to retrieve events. Please try again.");
     }
 };
 
@@ -108,17 +100,13 @@ export const getEventById = async (req, res) => {
             return res.status(404).json({ message: "Event not found" });
         }
 
-        // --- Strategic Access Verification ---
-        // We verify that the requesting entity has been granted operational visibility into this context.
         if (userId) {
             const allowedIds = await getAllowedEventIds(userId, userEmail);
             if (!allowedIds.includes(eventId)) {
-                console.warn(`[Security Alert] Unauthorized access attempt by ${userEmail || userId} on event ${eventId}`);
                 return res.status(403).json({ message: "Unauthorized: Access to this operational context is restricted." });
             }
         }
 
-        // Format for frontend
         const formattedEvent = {
             id: event._id,
             name: event.title,
@@ -135,7 +123,7 @@ export const getEventById = async (req, res) => {
 
         res.json(formattedEvent);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return handleControllerError(res, error, "Failed to retrieve event details. Please try again.");
     }
 };
 
@@ -157,7 +145,7 @@ export const updateEvent = async (req, res) => {
 
         res.json(updatedEvent);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return handleControllerError(res, error, "Failed to update event. Please try again.");
     }
 };
 
@@ -174,6 +162,6 @@ export const deleteEvent = async (req, res) => {
         await event.deleteOne();
         res.json({ message: "Event removed" });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return handleControllerError(res, error, "Failed to delete event. Please try again.");
     }
 };

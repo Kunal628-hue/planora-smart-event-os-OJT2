@@ -1,49 +1,50 @@
 import Joi from 'joi';
 
 export const loginSchema = Joi.object({
-  email: Joi.string().email().required(),
-  password: Joi.string().required()
+  email: Joi.string().email({ tlds: { allow: false } }).max(254).trim().required(),
+  password: Joi.string().min(8).max(128).required()
 });
 
 export const registerSchema = Joi.object({
-  name: Joi.string().required(),
-  email: Joi.string().email().required(),
-  password: Joi.string().required()
+  name: Joi.string().max(80).trim().required(),
+  email: Joi.string().email({ tlds: { allow: false } }).max(254).trim().required(),
+  password: Joi.string().min(8).max(128).required()
 });
 
 export const eventSchema = Joi.object({
-  title: Joi.string().required(),
-  description: Joi.string().allow('', null),
-  location: Joi.string().required(),
-  city: Joi.string().allow('', null),
-  country: Joi.string().allow('', null),
-  date: Joi.string().required(),
-  user: Joi.string().required(),
-  budget: Joi.number().allow(null),
-  status: Joi.string().allow('', null),
-  type: Joi.string().allow('', null),
-  registrationConfig: Joi.object().allow(null)
+  title: Joi.string().max(100).trim().optional(),
+  name: Joi.string().max(100).trim().optional(),
+  description: Joi.string().max(5000).allow('', null).optional(),
+  location: Joi.string().max(200).trim().required(),
+  city: Joi.string().max(80).allow('', null).optional(),
+  country: Joi.string().max(80).allow('', null).optional(),
+  date: Joi.string().max(50).required(),
+  user: Joi.string().max(128).required(),
+  budget: Joi.number().min(0).max(10_000_000_000).allow(null).optional(),
+  status: Joi.string().valid("Planned", "Active", "Completed", "Cancelled").allow('', null).optional(),
+  type: Joi.string().max(50).allow('', null).optional(),
+  registrationConfig: Joi.object().allow(null).optional()
 });
 
 export const vendorSchema = Joi.object({
-  name: Joi.string().required(),
-  service: Joi.string().allow('', null),
-  serviceType: Joi.string().allow('', null),
-  contact: Joi.string().allow('', null),
-  email: Joi.string().email().allow('', null),
-  phone: Joi.string().allow('', null),
-  cost: Joi.number().allow(null),
-  rating: Joi.number().allow(null),
-  status: Joi.string().allow('', null),
-  event: Joi.string().allow('', null),
-  eventId: Joi.string().allow('', null),
-  user: Joi.string().allow('', null)
+  name: Joi.string().max(80).trim().required(),
+  service: Joi.string().max(80).allow('', null).optional(),
+  serviceType: Joi.string().max(80).allow('', null).optional(),
+  contact: Joi.string().max(200).allow('', null).optional(),
+  email: Joi.string().email({ tlds: { allow: false } }).max(254).allow('', null).optional(),
+  phone: Joi.string().max(20).allow('', null).optional(),
+  cost: Joi.number().min(0).max(10_000_000_000).allow(null).optional(),
+  rating: Joi.number().min(0).max(5).allow(null).optional(),
+  status: Joi.string().valid("Inquiry", "Booked", "Paid", "Unpaid", "Pending").allow('', null).optional(),
+  event: Joi.string().max(128).allow('', null).optional(),
+  eventId: Joi.string().max(128).allow('', null).optional(),
+  user: Joi.string().max(128).allow('', null).optional()
 });
 
 export const guestSchema = Joi.object({
-  name: Joi.string().required(),
-  email: Joi.string().email().required(),
-  status: Joi.string().allow('', null),
-  eventId: Joi.string().required(),
-  role: Joi.string().allow('', null)
+  name: Joi.string().max(80).trim().required(),
+  email: Joi.string().email({ tlds: { allow: false } }).max(254).trim().required(),
+  status: Joi.string().valid("Pending", "Confirmed", "Declined", "Rejected").allow('', null).optional(),
+  eventId: Joi.string().max(128).required(),
+  role: Joi.string().max(50).allow('', null).optional()
 });

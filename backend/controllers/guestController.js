@@ -4,6 +4,8 @@ import { sendInvitation, sendRejectionMail } from "../utils/emailService.js";
 import { getAllowedEventIds } from "../utils/authHelper.js";
 import { esc, escCss, safeColour } from "../utils/htmlSanitizer.js";
 import { validateEmail, validateURL, validatePhone } from "../utils/inputValidator.js";
+import { handleControllerError } from "../utils/errorHandler.js";
+import { validateFileBufferContent } from "../utils/fileSecurity.js";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 
@@ -50,54 +52,48 @@ const generateGroqCompletion = async (prompt) => {
  * Generate a unique 6-character alphanumeric entry code.
  */
 const generateEntryCode = () => {
-    return crypto.randomBytes(3).toString("hex").toUpperCase(); // e.g., "A7F3B2"
+    return 'PL-' + Math.random().toString(36).substring(2, 6).toUpperCase();
 };
 
 export const createGuest = async (req, res) => {
     try {
-        const { event: eventId, email, phone, whatsapp, linkedIn, portfolio } = req.body;
-
-        // ── ReDoS-safe field validation ────────────────────────────────────
-        if (email && !validateEmail(email)) {
-            return res.status(400).json({ message: "Invalid email address" });
+        const { event: eventId, name, email, phone, whatsapp, category, familySize, linkedIn, portfolio, rejectionReason, dietary, notes, user: bodyUser } = req.body;
+        
+        if (!eventId || !name) {
+            return res.status(400).json({ message: "Event and Guest Name are required" });
         }
-        if (phone && !validatePhone(phone)) {
-            return res.status(400).json({ message: "Invalid phone number" });
-        }
-        if (whatsapp && !validatePhone(whatsapp)) {
-            return res.status(400).json({ message: "Invalid WhatsApp number" });
-        }
-        if (linkedIn && !validateURL(linkedIn)) {
-            return res.status(400).json({ message: "Invalid LinkedIn URL" });
-        }
-        if (portfolio && !validateURL(portfolio)) {
-            return res.status(400).json({ message: "Invalid portfolio URL" });
-        }
-        // ────────────────────────────────────────────────────────────────────
 
         const event = await Event.findById(eventId);
-        
-        // Ensure the item is created under the event owner's namespace
-        const guestData = { ...req.body };
-        if (event) {
-            guestData.user = event.user; 
+        if (!event) {
+            return res.status(404).json({ message: "Event context not found" });
         }
 
-        // Auto-generate unique entry code
-        guestData.entryCode = generateEntryCode();
+        const guestData = {
+            name,
+            email: email || undefined,
+            phone: phone || undefined,
+            whatsapp: whatsapp || undefined,
+            category: category || "General",
+            familySize: familySize ? parseInt(familySize, 10) : 1,
+            linkedIn: linkedIn || undefined,
+            portfolio: portfolio || undefined,
+            rejectionReason: rejectionReason || undefined,
+            dietary: dietary || undefined,
+            notes: notes || undefined,
+            event: eventId,
+            user: bodyUser || event.user,
+            entryCode: generateEntryCode()
+        };
 
         const guest = await Guest.create(guestData);
-        console.log(`[Operation: Guest Creation] Successfully registered new entity: ${guest.name} (${guest.email || 'No Email'}) | Code: ${guest.entryCode}`);
-        
-        // If guest has an email, send the invitation
-        if (guest.email && event) {
-            await sendInvitation(guest, event);
+
+        if (guest.email) {
+            sendInvitation(guest, event).catch(err => console.error("Invitation dispatch failed:", err));
         }
 
         res.status(201).json(guest);
     } catch (error) {
-        console.error("[Guest Creation Failed]", error);
-        res.status(500).json({ message: error.message });
+        return handleControllerError(res, error, "Failed to create guest. Please try again.");
     }
 };
 
@@ -125,7 +121,7 @@ export const getGuests = async (req, res) => {
 
         res.json(updatedGuests);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return handleControllerError(res, error, "Failed to retrieve guests. Please try again.");
     }
 };
 
@@ -153,7 +149,7 @@ export const updateGuest = async (req, res) => {
         const guest = await Guest.findByIdAndUpdate(id, req.body, { new: true });
         res.json(guest);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return handleControllerError(res, error, "Failed to update guest. Please try again.");
     }
 };
 
@@ -162,7 +158,7 @@ export const deleteGuest = async (req, res) => {
         await Guest.findByIdAndDelete(req.params.id);
         res.json({ message: "Guest removed" });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return handleControllerError(res, error, "Failed to delete guest. Please try again.");
     }
 };
 
@@ -276,6 +272,12 @@ export const bulkUploadGuests = async (req, res) => {
     try {
         const { eventId } = req.body;
         if (!req.file) return res.status(400).json({ message: "No file provided" });
+
+        // Validate File Buffer Content & Magic Number Signatures
+        const validation = validateFileBufferContent(req.file.buffer, req.file.mimetype, req.file.originalname);
+        if (!validation.valid) {
+            return res.status(400).json({ message: validation.message });
+        }
 
         const event = await Event.findById(eventId);
         if (!event) return res.status(404).json({ message: "Event not found" });

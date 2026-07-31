@@ -276,7 +276,8 @@ export const schemas = {
 export const validate = (schema) => (req, res, next) => {
     const { error, value } = schema.validate(req.body, {
         abortEarly: false,
-        stripUnknown: true,
+        allowUnknown: false,
+        stripUnknown: false,
         errors: { wrap: { label: false } },
     });
 
@@ -291,7 +292,7 @@ export const validate = (schema) => (req, res, next) => {
         });
     }
 
-    // Replace req.body with the validated & sanitised payload
+    // Replace req.body with the strictly validated payload
     req.body = value;
     next();
 };
