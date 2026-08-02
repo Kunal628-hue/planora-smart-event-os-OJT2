@@ -608,8 +608,8 @@ export default function DashboardLayout() {
                                 {item.icon}
                             </span>
                             <span style={{
-                                fontSize: "0.9rem",
-                                fontWeight: location.pathname === item.path ? 700 : 500,
+                                fontSize: "0.95rem",
+                                fontWeight: location.pathname === item.path ? 800 : 600,
                                 color: "inherit",
                                 letterSpacing: "-0.01em"
                             }}>

@@ -107,7 +107,9 @@ body::before {
 }
 
 .dashboard-sidebar .sidebar-item {
-  color: #a1a1aa !important;
+  color: #d4d4d8 !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
   margin: 4px 12px !important;
   padding: 0.7rem 1rem !important;
   border-radius: 12px !important;
@@ -116,16 +118,17 @@ body::before {
 }
 
 .dashboard-sidebar .sidebar-item:hover {
-  background: rgba(255, 255, 255, 0.03) !important;
-  color: #f4f4f5 !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #ffffff !important;
   transform: translateX(4px);
 }
 
 .dashboard-sidebar .sidebar-item.active {
-  background: transparent !important;
+  background: rgba(249, 115, 22, 0.12) !important;
   color: #f97316 !important;
-  font-weight: 700 !important;
-  border: none !important;
+  font-size: 0.95rem !important;
+  font-weight: 800 !important;
+  border: 1px solid rgba(249, 115, 22, 0.25) !important;
   box-shadow: none !important;
 }
 

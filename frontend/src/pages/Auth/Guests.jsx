@@ -496,7 +496,7 @@ export default function Guests() {
             <div className="events-header">
                 <div className="events-header-left">
                     <div>
-                        <h1 style={{ fontSize: "24px", fontWeight: 900, color: "var(--text-primary)", margin: 0, letterSpacing: "-0.02em" }}>
+                        <h1 style={{ fontSize: "28px", fontWeight: 900, color: "var(--text-primary)", margin: 0, letterSpacing: "-0.02em" }}>
                             Attendee Directory
                         </h1>
                     </div>
@@ -505,13 +505,13 @@ export default function Guests() {
                         display: "inline-flex",
                         alignItems: "center",
                         gap: "6px",
-                        background: "rgba(16, 185, 129, 0.1)",
-                        padding: "5px 12px",
+                        background: "rgba(16, 185, 129, 0.12)",
+                        padding: "6px 14px",
                         borderRadius: "20px",
-                        border: "1px solid rgba(16, 185, 129, 0.25)"
+                        border: "1px solid rgba(16, 185, 129, 0.3)"
                     }}>
-                        <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#10b981", animation: "pulseDot 2s infinite" }}></div>
-                        <span style={{ fontSize: "10px", fontWeight: 800, color: "#10b981", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                        <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#10b981", animation: "pulseDot 2s infinite" }}></div>
+                        <span style={{ fontSize: "12px", fontWeight: 900, color: "#10b981", textTransform: "uppercase", letterSpacing: "0.08em" }}>
                             Live Guest Roster
                         </span>
                     </div>
@@ -521,22 +521,22 @@ export default function Guests() {
                     <button 
                         onClick={() => setShowBadges(!showBadges)} 
                         style={{ 
-                            background: showBadges ? "var(--accent-primary)" : "rgba(255,255,255,0.04)", 
-                            border: "1px solid var(--border-subtle)", 
+                            background: showBadges ? "var(--accent-primary)" : "rgba(255,255,255,0.06)", 
+                            border: "1px solid var(--border-medium)", 
                             color: "#fff", 
-                            padding: "0.55rem 1rem", 
+                            padding: "0.6rem 1.15rem", 
                             borderRadius: "10px", 
-                            fontWeight: 700, 
+                            fontWeight: 800, 
                             cursor: "pointer", 
                             display: "flex", 
                             alignItems: "center", 
-                            gap: "6px", 
-                            fontSize: "12px",
-                            height: "40px",
+                            gap: "8px", 
+                            fontSize: "14px",
+                            height: "42px",
                             transition: "all 0.2s"
                         }}
                     >
-                        <CreditCard size={15} />
+                        <CreditCard size={17} />
                         {showBadges ? "Table View" : "Digital Badges"}
                     </button>
 
@@ -544,22 +544,22 @@ export default function Guests() {
                         onClick={downloadSampleCSV}
                         title="Download sample Excel/CSV template"
                         style={{ 
-                            background: "rgba(255,255,255,0.04)", 
-                            border: "1px solid var(--border-subtle)", 
-                            color: "var(--text-secondary)", 
-                            padding: "0.55rem 1rem", 
+                            background: "rgba(255,255,255,0.06)", 
+                            border: "1px solid var(--border-medium)", 
+                            color: "#e4e4e7", 
+                            padding: "0.6rem 1.15rem", 
                             borderRadius: "10px", 
-                            fontWeight: 700, 
+                            fontWeight: 800, 
                             cursor: "pointer", 
                             display: "flex", 
                             alignItems: "center", 
-                            gap: "6px", 
-                            fontSize: "12px",
-                            height: "40px",
+                            gap: "8px", 
+                            fontSize: "14px",
+                            height: "42px",
                             transition: "all 0.2s"
                         }}
                     >
-                        <FileSpreadsheet size={15} />
+                        <FileSpreadsheet size={17} />
                         Sample CSV
                     </button>
 
@@ -567,22 +567,22 @@ export default function Guests() {
                         onClick={() => document.getElementById('bulk-upload-input').click()} 
                         disabled={bulkLoading} 
                         style={{ 
-                            background: "rgba(255,255,255,0.04)", 
-                            border: "1px solid var(--border-subtle)", 
+                            background: "rgba(255,255,255,0.06)", 
+                            border: "1px solid var(--border-medium)", 
                             color: "#fff", 
-                            padding: "0.55rem 1rem", 
+                            padding: "0.6rem 1.15rem", 
                             borderRadius: "10px", 
-                            fontWeight: 700, 
+                            fontWeight: 800, 
                             cursor: "pointer", 
                             display: "flex", 
                             alignItems: "center", 
-                            gap: "6px", 
-                            fontSize: "12px",
-                            height: "40px",
+                            gap: "8px", 
+                            fontSize: "14px",
+                            height: "42px",
                             transition: "all 0.2s"
                         }}
                     >
-                        {bulkLoading ? <Loader2 className="animate-spin" size={15} /> : <Upload size={15} />}
+                        {bulkLoading ? <Loader2 className="animate-spin" size={17} /> : <Upload size={17} />}
                         Bulk Onboard
                         <input id="bulk-upload-input" type="file" hidden onChange={handleBulkUpload} />
                     </button>
@@ -593,20 +593,20 @@ export default function Guests() {
                             background: "linear-gradient(135deg, #f97316 0%, #ea580c 100%)", 
                             color: "#fff", 
                             border: "none", 
-                            padding: "0.6rem 1.35rem", 
+                            padding: "0.65rem 1.4rem", 
                             borderRadius: "10px", 
-                            fontWeight: 800, 
+                            fontWeight: 900, 
                             cursor: "pointer", 
                             display: "flex", 
                             alignItems: "center", 
                             gap: "8px", 
-                            fontSize: "13px", 
-                            height: "40px",
-                            boxShadow: "0 4px 14px rgba(249, 115, 22, 0.35)",
+                            fontSize: "14px", 
+                            height: "42px",
+                            boxShadow: "0 4px 14px rgba(249, 115, 22, 0.4)",
                             transition: "all 0.2s"
                         }}
                     >
-                        <UserPlus size={16} strokeWidth={3} />
+                        <UserPlus size={18} strokeWidth={3} />
                         Add Attendee
                     </button>
                 </div>
@@ -624,18 +624,18 @@ export default function Guests() {
                     justifyContent: "space-between"
                 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
-                        <span style={{ fontSize: "10px", color: "var(--text-secondary)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                        <span style={{ fontSize: "12px", color: "#a1a1aa", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                             Total Invited
                         </span>
-                        <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "rgba(249, 115, 22, 0.1)", color: "#f97316", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <Users size={18} />
+                        <div style={{ width: "38px", height: "38px", borderRadius: "10px", background: "rgba(249, 115, 22, 0.12)", color: "#f97316", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <Users size={20} />
                         </div>
                     </div>
                     <div>
-                        <div style={{ fontSize: "24px", fontWeight: 900, color: "var(--text-primary)", letterSpacing: "-0.02em", marginBottom: "2px" }}>
+                        <div style={{ fontSize: "30px", fontWeight: 900, color: "var(--text-primary)", letterSpacing: "-0.02em", marginBottom: "2px" }}>
                             {stats.total}
                         </div>
-                        <div style={{ fontSize: "11px", color: "var(--text-muted)", fontWeight: 600 }}>
+                        <div style={{ fontSize: "13px", color: "#a1a1aa", fontWeight: 600 }}>
                             Total attendee base
                         </div>
                     </div>
@@ -651,18 +651,18 @@ export default function Guests() {
                     justifyContent: "space-between"
                 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
-                        <span style={{ fontSize: "10px", color: "var(--text-secondary)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                        <span style={{ fontSize: "12px", color: "#a1a1aa", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                             Confirmed
                         </span>
-                        <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "rgba(16, 185, 129, 0.1)", color: "#10b981", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <CheckCircle2 size={18} />
+                        <div style={{ width: "38px", height: "38px", borderRadius: "10px", background: "rgba(16, 185, 129, 0.12)", color: "#10b981", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <CheckCircle2 size={20} />
                         </div>
                     </div>
                     <div>
-                        <div style={{ fontSize: "24px", fontWeight: 900, color: "#10b981", letterSpacing: "-0.02em", marginBottom: "2px" }}>
+                        <div style={{ fontSize: "30px", fontWeight: 900, color: "#10b981", letterSpacing: "-0.02em", marginBottom: "2px" }}>
                             {stats.confirmed}
                         </div>
-                        <div style={{ fontSize: "11px", color: "var(--text-muted)", fontWeight: 600 }}>
+                        <div style={{ fontSize: "13px", color: "#a1a1aa", fontWeight: 600 }}>
                             {stats.total > 0 ? Math.round((stats.confirmed / stats.total) * 100) : 0}% of total roster
                         </div>
                     </div>
@@ -678,18 +678,18 @@ export default function Guests() {
                     justifyContent: "space-between"
                 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
-                        <span style={{ fontSize: "10px", color: "var(--text-secondary)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                        <span style={{ fontSize: "12px", color: "#a1a1aa", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                             Pending
                         </span>
-                        <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "rgba(245, 158, 11, 0.1)", color: "#f59e0b", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <Clock size={18} />
+                        <div style={{ width: "38px", height: "38px", borderRadius: "10px", background: "rgba(245, 158, 11, 0.12)", color: "#f59e0b", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <Clock size={20} />
                         </div>
                     </div>
                     <div>
-                        <div style={{ fontSize: "24px", fontWeight: 900, color: "#f59e0b", letterSpacing: "-0.02em", marginBottom: "2px" }}>
+                        <div style={{ fontSize: "30px", fontWeight: 900, color: "#f59e0b", letterSpacing: "-0.02em", marginBottom: "2px" }}>
                             {stats.pending}
                         </div>
-                        <div style={{ fontSize: "11px", color: "var(--text-muted)", fontWeight: 600 }}>
+                        <div style={{ fontSize: "13px", color: "#a1a1aa", fontWeight: 600 }}>
                             {stats.total > 0 ? Math.round((stats.pending / stats.total) * 100) : 0}% awaiting response
                         </div>
                     </div>
@@ -705,18 +705,18 @@ export default function Guests() {
                     justifyContent: "space-between"
                 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
-                        <span style={{ fontSize: "10px", color: "var(--text-secondary)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                        <span style={{ fontSize: "12px", color: "#a1a1aa", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                             Declined
                         </span>
-                        <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "rgba(239, 68, 68, 0.1)", color: "#ef4444", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <XCircle size={18} />
+                        <div style={{ width: "38px", height: "38px", borderRadius: "10px", background: "rgba(239, 68, 68, 0.12)", color: "#ef4444", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <XCircle size={20} />
                         </div>
                     </div>
                     <div>
-                        <div style={{ fontSize: "24px", fontWeight: 900, color: "#ef4444", letterSpacing: "-0.02em", marginBottom: "2px" }}>
+                        <div style={{ fontSize: "30px", fontWeight: 900, color: "#ef4444", letterSpacing: "-0.02em", marginBottom: "2px" }}>
                             {stats.declined}
                         </div>
-                        <div style={{ fontSize: "11px", color: "var(--text-muted)", fontWeight: 600 }}>
+                        <div style={{ fontSize: "13px", color: "#a1a1aa", fontWeight: 600 }}>
                             {stats.total > 0 ? Math.round((stats.declined / stats.total) * 100) : 0}% attrition rate
                         </div>
                     </div>
@@ -1017,13 +1017,13 @@ export default function Guests() {
                             <table style={{ width: "100%", borderCollapse: "collapse" }}>
                                 <thead>
                                     <tr style={{ background: "rgba(255,255,255,0.01)", borderBottom: "1px solid var(--border-subtle)" }}>
-                                        <th style={{ textAlign: "left", padding: "0.85rem 1.5rem", fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>ATTENDEE</th>
-                                        <th style={{ textAlign: "left", padding: "0.85rem 1.5rem", fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>CONTACT</th>
-                                        <th style={{ textAlign: "center", padding: "0.85rem 1.5rem", fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>RSVP STATUS</th>
-                                        <th style={{ textAlign: "center", padding: "0.85rem 1.5rem", fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>ENTRY CODE</th>
-                                        <th style={{ textAlign: "center", padding: "0.85rem 1.5rem", fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>SEGMENT</th>
-                                        <th style={{ textAlign: "center", padding: "0.85rem 1.5rem", fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>SEATS</th>
-                                        <th style={{ textAlign: "right", padding: "0.85rem 1.5rem", fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>DISPATCH & ACTIONS</th>
+                                        <th style={{ textAlign: "left", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em" }}>ATTENDEE</th>
+                                        <th style={{ textAlign: "left", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em" }}>CONTACT</th>
+                                        <th style={{ textAlign: "center", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em" }}>RSVP STATUS</th>
+                                        <th style={{ textAlign: "center", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em" }}>ENTRY CODE</th>
+                                        <th style={{ textAlign: "center", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em" }}>SEGMENT</th>
+                                        <th style={{ textAlign: "center", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em" }}>SEATS</th>
+                                        <th style={{ textAlign: "right", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em" }}>DISPATCH & ACTIONS</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1036,14 +1036,14 @@ export default function Guests() {
                                             <tr key={g._id} className="event-row" style={{ borderBottom: "1px solid var(--border-subtle)", transition: "all 0.2s" }}>
                                                 <td style={{ padding: "1rem 1.5rem" }}>
                                                     <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                                                        <div style={{ width: "38px", height: "38px", borderRadius: "10px", background: "rgba(249, 115, 22, 0.12)", color: "#f97316", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: "13px", flexShrink: 0 }}>
+                                                        <div style={{ width: "42px", height: "42px", borderRadius: "12px", background: "rgba(249, 115, 22, 0.14)", color: "#f97316", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: "15px", flexShrink: 0 }}>
                                                             {g.name?.charAt(0).toUpperCase() || "A"}
                                                         </div>
                                                         <div>
-                                                            <div style={{ fontWeight: 800, fontSize: "14px", color: "var(--text-primary)" }}>
+                                                            <div style={{ fontWeight: 800, fontSize: "16px", color: "#ffffff" }}>
                                                                 {g.name}
                                                             </div>
-                                                            <div style={{ fontSize: "11px", color: "var(--text-muted)", fontWeight: 600 }}>
+                                                            <div style={{ fontSize: "13px", color: "#a1a1aa", fontWeight: 600 }}>
                                                                 {g.dietary && g.dietary !== "None" ? `Diet: ${g.dietary}` : "Standard Dietary"}
                                                             </div>
                                                         </div>
@@ -1051,10 +1051,10 @@ export default function Guests() {
                                                 </td>
 
                                                 <td style={{ padding: "1rem 1.5rem" }}>
-                                                    <div style={{ fontSize: "12px", color: "var(--text-primary)", fontWeight: 600 }}>
+                                                    <div style={{ fontSize: "14px", color: "#f4f4f5", fontWeight: 700 }}>
                                                         {g.email || "—"}
                                                     </div>
-                                                    <div style={{ fontSize: "11px", color: "var(--text-muted)", fontWeight: 500 }}>
+                                                    <div style={{ fontSize: "13px", color: "#a1a1aa", fontWeight: 500 }}>
                                                         {g.whatsapp || "No phone registered"}
                                                     </div>
                                                 </td>
@@ -1069,17 +1069,17 @@ export default function Guests() {
                                                             display: "inline-flex", 
                                                             alignItems: "center", 
                                                             gap: "6px", 
-                                                            padding: "4px 12px", 
+                                                            padding: "6px 14px", 
                                                             borderRadius: "20px", 
-                                                            border: `1px solid ${statusColor}44`, 
+                                                            border: `1px solid ${statusColor}55`, 
                                                             cursor: "pointer", 
-                                                            background: `${statusColor}11`,
+                                                            background: `${statusColor}18`,
                                                             transition: "all 0.2s"
                                                         }}
                                                         title="Click to toggle RSVP status"
                                                     >
-                                                        <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: statusColor }}></div>
-                                                        <span style={{ color: statusColor, fontWeight: 900, fontSize: "11px", letterSpacing: "0.04em" }}>
+                                                        <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: statusColor }}></div>
+                                                        <span style={{ color: statusColor, fontWeight: 900, fontSize: "13px", letterSpacing: "0.04em" }}>
                                                             {g.status}
                                                         </span>
                                                     </div>
@@ -1088,14 +1088,14 @@ export default function Guests() {
                                                 <td style={{ padding: "1rem 1.5rem", textAlign: "center" }}>
                                                     <span style={{ 
                                                         fontFamily: "'JetBrains Mono', monospace", 
-                                                        background: "rgba(249, 115, 22, 0.08)", 
+                                                        background: "rgba(249, 115, 22, 0.12)", 
                                                         color: "#f97316", 
-                                                        padding: "0.35rem 0.75rem", 
+                                                        padding: "0.45rem 0.9rem", 
                                                         borderRadius: "8px", 
-                                                        fontSize: "12px", 
+                                                        fontSize: "14px", 
                                                         fontWeight: 900, 
                                                         letterSpacing: "0.1em",
-                                                        border: "1px solid rgba(249, 115, 22, 0.2)"
+                                                        border: "1px solid rgba(249, 115, 22, 0.3)"
                                                     }}>
                                                         {getPasscode(g)}
                                                     </span>
@@ -1103,21 +1103,21 @@ export default function Guests() {
 
                                                 <td style={{ padding: "1rem 1.5rem", textAlign: "center" }}>
                                                     <span style={{ 
-                                                        background: "rgba(255,255,255,0.04)", 
-                                                        border: "1px solid var(--border-subtle)", 
-                                                        padding: "0.3rem 0.65rem", 
-                                                        borderRadius: "6px", 
-                                                        fontSize: "11px", 
-                                                        fontWeight: 700, 
-                                                        color: "var(--text-secondary)" 
+                                                        background: "rgba(255,255,255,0.06)", 
+                                                        border: "1px solid var(--border-medium)", 
+                                                        padding: "0.4rem 0.8rem", 
+                                                        borderRadius: "8px", 
+                                                        fontSize: "13px", 
+                                                        fontWeight: 800, 
+                                                        color: "#f4f4f5" 
                                                     }}>
                                                         {g.category || "General"}
                                                     </span>
                                                 </td>
 
                                                 <td style={{ padding: "1rem 1.5rem", textAlign: "center" }}>
-                                                    <div style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "12px", fontWeight: 800, color: "var(--text-primary)" }}>
-                                                        <Users size={13} style={{ color: "var(--text-muted)" }} />
+                                                    <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "14px", fontWeight: 800, color: "#ffffff" }}>
+                                                        <Users size={15} style={{ color: "#a1a1aa" }} />
                                                         {g.familySize || 1}
                                                     </div>
                                                 </td>
