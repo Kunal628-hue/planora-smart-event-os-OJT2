@@ -81,9 +81,9 @@ export default function Guests() {
     }, [events, selectedEventId]);
 
     // Fetch Data
-    const fetchData = async () => {
+    const fetchData = async (isSilent = false) => {
         if (!user) return;
-        setLoading(true);
+        if (!isSilent) setLoading(true);
         try {
             let url = `${API_URL}/guests?user=${user.uid}&email=${encodeURIComponent(user.email || "")}`;
             if (selectedEventId) url += `&eventId=${selectedEventId}`;
@@ -93,16 +93,14 @@ export default function Guests() {
             setGuests(Array.isArray(data) ? data : []);
         } catch (err) {
             console.error("Fetch error:", err);
-            setGuests([]);
+            if (!isSilent) setGuests([]);
         } finally {
-            setLoading(false);
+            if (!isSilent) setLoading(false);
         }
     };
 
     useEffect(() => {
         fetchData();
-        const pollInterval = setInterval(fetchData, 6000); 
-        return () => clearInterval(pollInterval);
     }, [user, selectedEventId, syncTimestamp]);
 
     useEffect(() => {
