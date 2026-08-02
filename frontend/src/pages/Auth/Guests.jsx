@@ -1013,17 +1013,17 @@ export default function Guests() {
                             </button>
                         </div>
                     ) : (
-                        <div style={{ width: "100%", overflowX: "auto" }}>
-                            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                        <div className="custom-scrollbar" style={{ width: "100%", overflowX: "auto" }}>
+                            <table style={{ width: "100%", minWidth: "980px", borderCollapse: "collapse" }}>
                                 <thead>
                                     <tr style={{ background: "rgba(255,255,255,0.01)", borderBottom: "1px solid var(--border-subtle)" }}>
-                                        <th style={{ textAlign: "left", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em" }}>ATTENDEE</th>
-                                        <th style={{ textAlign: "left", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em" }}>CONTACT</th>
-                                        <th style={{ textAlign: "center", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em" }}>RSVP STATUS</th>
-                                        <th style={{ textAlign: "center", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em" }}>ENTRY CODE</th>
-                                        <th style={{ textAlign: "center", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em" }}>SEGMENT</th>
-                                        <th style={{ textAlign: "center", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em" }}>SEATS</th>
-                                        <th style={{ textAlign: "right", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em" }}>DISPATCH & ACTIONS</th>
+                                        <th style={{ textAlign: "left", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap" }}>ATTENDEE</th>
+                                        <th style={{ textAlign: "left", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap" }}>CONTACT</th>
+                                        <th style={{ textAlign: "center", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap" }}>RSVP STATUS</th>
+                                        <th style={{ textAlign: "center", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap" }}>ENTRY CODE</th>
+                                        <th style={{ textAlign: "center", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap" }}>SEGMENT</th>
+                                        <th style={{ textAlign: "center", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap" }}>SEATS</th>
+                                        <th style={{ textAlign: "right", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap" }}>ACTIONS & DISPATCH</th>
                                     </tr>
                                 </thead>
                                 <tbody>
