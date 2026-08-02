@@ -20,12 +20,30 @@ const Team = lazy(() => import("./pages/Auth/Team"));
 const Settings = lazy(() => import("./pages/Auth/Settings"));
 const RegistrationBuilder = lazy(() => import("./pages/Auth/RegistrationBuilder"));
 const RegisterEvent = lazy(() => import("./pages/RegisterEvent"));
+const GuestPass = lazy(() => import("./pages/GuestPass"));
 
 import { LogoLoader } from "./components/ui/Loader";
 
 import { DialogProvider } from "./context/DialogContext";
 import CustomDialog from "./components/ui/CustomDialog";
 import { UploadProvider } from "./context/UploadContext";
+
+import { useEffect } from "react";
+import { useParams } from "react-router-dom";
+
+function PublicGuestPassRedirect() {
+  const { id } = useParams();
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5002/api";
+  useEffect(() => {
+    window.location.href = `${apiUrl}/guests/pass/${id}`;
+  }, [id, apiUrl]);
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", height: "100vh", background: "#09090b", color: "#fff", fontFamily: "sans-serif" }}>
+      <p style={{ fontSize: "16px", fontWeight: 700 }}>Loading Digital Access Pass...</p>
+    </div>
+  );
+}
 
 export default function App() {
   return (
@@ -38,8 +56,9 @@ export default function App() {
               <Routes>
                 <Route path="/" element={<Landing />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
                 <Route path="/register/:eventId" element={<RegisterEvent />} />
+                <Route path="/pass/:id" element={<GuestPass />} />
+                <Route path="/guests/pass/:id" element={<GuestPass />} />
 
                 {/* Protected Dashboard Routes */}
                 <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>

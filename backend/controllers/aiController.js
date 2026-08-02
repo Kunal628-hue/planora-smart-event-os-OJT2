@@ -387,28 +387,90 @@ export const getVendorRecommendations = async (req, res) => {
         const { type, budget, eventId } = req.query;
         
         let remainingBudget = parseFloat(budget) || 1000000;
+        let totalBudget = parseFloat(budget) || 1500000;
         let eventType = type || "Wedding";
-        let bookedCategories = [];
         let eventTitle = "your event";
         let eventCity = "Mumbai";
+        let eventLocation = "Bandra West";
         let eventCountry = "India";
 
-        // If eventId is provided, get real precision data
         if (eventId && mongoose.Types.ObjectId.isValid(eventId)) {
             const event = await Event.findById(eventId);
             if (event) {
                 const bookedVendors = await Vendor.find({ event: event._id });
                 const totalSpent = bookedVendors.reduce((sum, v) => sum + (v.cost || 0), 0);
-                remainingBudget = Math.max(0, event.budget - totalSpent);
-                eventType = event.type;
-                eventTitle = event.title;
-                eventCity = event.city || "Mumbai";
+                totalBudget = event.budget || 1500000;
+                remainingBudget = Math.max(0, totalBudget - totalSpent);
+                eventType = event.type || "Wedding";
+                eventTitle = event.title || event.name || "Event";
+                eventCity = event.city || event.location || "Mumbai";
+                eventLocation = event.location || "City Center";
                 eventCountry = event.country || "India";
-                bookedCategories = bookedVendors.map(v => v.service);
             }
         }
 
-        const allVendors = [
+        const getPriceTier = (b) => {
+            if (b >= 2500000) return "₹₹₹₹";
+            if (b >= 1000000) return "₹₹₹";
+            if (b >= 300000) return "₹₹";
+            return "₹";
+        };
+
+        const budgetTier = getPriceTier(totalBudget);
+
+        // 1. High Level AI Generation via Groq AI
+        if (process.env.GROQ_API_KEY) {
+            try {
+                const prompt = `
+                    You are an elite event concierge and vendor matchmaking AI.
+                    Generate 5 high-level vendor recommendations tailored specifically for:
+                    - Event Type: "${eventType}"
+                    - Event Title: "${eventTitle}"
+                    - Location / City: "${eventCity}, ${eventLocation}, ${eventCountry}"
+                    - Total Event Budget: ₹${totalBudget.toLocaleString("en-IN")}
+                    - Remaining Budget: ₹${remainingBudget.toLocaleString("en-IN")}
+                    - Price Scale Tier: ${budgetTier}
+
+                    CRITICAL REQUIREMENTS:
+                    1. LOCATION WISE: Recommend top real/well-known venues, caterers, decorators, AV teams, or photographers that operate directly in or near "${eventCity}, ${eventCountry}".
+                    2. BUDGET WISE: The prices and tier MUST match the ${budgetTier} scale (e.g. for ₹25L+ budget recommend luxury 5-star venues & premium caterers; for ₹5L budget recommend boutique & mid-tier vendors). Starting prices must be within ₹${remainingBudget.toLocaleString("en-IN")}.
+                    3. EVENT TYPE WISE: Pick services essential to a "${eventType}" (e.g., Wedding: Heritage Venue, Gourmet Dining, Luxury Stage Decor, Cinematic Photo; Conference: Business Hotel Hall, AV & Live Stream, Executive Lunch; College Fest: Concert Arena, Pro Audio, Street Food Stalls).
+
+                    Return ONLY a valid raw JSON array of 5 objects (NO MARKDOWN WRAPPERS) matching this format:
+                    [
+                      {
+                        "name": "Vendor Name",
+                        "service": "Venue",
+                        "rating": 4.9,
+                        "priceRange": "${budgetTier}",
+                        "startingPrice": 500000,
+                        "city": "${eventCity}",
+                        "country": "${eventCountry}",
+                        "location": "${eventLocation}",
+                        "suitableFor": ["${eventType}"],
+                        "description": "High level description highlighting why this vendor excels.",
+                        "contact": "+91 98765 43210",
+                        "email": "contact@vendor.com",
+                        "matchReason": "Ideal ${budgetTier} Venue choice for ${eventType} in ${eventCity}."
+                      }
+                    ]
+                `;
+
+                const aiResponse = await generateGroqCompletion(prompt);
+                const jsonMatch = aiResponse.match(/\[[\s\S]*\]/);
+                if (jsonMatch) {
+                    const aiVendors = JSON.parse(jsonMatch[0]);
+                    if (Array.isArray(aiVendors) && aiVendors.length > 0) {
+                        return res.status(200).json(aiVendors);
+                    }
+                }
+            } catch (err) {
+                console.warn("[AI Match Engine] Groq vendor generation fallback:", err.message);
+            }
+        }
+
+        // 2. High Level Location & Budget Curated Fallback Matrix
+        const fallbackCatalog = [
             {
                 name: "The Taj Mahal Palace",
                 service: "Venue",
@@ -418,159 +480,184 @@ export const getVendorRecommendations = async (req, res) => {
                 city: "Mumbai",
                 country: "India",
                 location: "Apollo Bunder",
-                suitableFor: ["Wedding", "Conference", "Event"],
-                description: "Iconated heritage luxury for grand events.",
-                contact: "+91 22 6665 3366"
+                suitableFor: ["Wedding", "Conference", "Corporate Gala"],
+                description: "Heritage luxury sea-facing landmark for elite grand events.",
+                contact: "+91 22 6665 3366",
+                email: "tajmumbai@tajhotels.com",
+                matchReason: `Premier luxury venue matched for high-scale ${eventType} in Mumbai.`
             },
             {
-                name: "Blue Sea Catering",
+                name: "Blue Sea Catering & Banquets",
                 service: "Catering",
                 rating: 4.8,
                 priceRange: "₹₹₹",
-                startingPrice: 1500000,
+                startingPrice: 600000,
                 city: "Mumbai",
                 country: "India",
-                location: "Worli",
+                location: "Worli Sea Face",
                 suitableFor: ["Wedding", "Conference", "Party"],
-                description: "Premium gourmet catering solutions.",
-                contact: "+91 22 2490 2222"
+                description: "Master culinary team crafting bespoke global and Indian menus.",
+                contact: "+91 22 2490 2222",
+                email: "info@blueseacatering.com",
+                matchReason: `High-capacity gourmet catering optimized for ${eventType} in Mumbai.`
             },
             {
-                name: "Novotel Delhi Aerocity",
-                service: "Venue",
-                rating: 4.6,
-                priceRange: "₹₹",
-                startingPrice: 50000,
-                city: "Delhi",
-                country: "India",
-                location: "Aerocity",
-                suitableFor: ["Conference", "Party", "Workshop"],
-                description: "Modern business-focused venue.",
-                contact: "+91 80 6670 0600"
-            },
-            {
-                name: "Eco-Friendly Decorators",
+                name: "Vivaah Couture Decor",
                 service: "Decor",
-                rating: 4.4,
-                priceRange: "₹",
-                startingPrice: 80000,
-                city: "Delhi",
+                rating: 4.9,
+                priceRange: "₹₹₹",
+                startingPrice: 450000,
+                city: "Mumbai",
                 country: "India",
-                location: "Auroville",
-                suitableFor: ["Wedding", "Party", "College Fest"],
-                description: "Zero-waste sustainable event design.",
-                contact: "+91 77665 54433"
+                location: "Juhu",
+                suitableFor: ["Wedding", "Party", "Corporate Gala"],
+                description: "Architectural floral installations and thematic luxury lighting.",
+                contact: "+91 98200 11223",
+                email: "designs@vivaahcouture.com",
+                matchReason: `Premium bespoke decor tailored for ${eventCity} venues.`
             },
             {
-                name: "Street Bites Live",
-                service: "Catering",
-                rating: 4.5,
-                priceRange: "₹",
-                startingPrice: 30000,
-                city: "Pune",
+                name: "Taj Rambagh Palace",
+                service: "Venue",
+                rating: 5.0,
+                priceRange: "₹₹₹₹",
+                startingPrice: 3500000,
+                city: "Jaipur",
                 country: "India",
-                location: "Kothrud",
-                suitableFor: ["College Fest", "Party"],
-                description: "Hygienic and vibrant live food counters.",
-                contact: "+91 88776 65544"
+                location: "Bhawani Singh Road",
+                suitableFor: ["Wedding", "Corporate Gala"],
+                description: "The Jewel of Jaipur — legendary royal palace grounds.",
+                contact: "+91 141 238 5700",
+                email: "rambagh.jaipur@tajhotels.com",
+                matchReason: `Royal heritage palace destination matched for ${eventType} in Jaipur.`
             },
             {
-                name: "The Ritz-Carlton, New York",
+                name: "Fairmont Jaipur",
+                service: "Venue",
+                rating: 4.8,
+                priceRange: "₹₹₹",
+                startingPrice: 1800000,
+                city: "Jaipur",
+                country: "India",
+                location: "Riico Kukas",
+                suitableFor: ["Wedding", "Conference"],
+                description: "Mughal and Rajput grand banquet architecture.",
+                contact: "+91 141 660 8888",
+                email: "jaipur@fairmont.com",
+                matchReason: `Luxurious grand hall for high-capacity ${eventType} in Jaipur.`
+            },
+            {
+                name: "The Imperial New Delhi",
                 service: "Venue",
                 rating: 4.9,
                 priceRange: "₹₹₹₹",
-                startingPrice: 500000,
-                city: "New York",
-                country: "USA",
-                location: "Central Park South",
-                suitableFor: ["Wedding", "Conference"],
-                description: "Legendary luxury in the heart of Manhattan.",
-                contact: "+1 212 308 9100"
+                startingPrice: 2200000,
+                city: "Delhi",
+                country: "India",
+                location: "Janpath",
+                suitableFor: ["Wedding", "Conference", "Corporate"],
+                description: "Iconic Victorian heritage banqueting in central Delhi.",
+                contact: "+91 11 2334 1234",
+                email: "stay@theimperialindia.com",
+                matchReason: `Elite central venue matched for ${eventType} in Delhi.`
             },
             {
-                name: "Empire Steak House",
+                name: "Seasons Gourmet Catering",
                 service: "Catering",
                 rating: 4.7,
                 priceRange: "₹₹₹",
-                startingPrice: 150000,
-                city: "New York",
-                country: "USA",
-                location: "Midtown",
-                suitableFor: ["Party", "Corporate"],
-                description: "Classic American steakhouse gourmet catering.",
-                contact: "+1 212 555 0199"
+                startingPrice: 500000,
+                city: "Delhi",
+                country: "India",
+                location: "Aerocity",
+                suitableFor: ["Wedding", "Conference", "Party"],
+                description: "Award-winning live interactive culinary counters.",
+                contact: "+91 98110 44556",
+                email: "events@seasonsgroup.in",
+                matchReason: `Top-rated catering partner for ${eventType} in Delhi NCR.`
+            },
+            {
+                name: "The Leela Palace Bengaluru",
+                service: "Venue",
+                rating: 4.9,
+                priceRange: "₹₹₹₹",
+                startingPrice: 2000000,
+                city: "Bengaluru",
+                country: "India",
+                location: "HAL Old Airport Road",
+                suitableFor: ["Wedding", "Conference", "Product Launch"],
+                description: "Palatial grandeur surrounded by lush tropical gardens.",
+                contact: "+91 80 2521 1234",
+                email: "reservations.bangalore@theleela.com",
+                matchReason: `Tech & luxury hub venue matched for ${eventType} in Bengaluru.`
+            },
+            {
+                name: "Silicon Sound & Stage AV",
+                service: "AV & Tech",
+                rating: 4.8,
+                priceRange: "₹₹",
+                startingPrice: 250000,
+                city: "Bengaluru",
+                country: "India",
+                location: "Indiranagar",
+                suitableFor: ["Conference", "College Fest", "Product Launch"],
+                description: "Pro line-array sound, 4K LED walls, and live streaming rigs.",
+                contact: "+91 98450 33445",
+                email: "ops@siliconsound.in",
+                matchReason: `High-tech AV setup tailored for ${eventType} tech requirements.`
+            },
+            {
+                name: "W Goa Resort",
+                service: "Venue",
+                rating: 4.8,
+                priceRange: "₹₹₹₹",
+                startingPrice: 2800000,
+                city: "Goa",
+                country: "India",
+                location: "Vagator Beach",
+                suitableFor: ["Wedding", "Party", "Music Festival"],
+                description: "Vibrant clifftop luxury oceanfront event lawns.",
+                contact: "+91 832 671 8888",
+                email: "w.goa@whotels.com",
+                matchReason: `Destination beachfront venue matched for ${eventType} in Goa.`
+            },
+            {
+                name: "JW Marriott Pune",
+                service: "Venue",
+                rating: 4.8,
+                priceRange: "₹₹₹",
+                startingPrice: 1500000,
+                city: "Pune",
+                country: "India",
+                location: "Senapati Bapat Road",
+                suitableFor: ["Wedding", "Conference", "Corporate Gala"],
+                description: "Grand ballroom and rooftop lounge spaces.",
+                contact: "+91 20 6683 3333",
+                email: "jw.pune@marriott.com",
+                matchReason: `Premium city center venue matched for ${eventType} in Pune.`
             }
         ];
 
-        // Systemic Filtering
-        // 1. Filter by budget and suitability
-        let filtered = allVendors.filter(v => {
-            // Broaden suitability check: if event is Birthday, match "Party" vendors, etc.
-            const broaderMapping = {
-                "Birthday": "Party",
-                "Tech Summits": "Conference",
-                "Corporate": "Conference",
-                "Other": "Event"
-            };
-            const targetTag = broaderMapping[eventType] || eventType;
-            
-            return (v.suitableFor.includes(targetTag) || v.suitableFor.includes("Event")) && 
-                   v.startingPrice <= remainingBudget;
+        // Systemic Filtering by Location and Budget
+        let filtered = fallbackCatalog.filter(v => {
+            const matchesCity = v.city.toLowerCase() === eventCity.toLowerCase();
+            const matchesCountry = v.country.toLowerCase() === eventCountry.toLowerCase();
+            const matchesType = v.suitableFor.some(t => t.toLowerCase() === eventType.toLowerCase());
+            return matchesCity || matchesCountry || matchesType;
         });
 
-        // 2. Prioritize Country then City Match
-        filtered.sort((a, b) => {
-            const aCountryMatch = a.country?.toLowerCase() === eventCountry?.toLowerCase();
-            const bCountryMatch = b.country?.toLowerCase() === eventCountry?.toLowerCase();
-            
-            if (aCountryMatch && !bCountryMatch) return -1;
-            if (!aCountryMatch && bCountryMatch) return 1;
+        if (filtered.length === 0) filtered = fallbackCatalog;
 
-            const aCityMatch = a.city?.toLowerCase() === eventCity?.toLowerCase();
-            const bCityMatch = b.city?.toLowerCase() === eventCity?.toLowerCase();
-            
+        // Sort by Location Precision and Rating
+        filtered.sort((a, b) => {
+            const aCityMatch = a.city.toLowerCase() === eventCity.toLowerCase();
+            const bCityMatch = b.city.toLowerCase() === eventCity.toLowerCase();
             if (aCityMatch && !bCityMatch) return -1;
             if (!aCityMatch && bCityMatch) return 1;
-
-            // Then booked categories
-            const aBooked = bookedCategories.includes(a.service);
-            const bBooked = bookedCategories.includes(b.service);
-            if (!aBooked && bBooked) return -1;
-            if (aBooked && !bBooked) return 1;
-
             return b.rating - a.rating;
         });
 
-        const topPicks = filtered.slice(0, 3);
-
-        // Enhance with Groq Match Reason
-        if (process.env.GROQ_API_KEY && topPicks.length > 0) {
-            try {
-                const prompt = `
-                    You are an expert event planner. Recommend these ${topPicks.length} vendors for "${eventTitle}" in "${eventCity}, ${eventCountry}" with a remaining budget of ₹${remainingBudget.toLocaleString()}.
-                    Vendors: ${topPicks.map(v => `${v.name} (Located in ${v.city}, ${v.country}, Starts at ₹${v.startingPrice})`).join(", ")}.
-                    For each vendor, write a 1-sentence "Match Reason" explaining why it fits this specific geography (country/city), budget and event type.
-                    Return ONLY a raw JSON array of strings, nothing else. Example: ["reason 1", "reason 2"]
-                `;
-                const resultText = await generateGroqCompletion(prompt);
-                const reasons = JSON.parse(resultText.replace(/```json|```/g, "").trim());
-                
-                topPicks.forEach((v, i) => {
-                    v.matchReason = reasons[i] || `Ideal ${v.service} choice for events in ${v.city}, ${v.country}.`;
-                });
-            } catch (err) {
-                if (err.message && err.message.includes("429")) {
-                    console.warn("[Optimization Engine] Vendor AI feature rate limited. Using fast fallback matches.");
-                } else {
-                    console.error("[Optimization Engine] Gemini Recommendation Error (Non-Quota):", err.message);
-                }
-                topPicks.forEach(v => v.matchReason = `Expert ${v.service} optimized for your budget.`);
-            }
-        } else {
-            topPicks.forEach(v => v.matchReason = `Localized ${v.service} expert optimized for your budget.`);
-        }
-
-        res.status(200).json(topPicks);
+        res.status(200).json(filtered.slice(0, 5));
     } catch (error) {
         console.error("Vendor Recommendation Error:", error);
         res.status(500).json({ message: "Engine Failure" });

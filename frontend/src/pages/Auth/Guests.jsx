@@ -120,13 +120,17 @@ export default function Guests() {
         return "A7F3B2";
     };
 
-    // Helper: Generate structured invitation message
     const generateInviteMessage = (guest, eventObj) => {
         const ev = eventObj || events.find(e => (e.id || e._id) === (guest.event?._id || guest.event)) || activeEvent;
         const eventName = ev?.name || ev?.title || 'Planora Smart Event';
         const eventDate = ev?.date ? new Date(ev.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Upcoming';
-        const location = ev?.location || ev?.city || '';
-        const passUrl = `${window.location.origin}/guests/pass/${guest._id || guest.id}`;
+        
+        const venueLocation = ev?.location || ev?.city || 'Venue TBD';
+        const mapsUrl = (venueLocation && venueLocation !== 'Venue TBD' && !venueLocation.startsWith('http'))
+            ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venueLocation)}`
+            : '';
+
+        const passUrl = `${window.location.origin}/pass/${guest._id || guest.id}`;
         
         let msg = `━━━━━━━━━━━━━━━━━━━━━\n`;
         msg += `✨ *OFFICIAL EVENT INVITATION* ✨\n`;
@@ -134,8 +138,9 @@ export default function Guests() {
         msg += `Dear *${guest.name}*,\n\n`;
         msg += `You are cordially invited to *${eventName}*!\n\n`;
         msg += `📅 *Date:* ${eventDate}\n`;
-        if (location) {
-            msg += `📍 *Venue:* ${location}\n`;
+        msg += `📍 *Venue:* ${venueLocation.startsWith('http') ? (ev?.city || 'Venue Location') : venueLocation}\n`;
+        if (mapsUrl) {
+            msg += `🗺️ *Google Maps:* ${mapsUrl}\n`;
         }
         msg += `🏷️ *Pass Category:* ${guest.category || 'Standard'} Pass\n`;
         msg += `🔑 *Entry Code:* ${getPasscode(guest)}\n`;
@@ -248,15 +253,27 @@ export default function Guests() {
             }
         }
 
+        const payload = {
+            name: newGuest.name.trim(),
+            category: newGuest.category || "General",
+            status: newGuest.status || "Pending",
+            event: targetEventId,
+            user: user.uid,
+            familySize: parseInt(newGuest.familySize) || 1
+        };
+
+        if (newGuest.email && newGuest.email.trim()) payload.email = newGuest.email.trim();
+        if (newGuest.whatsapp && newGuest.whatsapp.trim()) payload.whatsapp = newGuest.whatsapp.trim();
+        if (newGuest.linkedIn && newGuest.linkedIn.trim()) payload.linkedIn = newGuest.linkedIn.trim();
+        if (newGuest.portfolio && newGuest.portfolio.trim()) payload.portfolio = newGuest.portfolio.trim();
+        if (newGuest.dietary && newGuest.dietary.trim()) payload.dietary = newGuest.dietary.trim();
+        if (newGuest.notes && newGuest.notes.trim()) payload.notes = newGuest.notes.trim();
+
         try {
             const response = await fetch(`${API_URL}/guests`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    ...newGuest,
-                    user: user.uid,
-                    event: targetEventId
-                })
+                body: JSON.stringify(payload)
             });
 
             if (response.ok) {

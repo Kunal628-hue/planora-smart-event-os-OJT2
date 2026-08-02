@@ -578,23 +578,105 @@ export default function EventDetails() {
 
             {/* Config Adjustment Modal */}
             {showEditModal && (
-                <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2000, backdropFilter: "blur(8px)" }}>
-                    <div style={{ background: "var(--bg-surface)", width: "100%", maxWidth: "550px", padding: "3rem", borderRadius: "32px", border: "1px solid var(--border-subtle)", boxShadow: "0 25px 60px rgba(0,0,0,0.5)" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2.5rem" }}>
-                            <h2 style={{ fontSize: "1.75rem", fontWeight: 800, margin: 0, letterSpacing: "-0.03em", color: "var(--text-primary)" }}>Adjust Context</h2>
-                            <button onClick={() => setShowEditModal(false)} style={{ border: "1px solid var(--border-subtle)", background: "var(--bg-elevated)", width: "32px", height: "32px", borderRadius: "50%", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-secondary)" }}><X size={16} /></button>
-                        </div>
-                        <form onSubmit={handleUpdate} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                <div style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: "rgba(0, 0, 0, 0.85)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    zIndex: 99999,
+                    backdropFilter: "blur(12px)",
+                    padding: "1.5rem",
+                    overflowY: "auto"
+                }}>
+                    <div style={{
+                        background: "#121214",
+                        width: "100%",
+                        maxWidth: "520px",
+                        maxHeight: "85vh",
+                        overflowY: "auto",
+                        padding: "1.75rem 2rem",
+                        borderRadius: "24px",
+                        border: "1px solid rgba(255, 255, 255, 0.12)",
+                        boxShadow: "0 25px 60px rgba(0, 0, 0, 0.75)",
+                        position: "relative",
+                        margin: "auto"
+                    }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
                             <div>
-                                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-secondary)", marginBottom: "8px", textTransform: "uppercase" }}>Event Identity</label>
-                                <input style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid var(--border-subtle)", background: "var(--bg-elevated)", color: "var(--text-primary)", fontSize: "15px", fontWeight: 600 }} value={editData.name} onChange={e => setEditData({ ...editData, name: e.target.value })} required />
+                                <h2 style={{ fontSize: "1.4rem", fontWeight: 900, margin: 0, letterSpacing: "-0.03em", color: "var(--text-primary)" }}>
+                                    Adjust Context
+                                </h2>
+                                <p style={{ fontSize: "12px", color: "var(--text-muted)", margin: "2px 0 0" }}>
+                                    Update operational details and parameters for this event.
+                                </p>
                             </div>
-                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+                            <button
+                                onClick={() => setShowEditModal(false)}
+                                style={{
+                                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                                    background: "rgba(255, 255, 255, 0.05)",
+                                    width: "32px",
+                                    height: "32px",
+                                    borderRadius: "50%",
+                                    cursor: "pointer",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    color: "var(--text-muted)"
+                                }}
+                            >
+                                <X size={16} />
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleUpdate} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                            <div>
+                                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-muted)", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                                    Event Identity *
+                                </label>
+                                <input
+                                    style={{
+                                        width: "100%",
+                                        padding: "0.75rem 1rem",
+                                        borderRadius: "12px",
+                                        border: "1px solid rgba(255, 255, 255, 0.1)",
+                                        background: "rgba(255, 255, 255, 0.03)",
+                                        color: "var(--text-primary)",
+                                        fontSize: "14px",
+                                        fontWeight: 600,
+                                        outline: "none",
+                                        boxSizing: "border-box"
+                                    }}
+                                    value={editData.name}
+                                    onChange={e => setEditData({ ...editData, name: e.target.value })}
+                                    required
+                                />
+                            </div>
+
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                                 <div>
-                                    <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-secondary)", marginBottom: "8px", textTransform: "uppercase" }}>Start Date *</label>
+                                    <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-muted)", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                                        Start Date *
+                                    </label>
                                     <input 
                                         type="date" 
-                                        style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid var(--border-subtle)", background: "var(--bg-elevated)", color: "var(--text-primary)", fontSize: "15px", fontWeight: 600 }} 
+                                        style={{
+                                            width: "100%",
+                                            padding: "0.75rem 1rem",
+                                            borderRadius: "12px",
+                                            border: "1px solid rgba(255, 255, 255, 0.1)",
+                                            background: "rgba(255, 255, 255, 0.03)",
+                                            color: "var(--text-primary)",
+                                            fontSize: "13px",
+                                            fontWeight: 600,
+                                            outline: "none",
+                                            boxSizing: "border-box"
+                                        }} 
                                         value={editData.startDate || editData.date} 
                                         onChange={e => {
                                             const newStart = e.target.value;
@@ -609,41 +691,141 @@ export default function EventDetails() {
                                     />
                                 </div>
                                 <div>
-                                    <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-secondary)", marginBottom: "8px", textTransform: "uppercase" }}>End Date (Optional)</label>
+                                    <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-muted)", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                                        End Date (Optional)
+                                    </label>
                                     <input 
                                         type="date" 
                                         min={getMinEndDate(editData.startDate || editData.date)}
-                                        style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid var(--border-subtle)", background: "var(--bg-elevated)", color: "var(--text-primary)", fontSize: "15px", fontWeight: 600 }} 
+                                        style={{
+                                            width: "100%",
+                                            padding: "0.75rem 1rem",
+                                            borderRadius: "12px",
+                                            border: "1px solid rgba(255, 255, 255, 0.1)",
+                                            background: "rgba(255, 255, 255, 0.03)",
+                                            color: "var(--text-primary)",
+                                            fontSize: "13px",
+                                            fontWeight: 600,
+                                            outline: "none",
+                                            boxSizing: "border-box"
+                                        }} 
                                         value={editData.endDate} 
                                         onChange={e => setEditData({ ...editData, endDate: e.target.value })} 
                                     />
                                 </div>
                             </div>
+
                             <div>
-                                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-secondary)", marginBottom: "8px", textTransform: "uppercase" }}>Category</label>
-                                <select style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid var(--border-subtle)", background: "var(--bg-elevated)", color: "var(--text-primary)", fontSize: "15px", fontWeight: 700 }} value={editData.type} onChange={e => setEditData({ ...editData, type: e.target.value })}>
-                                    <option>Hackathon</option>
-                                    <option>Tech Fest</option>
-                                    <option>Tech Event</option>
-                                    <option>Conference</option>
-                                    <option>College Fest</option>
-                                    <option>Birthday</option>
-                                    <option>Corporate</option>
-                                    <option>Wedding</option>
-                                    <option>Other</option>
+                                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-muted)", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                                    Category
+                                </label>
+                                <select
+                                    style={{
+                                        width: "100%",
+                                        padding: "0.75rem 1rem",
+                                        borderRadius: "12px",
+                                        border: "1px solid rgba(255, 255, 255, 0.1)",
+                                        background: "#18181b",
+                                        color: "var(--text-primary)",
+                                        fontSize: "14px",
+                                        fontWeight: 700,
+                                        outline: "none",
+                                        boxSizing: "border-box"
+                                    }}
+                                    value={editData.type}
+                                    onChange={e => setEditData({ ...editData, type: e.target.value })}
+                                >
+                                    <option value="Wedding">Wedding</option>
+                                    <option value="Hackathon">Hackathon</option>
+                                    <option value="Tech Fest">Tech Fest</option>
+                                    <option value="Tech Event">Tech Event</option>
+                                    <option value="Conference">Conference</option>
+                                    <option value="College Fest">College Fest</option>
+                                    <option value="Birthday">Birthday</option>
+                                    <option value="Corporate">Corporate</option>
+                                    <option value="Other">Other</option>
                                 </select>
                             </div>
+
                             <div>
-                                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-secondary)", marginBottom: "8px", textTransform: "uppercase" }}>Geographical Coordinates</label>
-                                <input style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid var(--border-subtle)", background: "var(--bg-elevated)", color: "var(--text-primary)", fontSize: "15px", fontWeight: 600 }} value={editData.location} onChange={e => setEditData({ ...editData, location: e.target.value })} required />
+                                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-muted)", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                                    Geographical Coordinates / Location
+                                </label>
+                                <input
+                                    style={{
+                                        width: "100%",
+                                        padding: "0.75rem 1rem",
+                                        borderRadius: "12px",
+                                        border: "1px solid rgba(255, 255, 255, 0.1)",
+                                        background: "rgba(255, 255, 255, 0.03)",
+                                        color: "var(--text-primary)",
+                                        fontSize: "14px",
+                                        fontWeight: 600,
+                                        outline: "none",
+                                        boxSizing: "border-box"
+                                    }}
+                                    value={editData.location}
+                                    onChange={e => setEditData({ ...editData, location: e.target.value })}
+                                    required
+                                />
                             </div>
+
                             <div>
-                                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-secondary)", marginBottom: "8px", textTransform: "uppercase" }}>Budget Allocation (₹)</label>
-                                <input type="number" style={{ width: "100%", padding: "1rem", borderRadius: "12px", border: "1px solid var(--border-subtle)", background: "var(--bg-elevated)", color: "var(--text-primary)", fontSize: "16px", fontWeight: 800 }} value={editData.budget} onChange={e => setEditData({ ...editData, budget: e.target.value })} required />
+                                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-muted)", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                                    Budget Allocation (₹)
+                                </label>
+                                <input
+                                    type="number"
+                                    style={{
+                                        width: "100%",
+                                        padding: "0.75rem 1rem",
+                                        borderRadius: "12px",
+                                        border: "1px solid rgba(255, 255, 255, 0.1)",
+                                        background: "rgba(255, 255, 255, 0.03)",
+                                        color: "var(--text-primary)",
+                                        fontSize: "15px",
+                                        fontWeight: 800,
+                                        outline: "none",
+                                        boxSizing: "border-box"
+                                    }}
+                                    value={editData.budget}
+                                    onChange={e => setEditData({ ...editData, budget: e.target.value })}
+                                    required
+                                />
                             </div>
-                            <div style={{ display: "flex", gap: "1.25rem", marginTop: "1rem" }}>
-                                <button type="button" onClick={() => setShowEditModal(false)} style={{ flex: 1, padding: "1.1rem", borderRadius: "14px", border: "1px solid var(--border-subtle)", background: "transparent", color: "var(--text-primary)", fontWeight: 800, cursor: "pointer" }}>Abort</button>
-                                <button type="submit" style={{ flex: 2, padding: "1.1rem", borderRadius: "14px", border: "none", background: "var(--accent-primary)", color: "#000", fontWeight: 900, cursor: "pointer", boxShadow: "0 8px 20px rgba(255, 165, 0, 0.2)" }} disabled={updateLoading}>
+
+                            <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowEditModal(false)}
+                                    style={{
+                                        flex: 1,
+                                        padding: "0.85rem",
+                                        borderRadius: "12px",
+                                        border: "1px solid rgba(255, 255, 255, 0.1)",
+                                        background: "transparent",
+                                        color: "var(--text-primary)",
+                                        fontWeight: 800,
+                                        cursor: "pointer"
+                                    }}
+                                >
+                                    Abort
+                                </button>
+                                <button
+                                    type="submit"
+                                    style={{
+                                        flex: 2,
+                                        padding: "0.85rem",
+                                        borderRadius: "12px",
+                                        border: "none",
+                                        background: "linear-gradient(135deg, #f97316 0%, #ea580c 100%)",
+                                        color: "#fff",
+                                        fontWeight: 900,
+                                        cursor: "pointer",
+                                        boxShadow: "0 8px 20px rgba(249, 115, 22, 0.3)"
+                                    }}
+                                    disabled={updateLoading}
+                                >
                                     {updateLoading ? "Synchronizing..." : "Apply Transformations"}
                                 </button>
                             </div>

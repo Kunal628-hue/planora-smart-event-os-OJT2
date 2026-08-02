@@ -43,8 +43,11 @@ export const vendorSchema = Joi.object({
 
 export const guestSchema = Joi.object({
   name: Joi.string().max(80).trim().required(),
-  email: Joi.string().email({ tlds: { allow: false } }).max(254).trim().required(),
+  email: Joi.string().email({ tlds: { allow: false } }).max(254).trim().allow('', null).optional(),
+  phone: Joi.string().max(20).allow('', null).optional(),
+  whatsapp: Joi.string().max(20).allow('', null).optional(),
   status: Joi.string().valid("Pending", "Confirmed", "Declined", "Rejected").allow('', null).optional(),
-  eventId: Joi.string().max(128).required(),
+  event: Joi.string().max(128).allow('', null).optional(),
+  eventId: Joi.string().max(128).allow('', null).optional(),
   role: Joi.string().max(50).allow('', null).optional()
 });

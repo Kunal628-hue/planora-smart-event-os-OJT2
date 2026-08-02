@@ -408,6 +408,40 @@ export const bulkUploadGuests = async (req, res) => {
     }
 };
 
+export const getGuestPassData = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const guest = await Guest.findById(id);
+        if (!guest) return res.status(404).json({ message: "Guest pass not found" });
+
+        const event = await Event.findById(guest.event);
+        if (!event) return res.status(404).json({ message: "Event not found" });
+
+        res.json({
+            guest: {
+                id: guest._id,
+                name: guest.name,
+                category: guest.category || "Guest",
+                status: guest.status || "Pending",
+                entryCode: guest.entryCode || (guest._id ? guest._id.toString().substring(guest._id.toString().length - 8).toUpperCase() : "PL-PASS"),
+                familySize: guest.familySize || 1
+            },
+            event: {
+                id: event._id,
+                title: event.title || event.name,
+                name: event.title || event.name,
+                date: event.date,
+                location: event.location,
+                city: event.city,
+                type: event.type
+            }
+        });
+    } catch (error) {
+        console.error("[Get Guest Pass Data Error]", error);
+        res.status(500).json({ message: "Failed to load guest pass data" });
+    }
+};
+
 /**
  * Public Guest Pass Page — no login required.
  * Commercial/College/School events -> show unique entry code for verification.
