@@ -63,7 +63,9 @@ export default function EventDetails() {
         if (!eventId || !user) return;
         try {
             const [eventRes, healthRes, riskRes] = await Promise.all([
-                fetch(`${API_URL}/events/${eventId}?user=${user.uid}&email=${user.email}`),
+                fetch(`${API_URL}/events/${eventId}`, {
+                    headers: { "x-user-id": user.uid, "x-user-email": user.email || "" }
+                }),
                 fetch(`${API_URL}/ai/health/${eventId}`),
                 fetch(`${API_URL}/ai/risk/${eventId}`)
             ]);

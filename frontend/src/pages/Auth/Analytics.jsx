@@ -25,10 +25,11 @@ export default function Analytics() {
         if (!user) return;
         setLoading(true);
         try {
+            const headers = { "x-user-id": user.uid, "x-user-email": user.email || "" };
             const [vendorsRes, guestsRes, tasksRes] = await Promise.all([
-                fetch(`${API_URL}/vendors?user=${user.uid}&email=${encodeURIComponent(user.email || "")}`),
-                fetch(`${API_URL}/guests?user=${user.uid}&email=${encodeURIComponent(user.email || "")}`),
-                fetch(`${API_URL}/tasks?user=${user.uid}&email=${encodeURIComponent(user.email || "")}`)
+                fetch(`${API_URL}/vendors`, { headers }),
+                fetch(`${API_URL}/guests`, { headers }),
+                fetch(`${API_URL}/tasks`, { headers })
             ]);
 
             const vendorsData = await vendorsRes.json();

@@ -99,12 +99,14 @@ export const createGuest = async (req, res) => {
 
 export const getGuests = async (req, res) => {
     try {
-        const { eventId, user, email } = req.query;
+        const eventId = req.query.eventId;
+        const userId = req.query.user || req.headers["x-user-id"];
+        const userEmail = req.query.email || req.headers["x-user-email"];
         const filter = {};
         if (eventId) {
             filter.event = eventId;
-        } else if (user) {
-            const allowedIds = await getAllowedEventIds(user, email);
+        } else if (userId) {
+            const allowedIds = await getAllowedEventIds(userId, userEmail);
             filter.event = { $in: allowedIds };
         }
 

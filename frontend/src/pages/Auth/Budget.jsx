@@ -70,12 +70,13 @@ export default function Budget() {
         if (!user) return;
         setLoading(true);
         try {
-            const vendorUrl = `${API_URL}/vendors?user=${user.uid}&email=${encodeURIComponent(user.email || "")}${selectedEventId ? `&eventId=${selectedEventId}` : ""}`;
-            const taskUrl = `${API_URL}/tasks?user=${user.uid}${selectedEventId ? `&eventId=${selectedEventId}` : ""}`;
+            const vendorUrl = `${API_URL}/vendors${selectedEventId ? `?eventId=${selectedEventId}` : ""}`;
+            const taskUrl = `${API_URL}/tasks${selectedEventId ? `?eventId=${selectedEventId}` : ""}`;
+            const headers = { "x-user-id": user.uid, "x-user-email": user.email || "" };
             
             const [vRes, tRes] = await Promise.all([
-                fetch(vendorUrl),
-                fetch(taskUrl)
+                fetch(vendorUrl, { headers }),
+                fetch(taskUrl, { headers })
             ]);
             
             const [vData, tData] = await Promise.all([

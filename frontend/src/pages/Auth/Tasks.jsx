@@ -55,9 +55,11 @@ export default function Tasks() {
         if (!user) return;
         if (isInitial) setLoading(true);
         try {
-            let url = `${API_URL}/tasks?user=${user.uid}&email=${encodeURIComponent(user.email || "")}`;
-            if (selectedEventId) url += `&eventId=${selectedEventId}`;
-            const res = await fetch(url);
+            let url = `${API_URL}/tasks`;
+            if (selectedEventId) url += `?eventId=${selectedEventId}`;
+            const res = await fetch(url, {
+                headers: { "x-user-id": user.uid, "x-user-email": user.email || "" }
+            });
             const data = await res.json();
             setTasks(Array.isArray(data) ? data : []);
         } catch (err) {

@@ -85,9 +85,11 @@ export default function Guests() {
         if (!user) return;
         if (!isSilent) setLoading(true);
         try {
-            let url = `${API_URL}/guests?user=${user.uid}&email=${encodeURIComponent(user.email || "")}`;
-            if (selectedEventId) url += `&eventId=${selectedEventId}`;
-            const res = await fetch(url);
+            let url = `${API_URL}/guests`;
+            if (selectedEventId) url += `?eventId=${selectedEventId}`;
+            const res = await fetch(url, {
+                headers: { "x-user-id": user.uid, "x-user-email": user.email || "" }
+            });
             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
             const data = await res.json();
             setGuests(Array.isArray(data) ? data : []);

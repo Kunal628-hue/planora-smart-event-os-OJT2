@@ -37,7 +37,8 @@ export const createEvent = async (req, res) => {
 // @access  Public
 export const getEvents = async (req, res) => {
     try {
-        const { user: userId, email: userEmail } = req.query;
+        const userId = req.query.user || req.headers["x-user-id"];
+        const userEmail = req.query.email || req.headers["x-user-email"];
         if (!userId) {
             return res.status(400).json({ message: "User ID is required" });
         }

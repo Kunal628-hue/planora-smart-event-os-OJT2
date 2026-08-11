@@ -59,11 +59,13 @@ export default function Vendors() {
         if (!user) return;
         setLoading(true);
         try {
-            let url = `${API_URL}/vendors?user=${user.uid}&email=${user.email}`;
+            let url = `${API_URL}/vendors`;
             if (selectedEventId) {
-                url += `&eventId=${selectedEventId}`;
+                url += `?eventId=${selectedEventId}`;
             }
-            const res = await fetch(url);
+            const res = await fetch(url, {
+                headers: { "x-user-id": user.uid, "x-user-email": user.email || "" }
+            });
             const data = await res.json();
             setVendors(Array.isArray(data) ? data : []);
         } catch (err) {

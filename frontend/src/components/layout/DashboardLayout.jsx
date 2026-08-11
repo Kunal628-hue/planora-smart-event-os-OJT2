@@ -360,7 +360,9 @@ export default function DashboardLayout() {
 
     const fetchAllVendors = async (uid) => {
         try {
-            const res = await fetch(`${API_URL}/vendors?user=${uid}&email=${user.email}`);
+            const res = await fetch(`${API_URL}/vendors`, {
+                headers: { "x-user-id": uid, "x-user-email": user?.email || "" }
+            });
             if (res.ok) {
                 const data = await res.json();
                 setAllVendors(Array.isArray(data) ? data : []);
@@ -373,7 +375,9 @@ export default function DashboardLayout() {
 
     const fetchEvents = async (uid) => {
         try {
-            const res = await fetch(`${API_URL}/events?user=${uid}&email=${user.email}`);
+            const res = await fetch(`${API_URL}/events`, {
+                headers: { "x-user-id": uid, "x-user-email": user?.email || "" }
+            });
             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
 
             const data = await res.json();
@@ -434,7 +438,9 @@ export default function DashboardLayout() {
         const resolvePermissions = async () => {
             try {
                 // Fetch the event specifically to get its latest metadata including owner
-                const eventRes = await fetch(`${API_URL}/events/${selectedEventId}`);
+                const eventRes = await fetch(`${API_URL}/events/${selectedEventId}`, {
+                    headers: { "x-user-id": user.uid, "x-user-email": user?.email || "" }
+                });
                 const event = eventRes.ok ? await eventRes.json() : safeEvents.find(e => String(e.id || e._id) === String(selectedEventId));
 
                 // 1. Ownership Check (UID + Email fallback)

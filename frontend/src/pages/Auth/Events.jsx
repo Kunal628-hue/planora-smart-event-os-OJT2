@@ -69,7 +69,9 @@ export default function Events() {
         if (!user) return;
         try {
             setFetchLoading(true);
-            const response = await fetch(`${API_URL}/events?user=${user.uid}&email=${user.email}`);
+            const response = await fetch(`${API_URL}/events`, {
+                headers: { "x-user-id": user.uid, "x-user-email": user.email || "" }
+            });
             const data = await response.json();
             if (Array.isArray(data)) {
                 setEvents(data);
