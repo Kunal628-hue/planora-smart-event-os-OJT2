@@ -57,4 +57,49 @@ router.post('/receipt', upload.single('receipt'), (req, res) => {
     });
 });
 
+const bannerUploadDir = 'uploads/banners';
+const ensureBannerUploadDir = () => {
+    try {
+        if (!fs.existsSync(bannerUploadDir)) {
+            fs.mkdirSync(bannerUploadDir, { recursive: true });
+        }
+    } catch (err) {
+        console.warn("[Storage Warning] Local file system is read-only.");
+    }
+};
+
+// Banner Upload Endpoint
+router.post('/banner', upload.single('banner'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ message: "No image file uploaded" });
+    }
+
+    // 1. Content Magic Byte & Header Inspection
+    const validation = validateFileBufferContent(req.file.buffer, req.file.mimetype, req.file.originalname);
+    if (!validation.valid) {
+        return res.status(400).json({ message: validation.message });
+    }
+
+    // 2. Ensure isolated upload directory exists
+    ensureBannerUploadDir();
+
+    // 3. Generate randomized filename
+    const safeFilename = generateSanitizedFilename(req.file.originalname);
+    const destinationPath = path.join(bannerUploadDir, safeFilename);
+
+    try {
+        fs.writeFileSync(destinationPath, req.file.buffer);
+    } catch (err) {
+        console.error("Failed to save banner image file:", err);
+        return res.status(500).json({ message: "Failed to store banner image safely." });
+    }
+
+    const fileUrl = `/uploads/banners/${safeFilename}`;
+    res.json({ 
+        success: true, 
+        message: "Banner uploaded successfully",
+        url: fileUrl 
+    });
+});
+
 export default router;

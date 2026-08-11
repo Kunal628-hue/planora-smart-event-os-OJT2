@@ -69,6 +69,7 @@ const eventSchemas = {
         name:        fields.shortText(100).required()
             .messages({ "string.max": "Event name cannot exceed 100 characters" }),
         description: fields.longText(5000).optional().allow(""),
+        banner:      fields.longText(20000).optional().allow(""),
         location:    fields.shortText(200).required(),
         city:        fields.shortText(80).optional(),
         country:     fields.shortText(80).optional(),
@@ -85,6 +86,7 @@ const eventSchemas = {
         title:       fields.shortText(100).optional(),
         name:        fields.shortText(100).optional(),
         description: fields.longText(5000).optional().allow(""),
+        banner:      fields.longText(20000).optional().allow(""),
         location:    fields.shortText(200).optional(),
         city:        fields.shortText(80).optional(),
         country:     fields.shortText(80).optional(),
@@ -226,6 +228,23 @@ const aiSchemas = {
         userId:  fields.firebaseUid.required(),
         plan:    Joi.object().required(), // AI-generated plan structure
     }),
+    polishDescription: Joi.object({
+        title: Joi.string().max(200).optional().allow("", null),
+        type: Joi.string().max(100).optional().allow("", null),
+        location: Joi.string().max(200).optional().allow("", null),
+        city: Joi.string().max(100).optional().allow("", null),
+        country: Joi.string().max(100).optional().allow("", null),
+        date: Joi.string().max(100).optional().allow("", null),
+        shortDescription: Joi.string().max(3000).optional().allow("", null),
+    }),
+    generateBanner: Joi.object({
+        title: Joi.string().max(200).optional().allow("", null),
+        type: Joi.string().max(100).optional().allow("", null),
+        location: Joi.string().max(200).optional().allow("", null),
+        city: Joi.string().max(100).optional().allow("", null),
+        description: Joi.string().max(3000).optional().allow("", null),
+        stylePrompt: Joi.string().max(500).optional().allow("", null),
+    })
 };
 
 // ---------- USER / PROFILE (future-proof for password auth) ----------
@@ -292,8 +311,9 @@ export const validate = (schema) => (req, res, next) => {
         }));
         const summaryMessage = error.details.map(d => d.message).join(". ");
         return res.status(400).json({
-            message: summaryMessage || "Validation failed",
+            message: "Validation failed",
             errors:  details,
+            summary: summaryMessage
         });
     }
 

@@ -10,11 +10,12 @@ import { handleControllerError } from "../utils/errorHandler.js";
 // @access  Public
 export const createEvent = async (req, res) => {
     try {
-        const { name, budget, location, city, country, date, userId, type, status } = req.body;
+        const { name, budget, location, city, country, date, userId, type, status, description, banner } = req.body;
 
         const event = await Event.create({
             title: name,
-            description: "", // Now using a separate field for type
+            description: description || "",
+            banner: banner || "",
             location,
             city: city || "Mumbai",
             country: country || "India",
@@ -69,6 +70,8 @@ export const getEvents = async (req, res) => {
         const formattedEvents = events.map(event => ({
             id: event._id,
             name: event.title,
+            description: event.description || "",
+            banner: event.banner || "",
             date: event.date,
             location: event.location,
             city: event.city || "Mumbai",
@@ -110,6 +113,8 @@ export const getEventById = async (req, res) => {
         const formattedEvent = {
             id: event._id,
             name: event.title,
+            description: event.description || "",
+            banner: event.banner || "",
             date: event.date,
             location: event.location,
             city: event.city || "Mumbai",

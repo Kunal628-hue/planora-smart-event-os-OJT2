@@ -38,7 +38,9 @@ import {
     Globe,
     MapPin,
     ChevronRight,
-    Loader2
+    Loader2,
+    Wand2,
+    Upload
 } from "lucide-react";
 import DashboardBackground from "./DashboardBackground";
 import GlobalSearch from "./GlobalSearch";
@@ -123,6 +125,10 @@ export default function DashboardLayout() {
     // Quick Event Creation Modal State
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [createLoading, setCreateLoading] = useState(false);
+    const [polishingDesc, setPolishingDesc] = useState(false);
+    const [generatingBanner, setGeneratingBanner] = useState(false);
+    const [uploadingBanner, setUploadingBanner] = useState(false);
+
     const [newEventData, setNewEventData] = useState({
         name: "",
         date: "",
@@ -132,8 +138,164 @@ export default function DashboardLayout() {
         type: "Wedding",
         budget: "",
         city: "",
-        country: ""
+        country: "",
+        description: "",
+        banner: ""
     });
+
+    const handlePolishDescription = async () => {
+        setPolishingDesc(true);
+        try {
+            const response = await fetch(`${API_URL}/ai/polish-description`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    title: newEventData.name,
+                    type: newEventData.type,
+                    location: newEventData.location,
+                    city: newEventData.city,
+                    country: newEventData.country,
+                    date: newEventData.startDate || newEventData.date,
+                    shortDescription: newEventData.description
+                })
+            });
+            if (response.ok) {
+                const data = await response.json();
+                if (data.polishedDescription) {
+                    setNewEventData(prev => ({ ...prev, description: data.polishedDescription }));
+                }
+            } else {
+                const errData = await response.json();
+                alert(errData.message || "Failed to polish description.");
+            }
+        } catch (err) {
+            console.error("Polish description error:", err);
+            alert("AI server unreachable.");
+        } finally {
+            setPolishingDesc(false);
+        }
+    };
+
+    const handleGenerateBanner = async () => {
+        setGeneratingBanner(true);
+        try {
+            const response = await fetch(`${API_URL}/ai/generate-banner`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    title: newEventData.name,
+                    type: newEventData.type,
+                    location: newEventData.location,
+                    city: newEventData.city,
+                    description: newEventData.description
+                })
+            });
+            if (response.ok) {
+                const data = await response.json();
+                if (data.bannerUrl) {
+                    setNewEventData(prev => ({ ...prev, banner: data.bannerUrl }));
+                }
+            } else {
+                const errData = await response.json();
+                alert(errData.message || "Failed to generate event banner.");
+            }
+        } catch (err) {
+            console.error("Banner generation error:", err);
+            alert("AI Banner service unreachable.");
+        } finally {
+            setGeneratingBanner(false);
+        }
+    };
+
+    const handleSelfUploadBanner = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (file.size > 5 * 1024 * 1024) {
+            alert("Banner image size must be under 5MB.");
+            return;
+        }
+
+        setUploadingBanner(true);
+        try {
+            const formData = new FormData();
+            formData.append("banner", file);
+            const response = await fetch(`${API_URL}/upload/banner`, {
+                method: "POST",
+                body: formData
+            });
+            if (response.ok) {
+                const data = await response.json();
+                if (data.url) {
+                    setNewEventData(prev => ({ ...prev, banner: data.url }));
+                }
+            } else {
+                const errData = await response.json();
+                alert(errData.message || "Failed to upload banner image.");
+            }
+        } catch (err) {
+            console.error("Banner upload error:", err);
+            alert("Banner upload service unreachable.");
+        } finally {
+            setUploadingBanner(false);
+        }
+    };
+
+    const handleQuickCreateEvent = async (e) => {
+        e.preventDefault();
+        if (!user) return navigate("/login");
+
+        const startDateVal = newEventData.startDate || newEventData.date;
+        if (startDateVal && newEventData.endDate) {
+            const dateCheck = validateDateRange(startDateVal, newEventData.endDate);
+            if (!dateCheck.valid) {
+                alert(dateCheck.message);
+                return;
+            }
+        }
+
+        const payload = {
+            name: newEventData.name || "New Event",
+            date: startDateVal || "",
+            startDate: startDateVal || "",
+            endDate: newEventData.endDate || "",
+            location: newEventData.location || "Main Venue",
+            type: newEventData.type || "Other",
+            budget: parseInt(newEventData.budget) || 0,
+            userId: user.uid,
+            status: "Planned",
+            city: newEventData.city || "",
+            country: newEventData.country || "",
+            description: newEventData.description || "",
+            banner: newEventData.banner || ""
+        };
+
+        setCreateLoading(true);
+        try {
+            const res = await fetch(`${API_URL}/events`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                const created = await res.json();
+                const newId = created._id || created.id;
+                setShowCreateModal(false);
+                setNewEventData({ name: "", date: "", startDate: "", endDate: "", location: "", type: "Wedding", budget: "", city: "", country: "", description: "", banner: "" });
+                await fetchEvents(user.uid);
+                if (newId) handleEventChange(newId);
+                addNotification("Event Created", `'${payload.name}' has been initialized.`);
+            } else {
+                const errData = await res.json();
+                alert(errData.message || "Failed to initialize event.");
+            }
+        } catch (err) {
+            console.error("Error creating event:", err);
+        } finally {
+            setCreateLoading(false);
+        }
+    };
 
     const addNotification = (title, message, type = "system") => {
         // Respect Smart Notifications preference
@@ -237,60 +399,6 @@ export default function DashboardLayout() {
             console.error("Layout fetch error:", err);
         } finally {
             setLocalLoading(false);
-        }
-    };
-
-    const handleQuickCreateEvent = async (e) => {
-        e.preventDefault();
-        if (!user) return navigate("/login");
-
-        const startDateVal = newEventData.startDate || newEventData.date;
-        if (startDateVal && newEventData.endDate) {
-            const dateCheck = validateDateRange(startDateVal, newEventData.endDate);
-            if (!dateCheck.valid) {
-                alert(dateCheck.message);
-                return;
-            }
-        }
-
-        const payload = {
-            name: newEventData.name || "New Event",
-            date: startDateVal || "",
-            startDate: startDateVal || "",
-            endDate: newEventData.endDate || "",
-            location: newEventData.location || "Main Venue",
-            type: newEventData.type || "Other",
-            budget: parseInt(newEventData.budget) || 0,
-            userId: user.uid,
-            status: "Planned",
-            city: newEventData.city || "",
-            country: newEventData.country || ""
-        };
-
-        setCreateLoading(true);
-        try {
-            const res = await fetch(`${API_URL}/events`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
-
-            if (res.ok) {
-                const created = await res.json();
-                const newId = created._id || created.id;
-                setShowCreateModal(false);
-                setNewEventData({ name: "", date: "", startDate: "", endDate: "", location: "", type: "Wedding", budget: "", city: "", country: "" });
-                await fetchEvents(user.uid);
-                if (newId) handleEventChange(newId);
-                addNotification("Event Created", `'${payload.name}' has been initialized.`);
-            } else {
-                const errData = await res.json();
-                alert(errData.message || "Failed to initialize event.");
-            }
-        } catch (err) {
-            console.error("Error creating event:", err);
-        } finally {
-            setCreateLoading(false);
         }
     };
 
@@ -1225,6 +1333,105 @@ export default function DashboardLayout() {
                                         onChange={e => setNewEventData({ ...newEventData, location: e.target.value })} 
                                         style={{ width: "100%", padding: "0.75rem 1rem 0.75rem 2.5rem", borderRadius: "10px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", color: "#fff", fontSize: "13px", fontWeight: 600, outline: "none", boxSizing: "border-box" }}
                                     />
+                                </div>
+                            </div>
+
+                            {/* DESCRIPTION WITH AI POLISH */}
+                            <div>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+                                    <label style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.05em", margin: 0 }}>EVENT DESCRIPTION</label>
+                                    <button
+                                        type="button"
+                                        onClick={handlePolishDescription}
+                                        disabled={polishingDesc}
+                                        style={{
+                                            background: "rgba(249, 115, 22, 0.2)",
+                                            border: "1px solid rgba(249, 115, 22, 0.4)",
+                                            color: "#f97316",
+                                            padding: "3px 8px",
+                                            borderRadius: "6px",
+                                            fontSize: "11px",
+                                            fontWeight: 800,
+                                            cursor: "pointer",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: "4px"
+                                        }}
+                                    >
+                                        {polishingDesc ? (
+                                            <>
+                                                <Loader2 size={11} className="animate-spin" />
+                                                Polishing...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Wand2 size={11} />
+                                                Polish with AI
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                                <textarea
+                                    rows={2}
+                                    placeholder="Write a brief overview or click 'Polish with AI' to generate a full detailed description..."
+                                    value={newEventData.description}
+                                    onChange={e => setNewEventData({ ...newEventData, description: e.target.value })}
+                                    style={{ width: "100%", padding: "0.65rem 0.85rem", borderRadius: "10px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", color: "#fff", fontSize: "12px", fontWeight: 500, outline: "none", boxSizing: "border-box", resize: "vertical", fontFamily: "inherit" }}
+                                />
+                            </div>
+
+                            {/* BANNER GENERATOR & SELF UPLOAD */}
+                            <div>
+                                <label style={{ display: "block", fontSize: "10px", fontWeight: 800, color: "rgba(255,255,255,0.6)", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>EVENT BANNER</label>
+                                {newEventData.banner && (
+                                    <div style={{ position: "relative", marginBottom: "0.5rem", borderRadius: "8px", overflow: "hidden", border: "1px solid rgba(249, 115, 22, 0.3)" }}>
+                                        <img 
+                                            src={newEventData.banner.startsWith("/") ? `${API_URL}${newEventData.banner}` : newEventData.banner} 
+                                            alt="Banner Preview" 
+                                            style={{ width: "100%", height: "90px", objectFit: "cover", display: "block" }} 
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setNewEventData({ ...newEventData, banner: "" })}
+                                            style={{ position: "absolute", top: "4px", right: "4px", background: "rgba(0,0,0,0.7)", border: "none", color: "#fff", width: "20px", height: "20px", borderRadius: "50%", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                                        >
+                                            <X size={11} />
+                                        </button>
+                                    </div>
+                                )}
+                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
+                                    <button
+                                        type="button"
+                                        onClick={handleGenerateBanner}
+                                        disabled={generatingBanner}
+                                        style={{ background: "rgba(249, 115, 22, 0.15)", border: "1px dashed rgba(249, 115, 22, 0.4)", color: "#f97316", padding: "0.6rem 0.4rem", borderRadius: "8px", fontSize: "11px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "5px" }}
+                                    >
+                                        {generatingBanner ? (
+                                            <>
+                                                <Loader2 size={12} className="animate-spin" />
+                                                Generating...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Sparkles size={12} />
+                                                Generate Banner (Gemini)
+                                            </>
+                                        )}
+                                    </button>
+                                    <label style={{ background: "rgba(255,255,255,0.04)", border: "1px dashed rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)", padding: "0.6rem 0.4rem", borderRadius: "8px", fontSize: "11px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "5px" }}>
+                                        {uploadingBanner ? (
+                                            <>
+                                                <Loader2 size={12} className="animate-spin" />
+                                                Uploading...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Upload size={12} />
+                                                Self Upload Banner
+                                            </>
+                                        )}
+                                        <input type="file" accept="image/*" onChange={handleSelfUploadBanner} style={{ display: "none" }} disabled={uploadingBanner} />
+                                    </label>
                                 </div>
                             </div>
 

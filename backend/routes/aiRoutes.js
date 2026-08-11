@@ -7,7 +7,9 @@ import {
     getVendorRecommendations,
     askAiAssistant,
     generateStrategicPlan,
-    applyStrategicPlan
+    applyStrategicPlan,
+    polishDescription,
+    generateBanner
 } from "../controllers/aiController.js";
 import { validate, schemas } from "../middleware/validateInput.js";
 
@@ -21,5 +23,7 @@ router.get("/vendors", getVendorRecommendations);
 router.post("/chat", validate(schemas.ai.chat), askAiAssistant);
 router.get("/strategic-plan/:eventId", generateStrategicPlan);
 router.post("/apply-plan", validate(schemas.ai.applyPlan), applyStrategicPlan);
+router.post("/polish-description", validate(schemas.ai.polishDescription), polishDescription);
+router.post("/generate-banner", validate(schemas.ai.generateBanner), generateBanner);
 
 export default router;

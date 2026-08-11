@@ -22,7 +22,10 @@ import {
     FolderKanban,
     DollarSign,
     SlidersHorizontal,
-    ArrowUpRight
+    ArrowUpRight,
+    Wand2,
+    Upload,
+    Image as ImageIcon
 } from "lucide-react";
 import { TableSkeleton } from "../../components/ui/Skeleton";
 import { validateDateRange, getMinEndDate } from "../../utils/validation";
@@ -44,6 +47,10 @@ export default function Events() {
     const [categoryFilter, setCategoryFilter] = useState("All");
     const [viewMode, setViewMode] = useState("table"); // "table" | "grid"
     
+    const [polishingDesc, setPolishingDesc] = useState(false);
+    const [generatingBanner, setGeneratingBanner] = useState(false);
+    const [uploadingBanner, setUploadingBanner] = useState(false);
+
     const [newEvent, setNewEvent] = useState({
         name: "",
         date: "",
@@ -53,7 +60,9 @@ export default function Events() {
         type: "Wedding",
         budget: "",
         city: "",
-        country: ""
+        country: "",
+        description: "",
+        banner: ""
     });
 
     const fetchEvents = async () => {
@@ -77,6 +86,104 @@ export default function Events() {
     useEffect(() => {
         fetchEvents();
     }, [user]);
+
+    const handlePolishDescription = async () => {
+        setPolishingDesc(true);
+        try {
+            const response = await fetch(`${API_URL}/ai/polish-description`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    title: newEvent.name,
+                    type: newEvent.type,
+                    location: newEvent.location,
+                    city: newEvent.city,
+                    country: newEvent.country,
+                    date: newEvent.startDate || newEvent.date,
+                    shortDescription: newEvent.description
+                })
+            });
+            if (response.ok) {
+                const data = await response.json();
+                if (data.polishedDescription) {
+                    setNewEvent(prev => ({ ...prev, description: data.polishedDescription }));
+                }
+            } else {
+                const errData = await response.json();
+                await showAlert("AI Error", errData.message || "Failed to polish description.");
+            }
+        } catch (err) {
+            console.error("Polish description error:", err);
+            await showAlert("Connection Error", "AI server unreachable.");
+        } finally {
+            setPolishingDesc(false);
+        }
+    };
+
+    const handleGenerateBanner = async () => {
+        setGeneratingBanner(true);
+        try {
+            const response = await fetch(`${API_URL}/ai/generate-banner`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    title: newEvent.name,
+                    type: newEvent.type,
+                    location: newEvent.location,
+                    city: newEvent.city,
+                    description: newEvent.description
+                })
+            });
+            if (response.ok) {
+                const data = await response.json();
+                if (data.bannerUrl) {
+                    setNewEvent(prev => ({ ...prev, banner: data.bannerUrl }));
+                }
+            } else {
+                const errData = await response.json();
+                await showAlert("Banner AI Error", errData.message || "Failed to generate event banner.");
+            }
+        } catch (err) {
+            console.error("Banner generation error:", err);
+            await showAlert("Connection Error", "AI Banner service unreachable.");
+        } finally {
+            setGeneratingBanner(false);
+        }
+    };
+
+    const handleSelfUploadBanner = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (file.size > 5 * 1024 * 1024) {
+            await showAlert("File Too Large", "Banner image size must be under 5MB.");
+            return;
+        }
+
+        setUploadingBanner(true);
+        try {
+            const formData = new FormData();
+            formData.append("banner", file);
+            const response = await fetch(`${API_URL}/upload/banner`, {
+                method: "POST",
+                body: formData
+            });
+            if (response.ok) {
+                const data = await response.json();
+                if (data.url) {
+                    setNewEvent(prev => ({ ...prev, banner: data.url }));
+                }
+            } else {
+                const errData = await response.json();
+                await showAlert("Upload Error", errData.message || "Failed to upload banner image.");
+            }
+        } catch (err) {
+            console.error("Banner upload error:", err);
+            await showAlert("Connection Error", "Banner upload service unreachable.");
+        } finally {
+            setUploadingBanner(false);
+        }
+    };
 
     const handleCreateEvent = async (e) => {
         e.preventDefault();
@@ -103,7 +210,9 @@ export default function Events() {
             userId: user.uid,
             status: "Planned",
             city: newEvent.city || "",
-            country: newEvent.country || ""
+            country: newEvent.country || "",
+            description: newEvent.description || "",
+            banner: newEvent.banner || ""
         };
 
         setLoading(true);
@@ -117,7 +226,7 @@ export default function Events() {
 
             if (response.ok) {
                 setShowModal(false);
-                setNewEvent({ name: "", date: "", location: "", type: "Wedding", budget: "", city: "", country: "" });
+                setNewEvent({ name: "", date: "", location: "", type: "Wedding", budget: "", city: "", country: "", description: "", banner: "" });
                 fetchEvents();
                 addNotification("Event Created", `'${eventData.name}' has been successfully onboarded.`);
             } else {
@@ -696,6 +805,7 @@ export default function Events() {
                                         background: "rgba(255,255,255,0.02)",
                                         border: "1px solid var(--border-subtle)",
                                         borderRadius: "14px",
+                                        overflow: "hidden",
                                         padding: "1.25rem",
                                         cursor: "pointer",
                                         transition: "all 0.2s ease",
@@ -706,6 +816,15 @@ export default function Events() {
                                     className="event-card-hover"
                                 >
                                     <div>
+                                        {event.banner && (
+                                            <div style={{ height: "100px", borderRadius: "10px", overflow: "hidden", marginBottom: "0.85rem", border: "1px solid rgba(255,255,255,0.06)" }}>
+                                                <img 
+                                                    src={event.banner.startsWith("/") ? `${API_URL}${event.banner}` : event.banner} 
+                                                    alt={event.name} 
+                                                    style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+                                                />
+                                            </div>
+                                        )}
                                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.75rem" }}>
                                             <span style={{ fontSize: "10px", fontWeight: 800, padding: "3px 8px", borderRadius: "6px", background: `${dotColor}22`, color: dotColor }}>
                                                 {event.type}
@@ -943,6 +1062,167 @@ export default function Events() {
                                         onChange={e => setNewEvent({ ...newEvent, budget: e.target.value })}
                                         style={{ ...inputStyle, paddingLeft: "2.5rem" }}
                                     />
+                                </div>
+                            </div>
+
+                            {/* DESCRIPTION WITH AI POLISH */}
+                            <div>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.4rem" }}>
+                                    <label style={{ ...labelStyle, marginBottom: 0 }}>EVENT DESCRIPTION</label>
+                                    <button
+                                        type="button"
+                                        onClick={handlePolishDescription}
+                                        disabled={polishingDesc}
+                                        style={{
+                                            background: "linear-gradient(135deg, rgba(249, 115, 22, 0.2) 0%, rgba(234, 88, 12, 0.3) 100%)",
+                                            border: "1px solid rgba(249, 115, 22, 0.4)",
+                                            color: "#f97316",
+                                            padding: "4px 10px",
+                                            borderRadius: "8px",
+                                            fontSize: "11px",
+                                            fontWeight: 800,
+                                            cursor: "pointer",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: "5px",
+                                            transition: "all 0.2s"
+                                        }}
+                                        title="Click to polish your short notes into a professional description"
+                                    >
+                                        {polishingDesc ? (
+                                            <>
+                                                <Loader2 size={12} className="animate-spin" />
+                                                Polishing...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Wand2 size={12} />
+                                                Polish with AI
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                                <textarea
+                                    rows={3}
+                                    placeholder="Write a brief overview or click 'Polish with AI' to generate a full detailed description..."
+                                    value={newEvent.description}
+                                    onChange={e => setNewEvent({ ...newEvent, description: e.target.value })}
+                                    style={{
+                                        ...inputStyle,
+                                        padding: "0.75rem",
+                                        resize: "vertical",
+                                        minHeight: "75px",
+                                        fontFamily: "inherit"
+                                    }}
+                                />
+                            </div>
+
+                            {/* EVENT BANNER GENERATOR & SELF UPLOAD */}
+                            <div>
+                                <label style={labelStyle}>EVENT BANNER</label>
+
+                                {newEvent.banner && (
+                                    <div style={{ position: "relative", marginBottom: "0.75rem", borderRadius: "10px", overflow: "hidden", border: "1px solid rgba(249, 115, 22, 0.3)" }}>
+                                        <img 
+                                            src={newEvent.banner.startsWith("/") ? `${API_URL}${newEvent.banner}` : newEvent.banner} 
+                                            alt="Event Banner Preview" 
+                                            style={{ width: "100%", height: "110px", objectFit: "cover", display: "block" }} 
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setNewEvent({ ...newEvent, banner: "" })}
+                                            style={{
+                                                position: "absolute",
+                                                top: "6px",
+                                                right: "6px",
+                                                background: "rgba(0,0,0,0.7)",
+                                                border: "none",
+                                                color: "#fff",
+                                                width: "24px",
+                                                height: "24px",
+                                                borderRadius: "50%",
+                                                cursor: "pointer",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center"
+                                            }}
+                                            title="Remove Banner"
+                                        >
+                                            <X size={12} />
+                                        </button>
+                                    </div>
+                                )}
+
+                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
+                                    <button
+                                        type="button"
+                                        onClick={handleGenerateBanner}
+                                        disabled={generatingBanner}
+                                        style={{
+                                            background: "rgba(249, 115, 22, 0.12)",
+                                            border: "1px dashed rgba(249, 115, 22, 0.4)",
+                                            color: "#f97316",
+                                            padding: "0.65rem 0.5rem",
+                                            borderRadius: "10px",
+                                            fontSize: "11px",
+                                            fontWeight: 800,
+                                            cursor: "pointer",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            gap: "6px",
+                                            transition: "all 0.2s ease"
+                                        }}
+                                    >
+                                        {generatingBanner ? (
+                                            <>
+                                                <Loader2 size={13} className="animate-spin" />
+                                                Generating...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Sparkles size={13} />
+                                                Generate Banner (Gemini)
+                                            </>
+                                        )}
+                                    </button>
+
+                                    <label
+                                        style={{
+                                            background: "rgba(255,255,255,0.04)",
+                                            border: "1px dashed var(--border-medium)",
+                                            color: "var(--text-secondary)",
+                                            padding: "0.65rem 0.5rem",
+                                            borderRadius: "10px",
+                                            fontSize: "11px",
+                                            fontWeight: 800,
+                                            cursor: "pointer",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            gap: "6px",
+                                            transition: "all 0.2s ease"
+                                        }}
+                                    >
+                                        {uploadingBanner ? (
+                                            <>
+                                                <Loader2 size={13} className="animate-spin" />
+                                                Uploading...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Upload size={13} />
+                                                Self Upload Banner
+                                            </>
+                                        )}
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleSelfUploadBanner}
+                                            style={{ display: "none" }}
+                                            disabled={uploadingBanner}
+                                        />
+                                    </label>
                                 </div>
                             </div>
 

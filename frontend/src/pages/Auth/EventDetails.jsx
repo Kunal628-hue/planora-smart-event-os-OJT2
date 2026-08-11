@@ -17,7 +17,11 @@ import {
     MapPin,
     Calendar,
     ArrowRight,
-    X
+    X,
+    Wand2,
+    Sparkles,
+    Upload,
+    Loader2
 } from "lucide-react";
 import { LogoLoader } from "../../components/ui/Loader";
 import Box from '@mui/material/Box';
@@ -38,6 +42,11 @@ export default function EventDetails() {
     const [risks, setRisks] = useState([]);
     const [updateLoading, setUpdateLoading] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
+    
+    const [polishingDesc, setPolishingDesc] = useState(false);
+    const [generatingBanner, setGeneratingBanner] = useState(false);
+    const [uploadingBanner, setUploadingBanner] = useState(false);
+
     const [editData, setEditData] = useState({
         name: "",
         date: "",
@@ -45,7 +54,9 @@ export default function EventDetails() {
         endDate: "",
         location: "",
         type: "Wedding",
-        budget: ""
+        budget: "",
+        description: "",
+        banner: ""
     });
 
     const fetchEventData = async () => {
@@ -78,7 +89,9 @@ export default function EventDetails() {
                 endDate: eventData.endDate || "",
                 location: eventData.location,
                 type: eventData.type,
-                budget: eventData.budget
+                budget: eventData.budget,
+                description: eventData.description || "",
+                banner: eventData.banner || ""
             });
         } catch (err) {
             console.error("Fetch error:", err);
@@ -95,6 +108,98 @@ export default function EventDetails() {
     useEffect(() => {
         // Data-only effect, animations removed
     }, [loading, !!event]);
+
+    const handlePolishDescription = async () => {
+        setPolishingDesc(true);
+        try {
+            const response = await fetch(`${API_URL}/ai/polish-description`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    title: editData.name,
+                    type: editData.type,
+                    location: editData.location,
+                    date: editData.startDate || editData.date,
+                    shortDescription: editData.description
+                })
+            });
+            if (response.ok) {
+                const data = await response.json();
+                if (data.polishedDescription) {
+                    setEditData(prev => ({ ...prev, description: data.polishedDescription }));
+                }
+            } else {
+                const errData = await response.json();
+                if (showAlert) await showAlert("AI Error", errData.message || "Failed to polish description.");
+            }
+        } catch (err) {
+            console.error("Polish description error:", err);
+        } finally {
+            setPolishingDesc(false);
+        }
+    };
+
+    const handleGenerateBanner = async () => {
+        setGeneratingBanner(true);
+        try {
+            const response = await fetch(`${API_URL}/ai/generate-banner`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    title: editData.name,
+                    type: editData.type,
+                    location: editData.location,
+                    description: editData.description
+                })
+            });
+            if (response.ok) {
+                const data = await response.json();
+                if (data.bannerUrl) {
+                    setEditData(prev => ({ ...prev, banner: data.bannerUrl }));
+                }
+            } else {
+                const errData = await response.json();
+                if (showAlert) await showAlert("Banner AI Error", errData.message || "Failed to generate event banner.");
+            }
+        } catch (err) {
+            console.error("Banner generation error:", err);
+        } finally {
+            setGeneratingBanner(false);
+        }
+    };
+
+    const handleSelfUploadBanner = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (file.size > 5 * 1024 * 1024) {
+            if (showAlert) await showAlert("File Too Large", "Banner image size must be under 5MB.");
+            return;
+        }
+
+        setUploadingBanner(true);
+        try {
+            const formData = new FormData();
+            formData.append("banner", file);
+            const response = await fetch(`${API_URL}/upload/banner`, {
+                method: "POST",
+                body: formData
+            });
+            if (response.ok) {
+                const data = await response.json();
+                if (data.url) {
+                    setEditData(prev => ({ ...prev, banner: data.url }));
+                }
+            } else {
+                const errData = await response.json();
+                if (showAlert) await showAlert("Upload Error", errData.message || "Failed to upload banner image.");
+            }
+        } catch (err) {
+            console.error("Banner upload error:", err);
+        } finally {
+            setUploadingBanner(false);
+        }
+    };
 
     const handleUpdate = async (e) => {
         e.preventDefault();
@@ -126,7 +231,9 @@ export default function EventDetails() {
                     endDate: editData.endDate || "",
                     location: editData.location,
                     type: editData.type,
-                    budget: parseInt(editData.budget) || 0
+                    budget: parseInt(editData.budget) || 0,
+                    description: editData.description || "",
+                    banner: editData.banner || ""
                 })
             });
 
@@ -286,8 +393,68 @@ export default function EventDetails() {
                 </div>
             </div>
 
+            {/* EVENT BANNER HERO DISPLAY */}
+            {event.banner && (
+                <div style={{
+                    width: "100%",
+                    height: "260px",
+                    borderRadius: "28px",
+                    overflow: "hidden",
+                    marginBottom: "2.5rem",
+                    border: "1px solid var(--border-subtle)",
+                    boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
+                    position: "relative"
+                }}>
+                    <img 
+                        src={event.banner.startsWith("/") ? `${API_URL}${event.banner}` : event.banner} 
+                        alt={event.name} 
+                        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} 
+                    />
+                    <div style={{
+                        position: "absolute",
+                        inset: 0,
+                        background: "linear-gradient(to top, rgba(18, 18, 20, 0.9) 0%, transparent 60%)",
+                        display: "flex",
+                        alignItems: "flex-end",
+                        padding: "2rem"
+                    }}>
+                        <div>
+                            <span style={{ background: "rgba(249, 115, 22, 0.2)", color: "#f97316", fontSize: "11px", fontWeight: 900, padding: "4px 12px", borderRadius: "100px", textTransform: "uppercase", letterSpacing: "0.1em", border: "1px solid rgba(249, 115, 22, 0.4)" }}>
+                                {event.type} Stream
+                            </span>
+                            <h2 style={{ fontSize: "1.8rem", fontWeight: 900, margin: "0.4rem 0 0", color: "#ffffff" }}>
+                                {event.name}
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="event-details-split-grid" style={{ gap: "2.5rem" }}>
                 <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
+                    {/* EVENT DESCRIPTION OVERVIEW */}
+                    {event.description && (
+                        <div style={{
+                            background: "var(--bg-surface)",
+                            padding: "2.25rem",
+                            borderRadius: "28px",
+                            border: "1px solid var(--border-subtle)",
+                            boxShadow: "0 10px 30px rgba(0,0,0,0.15)"
+                        }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "1rem" }}>
+                                <div style={{ width: "32px", height: "32px", borderRadius: "10px", background: "rgba(249, 115, 22, 0.15)", color: "#f97316", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                    <Sparkles size={18} />
+                                </div>
+                                <h3 style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>
+                                    Event Overview & Vision
+                                </h3>
+                            </div>
+                            <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", lineHeight: "1.7", margin: 0, whiteSpace: "pre-line", fontWeight: 500 }}>
+                                {event.description}
+                            </p>
+                        </div>
+                    )}
+
                     {/* Operational Pulse Diagnostic */}
                     <div style={{
                         background: "var(--bg-surface)",
@@ -792,6 +959,122 @@ export default function EventDetails() {
                                     onChange={e => setEditData({ ...editData, budget: e.target.value })}
                                     required
                                 />
+                            </div>
+
+                            {/* DESCRIPTION WITH AI POLISH */}
+                            <div>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                                    <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", margin: 0 }}>
+                                        Event Description
+                                    </label>
+                                    <button
+                                        type="button"
+                                        onClick={handlePolishDescription}
+                                        disabled={polishingDesc}
+                                        style={{
+                                            background: "rgba(249, 115, 22, 0.2)",
+                                            border: "1px solid rgba(249, 115, 22, 0.4)",
+                                            color: "#f97316",
+                                            padding: "4px 10px",
+                                            borderRadius: "8px",
+                                            fontSize: "11px",
+                                            fontWeight: 800,
+                                            cursor: "pointer",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: "5px"
+                                        }}
+                                    >
+                                        {polishingDesc ? (
+                                            <>
+                                                <Loader2 size={12} className="animate-spin" />
+                                                Polishing...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Wand2 size={12} />
+                                                Polish with AI
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                                <textarea
+                                    rows={3}
+                                    placeholder="Brief overview or click 'Polish with AI' to expand details..."
+                                    value={editData.description}
+                                    onChange={e => setEditData({ ...editData, description: e.target.value })}
+                                    style={{
+                                        width: "100%",
+                                        padding: "0.75rem 1rem",
+                                        borderRadius: "12px",
+                                        border: "1px solid rgba(255, 255, 255, 0.1)",
+                                        background: "rgba(255, 255, 255, 0.03)",
+                                        color: "var(--text-primary)",
+                                        fontSize: "13px",
+                                        fontWeight: 500,
+                                        outline: "none",
+                                        boxSizing: "border-box",
+                                        resize: "vertical",
+                                        fontFamily: "inherit"
+                                    }}
+                                />
+                            </div>
+
+                            {/* BANNER GENERATOR & SELF UPLOAD */}
+                            <div>
+                                <label style={{ display: "block", fontSize: "11px", fontWeight: 800, color: "var(--text-muted)", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                                    Event Banner
+                                </label>
+                                {editData.banner && (
+                                    <div style={{ position: "relative", marginBottom: "0.6rem", borderRadius: "10px", overflow: "hidden", border: "1px solid rgba(249, 115, 22, 0.3)" }}>
+                                        <img 
+                                            src={editData.banner.startsWith("/") ? `${API_URL}${editData.banner}` : editData.banner} 
+                                            alt="Banner Preview" 
+                                            style={{ width: "100%", height: "100px", objectFit: "cover", display: "block" }} 
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setEditData({ ...editData, banner: "" })}
+                                            style={{ position: "absolute", top: "6px", right: "6px", background: "rgba(0,0,0,0.7)", border: "none", color: "#fff", width: "22px", height: "22px", borderRadius: "50%", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                                        >
+                                            <X size={12} />
+                                        </button>
+                                    </div>
+                                )}
+                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
+                                    <button
+                                        type="button"
+                                        onClick={handleGenerateBanner}
+                                        disabled={generatingBanner}
+                                        style={{ background: "rgba(249, 115, 22, 0.15)", border: "1px dashed rgba(249, 115, 22, 0.4)", color: "#f97316", padding: "0.65rem 0.5rem", borderRadius: "10px", fontSize: "11px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
+                                    >
+                                        {generatingBanner ? (
+                                            <>
+                                                <Loader2 size={13} className="animate-spin" />
+                                                Generating...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Sparkles size={13} />
+                                                Generate Banner (Gemini)
+                                            </>
+                                        )}
+                                    </button>
+                                    <label style={{ background: "rgba(255,255,255,0.04)", border: "1px dashed rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)", padding: "0.65rem 0.5rem", borderRadius: "10px", fontSize: "11px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
+                                        {uploadingBanner ? (
+                                            <>
+                                                <Loader2 size={13} className="animate-spin" />
+                                                Uploading...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Upload size={13} />
+                                                Self Upload Banner
+                                            </>
+                                        )}
+                                        <input type="file" accept="image/*" onChange={handleSelfUploadBanner} style={{ display: "none" }} disabled={uploadingBanner} />
+                                    </label>
+                                </div>
                             </div>
 
                             <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>

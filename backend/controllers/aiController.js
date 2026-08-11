@@ -160,12 +160,12 @@ export const applyStrategicPlan = async (req, res) => {
 export const getEventHealth = async (req, res) => {
     try {
         const { eventId } = req.params;
-        const event = await Event.findById(eventId);
+        const event = await Event.findById(eventId).lean();
         if (!event) return res.status(404).json({ message: "Event not found" });
 
-        const tasks = await Task.find({ event: new mongoose.Types.ObjectId(eventId) });
-        const vendors = await Vendor.find({ event: new mongoose.Types.ObjectId(eventId) });
-        const guests = await Guest.find({ event: new mongoose.Types.ObjectId(eventId) });
+        const tasks = await Task.find({ event: new mongoose.Types.ObjectId(eventId) }).lean();
+        const vendors = await Vendor.find({ event: new mongoose.Types.ObjectId(eventId) }).lean();
+        const guests = await Guest.find({ event: new mongoose.Types.ObjectId(eventId) }).lean();
 
         const now = new Date();
         const eventDate = new Date(event.date);
@@ -228,12 +228,12 @@ export const getEventHealth = async (req, res) => {
 export const getRiskAssessment = async (req, res) => {
     try {
         const { eventId } = req.params;
-        const event = await Event.findById(eventId);
+        const event = await Event.findById(eventId).lean();
         if (!event) return res.status(404).json({ message: "Strategic Context not found" });
 
-        const tasks = await Task.find({ event: new mongoose.Types.ObjectId(eventId) });
-        const vendors = await Vendor.find({ event: new mongoose.Types.ObjectId(eventId) });
-        const guests = await Guest.find({ event: new mongoose.Types.ObjectId(eventId) });
+        const tasks = await Task.find({ event: new mongoose.Types.ObjectId(eventId) }).lean();
+        const vendors = await Vendor.find({ event: new mongoose.Types.ObjectId(eventId) }).lean();
+        const guests = await Guest.find({ event: new mongoose.Types.ObjectId(eventId) }).lean();
 
         const now = new Date();
         const eventDate = new Date(event.date);
@@ -382,9 +382,20 @@ export const getBudgetOptimization = async (req, res) => {
     }
 };
 
+const vendorMatchCache = new Map();
+
 export const getVendorRecommendations = async (req, res) => {
     try {
         const { type, budget, eventId } = req.query;
+        const cacheKey = `${eventId || type || 'default'}`;
+
+        // Return cached vendor recommendations if requested within 10 minutes
+        if (vendorMatchCache.has(cacheKey)) {
+            const cached = vendorMatchCache.get(cacheKey);
+            if (Date.now() - cached.timestamp < 10 * 60 * 1000) {
+                return res.status(200).json(cached.data);
+            }
+        }
         
         let remainingBudget = parseFloat(budget) || 1000000;
         let totalBudget = parseFloat(budget) || 1500000;
@@ -395,9 +406,9 @@ export const getVendorRecommendations = async (req, res) => {
         let eventCountry = "India";
 
         if (eventId && mongoose.Types.ObjectId.isValid(eventId)) {
-            const event = await Event.findById(eventId);
+            const event = await Event.findById(eventId).lean();
             if (event) {
-                const bookedVendors = await Vendor.find({ event: event._id });
+                const bookedVendors = await Vendor.find({ event: event._id }).lean();
                 const totalSpent = bookedVendors.reduce((sum, v) => sum + (v.cost || 0), 0);
                 totalBudget = event.budget || 1500000;
                 remainingBudget = Math.max(0, totalBudget - totalSpent);
@@ -461,6 +472,7 @@ export const getVendorRecommendations = async (req, res) => {
                 if (jsonMatch) {
                     const aiVendors = JSON.parse(jsonMatch[0]);
                     if (Array.isArray(aiVendors) && aiVendors.length > 0) {
+                        vendorMatchCache.set(cacheKey, { timestamp: Date.now(), data: aiVendors });
                         return res.status(200).json(aiVendors);
                     }
                 }
@@ -657,7 +669,9 @@ export const getVendorRecommendations = async (req, res) => {
             return b.rating - a.rating;
         });
 
-        res.status(200).json(filtered.slice(0, 5));
+        const finalVendors = filtered.slice(0, 5);
+        vendorMatchCache.set(cacheKey, { timestamp: Date.now(), data: finalVendors });
+        res.status(200).json(finalVendors);
     } catch (error) {
         console.error("Vendor Recommendation Error:", error);
         res.status(500).json({ message: "Engine Failure" });
@@ -742,3 +756,212 @@ export const askAiAssistant = async (req, res) => {
         res.status(200).json({ response: userMessage });
     }
 };
+
+/**
+ * AI DESCRIPTION POLISHER
+ * Takes event details and optional short draft text and expands it into a polished, professional description.
+ */
+export const polishDescription = async (req, res) => {
+    try {
+        const { title, type, location, city, country, date, shortDescription } = req.body;
+
+        const eventTitle = title || "Upcoming Event";
+        const category = type || "Special Event";
+        const venue = [location, city, country].filter(Boolean).join(", ") || "TBD Location";
+        const eventDate = date || "Upcoming Date";
+        const draftText = shortDescription ? `User's draft notes/points:\n"${shortDescription}"` : "User provided no initial draft text.";
+
+        const prompt = `
+            You are an elite event curator, copywriter, and experience architect.
+            Draft a comprehensive, compelling, professional event description for the following event:
+
+            - Event Title: "${eventTitle}"
+            - Category / Type: "${category}"
+            - Venue / Location: "${venue}"
+            - Date: "${eventDate}"
+            - ${draftText}
+
+            INSTRUCTIONS:
+            1. Expand the details and draft notes into a structured, highly engaging event description (2 to 3 paragraphs).
+            2. Cover the core vision, expected highlights, atmosphere, and key reasons attendees should participate.
+            3. Use elegant, clean formatting with clear paragraphs. Do NOT include markdown code blocks or JSON formatting. Output plain polished description text ONLY.
+            4. STRICTLY NO EMOJIS. Maintain an executive, highly professional tone throughout.
+        `;
+
+        let polishedText = "";
+        if (process.env.GROQ_API_KEY) {
+            try {
+                polishedText = await generateGroqCompletion(prompt);
+                // Strip quotes if AI wrapped the entire output in quotes
+                polishedText = polishedText.trim().replace(/^"(.*)"$/s, '$1');
+            } catch (err) {
+                console.warn("[AI Polisher] Fallback due to Groq error:", err.message);
+            }
+        }
+
+        if (!polishedText) {
+            // Elegant fallback if AI key is missing or errored
+            polishedText = `Join us for ${eventTitle}, a premier ${category} taking place at ${venue} on ${eventDate}. ${shortDescription ? shortDescription + " " : ""}This event brings together participants for an unforgettable experience filled with engaging sessions, networking opportunities, and key highlights tailored for every attendee. Reserve your spot today to be part of this exceptional gathering!`;
+        }
+
+        res.status(200).json({ polishedDescription: polishedText });
+    } catch (error) {
+        console.error("Polish Description Error:", error);
+        res.status(500).json({ message: "Failed to polish description. Please try again." });
+    }
+};
+
+/**
+ * AI BANNER GENERATOR (Gemini Nanobanana Lite Image Engine)
+ * Takes event parameters and generates an aesthetic, high-resolution 1200x400 header banner.
+ */
+export const generateBanner = async (req, res) => {
+    try {
+        const { title, type, location, city, description, stylePrompt } = req.body;
+
+        const eventTitle = title || "Special Event";
+        const category = type || "Event";
+        const eventLocation = [location, city].filter(Boolean).join(", ") || "";
+        const details = description ? description.substring(0, 200) : "";
+
+        const fullText = `${eventTitle} ${category} ${details} ${eventLocation}`.toLowerCase();
+
+        // 1. Intelligent Sub-Theme & Keyword Detector for ultra-accurate visual scenes
+        let baseTheme = "Atmospheric luxury event hall venue, elegant ambient mood lighting, cinematic architecture wallpaper background";
+
+        if (fullText.includes("haldi")) {
+            baseTheme = "Indian Haldi ceremony venue, bright sunshine yellow marigold flower garlands, traditional brass urli bowl, marigold flower drapes, warm cheerful morning sunlight photography";
+        } else if (fullText.includes("mehendi") || fullText.includes("mehndi")) {
+            baseTheme = "Indian Mehendi garden party venue, vibrant emerald green foliage, colourful floral canopy, bohemian outdoor seating, fairy lights, festive Indian decor";
+        } else if (fullText.includes("sangeet") || fullText.includes("music night") || fullText.includes("musical")) {
+            baseTheme = "Indian Sangeet night celebration stage, royal purple and magenta LED illuminated backdrop, twinkling fairy light curtains, musical instrument decor, luxury palace stage";
+        } else if (fullText.includes("reception") || fullText.includes("banquet")) {
+            baseTheme = "Grand luxury wedding reception banquet hall, opulent crystal chandeliers, white and gold floral centerpieces, elegant candlelit dining, royal interior design";
+        } else if (category === "Wedding" || fullText.includes("wedding") || fullText.includes("marriage") || fullText.includes("shaadi")) {
+            baseTheme = "Indian luxury royal palace wedding mandap, golden stage pillars, red and marigold floral drapery, soft warm lanterns, opulent royal courtyard venue";
+        } else if (category === "Hackathon" || fullText.includes("hackathon") || fullText.includes("code") || fullText.includes("developer")) {
+            baseTheme = "Bustling high-tech hackathon event hall, software developers working at workstations with glowing laptop screens, neon purple and cyan LED stage backdrop, vibrant computer coding summit venue";
+        } else if (fullText.includes("gaming") || fullText.includes("esports")) {
+            baseTheme = "Illuminated esports stadium arena, glowing blue and red neon gaming mainstage, futuristic dark ambient lighting, high tech wallpaper";
+        } else if (fullText.includes("ai") || fullText.includes("robotics") || fullText.includes("tech fest") || category === "Tech Fest") {
+            baseTheme = "Futuristic tech innovation summit venue, massive glowing blue LED screens, interactive holographic display elements, modern high-tech exhibition stage";
+        } else if (category === "Tech Event" || fullText.includes("tech")) {
+            baseTheme = "Sleek modern tech conference keynote stage, glowing dark blue cyan backdrop, futuristic architectural lighting, professional summit venue";
+        } else if (fullText.includes("gala") || fullText.includes("award") || fullText.includes("red carpet")) {
+            baseTheme = "Glamorous red carpet award gala night stage, golden trophy spotlights, luxury crystal ballroom, elegant black-tie event venue";
+        } else if (fullText.includes("concert") || fullText.includes("edm") || fullText.includes("dj")) {
+            baseTheme = "Epic music concert festival mainstage, dramatic laser beam spotlights, moving light heads, festival crowd silhouettes, vibrant smoke and lights";
+        } else if (category === "College Fest" || fullText.includes("college") || fullText.includes("campus")) {
+            baseTheme = "Vibrant energetic campus festival stage, colorful laser lights, party crowd silhouette, festival beams and celebratory atmosphere";
+        } else if (category === "Birthday" || fullText.includes("birthday")) {
+            baseTheme = "Elegant luxury birthday party setup, glowing golden helium balloon backdrop wall, twinkling fairy lights, warm celebratory aesthetic";
+        } else if (category === "Corporate" || fullText.includes("corporate") || fullText.includes("executive")) {
+            baseTheme = "Modern glass corporate auditorium, executive event stage, sleek architectural interior with warm professional spotlights";
+        } else if (fullText.includes("food") || fullText.includes("culinary") || fullText.includes("feast")) {
+            baseTheme = "Gourmet food festival banquet setup, luxury outdoor dining table, warm festoon string lights, elegant culinary display";
+        }
+
+        let visualScene = baseTheme;
+
+        // 2. Groq AI Visual Art Director Prompt Synthesis
+        if (process.env.GROQ_API_KEY) {
+            try {
+                const promptDraft = `
+                    You are a world-class visual art director generating text-to-image prompts for high-resolution event header banners.
+                    Create a detailed, hyperrealistic visual scene description for an image banner:
+
+                    - Event Title: "${eventTitle}"
+                    - Category/Type: "${category}"
+                    - Location: "${eventLocation}"
+                    - Description details: "${details}"
+                    - Theme baseline: "${baseTheme}"
+                    - Style: "${stylePrompt || "photorealistic cinematic high resolution luxury event photography"}"
+
+                    STRICT RULES:
+                    1. Describe the VISUAL SCENE ONLY (decorations, stage, venue, lighting, color palette, atmosphere, background elements).
+                    2. DO NOT include any text, title, words, logos, alphabet letters, or typography in the scene description.
+                    3. Ensure the scene is highly relevant and visually stunning for this specific event. Include concrete subjects (e.g. laptops, screens, stage, flowers, chandeliers).
+                    4. Keep it under 45 words.
+                    5. Return ONLY the visual description string without intro text or quotes.
+                `;
+                const aiVisualPrompt = await generateGroqCompletion(promptDraft);
+                if (aiVisualPrompt && aiVisualPrompt.trim().length > 10) {
+                    visualScene = aiVisualPrompt.replace(/^"(.*)"$/s, '$1').trim();
+                }
+            } catch (err) {
+                console.warn("[AI Banner Engine] Prompt craft fallback:", err.message);
+            }
+        }
+
+        // 3. Sanitize out any text/typography references so AI doesn't render broken letters
+        const sanitizedScene = visualScene
+            .replace(/\b(text|words|title|typography|letters|font|logo|banner graphic|header|quote|writing)\b/gi, "")
+            .replace(/['"$&<>]/g, "")
+            .trim();
+
+        // 4. Construct hyperrealistic 8K photorealistic landscape prompt
+        const fullPrompt = `${sanitizedScene}, photographed on 35mm lens, f/1.8 depth of field, 8k resolution wallpaper background, cinematic ambient lighting, photorealistic wide landscape view, clean background, no text, no words`;
+
+        // 5. Check if GEMINI_API_KEY / GOOGLE_API_KEY is available for direct Gemini Imagen generation
+        let bannerUrl = "";
+        const geminiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+
+        if (geminiKey) {
+            try {
+                const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${geminiKey}`;
+                const geminiRes = await fetch(geminiUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        instances: [{ prompt: fullPrompt }],
+                        parameters: {
+                            sampleCount: 1,
+                            aspectRatio: "16:9",
+                            outputMimeType: "image/jpeg"
+                        }
+                    })
+                });
+
+                if (geminiRes.ok) {
+                    const geminiData = await geminiRes.json();
+                    const b64Data = geminiData?.predictions?.[0]?.bytesBase64Encoded;
+                    if (b64Data) {
+                        const fs = await import("fs");
+                        const path = await import("path");
+                        const uploadDir = path.join(process.cwd(), "uploads", "banners");
+                        if (!fs.existsSync(uploadDir)) {
+                            fs.mkdirSync(uploadDir, { recursive: true });
+                        }
+                        const filename = `gemini-banner-${Date.now()}-${Math.floor(Math.random() * 1000)}.jpg`;
+                        const filePath = path.join(uploadDir, filename);
+                        fs.writeFileSync(filePath, Buffer.from(b64Data, "base64"));
+                        bannerUrl = `/uploads/banners/${filename}`;
+                        console.log(`[Gemini Banner Engine] Generated native Gemini Imagen banner: ${bannerUrl}`);
+                    }
+                } else {
+                    const errText = await geminiRes.text();
+                    console.warn("[Gemini Banner Engine] API response error, falling back to Flux:", geminiRes.status, errText);
+                }
+            } catch (err) {
+                console.error("[Gemini Banner Engine] Gemini Imagen error:", err.message);
+            }
+        }
+
+        // Generate banner using high-definition Flux model
+        if (!bannerUrl) {
+            const seed = Math.floor(Math.random() * 1000000);
+            const encodedPrompt = encodeURIComponent(fullPrompt);
+            bannerUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1200&height=400&nologo=true&seed=${seed}&model=flux&enhance=true`;
+        }
+
+        res.status(200).json({ 
+            bannerUrl, 
+            prompt: fullPrompt,
+            model: "flux"
+        });
+    } catch (error) {
+        console.error("Banner Generation Error:", error);
+        res.status(500).json({ message: "Failed to generate AI event banner." });
+    }
+};
+

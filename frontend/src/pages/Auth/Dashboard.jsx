@@ -91,21 +91,42 @@ export default function Dashboard() {
     const API_URL = import.meta.env.VITE_API_URL;
 
     // Data Fetcher - Live MongoDB DB Querying per Selected Event
+    // Data Fetcher - Live MongoDB DB Querying per Selected Event
     const fetchAiInsights = async (eventId) => {
         if (!eventId) {
             setLoading(false);
             return;
         }
-        setLoading(true);
+
+        // Instant Render from Session Cache for 0ms refresh speed
+        const cacheKey = `planora_dash_cache_${eventId}`;
+        const cached = sessionStorage.getItem(cacheKey);
+        if (cached) {
+            try {
+                const parsed = JSON.parse(cached);
+                setHealthData(parsed.health);
+                setRisks(parsed.riskData);
+                setBudgetOpts(parsed.budgetData);
+                setUserTasks(parsed.tasksData || []);
+                setUserVendors(parsed.dbVendorsData || []);
+                setUserGuests(parsed.guestsData || []);
+                setVendors(parsed.vendorData || []);
+                setLoading(false);
+            } catch (e) {}
+        } else {
+            setLoading(true);
+        }
+        
         setError(null);
         try {
-            const [healthRes, riskRes, budgetRes, tasksRes, dbVendorsRes, guestsRes] = await Promise.all([
+            const [healthRes, riskRes, budgetRes, tasksRes, dbVendorsRes, guestsRes, vendorRes] = await Promise.all([
                 fetch(`${API_URL}/ai/health/${eventId}`),
                 fetch(`${API_URL}/ai/risk/${eventId}`),
                 fetch(`${API_URL}/ai/budget-opt/${eventId}`),
                 fetch(`${API_URL}/tasks?eventId=${eventId}`),
                 fetch(`${API_URL}/vendors?eventId=${eventId}`),
-                fetch(`${API_URL}/guests?eventId=${eventId}`)
+                fetch(`${API_URL}/guests?eventId=${eventId}`),
+                fetch(`${API_URL}/ai/vendors?eventId=${eventId}`)
             ]);
 
             const health = healthRes.ok ? await healthRes.json() : null;
@@ -114,6 +135,7 @@ export default function Dashboard() {
             const tasksData = tasksRes.ok ? await tasksRes.json() : [];
             const dbVendorsData = dbVendorsRes.ok ? await dbVendorsRes.json() : [];
             const guestsData = guestsRes.ok ? await guestsRes.json() : [];
+            const vendorData = vendorRes.ok ? await vendorRes.json() : [];
 
             setHealthData(health);
             setRisks(riskData);
@@ -121,6 +143,12 @@ export default function Dashboard() {
             setUserTasks(Array.isArray(tasksData) ? tasksData : []);
             setUserVendors(Array.isArray(dbVendorsData) ? dbVendorsData : []);
             setUserGuests(Array.isArray(guestsData) ? guestsData : []);
+            setVendors(Array.isArray(vendorData) ? vendorData : []);
+
+            // Save fresh response to sessionStorage cache
+            sessionStorage.setItem(cacheKey, JSON.stringify({
+                health, riskData, budgetData, tasksData: Array.isArray(tasksData) ? tasksData : [], dbVendorsData: Array.isArray(dbVendorsData) ? dbVendorsData : [], guestsData: Array.isArray(guestsData) ? guestsData : [], vendorData: Array.isArray(vendorData) ? vendorData : []
+            }));
 
             // Smart Notifications
             if (health?.metrics) {
@@ -138,10 +166,6 @@ export default function Dashboard() {
 
             const currentEvent = events.find(e => (e.id || e._id) === eventId);
             if (currentEvent) {
-                const vendorRes = await fetch(`${API_URL}/ai/vendors?type=${encodeURIComponent(currentEvent.type || "Wedding")}&eventId=${eventId}`);
-                const vendorData = vendorRes.ok ? await vendorRes.json() : [];
-                setVendors(vendorData);
-
                 const daysLeft = getDaysToEvent(currentEvent.date);
                 if (daysLeft > 0 && daysLeft <= 7) {
                     addNotification("Approaching Deadline", `${currentEvent.name} is in ${daysLeft} days! Finalize all vendor logistics.`);
@@ -161,7 +185,7 @@ export default function Dashboard() {
         } else if (events.length === 0) {
             setLoading(false);
         }
-    }, [selectedEventId, events, syncTimestamp]);
+    }, [selectedEventId, syncTimestamp]);
 
     // Calculate days remaining
     const getDaysToEvent = (eventDate) => {
@@ -663,6 +687,43 @@ export default function Dashboard() {
                     </button>
                 </div>
             </div>
+
+            {/* ACTIVE EVENT HERO BANNER */}
+            {currentEvent?.banner && (
+                <div style={{
+                    width: "100%",
+                    height: "180px",
+                    borderRadius: "20px",
+                    overflow: "hidden",
+                    marginBottom: "1.5rem",
+                    border: "1px solid rgba(255, 255, 255, 0.08)",
+                    position: "relative",
+                    boxShadow: "0 15px 35px rgba(0,0,0,0.3)"
+                }}>
+                    <img 
+                        src={currentEvent.banner.startsWith("/") ? `${API_URL}${currentEvent.banner}` : currentEvent.banner} 
+                        alt={currentEvent.name} 
+                        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} 
+                    />
+                    <div style={{
+                        position: "absolute",
+                        inset: 0,
+                        background: "linear-gradient(to top, rgba(18, 18, 20, 0.85) 0%, transparent 70%)",
+                        display: "flex",
+                        alignItems: "flex-end",
+                        padding: "1.5rem"
+                    }}>
+                        <div>
+                            <span style={{ background: "rgba(249, 115, 22, 0.2)", color: "#f97316", fontSize: "10px", fontWeight: 900, padding: "3px 10px", borderRadius: "100px", textTransform: "uppercase", letterSpacing: "0.1em", border: "1px solid rgba(249, 115, 22, 0.4)" }}>
+                                Active Banner: {currentEvent.type || "Event"}
+                            </span>
+                            <h3 style={{ fontSize: "1.4rem", fontWeight: 900, margin: "0.3rem 0 0", color: "#ffffff" }}>
+                                {currentEvent.name}
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* PERFECT SYMMETRICAL 6-CARD HERO KPI GRID */}
             <div style={{
@@ -1280,12 +1341,14 @@ export default function Dashboard() {
                                                 {vendor.service}
                                             </span>
                                         </div>
-                                        <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px", display: "flex", alignItems: "center", gap: "6px" }}>
-                                            <span>📍 {vendor.location ? `${vendor.location}, ${vendor.city || ""}` : (vendor.city || currentEvent?.city || "Mumbai")}</span>
+                                        <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px", display: "flex", alignItems: "center", gap: "5px" }}>
+                                            <MapPin size={12} color="var(--text-muted)" />
+                                            <span>{vendor.location ? `${vendor.location}, ${vendor.city || ""}` : (vendor.city || currentEvent?.city || "Mumbai")}</span>
                                         </div>
                                         {vendor.matchReason && (
-                                            <div style={{ fontSize: "10px", color: "#10b981", fontWeight: 600, marginTop: "2px" }}>
-                                                ⚡ {vendor.matchReason}
+                                            <div style={{ fontSize: "10px", color: "#10b981", fontWeight: 600, marginTop: "2px", display: "flex", alignItems: "center", gap: "4px" }}>
+                                                <Zap size={11} color="#10b981" />
+                                                <span>{vendor.matchReason}</span>
                                             </div>
                                         )}
                                     </div>
@@ -1293,7 +1356,8 @@ export default function Dashboard() {
                                 <div style={{ textAlign: "right", flexShrink: 0, marginLeft: "1rem" }}>
                                     <div style={{ fontSize: "14px", fontWeight: 900, color: "var(--text-primary)" }}>{vendor.priceRange || "₹₹₹"}</div>
                                     <div style={{ fontSize: "11px", color: "#f59e0b", display: "flex", alignItems: "center", gap: "3px", justifyContent: "flex-end", fontWeight: 700 }}>
-                                        ★ {vendor.rating || 4.9}
+                                        <Star size={12} fill="#f59e0b" color="#f59e0b" />
+                                        <span>{vendor.rating || 4.9}</span>
                                     </div>
                                 </div>
                             </div>

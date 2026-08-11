@@ -9,6 +9,12 @@ const eventSchema = mongoose.Schema(
         description: {
             type: String,
             required: false,
+            default: ""
+        },
+        banner: {
+            type: String,
+            required: false,
+            default: ""
         },
         location: {
             type: String,

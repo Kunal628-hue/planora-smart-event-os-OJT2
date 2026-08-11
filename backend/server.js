@@ -100,13 +100,15 @@ app.use("/api/upload", authenticatedRateLimiter, uploadRoutes);
 
 // Static files for uploads with strict non-executable response headers
 if (process.env.NODE_ENV !== "production") {
-  app.use("/api/uploads", express.static(path.join(__dirname, "uploads"), {
+  const staticUploadHandler = express.static(path.join(__dirname, "uploads"), {
     setHeaders: (res) => {
       res.setHeader("X-Content-Type-Options", "nosniff");
       res.setHeader("Content-Security-Policy", "default-src 'none'");
       res.setHeader("X-Frame-Options", "DENY");
     }
-  }));
+  });
+  app.use("/api/uploads", staticUploadHandler);
+  app.use("/uploads", staticUploadHandler);
 }
 
 // Test route with Public Rate Limiter
