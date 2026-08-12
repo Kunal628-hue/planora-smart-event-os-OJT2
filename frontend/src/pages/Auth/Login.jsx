@@ -8,6 +8,7 @@ export default function Login() {
     const navigate = useNavigate();
     const { loginWithGoogle, loginWithEmail, user } = useAuth();
     const [form, setForm] = useState({ email: "", password: "" });
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -74,86 +75,149 @@ export default function Login() {
             </Link>
 
             <div className="auth-container">
-                
                 <div className="auth-card-split">
                     {/* Left Side: Info */}
                     <div className="auth-info-side">
-                        <h1 className="auth-title">Welcome back</h1>
-                        
+                        <div className="auth-badge-pill">
+                            <span className="badge-pulse"></span>
+                            <span>PLANORA OS • NEURAL v2.0</span>
+                        </div>
+
+                        <h1 className="auth-title">
+                            Welcome back to <span className="title-gradient">Planora</span>
+                        </h1>
+                        <p className="auth-subtitle">
+                            Orchestrate unforgettable events with real-time AI automation and intelligent vendor workflows.
+                        </p>
+
                         <div className="feature-list">
                             <div className="feature-item">
-                                <div className="feature-icon">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <div className="feature-icon icon-glow-orange">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                                         <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
                                     </svg>
                                 </div>
                                 <div className="feature-text">
                                     <h3>Smart Coordination</h3>
-                                    <p>AI-driven event planning across platforms.</p>
+                                    <p>AI-driven timeline creation and automated task allocation.</p>
                                 </div>
                             </div>
 
                             <div className="feature-item">
-                                <div className="feature-icon">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <div className="feature-icon icon-glow-cyan">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                                         <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                                     </svg>
                                 </div>
                                 <div className="feature-text">
                                     <h3>Vendor Access</h3>
-                                    <p>Top-tier services at your fingertips.</p>
+                                    <p>Top-tier vetted marketplace at your fingertips.</p>
                                 </div>
                             </div>
+                        </div>
+
+                        <div className="auth-stat-box">
+                            <div className="stat-pill">⚡ 99.9% Uptime</div>
+                            <div className="stat-pill">🔒 End-to-End Encrypted</div>
                         </div>
                     </div>
 
                     {/* Right Side: Form */}
                     <div className="auth-form-side">
                         <div className="auth-form-container">
+                            <h2 className="form-heading">Sign In</h2>
+                            <p className="form-subheading">Enter your credentials to access your dashboard</p>
+
                             <SocialAuth onLogin={handleSocialLogin} loading={loading} />
 
                             <div className="auth-divider-new">
-                                <span>OR</span>
+                                <span>OR CONTINUE WITH EMAIL</span>
                             </div>
 
                             <form onSubmit={handleSubmit} className="auth-form">
-                                <div className="form-group" style={{ marginBottom: '1rem' }}>
+                                <div className="form-group">
                                     <label className="auth-label-new">Email address</label>
-                                    <input
-                                        className="auth-input-new"
-                                        type="email"
-                                        name="email"
-                                        value={form.email}
-                                        onChange={handleChange}
-                                        placeholder="name@gmail.com"
-                                        required
-                                    />
+                                    <div className="input-icon-wrapper">
+                                        <svg className="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                            <polyline points="22,6 12,13 2,6"/>
+                                        </svg>
+                                        <input
+                                            className="auth-input-new"
+                                            type="email"
+                                            name="email"
+                                            value={form.email}
+                                            onChange={handleChange}
+                                            placeholder="name@example.com"
+                                            required
+                                        />
+                                    </div>
                                 </div>
 
-                                <div className="form-group" style={{ marginBottom: '1.25rem' }}>
-                                    <label className="auth-label-new" style={{ marginBottom: '0.5rem' }}>Password</label>
-                                    <input
-                                        className="auth-input-new"
-                                        type="password"
-                                        name="password"
-                                        value={form.password}
-                                        onChange={handleChange}
-                                        placeholder="••••••••"
-                                        required
-                                    />
+                                <div className="form-group">
+                                    <div className="label-row">
+                                        <label className="auth-label-new">Password</label>
+                                    </div>
+                                    <div className="input-icon-wrapper">
+                                        <svg className="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                        </svg>
+                                        <input
+                                            className="auth-input-new"
+                                            type={showPassword ? "text" : "password"}
+                                            name="password"
+                                            value={form.password}
+                                            onChange={handleChange}
+                                            placeholder="••••••••"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            className="password-toggle-btn"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            tabIndex={-1}
+                                        >
+                                            {showPassword ? (
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                                                    <line x1="1" y1="1" x2="23" y2="23"/>
+                                                </svg>
+                                            ) : (
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                                    <circle cx="12" cy="12" r="3"/>
+                                                </svg>
+                                            )}
+                                        </button>
+                                    </div>
                                 </div>
 
                                 {error && (
-                                    <div className="auth-error-new" style={{ padding: '0.65rem', marginBottom: '1rem', fontSize: '0.85rem' }}>{error}</div>
+                                    <div className="auth-error-new">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                                        </svg>
+                                        <span>{error}</span>
+                                    </div>
                                 )}
 
                                 <button type="submit" className="auth-submit-btn" disabled={loading}>
-                                    {loading ? "Logging in..." : "Continue"}
+                                    {loading ? (
+                                        <span className="btn-loading-spinner"></span>
+                                    ) : (
+                                        <>
+                                            <span>Continue to Planora</span>
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                                <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                                            </svg>
+                                        </>
+                                    )}
                                 </button>
                             </form>
 
-                            <div className="auth-footer-links" style={{ marginTop: '1.5rem' }}>
-                                <p style={{ margin: 0 }}>Need an account? <Link to="/signup">Join Planora</Link></p>
+                            <div className="auth-footer-links">
+                                <p>Need an account? <Link to="/signup">Join Planora</Link></p>
                             </div>
                         </div>
                     </div>
@@ -163,75 +227,79 @@ export default function Login() {
             <style>{`
                 .auth-page-new {
                     min-height: 100vh;
-                    background: #070707;
+                    background: #060608;
                     display: flex;
                     flex-direction: column;
-                    padding: 2.5rem;
+                    padding: 2rem;
                     color: white;
-                    font-family: 'Inter', -apple-system, sans-serif;
+                    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
                     overflow-x: hidden;
                     overflow-y: auto;
                     position: relative;
                     box-sizing: border-box;
                 }
-                /* Hide white edges on scroll */
                 :global(html), :global(body) {
-                    background: #070707 !important;
+                    background: #060608 !important;
                     margin: 0;
                     padding: 0;
                 }
                 .auth-page-logo {
                     position: fixed;
-                    top: 2.5rem;
+                    top: 2rem;
                     left: 2.5rem;
                     z-index: 50;
-                    transition: transform 0.2s;
+                    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
                 }
                 .auth-page-logo img {
                     height: 2.2rem;
                     width: auto;
-                    filter: invert(72%) sepia(99%) saturate(400%) hue-rotate(5deg) brightness(110%) contrast(110%) drop-shadow(0 0 12px rgba(255, 215, 0, 0.4));
+                    filter: invert(72%) sepia(99%) saturate(400%) hue-rotate(5deg) brightness(110%) contrast(110%) drop-shadow(0 0 16px rgba(255, 140, 0, 0.4));
                 }
                 .auth-page-logo:hover {
                     transform: scale(1.05);
                 }
                 .auth-container {
                     width: 100%;
-                    max-width: 860px;
+                    max-width: 920px;
                     z-index: 10;
                     margin: auto;
                     display: flex;
                     flex-direction: column;
                     position: relative;
+                    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                }
+                @keyframes fadeInUp {
+                    from { opacity: 0; transform: translateY(20px); }
+                    to { opacity: 1; transform: translateY(0); }
                 }
                 .auth-card-split {
-                    background: #0d0d0d;
-                    border: 1px solid rgba(255, 255, 255, 0.04);
+                    background: rgba(13, 13, 17, 0.75);
+                    backdrop-filter: blur(32px);
+                    -webkit-backdrop-filter: blur(32px);
+                    border: 1px solid rgba(255, 255, 255, 0.08);
                     border-radius: 28px;
                     display: grid;
-                    grid-template-columns: 1fr 1fr;
+                    grid-template-columns: 1.1fr 1fr;
                     overflow: hidden;
-                    box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.9);
+                    box-shadow: 0 30px 90px -15px rgba(0, 0, 0, 0.8), 0 0 60px rgba(255, 90, 31, 0.05);
                     position: relative;
                 }
-                /* Vibrant Colorful Rainbow Border */
+                /* Vibrant Rainbow Border Glow */
                 .auth-card-split::before {
                     content: "";
                     position: absolute;
-                    inset: -2px;
-                    border-radius: 30px;
-                    padding: 2px;
+                    inset: -1px;
+                    border-radius: 29px;
+                    padding: 1.5px;
                     background: linear-gradient(
-                        90deg, 
-                        #00f2fe 0%, 
-                        #4facfe 20%, 
-                        #7000ff 40%, 
-                        #ff006a 60%, 
-                        #ff9900 80%,
-                        #00f2fe 100%
+                        135deg, 
+                        rgba(255, 90, 31, 0.6) 0%, 
+                        rgba(0, 242, 254, 0.4) 40%, 
+                        rgba(112, 0, 255, 0.5) 70%, 
+                        rgba(255, 153, 0, 0.6) 100%
                     );
                     background-size: 200% auto;
-                    animation: aurora-border 4s linear infinite;
+                    animation: aurora-border 6s linear infinite;
                     -webkit-mask: 
                         linear-gradient(#fff 0 0) content-box, 
                         linear-gradient(#fff 0 0);
@@ -243,119 +311,269 @@ export default function Login() {
                     0% { background-position: 0% 50%; }
                     100% { background-position: 200% 50%; }
                 }
-                @media (max-width: 900px) {
-                    .auth-page-new {
-                        padding: 1.5rem;
-                    }
-                    .auth-page-logo {
-                        top: 1.5rem;
-                        left: 1.5rem;
-                    }
-                    .auth-card-split {
-                        grid-template-columns: 1fr;
-                        max-height: none;
-                    }
-                    .auth-info-side { display: none; }
-                }
                 .auth-info-side {
-                    padding: 3rem;
-                    background: rgba(255, 255, 255, 0.012);
+                    padding: 3.25rem;
+                    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.005) 100%);
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
-                    border-right: 1px solid rgba(255, 255, 255, 0.04);
+                    border-right: 1px solid rgba(255, 255, 255, 0.06);
+                }
+                .auth-badge-pill {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    padding: 0.35rem 0.85rem;
+                    background: rgba(255, 90, 31, 0.1);
+                    border: 1px solid rgba(255, 90, 31, 0.25);
+                    border-radius: 100px;
+                    font-size: 0.72rem;
+                    font-weight: 700;
+                    letter-spacing: 0.08em;
+                    color: #ff8a5c;
+                    width: fit-content;
+                    margin-bottom: 1.5rem;
+                }
+                .badge-pulse {
+                    width: 6px;
+                    height: 6px;
+                    border-radius: 50%;
+                    background: #ff5a1f;
+                    box-shadow: 0 0 10px #ff5a1f;
+                    animation: pulseDot 2s infinite;
+                }
+                @keyframes pulseDot {
+                    0%, 100% { transform: scale(1); opacity: 1; }
+                    50% { transform: scale(1.4); opacity: 0.5; }
                 }
                 .auth-title {
-                    font-size: 2rem;
+                    font-size: 2.1rem;
                     font-weight: 800;
-                    margin-bottom: 2rem;
+                    margin-bottom: 0.75rem;
                     letter-spacing: -0.04em;
                     color: #ffffff;
+                    line-height: 1.2;
+                }
+                .title-gradient {
+                    background: linear-gradient(135deg, #ffffff 0%, #ff8a5c 100%);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                }
+                .auth-subtitle {
+                    font-size: 0.925rem;
+                    color: rgba(255, 255, 255, 0.55);
+                    line-height: 1.55;
+                    margin: 0 0 2.25rem 0;
                 }
                 .feature-list {
                     display: flex;
                     flex-direction: column;
-                    gap: 1.5rem;
+                    gap: 1.4rem;
                 }
                 .feature-item {
                     display: flex;
-                    gap: 1.25rem;
+                    gap: 1.15rem;
                     align-items: flex-start;
                 }
                 .feature-icon {
-                    width: 38px;
-                    height: 38px;
-                    background: rgba(255, 255, 255, 0.04);
-                    border: 1px solid rgba(255, 255, 255, 0.06);
-                    border-radius: 12px;
+                    width: 42px;
+                    height: 42px;
+                    border-radius: 14px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    color: rgba(255, 255, 255, 0.8);
+                    flex-shrink: 0;
+                }
+                .icon-glow-orange {
+                    background: rgba(255, 90, 31, 0.12);
+                    border: 1px solid rgba(255, 90, 31, 0.25);
+                    color: #ff8a5c;
+                    box-shadow: 0 0 20px rgba(255, 90, 31, 0.15);
+                }
+                .icon-glow-cyan {
+                    background: rgba(0, 242, 254, 0.1);
+                    border: 1px solid rgba(0, 242, 254, 0.22);
+                    color: #00f2fe;
+                    box-shadow: 0 0 20px rgba(0, 242, 254, 0.12);
                 }
                 .feature-text h3 {
-                    font-size: 1rem;
-                    font-weight: 600;
-                    margin-bottom: 0.25rem;
+                    font-size: 0.975rem;
+                    font-weight: 700;
+                    margin: 0 0 0.2rem 0;
                     color: #ffffff;
                 }
                 .feature-text p {
-                    font-size: 0.875rem;
-                    color: rgba(255, 255, 255, 0.4);
+                    font-size: 0.85rem;
+                    color: rgba(255, 255, 255, 0.45);
                     margin: 0;
-                    line-height: 1.4;
+                    line-height: 1.45;
+                }
+                .auth-stat-box {
+                    display: flex;
+                    gap: 0.75rem;
+                    margin-top: 2.25rem;
+                    padding-top: 1.5rem;
+                    border-top: 1px solid rgba(255, 255, 255, 0.05);
+                }
+                .stat-pill {
+                    font-size: 0.75rem;
+                    font-weight: 600;
+                    color: rgba(255, 255, 255, 0.5);
+                    background: rgba(255, 255, 255, 0.03);
+                    padding: 0.4rem 0.75rem;
+                    border-radius: 8px;
+                    border: 1px solid rgba(255, 255, 255, 0.06);
                 }
                 .auth-form-side {
-                    padding: 3rem;
+                    padding: 3.25rem;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    background: #0a0a0a;
+                    background: rgba(10, 10, 14, 0.85);
                 }
                 .auth-form-container {
                     width: 100%;
-                    max-width: 300px;
+                    max-width: 320px;
+                }
+                .form-heading {
+                    font-size: 1.5rem;
+                    font-weight: 800;
+                    color: #ffffff;
+                    margin: 0 0 0.35rem 0;
+                    letter-spacing: -0.02em;
+                }
+                .form-subheading {
+                    font-size: 0.84rem;
+                    color: rgba(255, 255, 255, 0.45);
+                    margin: 0 0 1.5rem 0;
+                }
+                .auth-form {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1.15rem;
+                }
+                .form-group {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.45rem;
+                }
+                .label-row {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
                 }
                 .auth-label-new {
-                    display: block;
                     font-size: 0.8125rem;
-                    font-weight: 500;
-                    color: rgba(255, 255, 255, 0.5);
-                    margin-bottom: 0.5rem;
+                    font-weight: 600;
+                    color: rgba(255, 255, 255, 0.65);
+                    letter-spacing: 0.01em;
+                }
+                .input-icon-wrapper {
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                }
+                .input-icon {
+                    position: absolute;
+                    left: 1rem;
+                    color: rgba(255, 255, 255, 0.3);
+                    pointer-events: none;
+                    transition: color 0.2s;
                 }
                 .auth-input-new {
                     width: 100%;
-                    padding: 0.7rem 1rem;
-                    background: rgba(255, 255, 255, 0.02);
-                    border: 1px solid rgba(255, 255, 255, 0.08);
-                    border-radius: 12px;
+                    padding: 0.8rem 1rem 0.8rem 2.75rem;
+                    background: rgba(255, 255, 255, 0.03);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border-radius: 14px;
                     font-size: 0.9375rem;
                     color: white;
-                    transition: all 0.2s;
+                    transition: all 0.25s ease;
+                    box-sizing: border-box;
                 }
                 .auth-input-new:focus {
-                    border-color: #00d1ff;
+                    border-color: #ff5a1f;
                     outline: none;
-                    background: rgba(255, 255, 255, 0.04);
+                    background: rgba(255, 255, 255, 0.06);
+                    box-shadow: 0 0 0 4px rgba(255, 90, 31, 0.15);
+                }
+                .auth-input-new:focus + .input-icon,
+                .input-icon-wrapper:focus-within .input-icon {
+                    color: #ff8a5c;
+                }
+                .password-toggle-btn {
+                    position: absolute;
+                    right: 0.85rem;
+                    background: none;
+                    border: none;
+                    color: rgba(255, 255, 255, 0.35);
+                    cursor: pointer;
+                    padding: 0.25rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: color 0.2s;
+                }
+                .password-toggle-btn:hover {
+                    color: rgba(255, 255, 255, 0.8);
+                }
+                .auth-error-new {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.6rem;
+                    padding: 0.75rem 1rem;
+                    background: rgba(239, 68, 68, 0.1);
+                    border: 1px solid rgba(239, 68, 68, 0.3);
+                    border-radius: 12px;
+                    color: #fca5a5;
+                    font-size: 0.825rem;
+                    font-weight: 500;
                 }
                 .auth-submit-btn {
                     width: 100%;
-                    padding: 0.85rem;
-                    background: #ff5a1f;
+                    padding: 0.9rem;
+                    background: linear-gradient(135deg, #ff5a1f 0%, #ff7844 100%);
                     color: white;
                     border: none;
-                    border-radius: 12px;
+                    border-radius: 14px;
                     font-size: 0.9375rem;
                     font-weight: 700;
                     cursor: pointer;
-                    transition: all 0.2s;
-                    margin-top: 0.5rem;
+                    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+                    margin-top: 0.35rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 0.5rem;
+                    box-shadow: 0 8px 24px rgba(255, 90, 31, 0.3);
                 }
-                .auth-submit-btn:hover { background: #ff7844; transform: translateY(-1px); }
+                .auth-submit-btn:hover:not(:disabled) {
+                    transform: translateY(-2px);
+                    box-shadow: 0 12px 30px rgba(255, 90, 31, 0.45);
+                    background: linear-gradient(135deg, #ff6a33 0%, #ff8855 100%);
+                }
+                .auth-submit-btn:active:not(:disabled) {
+                    transform: translateY(0);
+                }
+                .auth-submit-btn:disabled {
+                    opacity: 0.6;
+                    cursor: not-allowed;
+                }
+                .btn-loading-spinner {
+                    width: 18px;
+                    height: 18px;
+                    border: 2.5px solid rgba(255, 255, 255, 0.3);
+                    border-top-color: #ffffff;
+                    border-radius: 50%;
+                    animation: spin 0.8s linear infinite;
+                }
+                @keyframes spin {
+                    to { transform: rotate(360deg); }
+                }
                 .auth-divider-new {
                     position: relative;
                     text-align: center;
-                    margin: 1.5rem 0;
+                    margin: 1.4rem 0;
                 }
                 .auth-divider-new::before {
                     content: "";
@@ -364,25 +582,39 @@ export default function Login() {
                     left: 0;
                     right: 0;
                     height: 1px;
-                    background: rgba(255, 255, 255, 0.05);
+                    background: rgba(255, 255, 255, 0.08);
                 }
                 .auth-divider-new span {
                     position: relative;
-                    background: #0a0a0a;
-                    padding: 0 0.75rem;
-                    color: rgba(255, 255, 255, 0.2);
-                    font-size: 0.75rem;
-                    text-transform: uppercase;
-                    letter-spacing: 0.05em;
+                    background: #0a0a0e;
+                    padding: 0 0.85rem;
+                    color: rgba(255, 255, 255, 0.3);
+                    font-size: 0.7rem;
+                    font-weight: 700;
+                    letter-spacing: 0.08em;
                 }
                 .auth-footer-links {
                     text-align: center;
                     font-size: 0.875rem;
+                    margin-top: 1.5rem;
+                    color: rgba(255, 255, 255, 0.5);
                 }
                 .auth-footer-links a {
-                    color: #ff5a1f;
+                    color: #ff8a5c;
                     text-decoration: none;
-                    font-weight: 500;
+                    font-weight: 600;
+                    transition: color 0.2s;
+                }
+                .auth-footer-links a:hover {
+                    color: #ff9d75;
+                    text-decoration: underline;
+                }
+                @media (max-width: 900px) {
+                    .auth-page-new { padding: 1.25rem; }
+                    .auth-page-logo { top: 1.25rem; left: 1.25rem; }
+                    .auth-card-split { grid-template-columns: 1fr; }
+                    .auth-info-side { display: none; }
+                    .auth-form-side { padding: 2.25rem 1.5rem; }
                 }
             `}</style>
         </div>
