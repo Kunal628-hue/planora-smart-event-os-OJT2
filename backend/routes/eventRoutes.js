@@ -7,10 +7,22 @@ import {
     deleteEvent,
 } from "../controllers/eventController.js";
 import { validate, schemas } from "../middleware/validateInput.js";
+import { cacheRoute, clearCachePattern } from "../middleware/cacheMiddleware.js";
 
 const router = express.Router();
 
-router.route("/").post(validate(schemas.event.create), createEvent).get(getEvents);
-router.route("/:id").get(getEventById).patch(validate(schemas.event.update), updateEvent).delete(deleteEvent);
+const invalidateEventCache = async (req, res, next) => {
+    await clearCachePattern("events");
+    next();
+};
+
+router.route("/")
+    .post(validate(schemas.event.create), invalidateEventCache, createEvent)
+    .get(cacheRoute(180, "events"), getEvents);
+
+router.route("/:id")
+    .get(cacheRoute(180, "events"), getEventById)
+    .patch(validate(schemas.event.update), invalidateEventCache, updateEvent)
+    .delete(invalidateEventCache, deleteEvent);
 
 export default router;
