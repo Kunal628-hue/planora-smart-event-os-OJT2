@@ -122,7 +122,7 @@ export default function Signup() {
 
                         <div className="auth-stat-box">
                             <div className="stat-pill">✨ Free Plan Included</div>
-                            <div className="stat-pill">🚀 Instant Setup</div>
+                            <div className="stat-pill">🔒 256-Bit SSL Encryption</div>
                         </div>
                     </div>
 
@@ -438,11 +438,12 @@ export default function Signup() {
                 .stat-pill {
                     font-size: 0.75rem;
                     font-weight: 600;
-                    color: rgba(255, 255, 255, 0.5);
+                    color: rgba(255, 255, 255, 0.55);
                     background: rgba(255, 255, 255, 0.03);
-                    padding: 0.4rem 0.75rem;
+                    padding: 0.4rem 0.8rem;
                     border-radius: 8px;
                     border: 1px solid rgba(255, 255, 255, 0.06);
+                    white-space: nowrap;
                 }
                 .auth-form-side {
                     padding: 3.25rem;
