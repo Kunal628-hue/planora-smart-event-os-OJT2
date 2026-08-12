@@ -84,45 +84,45 @@ export default function Signup() {
                     <div className="auth-info-side">
                         <div className="auth-badge-pill">
                             <span className="badge-pulse"></span>
-                            <span>GET STARTED FREE</span>
+                            <span>PLANORA FOR TEAMS</span>
                         </div>
 
                         <h1 className="auth-title">
-                            Join <span className="title-gradient">Planora</span> Today
+                            Build better events with <span className="title-gradient">Planora</span>
                         </h1>
                         <p className="auth-subtitle">
-                            Unlock AI-assisted event creation, smart guest management, and seamless vendor coordination.
+                            Everything you need to organize conferences, weddings, and corporate gatherings efficiently.
                         </p>
 
                         <div className="feature-list">
                             <div className="feature-item">
                                 <div className="feature-icon icon-glow-orange">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
                                     </svg>
                                 </div>
                                 <div className="feature-text">
-                                    <h3>Instant AI Setup</h3>
-                                    <p>Generate full event structures in seconds with AI prompt engine.</p>
+                                    <h3>Centralized Workspace</h3>
+                                    <p>Keep budgets, guest lists, and vendor contracts synchronized.</p>
                                 </div>
                             </div>
 
                             <div className="feature-item">
                                 <div className="feature-icon icon-glow-cyan">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                                     </svg>
                                 </div>
                                 <div className="feature-text">
-                                    <h3>Enterprise Security</h3>
-                                    <p>Bank-grade encryption protecting all your event & guest data.</p>
+                                    <h3>Team Collaboration</h3>
+                                    <p>Invite co-planners, share digital passes, and send instant guest updates.</p>
                                 </div>
                             </div>
                         </div>
 
                         <div className="auth-stat-box">
-                            <div className="stat-pill">✨ Free Tier Included</div>
-                            <div className="stat-pill">🚀 No Credit Card Needed</div>
+                            <div className="stat-pill">✨ Free Plan Included</div>
+                            <div className="stat-pill">🚀 Instant Setup</div>
                         </div>
                     </div>
 

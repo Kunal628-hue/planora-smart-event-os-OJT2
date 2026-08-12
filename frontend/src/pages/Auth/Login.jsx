@@ -80,26 +80,26 @@ export default function Login() {
                     <div className="auth-info-side">
                         <div className="auth-badge-pill">
                             <span className="badge-pulse"></span>
-                            <span>PLANORA OS • NEURAL v2.0</span>
+                            <span>EVENT MANAGEMENT PLATFORM</span>
                         </div>
 
                         <h1 className="auth-title">
                             Welcome back to <span className="title-gradient">Planora</span>
                         </h1>
                         <p className="auth-subtitle">
-                            Orchestrate unforgettable events with real-time AI automation and intelligent vendor workflows.
+                            Streamline your event planning, manage vendor schedules, and track guest RSVPs in one place.
                         </p>
 
                         <div className="feature-list">
                             <div className="feature-item">
                                 <div className="feature-icon icon-glow-orange">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
                                     </svg>
                                 </div>
                                 <div className="feature-text">
-                                    <h3>Smart Coordination</h3>
-                                    <p>AI-driven timeline creation and automated task allocation.</p>
+                                    <h3>Automated Workflows</h3>
+                                    <p>Create event schedules, assign team tasks, and track real-time progress.</p>
                                 </div>
                             </div>
 
@@ -110,15 +110,15 @@ export default function Login() {
                                     </svg>
                                 </div>
                                 <div className="feature-text">
-                                    <h3>Vendor Access</h3>
-                                    <p>Top-tier vetted marketplace at your fingertips.</p>
+                                    <h3>Vendor Network</h3>
+                                    <p>Connect with verified caterers, venues, and event specialists.</p>
                                 </div>
                             </div>
                         </div>
 
                         <div className="auth-stat-box">
-                            <div className="stat-pill">⚡ 99.9% Uptime</div>
-                            <div className="stat-pill">🔒 End-to-End Encrypted</div>
+                            <div className="stat-pill">🛡️ Reliable & Cloud-Hosted</div>
+                            <div className="stat-pill">🔒 Encrypted Data Protection</div>
                         </div>
                     </div>
 
