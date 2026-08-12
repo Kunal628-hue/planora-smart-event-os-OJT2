@@ -53,10 +53,11 @@ export default function Login() {
             await loginWithEmail(form.email, form.password);
             navigate("/dashboard");
         } catch (err) {
-            if (err.code === "auth/invalid-credential") {
-                setError("Invalid email or password.");
+            console.error("Login error code:", err.code, err.message);
+            if (err.code === "auth/invalid-credential" || err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
+                setError("Invalid email or password. If you signed up with Google, please use 'Continue with Google'.");
             } else {
-                setError(err.message);
+                setError(err.message || "Failed to sign in. Please check your credentials.");
             }
         } finally {
             setLoading(false);
