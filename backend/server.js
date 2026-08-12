@@ -36,7 +36,9 @@ const PORT = process.env.PORT || 5001;
 const allowedOrigins = [
   "http://localhost:5173",
   "https://planora-smart-event-os-web.vercel.app",
-  "https://planora-smart-event-os-ojt-2-6zpq.vercel.app"
+  "https://planora-smart-event-os-ojt-2-6zpq.vercel.app",
+  "https://planora-os.com",
+  "https://www.planora-os.com"
 ];
 
 app.use(cors({
