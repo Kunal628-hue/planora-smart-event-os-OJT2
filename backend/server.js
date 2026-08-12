@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import eventRoutes from "./routes/eventRoutes.js";
 import guestRoutes from "./routes/guestRoutes.js";
@@ -20,6 +21,10 @@ import {
   publicRateLimiter,
   authenticatedRateLimiter
 } from "./middleware/rateLimiter.js";
+import {
+  securityHeadersMiddleware,
+  setCustomSecurityHeaders
+} from "./middleware/securityHeaders.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,6 +36,11 @@ initAlertEngine();
 
 const app = express();
 const PORT = process.env.PORT || 5001;
+
+// --- Production Security Hardening & Headers ---
+app.use(securityHeadersMiddleware);
+app.use(setCustomSecurityHeaders);
+app.use(cookieParser());
 
 // --- Multi-Tenant CORS Strategy ---
 const allowedOrigins = [
