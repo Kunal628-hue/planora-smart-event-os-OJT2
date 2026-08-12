@@ -121,8 +121,8 @@ export default function Signup() {
                         </div>
 
                         <div className="auth-stat-box">
-                            <div className="stat-pill">✨ Free Plan Included</div>
-                            <div className="stat-pill">🔒 256-Bit SSL Encryption</div>
+                            <div className="stat-pill">Free Plan Included</div>
+                            <div className="stat-pill">256-Bit SSL Encryption</div>
                         </div>
                     </div>
 

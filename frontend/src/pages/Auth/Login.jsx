@@ -117,8 +117,8 @@ export default function Login() {
                         </div>
 
                         <div className="auth-stat-box">
-                            <div className="stat-pill">⚡ 99.9% Uptime</div>
-                            <div className="stat-pill">🔒 256-Bit SSL Encryption</div>
+                            <div className="stat-pill">99.9% Uptime</div>
+                            <div className="stat-pill">256-Bit SSL Encryption</div>
                         </div>
                     </div>
 
