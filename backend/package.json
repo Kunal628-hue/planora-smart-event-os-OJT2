@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
-    "test": "node tests/ssti.test.js && node tests/redos.test.js && node tests/resource.test.js && node tests/nosql_injection.test.js",
+    "test": "node tests/ssti.test.js && node tests/redos.test.js && node tests/resource.test.js && node tests/nosql_injection.test.js && node tests/errorHandler.test.js && node tests/fileSecurity.test.js && node tests/rateLimiter.test.js",
     "test:ssti": "node tests/ssti.test.js",
     "test:redos": "node tests/redos.test.js",
     "test:resource": "node tests/resource.test.js",
