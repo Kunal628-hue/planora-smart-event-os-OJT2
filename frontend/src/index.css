@@ -1820,7 +1820,13 @@ td {
   margin-bottom: 1.75rem;
 }
 
-.guests-kpi-grid,
+.guests-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
 .analytics-kpi-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

@@ -32,7 +32,10 @@ import {
     FileSpreadsheet,
     Share2,
     Utensils,
-    ExternalLink
+    ExternalLink,
+    UserCheck,
+    CheckSquare,
+    Check
 } from "lucide-react";
 import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
@@ -345,19 +348,75 @@ export default function Guests() {
         }
     };
 
+    const toggleCheckIn = async (guest, e) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        const guestId = guest._id || guest.id;
+        if (!guestId) return;
+
+        const newCheckedIn = !guest.checkedIn;
+        const now = new Date().toISOString();
+
+        // Instant optimistic update
+        setGuests(prev => prev.map(g => {
+            const isMatch = String(g._id || g.id) === String(guestId);
+            return isMatch ? { ...g, checkedIn: newCheckedIn, checkedInAt: newCheckedIn ? now : null } : g;
+        }));
+
+        try {
+            const response = await fetch(`${API_URL}/guests/${guestId}`, {
+                method: "PATCH",
+                headers: { 
+                    "Content-Type": "application/json",
+                    "x-user-id": user?.uid || "",
+                    "x-user-email": user?.email || ""
+                },
+                body: JSON.stringify({ 
+                    checkedIn: newCheckedIn, 
+                    checkedInAt: newCheckedIn ? now : null 
+                })
+            });
+
+            if (response.ok) {
+                const updated = await response.json();
+                setGuests(prev => prev.map(g => {
+                    const isMatch = String(g._id || g.id) === String(guestId);
+                    return isMatch ? { ...g, ...updated } : g;
+                }));
+                addNotification(
+                    newCheckedIn ? "Gate Entry Confirmed" : "Gate Entry Revoked", 
+                    newCheckedIn 
+                        ? `Passcode ${getPasscode(guest)} verified. ${guest.name} entered venue.` 
+                        : `Check-in status cleared for ${guest.name}.`
+                );
+            } else {
+                console.error("Check-in patch error:", await response.text());
+                fetchData(true);
+            }
+        } catch (err) {
+            console.error("Check-in error:", err);
+            fetchData(true);
+        }
+    };
+
     const exportCSV = () => {
         if (filteredGuests.length === 0) {
             addNotification("Export Warning", "No attendee records available to export.");
             return;
         }
-        const headers = ["Name", "Email", "WhatsApp / Phone", "Status", "Category", "Entry Code", "Dietary", "Notes"];
+        const headers = ["Name", "Email", "WhatsApp / Phone", "RSVP Status", "Category", "Entry Code", "Checked In", "Check In Time", "Dietary", "Notes"];
         const rows = filteredGuests.map(g => [
             `"${g.name || ''}"`,
             `"${g.email || ''}"`,
             `"${g.whatsapp || ''}"`,
             `"${g.status || ''}"`,
             `"${g.category || ''}"`,
-            `"${g.entryCode || ''}"`,
+            `"${getPasscode(g)}"`,
+            `"${g.checkedIn ? 'Yes' : 'No'}"`,
+            `"${g.checkedInAt ? new Date(g.checkedInAt).toLocaleString() : ''}"`,
             `"${g.dietary || 'None'}"`,
             `"${(g.notes || '').replace(/"/g, '""')}"`
         ]);
@@ -369,7 +428,7 @@ export default function Guests() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        addNotification("Export Complete", "Attendee manifest downloaded.");
+        addNotification("Export Complete", "Attendee manifest with check-in records downloaded.");
     };
 
     const downloadSampleCSV = () => {
@@ -415,15 +474,38 @@ export default function Guests() {
         setShowReminderModal(false);
     };
 
+    // Reset page whenever search or filter criteria change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery, statusFilter, segmentFilter]);
+
     // Filters
     const filteredGuests = useMemo(() => {
+        const query = searchQuery.trim().toLowerCase();
+        const cleanQueryNum = searchQuery.replace(/[^0-9]/g, "");
+
         return guests.filter(g => {
-            const matchesSearch = !searchQuery || 
-                g.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                g.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                g.whatsapp?.includes(searchQuery);
-            const matchesStatus = statusFilter === "All Status" || g.status === statusFilter;
+            const passcode = getPasscode(g);
+            const cleanPhone = (g.whatsapp || g.phone || "").replace(/[^0-9]/g, "");
+
+            const matchesSearch = !query || [
+                g.name,
+                g.email,
+                g.whatsapp,
+                g.phone,
+                g.category,
+                g.status,
+                g.entryCode,
+                passcode,
+                g.dietary,
+                g.notes
+            ].some(val => val && String(val).toLowerCase().includes(query)) ||
+            (cleanQueryNum.length >= 3 && cleanPhone.includes(cleanQueryNum));
+
+            const matchesStatus = statusFilter === "All Status" 
+                || (statusFilter === "Checked In" ? g.checkedIn : statusFilter === "Not Checked In" ? !g.checkedIn : g.status === statusFilter);
             const matchesSegment = segmentFilter === "All Segments" || g.category === segmentFilter;
+
             return matchesSearch && matchesStatus && matchesSegment;
         });
     }, [guests, searchQuery, statusFilter, segmentFilter]);
@@ -433,6 +515,7 @@ export default function Guests() {
         confirmed: guests.filter(g => g.status === "Confirmed").length,
         pending: guests.filter(g => g.status === "Pending").length,
         declined: guests.filter(g => g.status === "Declined").length,
+        checkedIn: guests.filter(g => g.checkedIn).length,
     }), [guests]);
 
     // Analytics
@@ -721,6 +804,33 @@ export default function Guests() {
                         </div>
                     </div>
                 </div>
+
+                <div style={{
+                    background: "var(--bg-surface)",
+                    border: "1px solid var(--border-subtle)",
+                    borderRadius: "16px",
+                    padding: "1.25rem 1.5rem",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between"
+                }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
+                        <span style={{ fontSize: "12px", color: "#a1a1aa", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                            Gate Checked-In
+                        </span>
+                        <div style={{ width: "38px", height: "38px", borderRadius: "10px", background: "rgba(6, 182, 212, 0.12)", color: "#06b6d4", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <UserCheck size={20} />
+                        </div>
+                    </div>
+                    <div>
+                        <div style={{ fontSize: "30px", fontWeight: 900, color: "#06b6d4", letterSpacing: "-0.02em", marginBottom: "2px" }}>
+                            {stats.checkedIn}
+                        </div>
+                        <div style={{ fontSize: "13px", color: "#a1a1aa", fontWeight: 600 }}>
+                            {stats.total > 0 ? Math.round((stats.checkedIn / stats.total) * 100) : 0}% checked in at gate
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {/* Visual Analytics Split */}
@@ -816,7 +926,7 @@ export default function Guests() {
 
                     <div className="custom-select">
                         <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
-                            <option value="All Status">All RSVP Statuses</option>
+                            <option value="All Status">All Statuses</option>
                             <option value="Confirmed">Confirmed</option>
                             <option value="Pending">Pending</option>
                             <option value="Declined">Declined</option>
@@ -896,80 +1006,150 @@ export default function Guests() {
             {/* Content: Badges View vs Table View */}
             {showBadges ? (
                 /* Digital Badges Grid View */
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "1.25rem" }}>
-                    {filteredGuests.map(g => {
-                        const ev = events.find(e => (e.id || e._id) === (g.event?._id || g.event)) || activeEvent;
-                        const isConfirmed = g.status === "Confirmed";
-                        const isDeclined = g.status === "Declined";
-                        const statusColor = isConfirmed ? "#10b981" : isDeclined ? "#ef4444" : "#f59e0b";
+                filteredGuests.length === 0 ? (
+                    <div style={{ background: "var(--bg-surface)", borderRadius: "16px", border: "1px solid var(--border-subtle)", padding: "4rem 2rem", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                        <div style={{ width: "56px", height: "56px", borderRadius: "50%", background: "rgba(249, 115, 22, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent-primary)", marginBottom: "1rem" }}>
+                            <CreditCard size={28} />
+                        </div>
+                        <h3 style={{ fontSize: "16px", fontWeight: 800, margin: "0 0 0.4rem", color: "var(--text-primary)" }}>
+                            No Digital Badges Found
+                        </h3>
+                        <p style={{ color: "var(--text-muted)", fontSize: "12px", maxWidth: "340px", margin: "0 auto 1.5rem", lineHeight: 1.5 }}>
+                            {searchQuery ? `No digital badges matching "${searchQuery}".` : "Start building your roster by adding your first attendee."}
+                        </p>
+                    </div>
+                ) : (
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "1.25rem" }}>
+                        {filteredGuests.map(g => {
+                            const ev = events.find(e => (e.id || e._id) === (g.event?._id || g.event)) || activeEvent;
+                            const isConfirmed = g.status === "Confirmed";
+                            const isDeclined = g.status === "Declined";
+                            const statusColor = isConfirmed ? "#10b981" : isDeclined ? "#ef4444" : "#f59e0b";
 
-                        return (
-                            <div 
-                                key={g._id} 
-                                className="event-card-hover"
-                                style={{ 
-                                    background: "var(--bg-surface)", 
-                                    borderRadius: "16px", 
-                                    overflow: "hidden", 
-                                    border: "1px solid var(--border-subtle)", 
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    justifyContent: "space-between"
-                                }}
-                            >
-                                <div style={{ background: "linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(18, 18, 20, 0.9) 100%)", padding: "1.25rem", borderBottom: "1px solid var(--border-subtle)" }}>
-                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
-                                        <span style={{ fontSize: "10px", fontWeight: 800, color: "var(--accent-primary)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
-                                            {g.category || "General"} Pass
+                            return (
+                                <div 
+                                    key={g._id} 
+                                    className="event-card-hover"
+                                    style={{ 
+                                        background: "var(--bg-surface)", 
+                                        borderRadius: "16px", 
+                                        overflow: "hidden", 
+                                        border: "1px solid var(--border-subtle)", 
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        justifyContent: "space-between"
+                                    }}
+                                >
+                                    <div style={{ background: "linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(18, 18, 20, 0.9) 100%)", padding: "1.25rem", borderBottom: "1px solid var(--border-subtle)" }}>
+                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
+                                            <span style={{ fontSize: "10px", fontWeight: 800, color: "var(--accent-primary)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                                                {g.category || "General"} Pass
+                                            </span>
+                                            <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                                                {g.checkedIn && (
+                                                    <div style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "3px 8px", borderRadius: "12px", background: "rgba(16, 185, 129, 0.2)", border: "1px solid rgba(16, 185, 129, 0.4)" }}>
+                                                        <Check size={10} strokeWidth={3} style={{ color: "#10b981" }} />
+                                                        <span style={{ fontSize: "9px", fontWeight: 900, color: "#10b981", textTransform: "uppercase" }}>Checked In</span>
+                                                    </div>
+                                                )}
+                                                <div style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "3px 8px", borderRadius: "12px", background: `${statusColor}22` }}>
+                                                    <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: statusColor }}></div>
+                                                    <span style={{ fontSize: "9px", fontWeight: 900, color: statusColor }}>{g.status}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <h3 style={{ fontSize: "18px", fontWeight: 900, color: "var(--text-primary)", margin: "0 0 2px" }}>
+                                            {g.name}
+                                        </h3>
+                                        <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>
+                                            {ev?.name || "Event Stream"}
                                         </span>
-                                        <div style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "3px 8px", borderRadius: "12px", background: `${statusColor}22` }}>
-                                            <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: statusColor }}></div>
-                                            <span style={{ fontSize: "9px", fontWeight: 900, color: statusColor }}>{g.status}</span>
+                                    </div>
+
+                                    <div style={{ padding: "1.25rem" }}>
+                                        <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid var(--border-subtle)", borderRadius: "10px", padding: "0.75rem", textAlign: "center", marginBottom: "0.85rem" }}>
+                                            <span style={{ fontSize: "9px", fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Entry Passcode</span>
+                                            <div style={{ fontSize: "20px", fontWeight: 900, color: "var(--accent-primary)", fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.1em", marginTop: "2px" }}>
+                                                {getPasscode(g)}
+                                            </div>
+                                        </div>
+
+                                        {/* Gate Check-in Toggle Button */}
+                                        <button 
+                                            type="button"
+                                            onClick={(e) => toggleCheckIn(g, e)}
+                                            style={{ 
+                                                width: "100%", 
+                                                padding: "0.65rem 0.85rem", 
+                                                borderRadius: "10px", 
+                                                marginBottom: "0.9rem", 
+                                                cursor: "pointer", 
+                                                display: "flex", 
+                                                alignItems: "center", 
+                                                justifyContent: "center", 
+                                                gap: "8px", 
+                                                fontSize: "12px", 
+                                                fontWeight: 800, 
+                                                transition: "all 0.2s ease",
+                                                background: g.checkedIn 
+                                                    ? "linear-gradient(135deg, rgba(16, 185, 129, 0.22) 0%, rgba(16, 185, 129, 0.08) 100%)" 
+                                                    : "rgba(255, 255, 255, 0.04)",
+                                                border: g.checkedIn 
+                                                    ? "1px solid rgba(16, 185, 129, 0.6)" 
+                                                    : "1px dashed var(--border-medium)",
+                                                color: g.checkedIn ? "#10b981" : "var(--text-secondary)",
+                                                boxShadow: g.checkedIn ? "0 4px 14px rgba(16, 185, 129, 0.2)" : "none"
+                                            }}
+                                        >
+                                            <div style={{
+                                                width: "18px",
+                                                height: "18px",
+                                                borderRadius: "4px",
+                                                border: g.checkedIn ? "none" : "2px solid var(--text-muted)",
+                                                background: g.checkedIn ? "#10b981" : "transparent",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                color: "#000",
+                                                transition: "all 0.2s"
+                                            }}>
+                                                {g.checkedIn && <Check size={13} strokeWidth={3.5} />}
+                                            </div>
+                                            <span>
+                                                {g.checkedIn 
+                                                    ? `✓ ENTRY VERIFIED ${g.checkedInAt ? `(${new Date(g.checkedInAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})` : ''}` 
+                                                    : "MARK VENUE ENTRY"}
+                                            </span>
+                                        </button>
+
+                                        <div style={{ fontSize: "11px", color: "var(--text-secondary)", display: "flex", flexDirection: "column", gap: "4px", marginBottom: "1rem" }}>
+                                            <div><strong>Email:</strong> {g.email || "N/A"}</div>
+                                            <div><strong>Phone:</strong> {g.whatsapp || "N/A"}</div>
+                                            <div><strong>Seats:</strong> {g.familySize || 1} Person(s)</div>
+                                        </div>
+
+                                        {/* Action Buttons */}
+                                        <div style={{ display: "flex", gap: "0.5rem" }}>
+                                            <button 
+                                                onClick={() => sendWhatsAppInvite(g)}
+                                                style={{ flex: 1, background: "rgba(16, 185, 129, 0.1)", border: "1px solid rgba(16, 185, 129, 0.25)", color: "#10b981", borderRadius: "8px", padding: "0.5rem", fontSize: "11px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "4px" }}
+                                            >
+                                                <MessageCircle size={13} /> WhatsApp
+                                            </button>
+                                            <button 
+                                                onClick={() => sendEmailInvite(g)}
+                                                style={{ flex: 1, background: "rgba(59, 130, 246, 0.1)", border: "1px solid rgba(59, 130, 246, 0.25)", color: "#3b82f6", borderRadius: "8px", padding: "0.5rem", fontSize: "11px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "4px" }}
+                                            >
+                                                <Mail size={13} /> Mail
+                                            </button>
                                         </div>
                                     </div>
-                                    
-                                    <h3 style={{ fontSize: "18px", fontWeight: 900, color: "var(--text-primary)", margin: "0 0 2px" }}>
-                                        {g.name}
-                                    </h3>
-                                    <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>
-                                        {ev?.name || "Event Stream"}
-                                    </span>
                                 </div>
-
-                                <div style={{ padding: "1.25rem" }}>
-                                    <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid var(--border-subtle)", borderRadius: "10px", padding: "0.75rem", textAlign: "center", marginBottom: "1rem" }}>
-                                        <span style={{ fontSize: "9px", fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Entry Passcode</span>
-                                        <div style={{ fontSize: "20px", fontWeight: 900, color: "var(--accent-primary)", fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.1em", marginTop: "2px" }}>
-                                            {getPasscode(g)}
-                                        </div>
-                                    </div>
-
-                                    <div style={{ fontSize: "11px", color: "var(--text-secondary)", display: "flex", flexDirection: "column", gap: "4px", marginBottom: "1rem" }}>
-                                        <div><strong>Email:</strong> {g.email || "N/A"}</div>
-                                        <div><strong>Phone:</strong> {g.whatsapp || "N/A"}</div>
-                                        <div><strong>Seats:</strong> {g.familySize || 1} Person(s)</div>
-                                    </div>
-
-                                    {/* Action Buttons */}
-                                    <div style={{ display: "flex", gap: "0.5rem" }}>
-                                        <button 
-                                            onClick={() => sendWhatsAppInvite(g)}
-                                            style={{ flex: 1, background: "rgba(16, 185, 129, 0.1)", border: "1px solid rgba(16, 185, 129, 0.25)", color: "#10b981", borderRadius: "8px", padding: "0.5rem", fontSize: "11px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "4px" }}
-                                        >
-                                            <MessageCircle size={13} /> WhatsApp
-                                        </button>
-                                        <button 
-                                            onClick={() => sendEmailInvite(g)}
-                                            style={{ flex: 1, background: "rgba(59, 130, 246, 0.1)", border: "1px solid rgba(59, 130, 246, 0.25)", color: "#3b82f6", borderRadius: "8px", padding: "0.5rem", fontSize: "11px", fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "4px" }}
-                                        >
-                                            <Mail size={13} /> Mail
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
+                            );
+                        })}
+                    </div>
+                )
             ) : (
                 /* Main Directory Table */
                 <div style={{ background: "var(--bg-surface)", borderRadius: "16px", border: "1px solid var(--border-subtle)", overflow: "hidden", boxShadow: "0 8px 24px rgba(0,0,0,0.1)" }}>
@@ -1021,6 +1201,7 @@ export default function Guests() {
                                         <th style={{ textAlign: "left", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap" }}>CONTACT</th>
                                         <th style={{ textAlign: "center", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap" }}>RSVP STATUS</th>
                                         <th style={{ textAlign: "center", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap" }}>ENTRY CODE</th>
+                                        <th style={{ textAlign: "center", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap" }}>GATE ENTRY</th>
                                         <th style={{ textAlign: "center", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap" }}>SEGMENT</th>
                                         <th style={{ textAlign: "center", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap" }}>SEATS</th>
                                         <th style={{ textAlign: "right", padding: "1rem 1.5rem", fontSize: "12px", fontWeight: 800, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap" }}>ACTIONS & DISPATCH</th>
@@ -1099,6 +1280,43 @@ export default function Guests() {
                                                     }}>
                                                         {getPasscode(g)}
                                                     </span>
+                                                </td>
+
+                                                <td style={{ padding: "1rem 1.5rem", textAlign: "center" }}>
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => toggleCheckIn(g, e)}
+                                                        style={{
+                                                            display: "inline-flex",
+                                                            alignItems: "center",
+                                                            gap: "6px",
+                                                            padding: "5px 12px",
+                                                            borderRadius: "20px",
+                                                            border: g.checkedIn ? "1px solid rgba(16, 185, 129, 0.5)" : "1px dashed var(--border-medium)",
+                                                            background: g.checkedIn ? "rgba(16, 185, 129, 0.15)" : "rgba(255, 255, 255, 0.03)",
+                                                            color: g.checkedIn ? "#10b981" : "var(--text-muted)",
+                                                            fontSize: "12px",
+                                                            fontWeight: 800,
+                                                            cursor: "pointer",
+                                                            transition: "all 0.2s"
+                                                        }}
+                                                        title="Toggle venue gate check-in status"
+                                                    >
+                                                        <div style={{
+                                                            width: "14px",
+                                                            height: "14px",
+                                                            borderRadius: "3px",
+                                                            border: g.checkedIn ? "none" : "1px solid var(--text-muted)",
+                                                            background: g.checkedIn ? "#10b981" : "transparent",
+                                                            display: "flex",
+                                                            alignItems: "center",
+                                                            justifyContent: "center",
+                                                            color: "#000"
+                                                        }}>
+                                                            {g.checkedIn && <Check size={10} strokeWidth={3.5} />}
+                                                        </div>
+                                                        <span>{g.checkedIn ? "Checked In" : "Mark Entry"}</span>
+                                                    </button>
                                                 </td>
 
                                                 <td style={{ padding: "1rem 1.5rem", textAlign: "center" }}>

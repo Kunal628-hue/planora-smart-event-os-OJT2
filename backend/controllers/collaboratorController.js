@@ -1,3 +1,4 @@
+import * as xlsx from "xlsx";
 import Collaborator from "../models/Collaborator.js";
 import Event from "../models/Event.js";
 import Profile from "../models/Profile.js";
@@ -93,5 +94,89 @@ export const deleteCollaborator = async (req, res) => {
         res.json({ message: "Collaborator removed" });
     } catch (error) {
         return handleControllerError(res, error, "Failed to delete collaborator. Please try again.");
+    }
+};
+
+export const bulkUploadCollaborators = async (req, res) => {
+    try {
+        const { eventId, user: userId, inviterName } = req.body;
+        if (!req.file) return res.status(400).json({ message: "No Excel or CSV file provided." });
+        if (!eventId) return res.status(400).json({ message: "Event ID context is required." });
+
+        const event = await Event.findById(eventId);
+        if (!event) return res.status(404).json({ message: "Event not found." });
+
+        let rows = [];
+        try {
+            const workbook = xlsx.read(req.file.buffer, { type: "buffer" });
+            const sheetName = workbook.SheetNames[0];
+            const sheet = workbook.Sheets[sheetName];
+            rows = xlsx.utils.sheet_to_json(sheet, { defval: "" });
+        } catch (readErr) {
+            console.error("[Collaborators Bulk Upload] Read error:", readErr);
+            return res.status(400).json({ message: "Failed to parse Excel/CSV spreadsheet." });
+        }
+
+        if (!Array.isArray(rows) || rows.length === 0) {
+            return res.status(400).json({ message: "Spreadsheet contains no records." });
+        }
+
+        const validRoles = ["Event Lead", "Editor", "Viewer"];
+        const collaboratorsToCreate = [];
+
+        for (const row of rows) {
+            const getVal = (possibleKeys) => {
+                const foundKey = Object.keys(row).find(k => possibleKeys.some(p => k.toLowerCase().includes(p.toLowerCase())));
+                return foundKey ? String(row[foundKey]).trim() : "";
+            };
+
+            const name = getVal(["name", "full name", "member", "collaborator"]);
+            const email = getVal(["email", "mail", "e-mail"]);
+            const whatsapp = getVal(["whatsapp", "phone", "mobile", "contact"]);
+            let role = getVal(["role", "access", "permission"]);
+
+            if (!name || !email) continue;
+
+            const matchedRole = validRoles.find(r => r.toLowerCase() === role.toLowerCase());
+            role = matchedRole || "Editor";
+
+            const permissions = role === "Editor" 
+                ? "Can modify core modules" 
+                : role === "Event Lead" 
+                    ? "Full administrative control" 
+                    : "Read-only access";
+
+            collaboratorsToCreate.push({
+                name,
+                email,
+                whatsapp,
+                role,
+                status: "Active",
+                permissions,
+                event: eventId,
+                user: userId || event.user,
+                inviterName: inviterName || "Workspace Owner"
+            });
+        }
+
+        if (collaboratorsToCreate.length === 0) {
+            return res.status(400).json({ message: "No valid member records found in file. Ensure spreadsheet has 'Name' and 'Email' columns." });
+        }
+
+        const createdCollaborators = await Collaborator.insertMany(collaboratorsToCreate);
+
+        const eventName = event.title || event.name || "Upcoming Event";
+        const eventLocation = event.location || "";
+        Promise.all(createdCollaborators.map(c => 
+            sendCollaboratorInvite(c, inviterName || "Workspace Lead", eventName, eventLocation).catch(() => {})
+        ));
+
+        res.status(201).json({
+            message: `Successfully onboarded ${createdCollaborators.length} team member(s) from Excel sheet.`,
+            count: createdCollaborators.length,
+            collaborators: createdCollaborators
+        });
+    } catch (error) {
+        return handleControllerError(res, error, "Failed to process team member spreadsheet upload.");
     }
 };

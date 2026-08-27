@@ -60,6 +60,52 @@ export default function Budget() {
         receiptUrl: ""
     });
     
+    // Category management state
+    const DEFAULT_CATEGORIES = useMemo(() => [
+        { name: "Venue", ratio: 0.30, color: "#ec4899" },
+        { name: "Catering", ratio: 0.25, color: "#6366f1" },
+        { name: "Decor", ratio: 0.15, color: "#10b981" },
+        { name: "Photography", ratio: 0.10, color: "#f59e0b" },
+        { name: "Logistics", ratio: 0.08, color: "#3b82f6" },
+        { name: "Entertainment", ratio: 0.07, color: "#a855f7" },
+        { name: "Operations", ratio: 0.05, color: "#64748b" }
+    ], []);
+
+    const [customCategories, setCustomCategories] = useState(() => {
+        try {
+            const saved = localStorage.getItem(`planora_categories_${selectedEventId || "default"}`);
+            return saved ? JSON.parse(saved) : DEFAULT_CATEGORIES;
+        } catch {
+            return DEFAULT_CATEGORIES;
+        }
+    });
+
+    const [showCategoryModal, setShowCategoryModal] = useState(false);
+    const [editingCategory, setEditingCategory] = useState(null);
+    const [categoryForm, setCategoryForm] = useState({ name: "", allocated: "" });
+
+    useEffect(() => {
+        try {
+            const saved = localStorage.getItem(`planora_categories_${selectedEventId || "default"}`);
+            if (saved) {
+                setCustomCategories(JSON.parse(saved));
+            } else {
+                setCustomCategories(DEFAULT_CATEGORIES);
+            }
+        } catch {
+            setCustomCategories(DEFAULT_CATEGORIES);
+        }
+    }, [selectedEventId, DEFAULT_CATEGORIES]);
+
+    const saveCategories = (newList) => {
+        setCustomCategories(newList);
+        try {
+            localStorage.setItem(`planora_categories_${selectedEventId || "default"}`, JSON.stringify(newList));
+        } catch (e) {
+            console.error("Error saving categories to localStorage", e);
+        }
+    };
+
     const [filterCategory, setFilterCategory] = useState("All");
     const [aiPlan, setAiPlan] = useState(null);
     const [isGenerating, setIsGenerating] = useState(false);
@@ -143,8 +189,34 @@ export default function Budget() {
     }, [eventVendors]);
 
     // Filter & Categories
-    const baseCategories = ["Catering", "Decor", "Photography", "Venue", "Logistics", "Entertainment", "Operations"];
-    const uniqueCategories = ["All", ...new Set([...baseCategories, ...eventVendors.map(v => v.service).filter(Boolean)])];
+    const activeCategoriesList = useMemo(() => {
+        const list = [...customCategories];
+        const existingNames = new Set(list.map(c => c.name));
+        
+        eventVendors.forEach(v => {
+            if (v.service && !existingNames.has(v.service)) {
+                existingNames.add(v.service);
+                list.push({
+                    name: v.service,
+                    allocated: 0,
+                    color: "#f97316"
+                });
+            }
+        });
+        return list;
+    }, [customCategories, eventVendors]);
+
+    const getCategoryAllocated = (cat) => {
+        if (cat.allocated !== undefined && cat.allocated !== null && cat.allocated !== "") {
+            return Number(cat.allocated);
+        }
+        if (cat.ratio !== undefined) {
+            return Math.round(totalAllocated * cat.ratio);
+        }
+        return Math.round(totalAllocated * 0.1);
+    };
+
+    const uniqueCategories = ["All", ...new Set(activeCategoriesList.map(c => c.name))];
     
     const filteredVendors = useMemo(() => {
         return eventVendors.filter(v => {
@@ -157,26 +229,107 @@ export default function Budget() {
     }, [eventVendors, searchQuery, filterCategory]);
 
     const categoryStats = useMemo(() => {
-        const colors = {
-            "Catering": "#6366f1",
-            "Decor": "#10b981",
-            "Photography": "#f59e0b",
-            "Venue": "#ec4899",
-            "Logistics": "#3b82f6",
-            "Entertainment": "#a855f7",
-            "Operations": "#64748b"
-        };
-        return baseCategories.map(name => {
+        return activeCategoriesList.map(cat => {
             const spent = eventVendors
-                .filter(v => v.service === name || v.service?.startsWith(`${name}:`))
+                .filter(v => v.service === cat.name || v.service?.startsWith(`${cat.name}:`))
                 .reduce((sum, v) => sum + (Number(v.cost) || 0), 0);
             return {
-                name,
-                color: colors[name] || "#f97316",
-                spent
+                name: cat.name,
+                color: cat.color || "#f97316",
+                spent,
+                allocated: getCategoryAllocated(cat)
             };
         });
-    }, [eventVendors]);
+    }, [activeCategoriesList, eventVendors, totalAllocated]);
+
+    const openAddCategoryModal = () => {
+        setEditingCategory(null);
+        setCategoryForm({ name: "", allocated: "" });
+        setShowCategoryModal(true);
+    };
+
+    const openEditCategoryModal = (cat) => {
+        setEditingCategory(cat);
+        const currentAllocated = cat.allocated !== undefined && cat.allocated !== null ? cat.allocated : getCategoryAllocated(cat);
+        setCategoryForm({ name: cat.name, allocated: String(currentAllocated) });
+        setShowCategoryModal(true);
+    };
+
+    const handleSaveCategory = (e) => {
+        e.preventDefault();
+        const trimmedName = categoryForm.name.trim();
+        if (!trimmedName) return;
+
+        const allocVal = categoryForm.allocated !== "" ? Math.max(0, Number(categoryForm.allocated)) : 0;
+
+        if (editingCategory) {
+            const oldName = editingCategory.name;
+            const updated = activeCategoriesList.map(c => {
+                if (c.name === oldName) {
+                    return {
+                        ...c,
+                        name: trimmedName,
+                        allocated: allocVal
+                    };
+                }
+                return c;
+            });
+            saveCategories(updated);
+
+            if (oldName !== trimmedName) {
+                const vendorsToUpdate = eventVendors.filter(v => v.service === oldName);
+                vendorsToUpdate.forEach(async (v) => {
+                    try {
+                        const headers = { 
+                            "Content-Type": "application/json",
+                            "x-user-id": user.uid, 
+                            "x-user-email": user.email || "" 
+                        };
+                        await fetch(`${API_URL}/vendors/${v._id || v.id}`, {
+                            method: "PATCH",
+                            headers,
+                            body: JSON.stringify({ service: trimmedName })
+                        });
+                    } catch (err) {
+                        console.error("Error updating vendor service name:", err);
+                    }
+                });
+                if (vendorsToUpdate.length > 0) {
+                    fetchData();
+                }
+            }
+
+            addNotification("Category Updated", `Category "${trimmedName}" updated successfully.`);
+        } else {
+            if (activeCategoriesList.some(c => c.name.toLowerCase() === trimmedName.toLowerCase())) {
+                showAlert("Category Exists", `A category named "${trimmedName}" already exists.`);
+                return;
+            }
+            const palette = ["#6366f1", "#10b981", "#f59e0b", "#ec4899", "#3b82f6", "#a855f7", "#64748b", "#06b6d4", "#f97316"];
+            const randomColor = palette[activeCategoriesList.length % palette.length];
+            const newCat = {
+                name: trimmedName,
+                allocated: allocVal,
+                color: randomColor
+            };
+            saveCategories([...activeCategoriesList, newCat]);
+            addNotification("Category Added", `Category "${trimmedName}" created successfully.`);
+        }
+
+        setShowCategoryModal(false);
+    };
+
+    const handleDeleteCategory = async (catName) => {
+        const confirmed = await showConfirm(
+            "Delete Category",
+            `Are you sure you want to delete category "${catName}"? Existing logged expenses under this category will remain unaffected.`
+        );
+        if (confirmed) {
+            const updated = activeCategoriesList.filter(c => c.name !== catName);
+            saveCategories(updated);
+            addNotification("Category Removed", `Category "${catName}" was removed.`);
+        }
+    };
 
     // Handlers
     const handleFileUpload = async (e) => {
@@ -855,9 +1008,29 @@ export default function Budget() {
                 padding: "1.25rem 1.5rem",
                 marginBottom: "1.75rem"
             }}>
-                <h3 style={{ fontSize: "13px", fontWeight: 800, color: "var(--text-primary)", marginBottom: "1rem", textTransform: "uppercase", letterSpacing: "0.06em" }}>
-                    Category Utilization
-                </h3>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem", flexWrap: "wrap", gap: "0.75rem" }}>
+                    <h3 style={{ fontSize: "13px", fontWeight: 800, color: "var(--text-primary)", margin: 0, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                        Category Utilization
+                    </h3>
+                    <button 
+                        onClick={openAddCategoryModal}
+                        style={{ 
+                            background: "var(--accent-primary)", 
+                            color: "#fff", 
+                            border: "none", 
+                            padding: "0.45rem 0.9rem", 
+                            borderRadius: "8px", 
+                            fontWeight: 700, 
+                            cursor: "pointer", 
+                            fontSize: "12px",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "6px"
+                        }}
+                    >
+                        <Plus size={14} /> Add Category
+                    </button>
+                </div>
                 <div style={{ width: "100%", overflowX: "auto" }}>
                     <table style={{ width: "100%", borderCollapse: "collapse" }}>
                         <thead>
@@ -867,19 +1040,19 @@ export default function Budget() {
                                 <th style={{ textAlign: "right", padding: "0.75rem 1rem", fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>SPENT</th>
                                 <th style={{ textAlign: "right", padding: "0.75rem 1rem", fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>REMAINING</th>
                                 <th style={{ textAlign: "right", padding: "0.75rem 1rem", fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", width: "180px" }}>UTILIZATION</th>
+                                <th style={{ textAlign: "center", padding: "0.75rem 1rem", fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", width: "90px" }}>ACTIONS</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {baseCategories.map(cat => {
-                                const spent = eventVendors.filter(v => v.service === cat || v.service?.startsWith(`${cat}:`)).reduce((s, v) => s + (v.cost || 0), 0);
-                                const factorMap = { Venue: 0.3, Catering: 0.25, Decor: 0.15, Photography: 0.1, Logistics: 0.08, Entertainment: 0.07, Operations: 0.05 };
-                                const allocated = Math.round(totalAllocated * (factorMap[cat] || 0.1));
+                            {activeCategoriesList.map(cat => {
+                                const spent = eventVendors.filter(v => v.service === cat.name || v.service?.startsWith(`${cat.name}:`)).reduce((s, v) => s + (v.cost || 0), 0);
+                                const allocated = getCategoryAllocated(cat);
                                 const rem = allocated - spent;
                                 const util = allocated > 0 ? (spent / allocated) * 100 : 0;
                                 
                                 return (
-                                    <tr key={cat} style={{ borderBottom: "1px solid var(--border-subtle)" }}>
-                                        <td style={{ padding: "0.85rem 1rem", fontSize: "13px", fontWeight: 700, color: "var(--text-primary)" }}>{cat}</td>
+                                    <tr key={cat.name} style={{ borderBottom: "1px solid var(--border-subtle)" }}>
+                                        <td style={{ padding: "0.85rem 1rem", fontSize: "13px", fontWeight: 700, color: "var(--text-primary)" }}>{cat.name}</td>
                                         <td style={{ padding: "0.85rem 1rem", textAlign: "right", fontSize: "12px", fontWeight: 600, color: "var(--text-secondary)" }}>₹{allocated.toLocaleString('en-IN')}</td>
                                         <td style={{ padding: "0.85rem 1rem", textAlign: "right", fontSize: "12px", fontWeight: 800, color: "var(--text-primary)" }}>₹{spent.toLocaleString('en-IN')}</td>
                                         <td style={{ padding: "0.85rem 1rem", textAlign: "right", fontSize: "12px", fontWeight: 600, color: rem < 0 ? "#ef4444" : "#10b981" }}>₹{rem.toLocaleString('en-IN')}</td>
@@ -889,6 +1062,24 @@ export default function Budget() {
                                                 <div style={{ width: "90px", height: "5px", background: "rgba(255,255,255,0.06)", borderRadius: "3px", overflow: "hidden" }}>
                                                     <div style={{ width: `${Math.min(util, 100)}%`, height: "100%", background: util > 100 ? "#ef4444" : "var(--accent-primary)", borderRadius: "3px" }}></div>
                                                 </div>
+                                            </div>
+                                        </td>
+                                        <td style={{ padding: "0.85rem 1rem", textAlign: "center" }}>
+                                            <div style={{ display: "flex", gap: "0.4rem", justifyContent: "center" }}>
+                                                <button 
+                                                    onClick={() => openEditCategoryModal(cat)} 
+                                                    title="Edit Category" 
+                                                    style={{ background: "rgba(255, 255, 255, 0.04)", border: "1px solid var(--border-subtle)", color: "var(--text-secondary)", padding: "0.35rem", borderRadius: "6px", cursor: "pointer" }}
+                                                >
+                                                    <Edit2 size={13} />
+                                                </button>
+                                                <button 
+                                                    onClick={() => handleDeleteCategory(cat.name)} 
+                                                    title="Delete Category" 
+                                                    style={{ background: "rgba(239, 68, 68, 0.08)", border: "1px solid rgba(239, 68, 68, 0.2)", color: "#ef4444", padding: "0.35rem", borderRadius: "6px", cursor: "pointer" }}
+                                                >
+                                                    <Trash2 size={13} />
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -1127,15 +1318,9 @@ export default function Budget() {
                                 <div>
                                     <label style={labelStyle}>Category</label>
                                     <select style={{ ...inputStyle, paddingRight: "0.5rem" }} value={newExpense.service} onChange={e => setNewExpense({ ...newExpense, service: e.target.value })}>
-                                        <option value="Catering">Catering</option>
-                                        <option value="Decor">Decor & Production</option>
-                                        <option value="Photography">Photography & Video</option>
-                                        <option value="Venue">Venue & Hall</option>
-                                        <option value="Logistics">Logistics & Travel</option>
-                                        <option value="Entertainment">Entertainment & Sound</option>
-                                        <option value="Equipment">Equipment Hire</option>
-                                        <option value="Marketing">Marketing & PR</option>
-                                        <option value="Operations">Operations & Staff</option>
+                                        {activeCategoriesList.map(cat => (
+                                            <option key={cat.name} value={cat.name}>{cat.name}</option>
+                                        ))}
                                     </select>
                                 </div>
 
@@ -1310,6 +1495,125 @@ export default function Budget() {
                             >
                                 {isUpdatingBudget ? <RefreshCw size={16} className="animate-spin" /> : "Update Budget Target"}
                             </button>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Add / Edit Category Modal */}
+            {showCategoryModal && (
+                <div style={{ 
+                    position: "fixed", 
+                    inset: 0, 
+                    background: "rgba(0, 0, 0, 0.75)", 
+                    display: "flex", 
+                    alignItems: "center", 
+                    justifyContent: "center", 
+                    zIndex: 2000, 
+                    backdropFilter: "blur(12px)" 
+                }}>
+                    <div className="modal-reveal mobile-full-width" style={{
+                        background: "var(--bg-surface)",
+                        width: "95%",
+                        maxWidth: "420px",
+                        padding: "2rem",
+                        borderRadius: "20px",
+                        border: "1px solid var(--border-medium)",
+                        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.7)",
+                        position: "relative"
+                    }}>
+                        <button 
+                            onClick={() => setShowCategoryModal(false)} 
+                            style={{ 
+                                position: "absolute", 
+                                top: "1.25rem", 
+                                right: "1.5rem", 
+                                background: "rgba(255,255,255,0.05)", 
+                                border: "1px solid var(--border-subtle)", 
+                                color: "var(--text-muted)", 
+                                cursor: "pointer",
+                                width: "32px",
+                                height: "32px",
+                                borderRadius: "8px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center"
+                            }}
+                        >
+                            <X size={16} />
+                        </button>
+
+                        <div style={{ marginBottom: "1.5rem" }}>
+                            <div style={{ width: "42px", height: "42px", borderRadius: "12px", background: "rgba(249, 115, 22, 0.12)", color: "var(--accent-primary)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1rem" }}>
+                                {editingCategory ? <Edit2 size={20} /> : <Plus size={22} />}
+                            </div>
+                            <h2 style={{ fontSize: "1.25rem", fontWeight: 900, letterSpacing: "-0.02em", margin: "0 0 0.25rem", color: "var(--text-primary)" }}>
+                                {editingCategory ? "Edit Category" : "Add New Category"}
+                            </h2>
+                            <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", fontWeight: 500, margin: 0 }}>
+                                {editingCategory ? "Modify category details and budget allocation." : "Create a custom category for expense organization."}
+                            </p>
+                        </div>
+
+                        <form onSubmit={handleSaveCategory} style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
+                            <div>
+                                <label style={labelStyle}>Category Name</label>
+                                <input 
+                                    placeholder="e.g. Stage & Sound, Merch, Travel" 
+                                    style={inputStyle} 
+                                    value={categoryForm.name} 
+                                    onChange={e => setCategoryForm({ ...categoryForm, name: e.target.value })} 
+                                    required 
+                                />
+                            </div>
+
+                            <div>
+                                <label style={labelStyle}>Allocated Budget (INR ₹)</label>
+                                <input 
+                                    type="number" 
+                                    min="0" 
+                                    placeholder="e.g. 50000" 
+                                    style={inputStyle} 
+                                    value={categoryForm.allocated} 
+                                    onChange={e => setCategoryForm({ ...categoryForm, allocated: e.target.value })} 
+                                />
+                            </div>
+
+                            <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
+                                <button 
+                                    type="button" 
+                                    onClick={() => setShowCategoryModal(false)}
+                                    style={{ 
+                                        flex: 1, 
+                                        background: "rgba(255,255,255,0.05)", 
+                                        border: "1px solid var(--border-subtle)", 
+                                        color: "var(--text-secondary)", 
+                                        padding: "0.75rem", 
+                                        borderRadius: "10px", 
+                                        fontWeight: 700, 
+                                        cursor: "pointer", 
+                                        fontSize: "13px" 
+                                    }}
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    type="submit" 
+                                    style={{ 
+                                        flex: 1, 
+                                        background: "var(--accent-primary)", 
+                                        color: "#fff", 
+                                        border: "none", 
+                                        padding: "0.75rem", 
+                                        borderRadius: "10px", 
+                                        fontWeight: 800, 
+                                        cursor: "pointer", 
+                                        fontSize: "13px" 
+                                    }}
+                                >
+                                    {editingCategory ? "Save Changes" : "Add Category"}
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>

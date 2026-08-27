@@ -15,6 +15,8 @@ const guestSchema = mongoose.Schema(
         dietary: { type: String, default: "None" }, // Vegan, Vegetarian, etc.
         notes: { type: String }, // General notes
         entryCode: { type: String, unique: true, sparse: true }, // Unique pass code for event entry
+        checkedIn: { type: Boolean, default: false }, // Event gate check-in status
+        checkedInAt: { type: Date }, // Timestamp when guest entered venue
         event: { type: mongoose.Schema.Types.ObjectId, ref: "Event", required: true },
         user: { type: String, required: true }, // Firebase UID
     },

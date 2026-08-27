@@ -5,9 +5,11 @@ import {
     Plus, User, Mail, Shield, Check, ChevronRight, LayoutGrid, Users2, 
     MoreHorizontal, Trash2, Edit3, X, Calendar, Phone, Search, 
     RefreshCw, UserCheck, Sparkles, Copy, ExternalLink, ShieldCheck, 
-    AlertCircle, Filter, ArrowUpDown, CheckCircle2, MessageSquare
+    AlertCircle, Filter, ArrowUpDown, CheckCircle2, MessageSquare,
+    Upload, FileSpreadsheet, Loader2
 } from "lucide-react";
 import { validateEmail, validatePhone } from "../../utils/validation";
+import { useUpload } from "../../context/UploadContext";
 import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 
@@ -17,9 +19,11 @@ const FRONTEND_URL = window.location.origin;
 export default function Team() {
     const { user, events = [], selectedEventId, hasFullAccess, hasEditorAccess } = useOutletContext();
     const { showAlert, showConfirm } = useDialog();
+    const { startUpload, completeUpload, cancelUpload } = useUpload();
 
     const [members, setMembers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [bulkLoading, setBulkLoading] = useState(false);
     const [isInviting, setIsInviting] = useState(false);
     const [editingMember, setEditingMember] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
@@ -253,6 +257,60 @@ export default function Team() {
         }
     };
 
+    const handleBulkUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file || !selectedEventId) return;
+
+        startUpload(file);
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("eventId", selectedEventId);
+        formData.append("user", user?.uid || "");
+        formData.append("inviterName", user?.displayName || "Workspace Owner");
+
+        setBulkLoading(true);
+        try {
+            const response = await fetch(`${API_URL}/collaborators/bulk-upload`, {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                completeUpload();
+                showAlert("Bulk Team Onboarding Complete", data.message || `Successfully onboarded ${data.count || 0} team member(s).`);
+                fetchMembers();
+            } else {
+                cancelUpload();
+                showAlert("Onboarding Error", data.message || "Failed to process team spreadsheet.");
+            }
+        } catch (err) {
+            cancelUpload();
+            console.error("Team bulk upload failed:", err);
+            showAlert("Upload Failed", "An error occurred while uploading team spreadsheet.");
+        } finally {
+            setBulkLoading(false);
+            e.target.value = "";
+        }
+    };
+
+    const downloadSampleCSV = () => {
+        const headers = ["Full Name", "Email", "Role (Event Lead / Editor / Viewer)", "Phone / WhatsApp"];
+        const rows = [
+            ["Sarah Jenkins", "sarah.j@example.com", "Editor", "+919876543210"],
+            ["David Miller", "david.m@example.com", "Event Lead", "+918765432109"],
+            ["Elena Rostova", "elena.r@example.com", "Viewer", "+917654321098"]
+        ];
+        const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + [headers.join(","), ...rows.map(e => e.map(val => `"${val}"`).join(","))].join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "Sample_Team_Members_Template.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     const handleRenewal = async (renewalId, title) => {
         const confirmed = await showConfirm("Initiate Renewal", `Authorize the administrative security renewal for '${title}'? This will re-certify the access session.`);
         if (confirmed) {
@@ -389,29 +447,82 @@ export default function Team() {
                         <RefreshCw size={16} className={loading ? "spin-icon" : ""} />
                     </button>
 
+                    <button 
+                        onClick={downloadSampleCSV}
+                        title="Download sample Excel/CSV template for team members"
+                        style={{ 
+                            padding: "0.75rem 1.1rem", 
+                            background: "rgba(255,255,255,0.06)", 
+                            border: "1px solid var(--border-medium)", 
+                            borderRadius: "12px", 
+                            color: "var(--text-secondary)", 
+                            fontWeight: 700, 
+                            fontSize: "13px", 
+                            cursor: "pointer", 
+                            display: "flex", 
+                            alignItems: "center", 
+                            gap: "0.5rem",
+                            transition: "all 0.2s"
+                        }}
+                    >
+                        <FileSpreadsheet size={16} /> Sample CSV
+                    </button>
+
                     {hasFullAccess && (
-                        <button 
-                            onClick={() => setIsInviting(true)} 
-                            style={{ 
-                                padding: "0.75rem 1.4rem", 
-                                background: "linear-gradient(135deg, #f97316 0%, #ea580c 100%)", 
-                                border: "none", 
-                                borderRadius: "12px", 
-                                color: "#000", 
-                                fontWeight: 800, 
-                                fontSize: "13px", 
-                                cursor: "pointer", 
-                                display: "flex", 
-                                alignItems: "center", 
-                                gap: "0.6rem",
-                                boxShadow: "0 8px 25px rgba(249, 115, 22, 0.35)",
-                                transition: "all 0.2s transform cubic-bezier(0.4, 0, 0.2, 1)"
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.transform = "translateY(-2px)"}
-                            onMouseLeave={(e) => e.currentTarget.style.transform = "translateY(0)"}
-                        >
-                            <Plus size={18} strokeWidth={3} /> Invite Collaborator
-                        </button>
+                        <>
+                            <button 
+                                onClick={() => document.getElementById('team-bulk-upload-input').click()}
+                                disabled={bulkLoading}
+                                title="Upload Excel or CSV sheet of team members"
+                                style={{ 
+                                    padding: "0.75rem 1.25rem", 
+                                    background: "rgba(255,255,255,0.08)", 
+                                    border: "1px solid var(--border-medium)", 
+                                    borderRadius: "12px", 
+                                    color: "#fff", 
+                                    fontWeight: 800, 
+                                    fontSize: "13px", 
+                                    cursor: "pointer", 
+                                    display: "flex", 
+                                    alignItems: "center", 
+                                    gap: "0.5rem",
+                                    transition: "all 0.2s"
+                                }}
+                            >
+                                {bulkLoading ? <Loader2 className="animate-spin" size={16} /> : <Upload size={16} />}
+                                Upload Excel/CSV
+                                <input 
+                                    id="team-bulk-upload-input" 
+                                    type="file" 
+                                    accept=".csv, .xlsx, .xls" 
+                                    hidden 
+                                    onChange={handleBulkUpload} 
+                                />
+                            </button>
+
+                            <button 
+                                onClick={() => setIsInviting(true)} 
+                                style={{ 
+                                    padding: "0.75rem 1.4rem", 
+                                    background: "linear-gradient(135deg, #f97316 0%, #ea580c 100%)", 
+                                    border: "none", 
+                                    borderRadius: "12px", 
+                                    color: "#000", 
+                                    fontWeight: 800, 
+                                    fontSize: "13px", 
+                                    cursor: "pointer", 
+                                    display: "flex", 
+                                    alignItems: "center", 
+                                    gap: "0.6rem",
+                                    boxShadow: "0 8px 25px rgba(249, 115, 22, 0.35)",
+                                    transition: "all 0.2s transform cubic-bezier(0.4, 0, 0.2, 1)"
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.transform = "translateY(-2px)"}
+                                onMouseLeave={(e) => e.currentTarget.style.transform = "translateY(0)"}
+                            >
+                                <Plus size={18} strokeWidth={3} /> Invite Collaborator
+                            </button>
+                        </>
                     )}
                 </div>
             </div>
@@ -996,85 +1107,7 @@ export default function Team() {
                 </div>
             )}
 
-            {/* Access Renewals & Audit Log */}
-            <div style={{ marginTop: "2.5rem" }}>
-                <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "20px", overflow: "hidden" }}>
-                    <div style={{ padding: "1.25rem 1.5rem", background: "rgba(255,255,255,0.02)", borderBottom: "1px solid var(--border-subtle)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                            <Shield size={18} color="var(--accent-primary)" />
-                            <div>
-                                <h3 style={{ fontSize: "15px", fontWeight: 800, margin: 0, color: "#fff" }}>Access Renewals & Security Audit</h3>
-                                <p style={{ fontSize: "11px", color: "var(--text-muted)", margin: 0 }}>Workspace security re-certification schedule</p>
-                            </div>
-                        </div>
-                        <span style={{ fontSize: "10px", fontWeight: 900, background: "rgba(16, 185, 129, 0.1)", color: "#10b981", padding: "4px 10px", borderRadius: "100px", border: "1px solid rgba(16, 185, 129, 0.2)" }}>
-                            Protocol Compliant
-                        </span>
-                    </div>
 
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                        {renewals.map((item, idx) => (
-                            <div 
-                                key={item.id} 
-                                style={{ 
-                                    padding: "1.25rem 1.5rem", 
-                                    borderBottom: idx === renewals.length - 1 ? "none" : "1px solid var(--border-subtle)", 
-                                    display: "flex", 
-                                    justifyContent: "space-between", 
-                                    alignItems: "center",
-                                    flexWrap: "wrap",
-                                    gap: "1rem"
-                                }}
-                            >
-                                <div style={{ display: "flex", gap: "1rem", flex: 1, minWidth: "260px" }}>
-                                    <div style={{ 
-                                        width: "8px", 
-                                        height: "8px", 
-                                        borderRadius: "50%", 
-                                        background: item.status === "verified" ? "#10b981" : "var(--accent-primary)", 
-                                        marginTop: "6px",
-                                        boxShadow: item.status === "verified" ? "0 0 10px rgba(16, 185, 129, 0.5)" : "0 0 10px rgba(249, 115, 22, 0.5)"
-                                    }}></div>
-                                    <div>
-                                        <div style={{ fontSize: "14px", fontWeight: 750, color: "#fff", marginBottom: "3px" }}>{item.title}</div>
-                                        <div style={{ fontSize: "12px", color: "var(--text-muted)", lineHeight: 1.4 }}>{item.sub}</div>
-                                    </div>
-                                </div>
-                                <div style={{ textAlign: "right", display: "flex", alignItems: "center", gap: "1.25rem" }}>
-                                    <div>
-                                        <div style={{ fontSize: "11px", color: item.status === "verified" ? "#10b981" : "var(--text-secondary)", fontWeight: 700 }}>
-                                            {item.status === "verified" ? "Verified" : `Due in ${item.due}`}
-                                        </div>
-                                        <div style={{ fontSize: "10px", color: "var(--text-muted)" }}>{item.date}</div>
-                                    </div>
-                                    {item.status !== "verified" ? (
-                                        <button 
-                                            onClick={() => handleRenewal(item.id, item.title)}
-                                            style={{ 
-                                                background: "rgba(249, 115, 22, 0.12)", 
-                                                border: "1px solid rgba(249, 115, 22, 0.3)", 
-                                                color: "#f97316", 
-                                                padding: "6px 14px", 
-                                                borderRadius: "8px", 
-                                                fontSize: "12px", 
-                                                fontWeight: 800, 
-                                                cursor: "pointer",
-                                                transition: "all 0.2s"
-                                            }}
-                                        >
-                                            Renew Now
-                                        </button>
-                                    ) : (
-                                        <div style={{ display: "flex", alignItems: "center", gap: "4px", color: "#10b981", fontSize: "12px", fontWeight: 800 }}>
-                                            <CheckCircle2 size={16} /> Certified
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
 
             {/* Invite Collaborator Modal */}
             {isInviting && (
