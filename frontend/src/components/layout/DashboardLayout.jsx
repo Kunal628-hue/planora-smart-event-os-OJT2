@@ -51,7 +51,6 @@ const NAV_ITEMS = [
     { id: "events", label: "Events", path: "/events", icon: <Calendar size={20} /> },
     { id: "vendors", label: "Vendors", path: "/vendors", icon: <Handshake size={20} /> },
     { id: "guests", label: "Guests", path: "/guests", icon: <Users size={20} /> },
-    { id: "builder", label: "Registration Designer", path: "/builder", icon: <Sparkles size={20} /> },
     { id: "budget", label: "Budget", path: "/budget", icon: <Wallet size={20} /> },
     { id: "tasks", label: "Tasks / Timeline", path: "/tasks", icon: <ListTodo size={20} /> },
     { id: "analytics", label: "Analytics", path: "/analytics", icon: <BarChart3 size={20} /> },
