@@ -26,26 +26,46 @@ import crypto from "crypto";
 const generateGroqCompletion = async (prompt) => {
     if (!process.env.GROQ_API_KEY) throw new Error("GROQ_API_KEY is missing");
     
-    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-            "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            model: "llama-3.3-70b-versatile",
-            messages: [{ role: "user", content: prompt }],
-            temperature: 0.1
-        })
-    });
+    const candidateModels = [
+        "openai/gpt-oss-120b",
+        "groq/compound-mini",
+        "qwen/qwen3.8-27b",
+        "openai/gpt-oss-20b"
+    ];
 
-    if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Groq API Error: ${response.status} ${errorText}`);
+    let lastError = null;
+    for (const model of candidateModels) {
+        try {
+            const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    model: model,
+                    messages: [{ role: "user", content: prompt }],
+                    temperature: 0.1
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const content = data.choices[0]?.message?.content;
+                const cleanedContent = content ? content.replace(/<think>[\s\S]*?<\/think>/g, "").trim() : "";
+                if (cleanedContent) return cleanedContent;
+            } else {
+                const errorText = await response.text();
+                lastError = new Error(`Groq API Error (${model}): ${response.status} ${errorText}`);
+                console.warn(`[Groq AI] Model ${model} returned error ${response.status}: ${errorText}`);
+            }
+        } catch (err) {
+            lastError = err;
+            console.warn(`[Groq AI] Exception with model ${model}:`, err.message);
+        }
     }
 
-    const data = await response.json();
-    return data.choices[0].message.content;
+    throw lastError || new Error("All Groq AI models failed");
 };
 
 /**
